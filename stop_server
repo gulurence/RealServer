@@ -1,0 +1,9 @@
+#!/bin/bash
+
+kill -15 `pgrep AllianceServer`
+kill -15 `pgrep AllianceServerC`
+kill -15 `pgrep FriendServer`
+kill -15 `pgrep FriendServerC`
+kill -15 `pgrep GameServer`
+kill -15 `pgrep TransferServer`
+kill -15 `pgrep WorldServer`

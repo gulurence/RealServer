@@ -1,0 +1,37 @@
+#!/bin/bash
+
+echo " ===>>> enter AllianceServer dir"
+cd ./AllianceServer
+clean
+cd ..
+
+echo " ===>>> enter AllianceServerC dir"
+cd ./AllianceServerC
+clean
+cd ..
+
+echo " ===>>> enter FriendServer dir"
+cd ./FriendServer
+clean
+cd ..
+
+echo " ===>>> enter FriendServerC dir"
+cd ./FriendServerC
+clean
+cd ..
+
+echo " ===>>> enter GameServer dir"
+cd ./GameServer
+clean
+cd ..
+
+echo " ===>>> enter TransferServer dir"
+cd ./TransferServer
+clean
+cd ..
+
+echo " ===>>> enter WorldServer dir"
+cd ./WorldServer
+clean
+cd ..
+

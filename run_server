@@ -1,0 +1,31 @@
+#!/bin/bash
+
+cd ./AllianceServer
+./AllianceServer AllianceServer AllianceServer1
+cd ..
+echo "Start AllianceServer1 Ok!"
+
+./AllianceServerC AllianceServerC AllianceServerC
+cd ..
+echo "Start AllianceServerC Ok!"
+
+./FriendServer FriendServer FriendServer1
+cd ..
+echo "Start FriendServer1 Ok!"
+
+./FriendServerC FriendServerC FriendServerC
+cd ..
+echo "Start FriendServerC Ok!"
+
+./GameServer GameServer GameServer1
+cd ..
+echo "Start GameServer1 Ok!"
+
+./TransferServer TransferServer TransferServer
+cd ..
+echo "Start TransferServer Ok!"
+
+./WorldServer WorldServer WorldServer
+cd ..
+echo "Start WorldServer Ok!"
+
