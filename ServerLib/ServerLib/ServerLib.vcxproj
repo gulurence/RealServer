@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{EE8EA014-B38A-46EB-BCB3-46540B727F52}</ProjectGuid>
+    <RootNamespace>ServerLib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>a0_ServerLib</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../xBase/zlib/;../xBase/src/;../xBase/mySQL5.5/;../xBase/databases/;../xBase/des/;../xGameData/;../xGame/;../xConfig/;../xCommand/;../xBase/;../xNet/;../xServer/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\xBase\database\Makefile" />
+    <None Include="..\xBase\des\makefile_d3des" />
+    <None Include="..\xBase\makefile" />
+    <None Include="..\xBase\mySQL5.5\libmysql.dll" />
+    <None Include="..\xBase\zlib\Makefile" />
+    <None Include="..\xBase\zlib\zlib2ansi" />
+    <None Include="..\xCommand\makefile" />
+    <None Include="..\xConfig\makefile" />
+    <None Include="..\xGameData\makefile" />
+    <None Include="..\xGame\makefile" />
+    <None Include="..\xNet\makefile" />
+    <None Include="..\xServer\makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\xBase\database\xDBConnPool.cpp" />
+    <ClCompile Include="..\xBase\des\d3des.c" />
+    <ClCompile Include="..\xBase\src\lapi.c" />
+    <ClCompile Include="..\xBase\src\lauxlib.c" />
+    <ClCompile Include="..\xBase\src\lbaselib.c" />
+    <ClCompile Include="..\xBase\src\lcode.c" />
+    <ClCompile Include="..\xBase\src\ldblib.c" />
+    <ClCompile Include="..\xBase\src\ldebug.c" />
+    <ClCompile Include="..\xBase\src\ldo.c" />
+    <ClCompile Include="..\xBase\src\ldump.c" />
+    <ClCompile Include="..\xBase\src\lfunc.c" />
+    <ClCompile Include="..\xBase\src\lgc.c" />
+    <ClCompile Include="..\xBase\src\linit.c" />
+    <ClCompile Include="..\xBase\src\liolib.c" />
+    <ClCompile Include="..\xBase\src\llex.c" />
+    <ClCompile Include="..\xBase\src\lmathlib.c" />
+    <ClCompile Include="..\xBase\src\lmem.c" />
+    <ClCompile Include="..\xBase\src\loadlib.c" />
+    <ClCompile Include="..\xBase\src\lobject.c" />
+    <ClCompile Include="..\xBase\src\lopcodes.c" />
+    <ClCompile Include="..\xBase\src\loslib.c" />
+    <ClCompile Include="..\xBase\src\lparser.c" />
+    <ClCompile Include="..\xBase\src\lstate.c" />
+    <ClCompile Include="..\xBase\src\lstring.c" />
+    <ClCompile Include="..\xBase\src\lstrlib.c" />
+    <ClCompile Include="..\xBase\src\ltable.c" />
+    <ClCompile Include="..\xBase\src\ltablib.c" />
+    <ClCompile Include="..\xBase\src\ltm.c" />
+    <ClCompile Include="..\xBase\src\lundump.c" />
+    <ClCompile Include="..\xBase\src\lvm.c" />
+    <ClCompile Include="..\xBase\src\lzio.c" />
+    <ClCompile Include="..\xBase\xDBConnPool.cpp" />
+    <ClCompile Include="..\xBase\xExecutionTime.cpp" />
+    <ClCompile Include="..\xBase\xFunctionTime.cpp" />
+    <ClCompile Include="..\xBase\xLog.cpp" />
+    <ClCompile Include="..\xBase\xStringTool.cpp" />
+    <ClCompile Include="..\xBase\xThread.cpp" />
+    <ClCompile Include="..\xBase\xTime.cpp" />
+    <ClCompile Include="..\xBase\xTools.cpp" />
+    <ClCompile Include="..\xBase\xXMLParser.cpp" />
+    <ClCompile Include="..\xBase\zlib\adler32.c" />
+    <ClCompile Include="..\xBase\zlib\compress.c" />
+    <ClCompile Include="..\xBase\zlib\crc32.c" />
+    <ClCompile Include="..\xBase\zlib\deflate.c" />
+    <ClCompile Include="..\xBase\zlib\gzclose.c" />
+    <ClCompile Include="..\xBase\zlib\gzlib.c" />
+    <ClCompile Include="..\xBase\zlib\gzread.c" />
+    <ClCompile Include="..\xBase\zlib\gzwrite.c" />
+    <ClCompile Include="..\xBase\zlib\infback.c" />
+    <ClCompile Include="..\xBase\zlib\inffast.c" />
+    <ClCompile Include="..\xBase\zlib\inflate.c" />
+    <ClCompile Include="..\xBase\zlib\inftrees.c" />
+    <ClCompile Include="..\xBase\zlib\trees.c" />
+    <ClCompile Include="..\xBase\zlib\uncompr.c" />
+    <ClCompile Include="..\xBase\zlib\zutil.c" />
+    <ClCompile Include="..\xNet\xByteBuffer.cpp" />
+    <ClCompile Include="..\xNet\xNetProcessor.cpp" />
+    <ClCompile Include="..\xNet\xSocket.cpp" />
+    <ClCompile Include="..\xServer\xClient.cpp" />
+    <ClCompile Include="..\xServer\xServer.cpp" />
+    <ClCompile Include="..\xServer\xTask.cpp" />
+    <ClCompile Include="..\xServer\ZoneServer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\xBase\database\xDBConnPool.h" />
+    <ClInclude Include="..\xBase\database\xDBMeta.h" />
+    <ClInclude Include="..\xBase\des\d3des.h" />
+    <ClInclude Include="..\xBase\mySQL5.5\mysql.h" />
+    <ClInclude Include="..\xBase\mySQL5.5\mysql_com.h" />
+    <ClInclude Include="..\xBase\mySQL5.5\mysql_time.h" />
+    <ClInclude Include="..\xBase\mySQL5.5\mysql_version.h" />
+    <ClInclude Include="..\xBase\mySQL5.5\my_alloc.h" />
+    <ClInclude Include="..\xBase\mySQL5.5\my_list.h" />
+    <ClInclude Include="..\xBase\mySQL5.5\typelib.h" />
+    <ClInclude Include="..\xBase\src\lapi.h" />
+    <ClInclude Include="..\xBase\src\lauxlib.h" />
+    <ClInclude Include="..\xBase\src\lcode.h" />
+    <ClInclude Include="..\xBase\src\ldebug.h" />
+    <ClInclude Include="..\xBase\src\ldo.h" />
+    <ClInclude Include="..\xBase\src\lfunc.h" />
+    <ClInclude Include="..\xBase\src\lgc.h" />
+    <ClInclude Include="..\xBase\src\llex.h" />
+    <ClInclude Include="..\xBase\src\llimits.h" />
+    <ClInclude Include="..\xBase\src\lmem.h" />
+    <ClInclude Include="..\xBase\src\lobject.h" />
+    <ClInclude Include="..\xBase\src\lopcodes.h" />
+    <ClInclude Include="..\xBase\src\lparser.h" />
+    <ClInclude Include="..\xBase\src\lstate.h" />
+    <ClInclude Include="..\xBase\src\lstring.h" />
+    <ClInclude Include="..\xBase\src\ltable.h" />
+    <ClInclude Include="..\xBase\src\ltm.h" />
+    <ClInclude Include="..\xBase\src\lua.h" />
+    <ClInclude Include="..\xBase\src\luaconf.h" />
+    <ClInclude Include="..\xBase\src\lualib.h" />
+    <ClInclude Include="..\xBase\src\lundump.h" />
+    <ClInclude Include="..\xBase\src\lvm.h" />
+    <ClInclude Include="..\xBase\src\lzio.h" />
+    <ClInclude Include="..\xBase\xDBConnPool.h" />
+    <ClInclude Include="..\xBase\xDBMeta.h" />
+    <ClInclude Include="..\xBase\xDefine.h" />
+    <ClInclude Include="..\xBase\xExecutionTime.h" />
+    <ClInclude Include="..\xBase\xFunctionTime.h" />
+    <ClInclude Include="..\xBase\xLog.h" />
+    <ClInclude Include="..\xBase\xStringTool.h" />
+    <ClInclude Include="..\xBase\xThread.h" />
+    <ClInclude Include="..\xBase\xTime.h" />
+    <ClInclude Include="..\xBase\xTools.h" />
+    <ClInclude Include="..\xBase\xUniqueIDManager.h" />
+    <ClInclude Include="..\xBase\xXMLParser.h" />
+    <ClInclude Include="..\xBase\zlib\crc32.h" />
+    <ClInclude Include="..\xBase\zlib\deflate.h" />
+    <ClInclude Include="..\xBase\zlib\gzguts.h" />
+    <ClInclude Include="..\xBase\zlib\inffast.h" />
+    <ClInclude Include="..\xBase\zlib\inffixed.h" />
+    <ClInclude Include="..\xBase\zlib\inflate.h" />
+    <ClInclude Include="..\xBase\zlib\inftrees.h" />
+    <ClInclude Include="..\xBase\zlib\trees.h" />
+    <ClInclude Include="..\xBase\zlib\zconf.h" />
+    <ClInclude Include="..\xBase\zlib\zlib.h" />
+    <ClInclude Include="..\xBase\zlib\zutil.h" />
+    <ClInclude Include="..\xCommand\LogCmd.h" />
+    <ClInclude Include="..\xCommand\LoginCmd.h" />
+    <ClInclude Include="..\xCommand\SystemCmd.h" />
+    <ClInclude Include="..\xCommand\UserCmd.h" />
+    <ClInclude Include="..\xCommand\xCommand.h" />
+    <ClInclude Include="..\xNet\xByteBuffer.h" />
+    <ClInclude Include="..\xNet\xNetDefine.h" />
+    <ClInclude Include="..\xNet\xNetProcessor.h" />
+    <ClInclude Include="..\xNet\xSocket.h" />
+    <ClInclude Include="..\xServer\xClient.h" />
+    <ClInclude Include="..\xServer\xServer.h" />
+    <ClInclude Include="..\xServer\xSignal.h" />
+    <ClInclude Include="..\xServer\xState.h" />
+    <ClInclude Include="..\xServer\xStateMachine.h" />
+    <ClInclude Include="..\xServer\xTask.h" />
+    <ClInclude Include="..\xServer\ZoneServer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\xBase\mySQL5.5\libmySQL.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
