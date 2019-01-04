@@ -11,10 +11,10 @@
             <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
             <param name="TimeZone" value="GMT-8"/>
         </layout>
-    </appender>                    
+    </appender>
 
-    <appender name="GateServer1" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="./tmp/GateServer1.log"/>
+    <appender name="GameServer1" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="./tmp/GameServer1.log"/>
         <param name="MaxBackupIndex" value="10"/>
         <param name="MaxFileSize" value="256000000"/>
         <param name="Append" value="true"/>
@@ -22,10 +22,30 @@
             <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
             <param name="TimeZone" value="GMT-8"/>
         </layout>
-    </appender>             
+    </appender>
+  <appender name="GameServer2" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="./tmp/GameServer2.log"/>
+    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxFileSize" value="256000000"/>
+    <param name="Append" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+      <param name="TimeZone" value="GMT-8"/>
+    </layout>
+  </appender>
+  <appender name="GameServer3" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="./tmp/GameServer3.log"/>
+    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxFileSize" value="256000000"/>
+    <param name="Append" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+      <param name="TimeZone" value="GMT-8"/>
+    </layout>
+  </appender>
    
-    <appender name="RecordServer" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="./tmp/RecordServer.log"/>
+    <appender name="WorldServer1" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="./tmp/WorldServer1.log"/>
         <param name="MaxBackupIndex" value="10"/>
         <param name="MaxFileSize" value="256000000"/>
         <param name="Append" value="true"/>
@@ -33,54 +53,30 @@
             <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
             <param name="TimeZone" value="GMT-8"/>
         </layout>
-    </appender>                    
+    </appender>
+  <appender name="WorldServer2" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="./tmp/WorldServer2.log"/>
+    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxFileSize" value="256000000"/>
+    <param name="Append" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+      <param name="TimeZone" value="GMT-8"/>
+    </layout>
+  </appender>
+  <appender name="WorldServer3" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="./tmp/WorldServer3.log"/>
+    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxFileSize" value="256000000"/>
+    <param name="Append" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+      <param name="TimeZone" value="GMT-8"/>
+    </layout>
+  </appender>
 
-    <appender name="RegServer" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="./tmp/RegServer.log"/>
-        <param name="MaxBackupIndex" value="10"/>
-        <param name="MaxFileSize" value="256000000"/>
-        <param name="Append" value="true"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
-            <param name="TimeZone" value="GMT-8"/>
-        </layout>
-    </appender>                    
-
-    <appender name="LogServer" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="./tmp/LogServer.log"/>
-        <param name="MaxBackupIndex" value="10"/>
-        <param name="MaxFileSize" value="256000000"/>
-        <param name="Append" value="true"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
-            <param name="TimeZone" value="GMT-8"/>
-        </layout>
-    </appender>                    
-
-    <appender name="SuperServer" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="./tmp/SuperServer.log"/>
-        <param name="MaxBackupIndex" value="10"/>
-        <param name="MaxFileSize" value="256000000"/>
-        <param name="Append" value="true"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
-            <param name="TimeZone" value="GMT-8"/>
-        </layout>
-    </appender>                    
-
-    <appender name="SessionServer" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="./tmp/SessionServer.log"/>
-        <param name="MaxBackupIndex" value="10"/>
-        <param name="MaxFileSize" value="256000000"/>
-        <param name="Append" value="true"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
-            <param name="TimeZone" value="GMT-8"/>
-        </layout>
-    </appender>                    
-
-    <appender name="SceneServer1" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="./tmp/SceneServer1.log"/>
+    <appender name="FriendServerC" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="./tmp/FriendServerC.log"/>
         <param name="MaxBackupIndex" value="10"/>
         <param name="MaxFileSize" value="256000000"/>
         <param name="Append" value="true"/>
@@ -90,8 +86,8 @@
         </layout>
     </appender>
 
-    <appender name="SceneServer1_talk" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="./tmp/SceneServer1_Talk.log"/>
+    <appender name="FriendServer1" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="./tmp/FriendServer1.log"/>
         <param name="MaxBackupIndex" value="10"/>
         <param name="MaxFileSize" value="256000000"/>
         <param name="Append" value="true"/>
@@ -99,10 +95,30 @@
             <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
             <param name="TimeZone" value="GMT-8"/>
         </layout>
-    </appender>                    
+    </appender>
+  <appender name="FriendServer2" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="./tmp/FriendServer2.log"/>
+    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxFileSize" value="256000000"/>
+    <param name="Append" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+      <param name="TimeZone" value="GMT-8"/>
+    </layout>
+  </appender>
+  <appender name="FriendServer3" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="./tmp/FriendServer3.log"/>
+    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxFileSize" value="256000000"/>
+    <param name="Append" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+      <param name="TimeZone" value="GMT-8"/>
+    </layout>
+  </appender>
 
-    <appender name="SceneServerQuest1" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="./tmp/SceneServerQuest1.log"/>
+    <appender name="AllianceServerC" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="./tmp/AllianceServerC.log"/>
         <param name="MaxBackupIndex" value="10"/>
         <param name="MaxFileSize" value="256000000"/>
         <param name="Append" value="true"/>
@@ -112,51 +128,148 @@
         </layout>
     </appender>
 
-    <logger name="GateServer1" additivity="false">
+    <appender name="AllianceServer1" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="./tmp/AllianceServer1.log"/>
+        <param name="MaxBackupIndex" value="10"/>
+        <param name="MaxFileSize" value="256000000"/>
+        <param name="Append" value="true"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+            <param name="TimeZone" value="GMT-8"/>
+        </layout>
+    </appender>
+  <appender name="AllianceServer2" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="./tmp/AllianceServer2.log"/>
+    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxFileSize" value="256000000"/>
+    <param name="Append" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+      <param name="TimeZone" value="GMT-8"/>
+    </layout>
+  </appender>
+  <appender name="AllianceServer3" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="./tmp/AllianceServer3.log"/>
+    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxFileSize" value="256000000"/>
+    <param name="Append" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+      <param name="TimeZone" value="GMT-8"/>
+    </layout>
+  </appender>
+
+  <appender name="TransferServer" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="./tmp/TransferServer.log"/>
+        <param name="MaxBackupIndex" value="10"/>
+        <param name="MaxFileSize" value="256000000"/>
+        <param name="Append" value="true"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+            <param name="TimeZone" value="GMT-8"/>
+        </layout>
+    </appender>
+
+  <appender name="RegServer" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="./tmp/RegServer.log"/>
+    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxFileSize" value="256000000"/>
+    <param name="Append" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+      <param name="TimeZone" value="GMT-8"/>
+    </layout>
+  </appender>
+
+  <appender name="LoginServer" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="./tmp/LoginServer.log"/>
+    <param name="MaxBackupIndex" value="10"/>
+    <param name="MaxFileSize" value="256000000"/>
+    <param name="Append" value="true"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %t %-5p %c - %m%n"/>
+      <param name="TimeZone" value="GMT-8"/>
+    </layout>
+  </appender>
+  
+    <logger name="GameServer1" additivity="false">
         <level value="debug"/>
-        <appender-ref ref="GateServer1" />
-    </logger> 
-   <logger name="RecordServer" additivity="false">
+        <appender-ref ref="GameServer1" />
+    </logger>
+  <logger name="GameServer2" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="GameServer2" />
+  </logger>
+  <logger name="GameServer3" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="GameServer3" />
+  </logger>
+  
+  <logger name="WorldServer1" additivity="false">
         <level value="debug"/>
-        <appender-ref ref="RecordServer" />
+        <appender-ref ref="WorldServer1" />
+    </logger>
+  <logger name="WorldServer2" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="WorldServer2" />
+  </logger>
+  <logger name="WorldServer3" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="WorldServer3" />
+  </logger>
+
+  <logger name="FriendServerC" additivity="false">
+        <level value="debug"/>
+        <appender-ref ref="FriendServerC" />
     </logger> 
 
-    <logger name="RegServer" additivity="false">
+    <logger name="FriendServer1" additivity="false">
         <level value="debug"/>
-        <appender-ref ref="RegServer" />
+        <appender-ref ref="FriendServer1" />
+    </logger>
+  <logger name="FriendServer2" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="FriendServer2" />
+  </logger>
+  <logger name="FriendServer3" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="FriendServer3" />
+  </logger>
+
+  <logger name="AllianceServerC" additivity="false">
+        <level value="debug"/>
+        <appender-ref ref="AllianceServerC" />
     </logger> 
 
-    <logger name="LogServer" additivity="false">
+    <logger name="AllianceServer1" additivity="false">
         <level value="debug"/>
-        <appender-ref ref="LogServer" />
-    </logger> 
+        <appender-ref ref="AllianceServer1" />
+    </logger>
+  <logger name="AllianceServer2" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="AllianceServer2" />
+  </logger>
+  <logger name="AllianceServer3" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="AllianceServer3" />
+  </logger>
 
-    <logger name="SessionServer" additivity="false">
+  <logger name="TransferServer" additivity="false">
         <level value="debug"/>
-        <appender-ref ref="SessionServer" />
-    </logger> 
+        <appender-ref ref="TransferServer" />
+    </logger>
 
-    <logger name="SuperServer" additivity="false">
-        <level value="debug"/>
-        <appender-ref ref="SuperServer" />
-    </logger> 
+  <logger name="RegServer" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="RegServer" />
+  </logger>
 
-    <logger name="SceneServer1" additivity="false">
-        <level value="debug"/>
-        <appender-ref ref="SceneServer1" />
-    </logger> 
-
-    <logger name="SceneServerQuest1" additivity="false">
-        <level value="debug"/>
-        <appender-ref ref="SceneServerQuest1" />
-    </logger> 
-
-    <logger name="SceneServer1_talk" additivity="false">
-        <level value="debug"/>
-        <appender-ref ref="SceneServer1_talk" />
-    </logger> 
- 
-    <root>
+  <logger name="LoginServer" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="LoginServer" />
+  </logger>
+  
+  <root>
         <priority value ="debug" />
         <appender-ref ref="NULL" />
     </root>

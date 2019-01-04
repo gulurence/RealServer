@@ -7,3 +7,9 @@ kill -15 `pgrep FriendServerC`
 kill -15 `pgrep GameServer`
 kill -15 `pgrep TransferServer`
 kill -15 `pgrep WorldServer`
+kill -15 `pgrep RegServer`
+kill -15 `pgrep LoginServer`
+
+
+ps -aux|grep Server
+

@@ -2,36 +2,45 @@
 
 echo " ===>>> enter AllianceServer dir"
 cd ./AllianceServer
-clean
+make clean
 cd ..
 
 echo " ===>>> enter AllianceServerC dir"
 cd ./AllianceServerC
-clean
+make clean
 cd ..
 
 echo " ===>>> enter FriendServer dir"
 cd ./FriendServer
-clean
+make clean
 cd ..
 
 echo " ===>>> enter FriendServerC dir"
 cd ./FriendServerC
-clean
+make clean
 cd ..
 
 echo " ===>>> enter GameServer dir"
 cd ./GameServer
-clean
+make clean
 cd ..
 
 echo " ===>>> enter TransferServer dir"
 cd ./TransferServer
-clean
+make clean
 cd ..
 
 echo " ===>>> enter WorldServer dir"
 cd ./WorldServer
-clean
+make clean
 cd ..
 
+echo " ===>>> enter RegServer dir"
+cd ./RegServer
+make clean
+cd ..
+
+echo " ===>>> enter LoginServer dir"
+cd ./LoginServer
+make clean
+cd ..

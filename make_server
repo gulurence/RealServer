@@ -35,3 +35,13 @@ cd ./WorldServer
 make
 cd ..
 
+echo " ===>>> enter RegServer dir"
+cd ./RegServer
+make
+cd ..
+
+echo " ===>>> enter LoginServer dir"
+cd ./LoginServer
+make
+cd ..
+

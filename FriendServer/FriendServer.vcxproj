@@ -11,10 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Makefile" />
     <None Include="src\Makefile" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\test.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="config.xml" />
+    <Xml Include="log.xml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9F338FAF-6E77-4394-9BFB-3459A57337F2}</ProjectGuid>
