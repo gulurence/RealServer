@@ -58,7 +58,11 @@ void xLog::debug(const char* format, ...) {
 }
 
 bool xLog::isDebug() {
-    //return (m_logger->getLevel() == Level::getDebug());
+
+#ifndef _WINDOWS
+    return (m_logger->getLevel() == Level::getDebug());
+#endif
+
     return true;
 }
 
@@ -66,25 +70,43 @@ void xLog::_log(int logLevel, const char* format, va_list args) {
     char message[20480];
     size_t dataLen = vsnprintf(message, sizeof(message) - 1, format, args);
     if (dataLen >= sizeof(message) - 1) {
-        //m_logger->warn(("truncating part of log message."));
+
+
+#ifndef _WINDOWS
+        m_logger->warn(("truncating part of log message."));
+#else
         printf(("truncating part of log message."));
+#endif
+
     }
     switch (logLevel) {
     case LOG_LEVEL_DEBUG:
-        //m_logger->debug((message));
+#ifndef _WINDOWS
+        m_logger->debug((message));
+#else
         printf("[DEBUG] %s \n", message);
+#endif
         break;
     case LOG_LEVEL_INFO:
-        //m_logger->info((message));
+#ifndef _WINDOWS
+        m_logger->info((message));
+#else
         printf("[INFO] %s \n", message);
+#endif
         break;
     case LOG_LEVEL_WARN:
-       // m_logger->warn((message));
+#ifndef _WINDOWS
+        m_logger->warn((message));
+#else
         printf("[WARN] %s \n", message);
+#endif
         break;
     case LOG_LEVEL_ERROR:
-        //m_logger->error((message));
+#ifndef _WINDOWS
+        m_logger->error((message));
+#else
         printf("[ERROR] %s \n", message);
+#endif
         break;
     default:
         break;
@@ -92,32 +114,43 @@ void xLog::_log(int logLevel, const char* format, va_list args) {
 }
 
 void xLog::config(const string& configFile) {
-    //xml::DOMConfigurator::configureAndWatch(configFile);
+
+#ifndef _WINDOWS
+    xml::DOMConfigurator::configureAndWatch(configFile);
+#endif
+
 }
 
 int xLog::getLevel()
 {
-//     if(m_logger->getParent()->getLevel() == NULL ){
-//         return 0;
-//     }
-//     if(m_logger->getParent()->getLevel()->equals(Level::getDebug()))
-//         return LOG_LEVEL_DEBUG;
-//     else if (m_logger->getParent()->getLevel()->equals(Level::getInfo()))
-//         return LOG_LEVEL_INFO;
-//     else if (m_logger->getParent()->getLevel()->equals(Level::getWarn()))
-//         return LOG_LEVEL_WARN;
-//     else if (m_logger->getParent()->getLevel()->equals(Level::getError()))
-//         return LOG_LEVEL_ERROR;
-//     else 
-//         return LOG_LEVEL_FATAL;
+
+#ifndef _WINDOWS
+    if (m_logger->getParent()->getLevel() == NULL) {
+        return 0;
+    }
+    if (m_logger->getParent()->getLevel()->equals(Level::getDebug()))
+        return LOG_LEVEL_DEBUG;
+    else if (m_logger->getParent()->getLevel()->equals(Level::getInfo()))
+        return LOG_LEVEL_INFO;
+    else if (m_logger->getParent()->getLevel()->equals(Level::getWarn()))
+        return LOG_LEVEL_WARN;
+    else if (m_logger->getParent()->getLevel()->equals(Level::getError()))
+        return LOG_LEVEL_ERROR;
+    else
+        return LOG_LEVEL_FATAL;
+#endif
     return 0;
 }
 
 xLog::xLog(const char* moduleName) {
-//  setlocale(LC_ALL, "");
-//  xLog::config("./log.xml");
-//     m_logger = Logger::getLogger((moduleName));
-//     m_bufSize = BUF_SIZE;
+
+#ifndef _WINDOWS
+    setlocale(LC_ALL, "");
+    xLog::config("./log.xml");
+    m_logger = Logger::getLogger((moduleName));
+    m_bufSize = BUF_SIZE;
+#endif
+
 }
 
 xLog::~xLog() 

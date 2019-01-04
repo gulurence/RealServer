@@ -18,6 +18,7 @@
 		<server type="RegServer" name="RegServer" ip="219.235.1.239" port="21001" portClient="21000"/>
 		<mysql server="219.235.1.239" user="root" password="gmy369" database="act_platform_new"/>
 	</ServerList>
+
 	<GameServer>
 		<mysql server="219.235.1.239" user="root" password="gmy369" database="act_user_data_new" maxConn="5"/>
 	</GameServer>
@@ -35,7 +36,8 @@
 	</AllianceServerC>
 	<AllianceServer>
 		<mysql server="219.235.1.239" user="root" password="gmy369" database="act_user_data_new" maxConn="1"/>
-	</AllianceServer>	
+	</AllianceServer>
+
    <LogServer>
       <mysql server="219.235.1.239" user="6kyo" password="6kyo1qaz@WSX#EDC" database="qjfml_log" maxConn="5"/>
    </LogServer>

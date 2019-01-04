@@ -86,6 +86,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../xBase/zlib/;../xBase/src/;../xBase/mySQL5.5/;../xBase/databases/;../xBase/des/;../xGameData/;../xGame/;../xConfig/;../xCommand/;../xBase/;../xNet/;../xServer/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,6 +118,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\..\clean_server" />
+    <None Include="..\..\make_server" />
+    <None Include="..\..\run_server" />
+    <None Include="..\..\stop_server" />
     <None Include="..\xBase\database\Makefile" />
     <None Include="..\xBase\des\makefile_d3des" />
     <None Include="..\xBase\makefile" />

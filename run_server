@@ -2,30 +2,55 @@
 
 cd ./AllianceServer
 ./AllianceServer AllianceServer AllianceServer1
+./AllianceServer AllianceServer AllianceServer2
+./AllianceServer AllianceServer AllianceServer3
 cd ..
 echo "Start AllianceServer1 Ok!"
 
+cd ./AllianceServerC
 ./AllianceServerC AllianceServerC AllianceServerC
 cd ..
 echo "Start AllianceServerC Ok!"
 
+cd ./FriendServer
 ./FriendServer FriendServer FriendServer1
+./FriendServer FriendServer FriendServer2
+./FriendServer FriendServer FriendServer3
 cd ..
 echo "Start FriendServer1 Ok!"
 
+cd ./FriendServerC
 ./FriendServerC FriendServerC FriendServerC
 cd ..
 echo "Start FriendServerC Ok!"
 
+cd ./GameServer
 ./GameServer GameServer GameServer1
+./GameServer GameServer GameServer2
+./GameServer GameServer GameServer3
 cd ..
 echo "Start GameServer1 Ok!"
 
+cd ./TransferServer
 ./TransferServer TransferServer TransferServer
 cd ..
 echo "Start TransferServer Ok!"
 
-./WorldServer WorldServer WorldServer
+cd ./WorldServer
+./WorldServer WorldServer WorldServer1
+./WorldServer WorldServer WorldServer2
+./WorldServer WorldServer WorldServer3
 cd ..
 echo "Start WorldServer Ok!"
+
+cd ./RegServer
+./RegServer RegServer RegServer
+cd ..
+echo "Start RegServer Ok!"
+
+cd ./LoginServer
+./LoginServer LoginServer LoginServer
+cd ..
+echo "Start LoginServer Ok!"
+
 

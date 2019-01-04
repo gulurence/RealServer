@@ -1,6 +1,5 @@
 #include "ZoneServer.h"
 
-string gStrCurServer;
 
 class MyServer : public ZoneServer
 {
@@ -13,22 +12,15 @@ public:
 public:
     bool init() {
         // 会和当前进程建立连接的所有服务器
-        setConnectServerType("SuperServer");
-        setConnectServerType("SessionServer");
-        setConnectServerType("RecordServer");
-        setConnectServerType("GateServer");
-        setConnectServerType("LogServer");
+        setConnectServerType("AllianceServerC");
 
-//         if (!SceneConfig::getMe().init())
-//             return false;
-//         if (!MassiveConfig::getMe().loadConfig())
-//             return false;
-//         if (!EquipConfig::getMe().loadConfig())
-//             return false;
-//         if (!EquipConfig::getMe().loadStrConfig())
-//             return false;
-//         if (!CityConfig::getMe().loadConfig())
-//             return false;
+        // 配置文件初始化
+
+        // TODO
+
+        // 逻辑系统初始化
+
+        // TODO
 
         return true;
     }
@@ -37,32 +29,12 @@ public:
         // 需要自己主动连接的服务器
         bool ret = true;
         UInt32 st = time(NULL);
+        
 
-        if ("GateServer" == gStrCurServer) {
-
-            if (!checkConnectedServer("SessionServer"))
-                if (!connectServerByType("SessionServer"))
-                    ret = false;
-        }
-
-
-//         if (!checkConnectedServer("SuperServer"))
-//             if (!connectServerByType("SuperServer"))
-//                 ret = false;
-// 
-//         if (!checkConnectedServer("SessionServer"))
-//             if (!connectServerByType("SessionServer"))
-//                 ret = false;
-// 
-//         if (!checkConnectedServer("RecordServer"))
-//             if (!connectServerByType("RecordServer"))
-//                 ret = false;
-// 
-//         if (!checkConnectedServer("LogServer"))
-//             if (!connectServerByType("LogServer"))
-//                 ret = false;
-
-        //checkGateServer();
+        if (!checkConnectedServer("AllianceServerC"))
+            if (!connectServerByType("AllianceServerC"))
+                ret = false;
+        
 
         return true;
     }
@@ -70,20 +42,12 @@ public:
     virtual void v_closeServer(xNetProcessor *np) {
         if (!np)
             return;
-        if (strcmp(np->name, "SessionServer") == 0) {
-            server_stop();
+       
+        if (strcmp(np->name, "AllianceServerC") == 0) {
+            // 处理Server断开之后的逻辑
         }
-        else if (strcmp(np->name, "SuperServer") == 0) {
 
-        }
-        else if (strcmp(np->name, "RecordServer") == 0) {
-
-        }
-//         else if (strncmp(np->name, "GateServer", 10) == 0) {
-//             pthread_rwlock_wrlock(&SceneUserManager::getMe().delgate_cirtical);
-//             SceneUserManager::getMe().addOfflineGateCount();
-//             pthread_rwlock_unlock(&SceneUserManager::getMe().delgate_cirtical);
-//         }
+        // ... .. .
     }
 
     virtual bool v_processCmd(string serverName, xNetProcessor *np, unsigned char *buf, unsigned short len) {
@@ -102,7 +66,10 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    gStrCurServer = argv[1];
+#ifndef _WINDOWS
+    daemon(1, 1);
+#endif
+
 
     MyServer *myServer = new MyServer(argv[1], argv[2]);
     myServer->run();
