@@ -1,4 +1,5 @@
 #include "ZoneServer.h"
+#include "xBalanceMgr.h"
 
 
 class MyServer : public ZoneServer
@@ -27,23 +28,49 @@ public:
         return true;
     }
 
+    virtual bool verifyServer(xNetProcessor *np, const char *t, const char *n) {
+        // 如果服务器连接成功 加入负载列表
+        if (ZoneServer::verifyServer(np, t, n)) {
+            BalanceNodeST *pNode = new BalanceNodeST();
+            pNode->eState = eBalanceNodeState_Disconnect;
+            pNode->strServerType = t ? t : "";
+            pNode->strServerName = n ? n : "";
+            pNode->u32CurRunCount = 0;
+            pNode->u32MaxRunCount = 500;
+            pNode->pNet = (void*)np;
+            if (!BalanceMgrInst::singleton()->addBalanceNode(pNode)) {
+                delete pNode;
+                XERR("add server to balance error [%s,%s] !!!",t?t:"" , n?n:"");
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     virtual bool checkConnect() {
         // 需要自己主动连接的服务器
         bool ret = true;
-        UInt32 st = time(NULL);
+        //UInt32 st = time(NULL);
         
 
         if (!checkConnectedServer("RegServer"))
             if (!connectServerByType("RegServer"))
                 ret = false;
-        
 
-        return true;
+        return ret;
     }
 
     virtual void v_closeServer(xNetProcessor *np) {
         if (!np)
             return;
+
+        // 删除掉负载节点
+        if (!BalanceMgrInst::singleton()->removeBalanceNode(np)) {
+            XERR("remove server to balance error [%s] !!!", np->name);
+        }
 
         if (strcmp(np->name, "RegServer") == 0) {
             // 断开逻辑处理

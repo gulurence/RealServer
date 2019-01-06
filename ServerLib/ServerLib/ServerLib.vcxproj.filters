@@ -270,6 +270,9 @@
     <ClCompile Include="..\xBase\zlib\zutil.c">
       <Filter>xBase\zlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\xServer\xBalanceMgr.cpp">
+      <Filter>xServer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\xServer\xClient.h">
@@ -487,6 +490,21 @@
     </ClInclude>
     <ClInclude Include="..\xCommand\xCommand.h">
       <Filter>xCommand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xBase\xSingletonTemplate.h">
+      <Filter>xBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xBase\xPoolBase.h">
+      <Filter>xBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xServer\xBalanceMgr.h">
+      <Filter>xServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xBase\xSimpleAllocator.h">
+      <Filter>xBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xBase\xSynlock.h">
+      <Filter>xBase</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@ void xNetProcessor::setName(const char *n)
     bzero(name, sizeof(name));
     if (n)
     {
-        strncpy(name, n, MAX_NAMESIZE);
+        strncpy(name, n, MAX_NAMESIZE-1);
     }
 }
 

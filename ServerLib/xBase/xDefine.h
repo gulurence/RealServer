@@ -10,17 +10,31 @@
 
 
 
-/*
-typedef char Int8;
-typedef short Int16;
-typedef int Int32;
-typedef long long Int64;
+#ifdef _WINDOWS
 
-typedef unsigned char UInt8;
-typedef unsigned short UInt16;
-typedef unsigned int UInt32;
-typedef unsigned long long UInt64;
-*/
+typedef char        int8;
+typedef short       int16;
+typedef int         int32;
+typedef long long   int64;
+
+typedef unsigned char       uint8;
+typedef unsigned short      uint16;
+typedef unsigned int        uint32;
+typedef unsigned long long  uint64;
+
+#else
+
+typedef char    int8;
+typedef short   int16;
+typedef int     int32;
+typedef long    int64;
+
+typedef unsigned char   uint8;
+typedef unsigned short  uint16;
+typedef unsigned int    uint32;
+typedef unsigned long   uint64;
+
+#endif
 
 
 
@@ -231,6 +245,11 @@ enum eRandomNameCode{
 
 #include "xLog.h"
 #include <string.h>
+#include <map>
+#include <string>
+#include <list>
 //#include <stdlib.h>
+
+using namespace std;
 
 #endif

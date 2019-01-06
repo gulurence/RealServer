@@ -104,4 +104,32 @@ struct ServerCloseSysCmd:public SystemCmd{
     }
 };
 
+// 最大的消息长度
+const uint32 CONST_SERVER_TRANSFER_MAX_LEN = 65535;
+//服务器间的消息透传
+#define SERVER_TRANSFER_SYSCMD 10
+struct ServerTransferSysCmd :public SystemCmd
+{
+    ServerTransferSysCmd() :SystemCmd(SERVER_TRANSFER_SYSCMD) {
+
+    }
+
+    uint32 targetServerTypsId = 0;
+    uint32 cmdLen = 0;
+    char arrData[CONST_SERVER_TRANSFER_MAX_LEN] = {0};
+
+    void clean() {
+        cmdLen = 0;
+        targetServerTypsId = 0;
+    }
+
+    uint32 getLen() {
+        if (CONST_SERVER_TRANSFER_MAX_LEN < cmdLen) {
+            cmdLen = CONST_SERVER_TRANSFER_MAX_LEN;
+        }
+
+        return reinterpret_cast<char *>(arrData + cmdLen) - reinterpret_cast<char *>(this);
+    }
+};
+
 #pragma pack()

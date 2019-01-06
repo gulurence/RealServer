@@ -70,13 +70,17 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../xBase/zlib/;../xBase/src/;../xBase/mySQL5.5/;../xBase/databases/;../xBase/des/;../xGameData/;../xGame/;../xConfig/;../xCommand/;../xBase/;../xNet/;../xServer/;</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -194,6 +198,7 @@
     <ClCompile Include="..\xNet\xByteBuffer.cpp" />
     <ClCompile Include="..\xNet\xNetProcessor.cpp" />
     <ClCompile Include="..\xNet\xSocket.cpp" />
+    <ClCompile Include="..\xServer\xBalanceMgr.cpp" />
     <ClCompile Include="..\xServer\xClient.cpp" />
     <ClCompile Include="..\xServer\xServer.cpp" />
     <ClCompile Include="..\xServer\xTask.cpp" />
@@ -239,7 +244,11 @@
     <ClInclude Include="..\xBase\xExecutionTime.h" />
     <ClInclude Include="..\xBase\xFunctionTime.h" />
     <ClInclude Include="..\xBase\xLog.h" />
+    <ClInclude Include="..\xBase\xPoolBase.h" />
+    <ClInclude Include="..\xBase\xSimpleAllocator.h" />
+    <ClInclude Include="..\xBase\xSingletonTemplate.h" />
     <ClInclude Include="..\xBase\xStringTool.h" />
+    <ClInclude Include="..\xBase\xSynlock.h" />
     <ClInclude Include="..\xBase\xThread.h" />
     <ClInclude Include="..\xBase\xTime.h" />
     <ClInclude Include="..\xBase\xTools.h" />
@@ -265,6 +274,7 @@
     <ClInclude Include="..\xNet\xNetDefine.h" />
     <ClInclude Include="..\xNet\xNetProcessor.h" />
     <ClInclude Include="..\xNet\xSocket.h" />
+    <ClInclude Include="..\xServer\xBalanceMgr.h" />
     <ClInclude Include="..\xServer\xClient.h" />
     <ClInclude Include="..\xServer\xServer.h" />
     <ClInclude Include="..\xServer\xSignal.h" />

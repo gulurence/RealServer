@@ -93,7 +93,8 @@ void ListenThread::thread_proc()
 {
     XLOG("[%s]start", name);
 
-    int cfd=0, nfds=0;
+    int cfd = 0;
+    //int nfds = 0;
     sockaddr_in caddr;
     int addrlen=sizeof(caddr);
 

@@ -8,7 +8,7 @@ DEBUG_CXXLFLAGS =${MYLIB} -L/usr/lib64/ -lX -lxml2 -lpthread -lmysqlclient -llog
 
 DIST_CXXFLAGS =-I./ -I../ -I../base -I../util -I../base/recastnavigation/Recast/Include -I../base/recastnavigation/Detour/Include -I../Command -I/usr/include/libxml2 -I/usr/local/mysql5.6/include/ -Wall -Wno-unknown-pragmas --std=c++0x -Wno-deprecated -g3 #-O2 优化暂不打开
 DIST_CXXLFLAGS =-L/usr/lib64/ -lX -lxml2 -lpthread -lmysqlclient -llog4cxx -lboost_regex -lrt
-BASE_OBJECTS =xTask.o xClient.o xServer.o ZoneServer.o
+BASE_OBJECTS =xTask.o xClient.o xServer.o ZoneServer.o xBalanceMgr.o
 BINPATH=../../lib/libXServer/
 TARGET = $(BINPATH)libXServer.a
 .PHONY : all

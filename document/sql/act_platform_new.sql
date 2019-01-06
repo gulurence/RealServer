@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50724
 File Encoding         : 65001
 
-Date: 2019-01-04 20:23:24
+Date: 2019-01-06 22:55:17
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -149,7 +149,8 @@ CREATE TABLE `nameused` (
 DROP TABLE IF EXISTS `serverlist`;
 CREATE TABLE `serverlist` (
   `zoneid` int(10) unsigned NOT NULL,
-  `servertype` varchar(32) NOT NULL,
+  `servertypeid` int(10) NOT NULL COMMENT '路由表ID',
+  `servertype` varchar(30) NOT NULL,
   `servername` varchar(32) NOT NULL,
   `ip` varchar(32) NOT NULL,
   `port` int(10) unsigned NOT NULL,
@@ -161,23 +162,23 @@ CREATE TABLE `serverlist` (
 -- ----------------------------
 -- Records of serverlist
 -- ----------------------------
-INSERT INTO serverlist VALUES ('1', 'WorldServer', 'WorldServer1', '219.235.1.239', '20000', '219.235.1.239', '21000');
-INSERT INTO serverlist VALUES ('1', 'WorldServer', 'WorldServer2', '219.235.1.239', '20001', '219.235.1.239', '21001');
-INSERT INTO serverlist VALUES ('1', 'WorldServer', 'WorldServer3', '219.235.1.239', '20002', '219.235.1.239', '21002');
-INSERT INTO serverlist VALUES ('1', 'GameServer', 'GameServer1', '219.235.1.239', '20100', '219.235.1.239', '21100');
-INSERT INTO serverlist VALUES ('1', 'GameServer', 'GameServer2', '219.235.1.239', '20101', '219.235.1.239', '21101');
-INSERT INTO serverlist VALUES ('1', 'GameServer', 'GameServer3', '219.235.1.239', '20102', '219.235.1.239', '21102');
-INSERT INTO serverlist VALUES ('1', 'FriendServerC', 'FriendServerC', '219.235.1.239', '20200', '219.235.1.239', '21200');
-INSERT INTO serverlist VALUES ('1', 'FriendServer', 'FriendServer1', '219.235.1.239', '20201', '219.235.1.239', '21201');
-INSERT INTO serverlist VALUES ('1', 'FriendServer', 'FriendServer2', '219.235.1.239', '20202', '219.235.1.239', '21202');
-INSERT INTO serverlist VALUES ('1', 'FriendServer', 'FriendServer3', '219.235.1.239', '20203', '219.235.1.239', '21203');
-INSERT INTO serverlist VALUES ('1', 'AllianceServerC', 'AllianceServerC', '219.235.1.239', '20300', '219.235.1.239', '21300');
-INSERT INTO serverlist VALUES ('1', 'AllianceServer', 'AllianceServer1', '219.235.1.239', '20301', '219.235.1.239', '21301');
-INSERT INTO serverlist VALUES ('1', 'AllianceServer', 'AllianceServer2', '219.235.1.239', '20302', '219.235.1.239', '21302');
-INSERT INTO serverlist VALUES ('1', 'AllianceServer', 'AllianceServer3', '219.235.1.239', '20303', '219.235.1.239', '21303');
-INSERT INTO serverlist VALUES ('1', 'TransferServer', 'TransferServer', '219.235.1.239', '20900', '219.235.1.239', '21900');
-INSERT INTO serverlist VALUES ('1', 'LoginServer', 'LoginServer', '219.235.1.239', '20901', '219.235.1.239', '21901');
-INSERT INTO serverlist VALUES ('1', 'RegServer', 'RegServer', '219.235.1.239', '20902', '219.235.1.239', '21902');
+INSERT INTO serverlist VALUES ('1', '7000', 'WorldServer', 'WorldServer1', '219.235.1.239', '20000', '219.235.1.239', '21000');
+INSERT INTO serverlist VALUES ('1', '7000', 'WorldServer', 'WorldServer2', '219.235.1.239', '20001', '219.235.1.239', '21001');
+INSERT INTO serverlist VALUES ('1', '7000', 'WorldServer', 'WorldServer3', '219.235.1.239', '20002', '219.235.1.239', '21002');
+INSERT INTO serverlist VALUES ('1', '6000', 'GameServer', 'GameServer1', '219.235.1.239', '20100', '219.235.1.239', '21100');
+INSERT INTO serverlist VALUES ('1', '6000', 'GameServer', 'GameServer2', '219.235.1.239', '20101', '219.235.1.239', '21101');
+INSERT INTO serverlist VALUES ('1', '6000', 'GameServer', 'GameServer3', '219.235.1.239', '20102', '219.235.1.239', '21102');
+INSERT INTO serverlist VALUES ('1', '5', 'FriendServerC', 'FriendServerC', '219.235.1.239', '20200', '219.235.1.239', '21200');
+INSERT INTO serverlist VALUES ('1', '5000', 'FriendServer', 'FriendServer1', '219.235.1.239', '20201', '219.235.1.239', '21201');
+INSERT INTO serverlist VALUES ('1', '5000', 'FriendServer', 'FriendServer2', '219.235.1.239', '20202', '219.235.1.239', '21202');
+INSERT INTO serverlist VALUES ('1', '5000', 'FriendServer', 'FriendServer3', '219.235.1.239', '20203', '219.235.1.239', '21203');
+INSERT INTO serverlist VALUES ('1', '4', 'AllianceServerC', 'AllianceServerC', '219.235.1.239', '20300', '219.235.1.239', '21300');
+INSERT INTO serverlist VALUES ('1', '4000', 'AllianceServer', 'AllianceServer1', '219.235.1.239', '20301', '219.235.1.239', '21301');
+INSERT INTO serverlist VALUES ('1', '4000', 'AllianceServer', 'AllianceServer2', '219.235.1.239', '20302', '219.235.1.239', '21302');
+INSERT INTO serverlist VALUES ('1', '4000', 'AllianceServer', 'AllianceServer3', '219.235.1.239', '20303', '219.235.1.239', '21303');
+INSERT INTO serverlist VALUES ('1', '3', 'TransferServer', 'TransferServer', '219.235.1.239', '20900', '219.235.1.239', '21900');
+INSERT INTO serverlist VALUES ('1', '2', 'LoginServer', 'LoginServer', '219.235.1.239', '20901', '219.235.1.239', '21901');
+INSERT INTO serverlist VALUES ('1', '1', 'RegServer', 'RegServer', '219.235.1.239', '20902', '219.235.1.239', '21902');
 
 -- ----------------------------
 -- Table structure for `serverlist1`

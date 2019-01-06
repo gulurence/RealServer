@@ -5,6 +5,7 @@
 #ifndef _WINDOWS
 #include <arpa/inet.h>
 #endif
+
 //网络处理
 class xNetProcessor : public xCmdQueue
 {
@@ -49,6 +50,7 @@ class xNetProcessor : public xCmdQueue
         in_addr ip;
         UInt16 port;
         UInt32 zoneID;
+
     protected:
         xSocket sock;
         NPState np_state;

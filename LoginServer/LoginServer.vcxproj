@@ -67,7 +67,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_TIMESPEC_DEFINED;_WINDOWS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\xTool\mySQL5.5\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../ServerLib/xBase/zlib/;../ServerLib/xBase/src/;../ServerLib/xBase/mySQL5.5/;../ServerLib/xBase/databases/;../ServerLib/xBase/des/;../ServerLib/xGameData/;../ServerLib/xGame/;../ServerLib/xConfig/;../ServerLib/xCommand/;../ServerLib/xBase/;../ServerLib/xNet/;../ServerLib/xServer/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

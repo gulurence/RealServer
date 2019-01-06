@@ -4,7 +4,7 @@
 #include "xSocket.h"
 #include "xThread.h"
 #include "xTime.h"
-#include <map>
+
 #ifndef _WINDOWS
 #include "SystemCmd.h"
 #include <netinet/in.h>
@@ -46,6 +46,7 @@ public:
 
     char name[MAX_NAMESIZE];
 };
+
 //抽象服务器
 class xServer
 {
@@ -62,6 +63,20 @@ class xServer
             SERVER_SAVE,        //保存数据，仅场景进程用
             SERVER_STOP,        //will server_stop
             SERVER_FINISH,        //all done
+        };
+
+        // 注意这个需要和数据库对应
+        enum ServerType
+        {
+            SERVER_TID_REG        = 1,
+            SERVER_TID_LOGIN      = 2,
+            SERVER_TID_TRANSFER   = 3,
+            SERVER_TID_ALLIANCE_C = 4,
+            SERVER_TID_ALLIANCE = 4000,
+            SERVER_TID_FRIEND_C = 5,
+            SERVER_TID_FRIEND = 5000,
+            SERVER_TID_GAME = 6000,
+            SERVER_TID_WORLD      = 7000,
         };
 
         void run();
