@@ -36,7 +36,7 @@ public:
                 ret = false;
         
 
-        return true;
+        return ret;
     }
 
     virtual void v_closeServer(xNetProcessor *np) {

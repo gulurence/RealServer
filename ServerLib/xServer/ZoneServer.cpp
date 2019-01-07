@@ -592,8 +592,10 @@ bool ZoneServer::verifyServer(xNetProcessor *np, const char *t, const char *n)  
 bool ZoneServer::runAction() {
     if (m_stCheckConnectTimer.elapse(3)) {
         if (checkConnect()) {
+
             if (!m_pListener)
                 startListen(m_n32ServerPort);
+
             //wwj:与各服务器连接成功以后再初始化一次，临时用，还没有想到更好的方法
             if (!m_bInit) {
                 m_bInit = true;
