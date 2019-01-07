@@ -42,7 +42,7 @@ public:
             if (!connectServerByType("RegServer"))
                 ret = false;
 
-        return true;
+        return ret;
     }
 
     virtual void v_closeServer(xNetProcessor *np) {
