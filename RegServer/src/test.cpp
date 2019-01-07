@@ -32,7 +32,7 @@ public:
     virtual bool checkConnect() {
         // 需要自己主动连接的服务器
         bool ret = true;
-        UInt32 st = time(NULL);
+        //UInt32 st = time(NULL);
         
 
         //if (!checkConnectedServer("TransferServer"))
