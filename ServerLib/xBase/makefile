@@ -22,10 +22,10 @@ SHA1_DIR = ./sha1
 SHA1_SRCS = $(wildcard $(SHA1_DIR)/*.c)
 SHA1_OBJECTS = $(patsubst %.c, %.o,$(SHA1_SRCS))
 SHA1_CFLAGS = -g3 
-DEBUG_CXXFLAGS =  -I./ -I/usr/local/include/libxml2 -I/usr/local/mysql5.6/include/ -D_DEBUG -D_ALL_SUPER_GM $(DEBUG_FLAG) -g -Wall -Wno-unknown-pragmas --std=c++0x -Wno-deprecated --std=c++0x
+DEBUG_CXXFLAGS =  -I./ -I/usr/local/include/libxml2 -I/usr/local/mysql/include/ -D_DEBUG -D_ALL_SUPER_GM $(DEBUG_FLAG) -g -Wall -Wno-unknown-pragmas --std=c++0x -Wno-deprecated --std=c++0x
 DEBUG_CXXLFLAGS =-L/usr/lib64/ -lX -lxml2 -lpthread -lmysqlclient -llog4cxx -lboost_regex -lrt
 
-DIST_CXXFLAGS = -I./ -I../ -I../base -I../util -I../base/recastnavigation/Recast/Include -I../base/recastnavigation/Detour/Include -I../Command -I/usr/local/include/libxml2 -I/usr/local/mysql5.6/include/ -Wall -Wno-unknown-pragmas --std=c++0x -Wno-deprecated -g3 #-O2 优化暂不打开
+DIST_CXXFLAGS = -I./ -I../ -I../base -I../util -I../base/recastnavigation/Recast/Include -I../base/recastnavigation/Detour/Include -I../Command -I/usr/local/include/libxml2 -I/usr/local/mysql/include/ -Wall -Wno-unknown-pragmas --std=c++0x -Wno-deprecated -g3 #-O2 优化暂不打开
 DIST_CXXLFLAGS =-L/usr/lib64/ -lX -lxml2 -lpthread -lmysqlclient -llog4cxx -lboost_regex -lrt
 
 BASE_OBJECTS = xExecutionTime.o xFunctionTime.o xLog.o xStringTool.o xThread.o xTime.o xTools.o xXMLParser.o xDBConnPool.o

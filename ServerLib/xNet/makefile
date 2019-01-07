@@ -3,10 +3,10 @@ GXX=g++
 DEBUG_FLAG = -D_SQL_DEBUG_ZYX -D_ZYX_DEBUG
 MYINCLUDE =-I../../lib/libXBase/include
 MYLIB =-L../../lib/libXBase/ -lXBase 
-DEBUG_CXXFLAGS = -I/usr/local/include/libxml2 -I/usr/local/mysql5.6/include/ ${MYINCLUDE} -D_DEBUG -D_ALL_SUPER_GM $(DEBUG_FLAG) -g -Wall -Wno-unknown-pragmas --std=c++0x -Wno-deprecated --std=c++0x
+DEBUG_CXXFLAGS = -I/usr/local/include/libxml2 -I/usr/local/mysql/include/ ${MYINCLUDE} -D_DEBUG -D_ALL_SUPER_GM $(DEBUG_FLAG) -g -Wall -Wno-unknown-pragmas --std=c++0x -Wno-deprecated --std=c++0x
 DEBUG_CXXLFLAGS = -L/usr/lib64/ -lX -lxml2 -lpthread -lmysqlclient -llog4cxx -lboost_regex ${MYLIB} -lrt
 
-DIST_CXXFLAGS = -I./ -I../ -I../base -I../util -I../base/recastnavigation/Recast/Include -I../base/recastnavigation/Detour/Include -I../Command -I/usr/local/include/libxml2 -I/usr/local/mysql5.6/include/ -Wall -Wno-unknown-pragmas --std=c++0x -Wno-deprecated -g3 #-O2 优化暂不打开
+DIST_CXXFLAGS = -I./ -I../ -I../base -I../util -I../base/recastnavigation/Recast/Include -I../base/recastnavigation/Detour/Include -I../Command -I/usr/local/include/libxml2 -I/usr/local/mysql/include/ -Wall -Wno-unknown-pragmas --std=c++0x -Wno-deprecated -g3 #-O2 优化暂不打开
 DIST_CXXLFLAGS =-L/usr/lib64/ -lX -lxml2 -lpthread -lmysqlclient -llog4cxx -lboost_regex -lrt
 BASE_OBJECTS =xByteBuffer.o xNetProcessor.o xSocket.o
 BINPATH=../../lib/libXNet/
