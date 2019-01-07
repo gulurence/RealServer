@@ -10,12 +10,12 @@ lib=$(CURRENT_PATH)/../lib
 
 MYINCLUDE = -I$(lib)/XConfig/include -I/home/gumy/boost_1_67_0/ -I$(lib)/libXGame/include  -I$(lib)/util/include -I$(lib)/recastnavigation/Recast/Include -I$(lib)/recastnavigation/Detour/Include -I$(lib)/libXFindPath/include/ -I$(lib)/XGameData/include  -I$(lib)/xCommand  -I$(lib)/libXServer/include -I$(lib)/libXNet/include  -I$(lib)/libXBase/include -g -Wall -Wno-unknown-pragmas --std=c++0x -Wno-deprecated --std=c++0x 
 
-MYLIB = -L/usr/local/mysql5.6/lib -L$(lib)/libXServer -lXServer -L$(lib)/libXNet -lXNet -L$(lib)/libXBase/ -lXBase
+MYLIB = -L/usr/local/mysql/lib -L$(lib)/libXServer -lXServer -L$(lib)/libXNet -lXNet -L$(lib)/libXBase/ -lXBase
 # -L$(lib)/XConfig/ -lXConfig -L$(lib)/XGameData/ -lXGameData -L$(lib)/libXGame -lXGame -L$(lib)/libXFindPath/ -lXFindPath -L$(lib)/recastnavigation/Detour/ -L$(lib)/recastnavigation/Recast/ -lDetour -lRecast -L$(lib)/util/ -lUtil 
 
 INC_PATH:= -I/home/gumy/boost_1_67_0/ -I$(SRC_PATH) -I$(SRC_PATH)/User -I$(SRC_PATH)/Npc -I$(SRC_PATH)/PackEquipObj -I$(SRC_PATH)/Scene -I$(SRC_PATH)/SceneBase -I$(SRC_PATH)/Skill -I$(SRC_PATH)/SubSystem ${MYINCLUDE} -I/usr/local/include/libxml2 -I/usr/local/mysql/include/ -D_DEBUG -D_ALL_SUPER_GM $(DEBUG_FLAG) 
 
-LIB_PATH:= ${MYLIB} -L/usr/lib64/ -L/usr/local/mysql5.6/lib -lxml2 -lpthread -lmysqlclient -llog4cxx  -lrt -ldl
+LIB_PATH:= ${MYLIB} -L/usr/lib64/ -L/usr/local/mysql/lib -lxml2 -lpthread -lmysqlclient -llog4cxx  -lrt -ldl
 
 
 
