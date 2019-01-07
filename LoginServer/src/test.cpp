@@ -5,7 +5,7 @@
 class MyServer : public ZoneServer
 {
 public:
-    MyServer(const char *t, const char *n) :ZoneServer(t, n) {
+    MyServer(const char *t, const char *n) : ZoneServer(t, n) {
     }
     ~MyServer() {
     }
@@ -28,7 +28,7 @@ public:
         return true;
     }
 
-    virtual bool verifyServer(xNetProcessor *np, const char *t, const char *n) {
+    virtual bool verifyServer(xNetProcessor *np, const char *t, const char *n) override {
         // 如果服务器连接成功 加入负载列表
         if (ZoneServer::verifyServer(np, t, n)) {
             BalanceNodeST *pNode = new BalanceNodeST();
@@ -50,7 +50,7 @@ public:
         return false;
     }
 
-    virtual bool checkConnect() {
+    virtual bool checkConnect() override {
         // 需要自己主动连接的服务器
         bool ret = true;
         //UInt32 st = time(NULL);
@@ -60,10 +60,10 @@ public:
             if (!connectServerByType("RegServer"))
                 ret = false;
 
-        return ret;
+        return true;
     }
 
-    virtual void v_closeServer(xNetProcessor *np) {
+    virtual void v_closeServer(xNetProcessor *np) override {
         if (!np)
             return;
 
@@ -83,7 +83,7 @@ public:
 
     }
 
-    virtual bool v_processCmd(string serverName, xNetProcessor *np, unsigned char *buf, unsigned short len) {
+    virtual bool v_processCmd(string serverName, xNetProcessor *np, unsigned char *buf, unsigned short len) override {
         if (!np || !buf || !len)
             return false;
 
