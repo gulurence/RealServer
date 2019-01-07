@@ -118,6 +118,7 @@ bool ZoneServer::loadServerList() {
             if (0 == tret
                 && 0 == nret && s.port > 0) {
                 m_n32ServerPort = s.port;
+                m_n32ServerTypeId = s.servertypeid;
                 XLOG("[%s],服务器类型:%s 服务器名称:%s", serverName, result[i].servertype, result[i].servername);
                 ret = true;
             }
@@ -262,8 +263,8 @@ bool ZoneServer::accept(int sockfd, sockaddr_in &addr) {
     addSocket(task);
 #endif
 
-    task->ip = addr.sin_addr;
-    task->port = addr.sin_port;
+    task->m_stIp = addr.sin_addr;
+    task->m_u16Port = addr.sin_port;
 
     XDBG("[%s]%s:%d connect, new task:%p, add verify list", serverName, inet_ntoa(addr.sin_addr), ntohs(addr.sin_port), task);
 
@@ -369,19 +370,19 @@ bool ZoneServer::processNetwork() {
         xNetProcessor *np = (xNetProcessor *)m_szServerEv[i].data.ptr;
 //        if (xNetProcessor::NP_ESTABLISH != np->getState())
 //            continue;
-    //    if(strcmp(np->name,"SceneServer1")==0){
+    //    if(strcmp(np->m_arrcName,"SceneServer1")==0){
                 //int i=0;
                 //    i=1;
         //}
         if (m_szServerEv[i].events & EPOLLERR) {
-            XLOG("[%s] connect error %s %p", serverName, np->name, np);
+            XLOG("[%s] connect error %s %p", serverName, np->m_arrcName, np);
             np->setNPState(xNetProcessor::NP_DISCONNECT);
             closeServer(np);
             continue;
         }
         else if (m_szServerEv[i].events & EPOLLIN) {
             if (!np->readCmd()) {
-                XLOG("[%s] read error %s %p", serverName, np->name, np);
+                XLOG("[%s] read error %s %p", serverName, np->m_arrcName, np);
                 np->setNPState(xNetProcessor::NP_DISCONNECT);
                 closeServer(np);
                 continue;
@@ -391,18 +392,18 @@ bool ZoneServer::processNetwork() {
             unsigned short cmdLen;
             bool process_ret = true;
             while (np->getCmd(cmd, cmdLen)) {
-                process_ret = processCmd(np->name, np, cmd, cmdLen);
+                process_ret = processCmd(np->m_arrcName, np, cmd, cmdLen);
                 np->popCmd();
                 if (!cmdLen || !process_ret) break;
             }
             if (cmdLen && !process_ret) {
                 xCommand *c = (xCommand *)cmd;
                 if (c) {
-                    XERR("[%s] message error %s %p (%u, %u),len:%u", serverName, np->name, np, c->cmd, c->param, cmdLen);
+                    XERR("[%s] message error %s %p (%u, %u),len:%u", serverName, np->m_arrcName, np, c->cmd, c->param, cmdLen);
                     //return true;
                 }
                 else {
-                    XERR("[%s] message error %s %p", serverName, np->name, np);
+                    XERR("[%s] message error %s %p", serverName, np->m_arrcName, np);
                 }
 
                 np->setNPState(xNetProcessor::NP_DISCONNECT);
@@ -414,12 +415,12 @@ bool ZoneServer::processNetwork() {
            if (server_ev[i].events & EPOLLOUT)
            {
 #ifdef _DEBUG
-        //XLOG("[%s] EPOLLOUT %s %p", serverName, np->name, np);
+        //XLOG("[%s] EPOLLOUT %s %p", serverName, np->m_arrcName, np);
 #endif
 while (np->sendCmd())
 {
 #ifdef _DEBUG
-        //    XLOG("[%s] EPOLLOUT send, %s %p", serverName, np->name, np);
+        //    XLOG("[%s] EPOLLOUT send, %s %p", serverName, np->m_arrcName, np);
 #endif
 }
 
@@ -478,14 +479,14 @@ while (np->sendCmd())
                 continue;
 
             if (FD_ISSET(s, &m_arrExceptFDs[SELECT_USE])) {
-                XLOG("[%s] connect error %s %p", serverName, np->name, np);
+                XLOG("[%s] connect error %s %p", serverName, np->m_arrcName, np);
                 np->setNPState(xNetProcessor::NP_DISCONNECT);
                 closeServer(np);
                 continue;
             }
             if (FD_ISSET(s, &m_arrReadFDs[SELECT_USE])) {
                 if (!np->readCmd()) {
-                    XLOG("[%s] connect error %s %p", serverName, np->name, np);
+                    XLOG("[%s] connect error %s %p", serverName, np->m_arrcName, np);
                     np->setNPState(xNetProcessor::NP_DISCONNECT);
                     closeServer(np);
                     continue;
@@ -495,18 +496,18 @@ while (np->sendCmd())
                 unsigned short cmdLen;
                 bool process_ret = true;
                 while (np->getCmd(cmd, cmdLen)) {
-                    process_ret = processCmd(np->name, np, cmd, cmdLen);
+                    process_ret = processCmd(np->m_arrcName, np, cmd, cmdLen);
                     np->popCmd();
                     if (!cmdLen || !process_ret) break;
                 }
                 if (cmdLen && !process_ret) {
                     xCommand *c = (xCommand *)cmd;
                     if (c) {
-                        XERR("[%s] message error %s %p (%u, %u),len:%u", serverName, np->name, np, c->cmd, c->param, cmdLen);
+                        XERR("[%s] message error %s %p (%u, %u),len:%u", serverName, np->m_arrcName, np, c->cmd, c->param, cmdLen);
                         //return true;
                     }
                     else {
-                        XERR("[%s] message error %s %p", serverName, np->name, np);
+                        XERR("[%s] message error %s %p", serverName, np->m_arrcName, np);
                     }
 
                     np->setNPState(xNetProcessor::NP_DISCONNECT);
@@ -693,7 +694,8 @@ bool ZoneServer::checkConnectedServer(std::string t, std::string n)    //主线�
 
 void ZoneServer::setConnectServerType(std::string t)    //主线程
 {
-    if ((t == "") || (m_mapServerInfoList.find(t) == m_mapServerInfoList.end()))
+    auto it = m_mapServerInfoList.find(t);
+    if ((t == "") || (it == m_mapServerInfoList.end()))
         return;
 
     for (ServerinfoMapIt s_it = m_mapServerInfoList[t].begin(); s_it != m_mapServerInfoList[t].end(); s_it++) {
@@ -701,6 +703,10 @@ void ZoneServer::setConnectServerType(std::string t)    //主线程
             continue;
 
         m_mapServerList[t][s_it->first] = new ServerClient();
+
+        // 初始化ID对应关系列表
+        uint32 serverTypeId = getConnectServerTypeId(t);
+        m_mapServerIdList[serverTypeId][s_it->first] = m_mapServerList[t][s_it->first];
 
         XDBG("[%s],设置要连接的服务器:%s,%s,%p", serverName, t.c_str(), s_it->first.c_str(), m_mapServerList[t][s_it->first]);
     }
@@ -844,6 +850,10 @@ uint32 ZoneServer::getConnectServerTypeId(std::string t) {
     return it_temp->second.servertypeid;
 }
 
+int32 ZoneServer::getThisServerTypeId() {
+    return m_n32ServerTypeId;
+}
+
 ServerClient *ZoneServer::getConnectedServer(std::string t, std::string n) {
     std::map<std::string, std::map<std::string, ServerClient *> > tempList;
 
@@ -917,19 +927,72 @@ bool ZoneServer::sendCmdToServer(void *data, unsigned short len, const char *typ
 
 bool ZoneServer::sendCmdToServer(void *data, unsigned short len, uint32 serverTypeId) {
 
+    /*
+    
+    发Ts接口需要包装         发Ts接口不需要包装了        直接发给目标或者集群上级节点          发给集群叶子          集群叶子 
+    LoginServer        ->    GameServer            ->    *TransferServer*                ->    FriendC         ->    Friend1
+
+    *TransferServer* -> RegServer
+    
+    */
+
+    // 发给自己服务器的 先不处理直接返回
+    if (getThisServerTypeId() == xServer::SERVER_TID_TRANSFER) {
+
+        XERR("ZoneServer::sendCmdToServer [targetServerTypeId:%d,cmd:%d,param:%d] error !!!", serverTypeId, ((xCommand*)data)->cmd, ((xCommand*)data)->param);
+
+        return true;
+    }
+
+    xCommand *pCmd = (xCommand *)data;
+
     // 如果跨Server进程 这里需要封装一次
     auto it = m_mapServerIdList.find(serverTypeId);
     if (it == m_mapServerIdList.end()) {
 
-        static ServerTransferSysCmd sTransferSysCmd;
-        sTransferSysCmd.targetServerTypsId = serverTypeId;
-        memcpy(sTransferSysCmd.arrData, data, len);
-        sTransferSysCmd.cmdLen = len;
-        if (!sendCmdToTransfer(&sTransferSysCmd, sTransferSysCmd.getLen())) {
-            XERR("ZoneServer::sendCmdToServer sendCmdToTransfer [targetServerTypeId:%d,cmd:%d,param:%d] error !!!", serverTypeId,((xCommand*)data)->cmd, ((xCommand*)data)->param);
+        // 如果是集群叶子服务器 则 发给上一级的管理节点
+        // 进行一次广播过滤
+        if (getThisServerTypeId() == xServer::SERVER_TID_TRANSFER && xServer::SERVER_TID_NODE_NUM <= serverTypeId) {
+
+            // 找到上级节点直接返回 否则广播
+            bool bFindParentNode = false;
+            // 发给集群上级节点
+            for (auto it_typeS: m_mapServerIdList) {
+                if (serverTypeId / xServer::SERVER_TID_NODE_NUM == it_typeS.first) {
+                    for (auto &it_temp : it_typeS.second) {
+                        it_temp.second->sendCmd(data, len);
+                    }
+
+                    bFindParentNode = true;
+                }
+            }
+
+            if(bFindParentNode)
+                return true;
+        }
+
+        // 不是包装过的 包装成转发消息
+        if (SYSTEM_CMD != pCmd->cmd && SERVER_TRANSFER_SYSCMD != pCmd->param) {
+
+            static ServerTransferSysCmd sTransferSysCmd;
+            sTransferSysCmd.targetServerTypsId = serverTypeId;
+            memcpy(sTransferSysCmd.arrData, data, len);
+            sTransferSysCmd.cmdLen = len;
+            if (!sendCmdToTransfer(&sTransferSysCmd, sTransferSysCmd.getLen())) {
+                XERR("ZoneServer::sendCmdToServer sendCmdToTransfer [targetServerTypeId:%d,cmd:%d,param:%d] error !!!", serverTypeId, ((xCommand*)data)->cmd, ((xCommand*)data)->param);
+            }
+
+        } else {
+
+            // 包装过的直接转发
+            if (!sendCmdToTransfer(data, len)) {
+                XERR("ZoneServer::sendCmdToServer sendCmdToTransfer [targetServerTypeId:%d,cmd:%d,param:%d] error !!!", serverTypeId, ((xCommand*)data)->cmd, ((xCommand*)data)->param);
+            }
         }
 
     } else {
+
+        // 找到目标节点直接发送
         for (auto &it_temp:it->second) {
             if (it_temp.second) {
                 it_temp.second->sendCmd(data, len);
@@ -990,7 +1053,7 @@ bool ZoneServer::processCmd(string serverName, xNetProcessor *np, unsigned char 
             VerifyConnSystemCmd *rev = (VerifyConnSystemCmd *)cmd;
             if (!np->isClient()) {
                 np->setName(rev->name);//need
-                np->zoneID = rev->zoneID;
+                np->m_u32ZoneId = rev->zoneID;
             }
             bool vRet = 0 != rev->ret;
             if (vRet)
@@ -1043,7 +1106,7 @@ void ZoneServer::removeVerifyList(xNetProcessor *task) {
     if (!task) 
         return;
 
-    XDBG("[verify_list],delete:%p", task);
+    XDBG("[verify_list],removeVerifyList:%p", task);
 
     pthread_rwlock_wrlock(&m_stVerifylistCritical);
     m_mapVerify.erase(task);
@@ -1065,7 +1128,7 @@ bool ZoneServer::inVerifyList(xNetProcessor *task) {
 xNetProcessor *ZoneServer::getNpByIPAndPort(UInt32 ip, UInt32 port) {
     pthread_rwlock_wrlock(&m_stVerifylistCritical);
     for (VerifyMapIt iter = m_mapVerify.begin(); iter != m_mapVerify.end(); ++iter) {
-        if (iter->first && *((UInt32 *)&iter->first->ip) == ip && ((iter->first))->port == port)
+        if (iter->first && *((UInt32 *)&iter->first->m_stIp) == ip && ((iter->first))->m_u16Port == port)
             return iter->first;
     }
     pthread_rwlock_unlock(&m_stVerifylistCritical);

@@ -59,15 +59,19 @@ class xServer
         {
             SERVER_CREATE = 0,
             SERVER_INIT,        //connect other server
-            SERVER_RUN,            //all server connected, do work
+            SERVER_RUN,         //all server connected, do work
             SERVER_SAVE,        //保存数据，仅场景进程用
             SERVER_STOP,        //will server_stop
-            SERVER_FINISH,        //all done
+            SERVER_FINISH,      //all done
         };
 
         // 注意这个需要和数据库对应
         enum ServerType
         {
+            // 集群叶子节点倍数
+            SERVER_TID_NODE_NUM = 1000,
+
+            // 下面是数据库对应的ID 定义
             SERVER_TID_REG        = 1,
             SERVER_TID_LOGIN      = 2,
             SERVER_TID_TRANSFER   = 3,
@@ -88,6 +92,7 @@ class xServer
         virtual void v_closeConn(xNetProcessor *np){}
         char serverName[MAX_NAMESIZE];//server name
         ServerState getServerState(){return server_state;}
+        void setServerState(ServerState s);
 
     protected:
         bool serverCallback();
@@ -97,7 +102,6 @@ class xServer
         virtual void v_final()=0;
         virtual bool v_stop() {return true;}
 
-        void setServerState(ServerState s);
 
         virtual bool processNetwork()=0;
 

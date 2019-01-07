@@ -240,6 +240,7 @@
     <ClInclude Include="..\xBase\src\lundump.h" />
     <ClInclude Include="..\xBase\src\lvm.h" />
     <ClInclude Include="..\xBase\src\lzio.h" />
+    <ClInclude Include="..\xBase\xCmdCrc.h" />
     <ClInclude Include="..\xBase\xDBConnPool.h" />
     <ClInclude Include="..\xBase\xDBMeta.h" />
     <ClInclude Include="..\xBase\xDefine.h" />
@@ -269,6 +270,7 @@
     <ClInclude Include="..\xBase\zlib\zutil.h" />
     <ClInclude Include="..\xCommand\LogCmd.h" />
     <ClInclude Include="..\xCommand\LoginCmd.h" />
+    <ClInclude Include="..\xCommand\PressureTestCmd.h" />
     <ClInclude Include="..\xCommand\SystemCmd.h" />
     <ClInclude Include="..\xCommand\UserCmd.h" />
     <ClInclude Include="..\xCommand\xCommand.h" />

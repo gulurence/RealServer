@@ -2,16 +2,16 @@
 
 
 xNetProcessor::xNetProcessor(int fd, const char *n)
-:sock(fd)
+:m_stSock(fd)
 {
     setNPState(NP_CREATE);
 
-    id = 0;
+    m_u64Id = 0;
     setName(n);
-    epfd = 0;
+    m_n32Epfd = 0;
 
-    bzero(&ip, sizeof(ip));
-    port = 0;
+    bzero(&m_stIp, sizeof(m_stIp));
+    m_u16Port = 0;
 }
 
 xNetProcessor::~xNetProcessor()
@@ -20,33 +20,33 @@ xNetProcessor::~xNetProcessor()
 
 void xNetProcessor::setName(const char *n)
 {
-    bzero(name, sizeof(name));
+    bzero(m_arrcName, sizeof(m_arrcName));
     if (n)
     {
-        strncpy(name, n, MAX_NAMESIZE-1);
+        strncpy(m_arrcName, n, MAX_NAMESIZE-1);
     }
 }
 
 void xNetProcessor::disconnect()
 {
-    sock.close();
-    XLOG("[Socket]%s disconnect %p", name, this);
+    m_stSock.close();
+    XLOG("[Socket]%s disconnect %p", m_arrcName, this);
     setNPState(NP_CLOSE);
 }
 
 void xNetProcessor::addEpoll(int ep)
 {
 #ifndef _WINDOWS
-    epfd = ep;
+    m_n32Epfd = ep;
     epoll_event ev;
     bzero(&ev, sizeof(ev));
-    ev.data.fd = sock.get_fd();
+    ev.data.fd = m_stSock.get_fd();
     ev.data.ptr = this;
     ev.events = EPOLLIN|EPOLLOUT|EPOLLET;
-    epoll_ctl(ep, EPOLL_CTL_ADD, sock.get_fd(), &ev);
+    epoll_ctl(ep, EPOLL_CTL_ADD, m_stSock.get_fd(), &ev);
     setNPState(NP_VERIFIED);
 #ifdef _LX_DEBUG
-    XDBG("[添加Epoll],%s,epfd:%d, fd:%d", name, epfd, sock.get_fd());
+    XDBG("[添加Epoll],%s,epfd:%d, fd:%d", name, m_n32Epfd, m_stSock.get_fd());
 #endif
 #else
 
@@ -58,12 +58,12 @@ void xNetProcessor::delEpoll()
 #ifndef _WINDOWS
     epoll_event ev;
     bzero(&ev, sizeof(ev));
-    ev.data.fd = sock.get_fd();
+    ev.data.fd = m_stSock.get_fd();
     ev.data.ptr = this;
     ev.events = EPOLLIN|EPOLLOUT|EPOLLET;
-    epoll_ctl(epfd, EPOLL_CTL_DEL, sock.get_fd(), &ev);
+    epoll_ctl(m_n32Epfd, EPOLL_CTL_DEL, m_stSock.get_fd(), &ev);
 #ifdef _LX_DEBUG
-    XDBG("[删除Epoll],%s,epfd:%d, fd:%d", name, epfd, sock.get_fd());
+    XDBG("[删除Epoll],%s,epfd:%d, fd:%d", name, m_n32Epfd, m_stSock.get_fd());
 #endif
 #else
 
@@ -72,12 +72,12 @@ void xNetProcessor::delEpoll()
 
 bool xNetProcessor::readCmd()
 {
-    return sock.readToBuf();
+    return m_stSock.readToBuf();
 }
 
 bool xNetProcessor::sendCmd()
 {
-    return sock.sendCmd();
+    return m_stSock.sendCmd();
 }
 
 bool xNetProcessor::sendCmd(const void *cmd, unsigned short len)
@@ -92,7 +92,7 @@ bool xNetProcessor::sendCmd(const void *cmd, unsigned short len)
 #endif
 #endif
 
-    if (!sock.sendCmd(cmd, len))
+    if (!m_stSock.sendCmd(cmd, len))
     {
         XERR("sendCmd failed %p", this);
         //post_disconnect();
@@ -102,10 +102,10 @@ bool xNetProcessor::sendCmd(const void *cmd, unsigned short len)
     else
     {
         struct epoll_event ev;
-        ev.data.fd = sock.get_fd();
+        ev.data.fd = m_stSock.get_fd();
         ev.events = EPOLLIN|EPOLLOUT|EPOLLET;
         ev.data.ptr = this;
-        epoll_ctl(epfd, EPOLL_CTL_MOD, sock.get_fd(), &ev);
+        epoll_ctl(m_n32Epfd, EPOLL_CTL_MOD, m_stSock.get_fd(), &ev);
     }
     */
     return true;
@@ -113,10 +113,10 @@ bool xNetProcessor::sendCmd(const void *cmd, unsigned short len)
 
 bool xNetProcessor::getCmd(unsigned char *&cmd, unsigned short &len)
 {
-    return sock.getCmd(cmd, len);
+    return m_stSock.getCmd(cmd, len);
 }
 
 bool xNetProcessor::popCmd()
 {
-    return sock.popCmd();
+    return m_stSock.popCmd();
 }

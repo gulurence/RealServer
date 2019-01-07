@@ -8,6 +8,7 @@
 #ifndef _WINDOWS
 #include <unistd.h>
 #include <sys/socket.h>
+#include "xLog.h"
 #else
 #include <winsock2.h>
 #include <time.h>

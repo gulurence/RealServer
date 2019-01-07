@@ -1,71 +1,71 @@
 #!/bin/bash
 
 cd ./AllianceServer
-./AllianceServer AllianceServer AllianceServer1
+./AllianceServer -d -nAllianceServer1
 sleep 1
-./AllianceServer AllianceServer AllianceServer2
+./AllianceServer -d -nAllianceServer2
 sleep 1
-./AllianceServer AllianceServer AllianceServer3
+./AllianceServer -d -nAllianceServer3
 sleep 1
 cd ..
 echo "Start AllianceServer1 Ok!"
 
 cd ./AllianceServerC
-./AllianceServerC AllianceServerC AllianceServerC
+./AllianceServerC -d -nAllianceServerC
 sleep 1
 cd ..
 echo "Start AllianceServerC Ok!"
 
 cd ./FriendServer
-./FriendServer FriendServer FriendServer1
+./FriendServer -d -nFriendServer1
 sleep 1
-./FriendServer FriendServer FriendServer2
+./FriendServer -d -nFriendServer2
 sleep 1
-./FriendServer FriendServer FriendServer3
+./FriendServer -d -nFriendServer3
 sleep 1
 cd ..
 echo "Start FriendServer1 Ok!"
 
 cd ./FriendServerC
-./FriendServerC FriendServerC FriendServerC
+./FriendServerC -d -nFriendServerC
 sleep 1
 cd ..
 echo "Start FriendServerC Ok!"
 
 cd ./GameServer
-./GameServer GameServer GameServer1
+./GameServer -d -nGameServer1
 sleep 1
-./GameServer GameServer GameServer2
+./GameServer -d -nGameServer2
 sleep 1
-./GameServer GameServer GameServer3
+./GameServer -d -nGameServer3
 sleep 1
 cd ..
 echo "Start GameServer1 Ok!"
 
 cd ./TransferServer
-./TransferServer TransferServer TransferServer
+./TransferServer -d -nTransferServer
 sleep 1
 cd ..
 echo "Start TransferServer Ok!"
 
 cd ./WorldServer
-./WorldServer WorldServer WorldServer1
+./WorldServer -d -nWorldServer1
 sleep 1
-./WorldServer WorldServer WorldServer2
+./WorldServer -d -nWorldServer2
 sleep 1
-./WorldServer WorldServer WorldServer3
+./WorldServer -d -nWorldServer3
 sleep 1
 cd ..
 echo "Start WorldServer Ok!"
 
 cd ./RegServer
-./RegServer RegServer RegServer
+./RegServer -d -nRegServer
 sleep 1
 cd ..
 echo "Start RegServer Ok!"
 
 cd ./LoginServer
-./LoginServer LoginServer LoginServer
+./LoginServer -d -nLoginServer
 sleep 1
 cd ..
 echo "Start LoginServer Ok!"

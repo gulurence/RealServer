@@ -3,7 +3,7 @@
 xTask::xTask(int fd)
 :xNetProcessor(fd)
 {
-    sock.setNonBlock();
+    m_stSock.setNonBlock();
 }
 
 xTask::~xTask()

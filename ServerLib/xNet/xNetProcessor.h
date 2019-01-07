@@ -33,26 +33,26 @@ class xNetProcessor : public xCmdQueue
 
         bool sendCmd(const void *cmd, unsigned short len);
         bool sendCmd();
-        UInt16 getSendLen() const { return sock.getSendLen(); }
+        UInt16 getSendLen() const { return m_stSock.getSendLen(); }
         bool readCmd();
-        void setComp(bool flag) { sock.setComp(flag); }
+        void setComp(bool flag) { m_stSock.setComp(flag); }
 
         bool getCmd(unsigned char *&cmd, unsigned short &len);
         bool popCmd();
 
-        NPState getNPState() {return np_state;}
-        void setNPState(NPState s){np_state = s;}
-        const xSocket& GetSock() const {return sock;}
+        NPState getNPState() {return m_stNpState;}
+        void setNPState(NPState s){m_stNpState = s;}
+        const xSocket& GetSock() const {return m_stSock;}
 
-        UInt64 id;
-        char name[MAX_NAMESIZE];
+        UInt64 m_u64Id;
+        char m_arrcName[MAX_NAMESIZE];
 
-        in_addr ip;
-        UInt16 port;
-        UInt32 zoneID;
+        in_addr m_stIp;
+        UInt16 m_u16Port = 0;
+        UInt32 m_u32ZoneId = 0;
 
     protected:
-        xSocket sock;
-        NPState np_state;
-        int epfd;
+        xSocket m_stSock;
+        NPState m_stNpState;
+        int m_n32Epfd = -1;
 };

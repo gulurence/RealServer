@@ -218,7 +218,7 @@ void xServer::final()
 
         clo = tmp_close->first;
 
-        XLOG("[%s]%s delete %p", serverName, clo->name, clo);
+        XLOG("[%s]%s delete %p", serverName, clo->m_arrcName, clo);
         SAFE_DELETE(clo);
     }
     _close_list.clear();
@@ -280,13 +280,13 @@ bool xServer::closeConn(xNetProcessor *np)
     pthread_rwlock_wrlock(&_close_critical);
     if (_close_list.find(np)!=_close_list.end())
     {
-        XERR("[%s]re close %s %p", serverName, np->name, np);
+        XERR("[%s]re close %s %p", serverName, np->m_arrcName, np);
     }
     else
     {
         v_closeConn(np);
         _close_list[np] = time(0);
-        XDBG("[%s]close %s %p", serverName, np->name, np);
+        XDBG("[%s]close %s %p", serverName, np->m_arrcName, np);
         ret = true;
     }
     pthread_rwlock_unlock(&_close_critical);
@@ -324,7 +324,7 @@ bool xServer::serverCallback()
             clo->disconnect();
 
 
-            XLOG("[%s],_close_list 删除连接,%s(%llu),%p", serverName, clo->name, clo->id, clo);
+            XLOG("[%s],_close_list 删除连接,%s(%llu),%p", serverName, clo->m_arrcName, clo->m_u64Id, clo);
             _close_list.erase(tmp_close);
             SAFE_DELETE(clo);
         }

@@ -243,7 +243,6 @@ enum eRandomNameCode{
 #define countof(array) (sizeof(array) / sizeof((array)[0]))
 #endif
 
-#include "xLog.h"
 #include <string.h>
 #include <map>
 #include <string>

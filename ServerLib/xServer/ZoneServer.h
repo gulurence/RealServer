@@ -64,7 +64,7 @@ public:
         return np;
     }
     const char* getName() {
-        if (np) return np->name;
+        if (np) return np->m_arrcName;
         return "";
     }
     bool check() {
@@ -141,6 +141,7 @@ public:
     bool checkConnectedServer(std::string t, std::string n = "");
     void setConnectServerType(std::string t);
     uint32 getConnectServerTypeId(std::string t);
+    int32  getThisServerTypeId();
     ServerClient *getConnectedServer(std::string t, std::string n = "");
     bool getConnectedServer(std::string t, std::string n, std::list<ServerClient *> &list);
 
@@ -240,7 +241,7 @@ public:
     UInt32          m_u32PlatformId = 0;
     char            m_szPlatformName[MAX_NAMESIZE];
     UInt32          m_u32ZoneID = 0;
-    uint32          m_serverTypeId = 0;
+    int32           m_n32ServerTypeId = -1;
     char            m_szZoneName[MAX_NAMESIZE];
     ZoneMap         m_mapZone;
 

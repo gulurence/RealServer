@@ -23,7 +23,7 @@ bool xClient::connect(const char *ip, int port)
     server.sin_addr.s_addr = inet_addr(ip); 
     server.sin_port = htons(port);
 
-    int ret = ::connect(sock.get_fd(), (sockaddr *)&server, sizeof(sockaddr_in));
+    int ret = ::connect(m_stSock.get_fd(), (sockaddr *)&server, sizeof(sockaddr_in));
     if (0!=ret)
     {
         //XERR("connect() failed with error %d %p", ret, this);
@@ -47,7 +47,7 @@ bool xClient::connect(const char *ip, int port)
     }
     */
 
-    sock.setNonBlock();
+    m_stSock.setNonBlock();
     return true;
 }
 

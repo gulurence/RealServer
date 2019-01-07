@@ -4,6 +4,7 @@ extern "C" {
 }
 
 #include "xSocket.h"
+#include "xCmdCrc.h"
 #include <errno.h>
 #include <fcntl.h>
 
@@ -32,6 +33,8 @@ xSocket::xSocket(int sock) :
     sendLen = 0;
 
     setSockOpt();
+
+    make_crc32_table();
 }
 
 xSocket::~xSocket() {
@@ -158,10 +161,11 @@ bool xSocket::sendCmd() {
 bool xSocket::sendCmd(const void *data, UInt16 len) {
     if (!valid())
         return false;
-    encBuffer.reset();            //重置缓冲区
-    PacketHead ph;            //协议头
-    encBuffer.put(&ph, PH_LEN);            //封装头4字节
-    encBuffer.put(data, len);            //数据长度
+    
+    encBuffer.reset();              //重置缓冲区
+    PacketHead ph;                  //协议头
+    encBuffer.put(&ph, PH_LEN);     //封装头4字节
+    encBuffer.put(data, len);       //数据长度
     PacketHead *p = (PacketHead *) encBuffer.getBufBegin();
     UInt16 real_size = len;
 
@@ -183,8 +187,16 @@ bool xSocket::sendCmd(const void *data, UInt16 len) {
         encrypt(encBuffer.getBufBegin(), real_size);
     }
 
+    // 做Crc校验处理
+    uint32 u32CmdCrc = make_crc(0xFFFFFFFF, (unsigned char*)data, len);
+    encBuffer.put(&u32CmdCrc,sizeof(uint32));
+
+    p->len += 4;
+    real_size += 4;
+
     if (!writeToBuf(encBuffer.getBufBegin(), real_size))
         return false;
+
     return sendCmd();
 }
 
@@ -249,6 +261,14 @@ bool xSocket::getCmd(UInt8 *&cmd, UInt16 &len) {
     Packet *p = (Packet *) buf;
 
     UInt16 real_size = 0;
+
+    // crc 检查 最后4位位算出来的crc
+    if (0 != make_crc(0xFFFFFFFF, p->data, p->ph.len)) {
+        XERR("Crc 检查错误，协议错误:real_size[%u],buffer_size[%u]", real_size, used);
+        return false;
+    }
+    // 去掉最后的crc
+    p->ph.len -= sizeof(int);
 
     if (needDec()) {
         UInt8 copy[8];

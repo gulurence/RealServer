@@ -1,4 +1,5 @@
 #include "ZoneServer.h"
+#include "PressureTestCmd.h"
 
 
 class MyServer : public ZoneServer
@@ -50,7 +51,7 @@ public:
         if (!np)
             return;
 
-        if (strcmp(np->name, "TransferServer") == 0) {
+        if (strcmp(np->m_arrcName, "TransferServer") == 0) {
             // 断开逻辑处理
 
             // TODO 
@@ -58,52 +59,99 @@ public:
 
         // ... .. .
     }
-
-    virtual bool v_processCmd(string serverName, xNetProcessor *np, unsigned char *buf, unsigned short len) {
+    
+    virtual bool v_processCmd(string serverName, xNetProcessor *np, unsigned char *buf, unsigned short len) override {
         if (!np || !buf || !len)
             return false;
 
+        xCommand *pCmd = (xCommand *)buf;
+
+        // 测试消息
+        if (PRESSURE_TEST_CMD == pCmd->cmd) {
+            if (BASE_TEST_SYSCMD == pCmd->param) {
+                basePressureTest(np, buf, len);
+                return true;
+            }
+        }
+
+        //缓存到消息队列
         np->put(buf, len);
 
         return true;
     }
+
+public:
+    void basePressureTest(xNetProcessor *np, unsigned char *buf, unsigned short len) {
+
+        BasePressureTestSystemCmd *pMsg = (BasePressureTestSystemCmd *)buf;
+
+        // 如果已经是终点Server了 反向发给发消息的Server
+        if (getThisServerTypeId() == pMsg->targetServerTypeId) {
+            int32 tempServerTypeId = pMsg->srcServerTypeId;
+            pMsg->srcServerTypeId = pMsg->targetServerTypeId;
+            pMsg->targetServerTypeId = tempServerTypeId;
+        }
+
+        sendCmdToTransfer(buf, len);
+    }
 };
 
-int main(int argc, char *argv[]) {
-    if (3 > argc) {
-        XERR("main param count < 3 [dir,servertype,servername]");
-        return 0;
-    }
+
+
+
+MyServer *myServer = nullptr;
 
 #ifndef _WINDOWS
-    daemon(1, 1);
+#include <signal.h>
+void kill_handler(int s) {
+    myServer->setServerState(xServer::SERVER_SAVE);
+    myServer->server_stop();
+    printf("捕获到 中断信号 [%d] \n", s);
+}
 #endif
 
+int main(int argc, char *argv[]) {
 
-    MyServer *myServer = new MyServer(argv[1], argv[2]);
-    myServer->run();
+#ifndef _WINDOWS
+
+    signal(SIGTERM, kill_handler);
+    signal(SIGSTOP, kill_handler);
+    signal(SIGINT, kill_handler);
+
+    int oc = -1;
+    while ((oc = getopt(argc, argv, "dn:")) != -1) {
+        switch (oc) {
+        case 'd':
+        {
+            XLOG_SETSILENT;
+            daemon(1, 1);
+        }
+        break;
+        case 'n':
+        {
+            myServer = new MyServer("FriendServerC", optarg);
+        }
+        break;
+        case '?':
+            break;
+        }
+    }
+
+#else
+
+    if (2 <= argc) {
+        myServer = new MyServer("AllianceServer", argv[1]);
+    }
+
+#endif
+
+    if (myServer) {
+
+        myServer->run();
+
+        SAFE_DELETE(myServer);
+    } else
+        XERR("命令行参数错误 请指定 -n ServerName");
+
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

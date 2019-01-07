@@ -37,12 +37,12 @@ bool CBalanceMgr::removeBalanceNode(void *pNetProcess) {
     }
 
     for (auto it: m_mapBalance) {
-        auto it_f = it.second.find(pNetProcessor->name);
+        auto it_f = it.second.find(pNetProcessor->m_arrcName);
         if (it_f != it.second.end()) {
 
             BalanceNodeMap *pNode = (BalanceNodeMap *)it_f->second;
 
-            it.second.erase(pNetProcessor->name);
+            it.second.erase(pNetProcessor->m_arrcName);
 
             if (nullptr != pNode) {
                 delete pNode;

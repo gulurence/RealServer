@@ -519,6 +519,12 @@
     <ClInclude Include="..\xBase\xSynlock.h">
       <Filter>xBase</Filter>
     </ClInclude>
+    <ClInclude Include="..\xCommand\PressureTestCmd.h">
+      <Filter>xCommand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xBase\xCmdCrc.h">
+      <Filter>xBase</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\xBase\mySQL5.5\libmySQL.lib">
