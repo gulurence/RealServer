@@ -126,6 +126,8 @@
     <None Include="..\..\make_server" />
     <None Include="..\..\run_server" />
     <None Include="..\..\stop_server" />
+    <None Include="..\clean" />
+    <None Include="..\libmake" />
     <None Include="..\xBase\database\Makefile" />
     <None Include="..\xBase\des\makefile_d3des" />
     <None Include="..\xBase\makefile" />

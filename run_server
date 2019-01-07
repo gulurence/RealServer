@@ -2,54 +2,71 @@
 
 cd ./AllianceServer
 ./AllianceServer AllianceServer AllianceServer1
+sleep 1
 ./AllianceServer AllianceServer AllianceServer2
+sleep 1
 ./AllianceServer AllianceServer AllianceServer3
+sleep 1
 cd ..
 echo "Start AllianceServer1 Ok!"
 
 cd ./AllianceServerC
 ./AllianceServerC AllianceServerC AllianceServerC
+sleep 1
 cd ..
 echo "Start AllianceServerC Ok!"
 
 cd ./FriendServer
 ./FriendServer FriendServer FriendServer1
+sleep 1
 ./FriendServer FriendServer FriendServer2
+sleep 1
 ./FriendServer FriendServer FriendServer3
+sleep 1
 cd ..
 echo "Start FriendServer1 Ok!"
 
 cd ./FriendServerC
 ./FriendServerC FriendServerC FriendServerC
+sleep 1
 cd ..
 echo "Start FriendServerC Ok!"
 
 cd ./GameServer
 ./GameServer GameServer GameServer1
+sleep 1
 ./GameServer GameServer GameServer2
+sleep 1
 ./GameServer GameServer GameServer3
+sleep 1
 cd ..
 echo "Start GameServer1 Ok!"
 
 cd ./TransferServer
 ./TransferServer TransferServer TransferServer
+sleep 1
 cd ..
 echo "Start TransferServer Ok!"
 
 cd ./WorldServer
 ./WorldServer WorldServer WorldServer1
+sleep 1
 ./WorldServer WorldServer WorldServer2
+sleep 1
 ./WorldServer WorldServer WorldServer3
+sleep 1
 cd ..
 echo "Start WorldServer Ok!"
 
 cd ./RegServer
 ./RegServer RegServer RegServer
+sleep 1
 cd ..
 echo "Start RegServer Ok!"
 
 cd ./LoginServer
 ./LoginServer LoginServer LoginServer
+sleep 1
 cd ..
 echo "Start LoginServer Ok!"
 

@@ -1038,7 +1038,8 @@ void ZoneServer::setVerifyList(xNetProcessor *task, time_t time) {
 }
 
 void ZoneServer::removeVerifyList(xNetProcessor *task) {
-    if (!task) return;
+    if (!task) 
+        return;
 
     XDBG("[verify_list],delete:%p", task);
 

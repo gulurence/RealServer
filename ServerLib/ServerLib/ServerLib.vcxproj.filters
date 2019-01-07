@@ -40,6 +40,9 @@
     <Filter Include="xBase\zlib">
       <UniqueIdentifier>{39be19b4-ec7c-47cf-8c3a-c7f89616de78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GlobalShell">
+      <UniqueIdentifier>{5c39db79-4d8d-427f-bece-a7603438537a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\xServer\makefile">
@@ -78,10 +81,20 @@
     <None Include="..\xGameData\makefile">
       <Filter>xGameData</Filter>
     </None>
-    <None Include="..\..\clean_server" />
-    <None Include="..\..\make_server" />
-    <None Include="..\..\run_server" />
-    <None Include="..\..\stop_server" />
+    <None Include="..\..\clean_server">
+      <Filter>GlobalShell</Filter>
+    </None>
+    <None Include="..\..\make_server">
+      <Filter>GlobalShell</Filter>
+    </None>
+    <None Include="..\..\run_server">
+      <Filter>GlobalShell</Filter>
+    </None>
+    <None Include="..\..\stop_server">
+      <Filter>GlobalShell</Filter>
+    </None>
+    <None Include="..\clean" />
+    <None Include="..\libmake" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\xServer\xClient.cpp">
