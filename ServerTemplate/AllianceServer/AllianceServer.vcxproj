@@ -67,7 +67,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_TIMESPEC_DEFINED;_WINDOWS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\Engine\thirdlibrary\database;..\..\Engine\thirdlibrary\des;..\..\Engine\thirdlibrary\mySQL5.5;..\..\Engine\thirdlibrary\zlib;..\..\Engine\thirdlibrary\lua;..\..\Engine\thirdlibrary\log4cxx\apache-log4cxx-0.10.0\src\main\include;..\..\Engine\thirdlibrary\libxml2-2.7.3.win32\include;..\..\Engine\thirdlibrary\iconv-1.9.2.win32\include;..\..\Engine\include\libXBase;..\..\Engine\include\libXCommand;..\..\Engine\include\libXConfig;..\..\Engine\include\libXGame;..\..\Engine\include\libXGameData;..\..\Engine\include\libXNet;..\..\Engine\include\libXServer</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Engine\include\libXThiredTool;..\..\Engine\include\libXThiredTool\database;..\..\Engine\include\libXThiredTool\des;..\..\Engine\include\libXThiredTool\lua;..\..\Engine\include\libXBase;..\..\Engine\include\libXCommand;..\..\Engine\include\libXConfig;..\..\Engine\include\libXGame;..\..\Engine\include\libXGameData;..\..\Engine\include\libXNet;..\..\Engine\include\libXServer;..\..\Build\win32\thirdlibrary\mySQL5.5;..\..\Build\win32\thirdlibrary\log4cxx\libxml2-src\include;..\..\Build\win32\thirdlibrary\log4cxx\libiconv-1.9.2-src\include;..\..\Build\win32\thirdlibrary\log4cxx\apache-log4cxx-0.10.0\src\main\include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251</DisableSpecificWarnings>
     </ClCompile>
     <Link>

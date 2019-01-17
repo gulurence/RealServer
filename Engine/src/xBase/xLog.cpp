@@ -58,12 +58,7 @@ void xLog::debug(const char* format, ...) {
 }
 
 bool xLog::isDebug() {
-
-#ifndef _WINDOWS
     return (m_logger->getLevel() == Level::getDebug());
-#endif
-
-    return true;
 }
 
 void xLog::_log(int logLevel, const char* format, va_list args) {
@@ -115,7 +110,8 @@ xLog::xLog(const char* moduleName) {
     setlocale(LC_ALL, "");
     xLog::config("./log.xml");
     m_logger = Logger::getLogger((moduleName));
-    m_bufSize = BUF_SIZE;}
+    m_bufSize = BUF_SIZE;
+}
 
 xLog::~xLog() 
 {
