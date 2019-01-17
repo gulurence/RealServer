@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{EE8EA014-B38A-46EB-BCB3-46540B727F52}</ProjectGuid>
+    <RootNamespace>ServerLib</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>Engine</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>../../Engine/lib/</OutDir>
+    <TargetName>Engine</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../../Engine/src/xBase;../../Engine/src/xGameData;../../Engine/src/xGame;../../Engine/src/xConfig;../../Engine/src/xCommand;../../Engine/src/xNet;../../Engine/src/xServer;../../Engine/src/xThiredTool;../../Engine/src/xThiredTool/des;../../Engine/src/xThiredTool/lua;../../Engine/src/xThiredTool/sha1;../../Engine/src/xThiredTool/database;../../Build/win32/thirdlibrary/mySQL5.5;../../Build/win32/thirdlibrary/\libxml2-src\include;../../Build/win32/thirdlibrary/\libiconv-1.9.2-src\include;../../Build/win32/thirdlibrary/\log4cxx\apache-log4cxx-0.10.0\src\main\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TRVLM_EXPORTS;LIBXML_SAX1_ENABLED;_CRT_SECURE_NO_WARNINGS;_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>../../../_bin/Engine.lib</OutputFile>
+      <AdditionalDependencies>libxml2.lib;libmySQL.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../thirdlibrary/libxml2-2.7.3.win32/lib;../thirdlibrary/libxml2-src/lib;../thirdlibrary/mySQL5.5;</AdditionalLibraryDirectories>
+    </Lib>
+    <PostBuildEvent>
+      <Command>call copy_to_include.bat</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalLibraryDirectories>../../Engine/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>log4cxx.lib;libiconv.lib;libxml2.lib;libmySQL.lib;ws2_32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../../Engine/lib/Engine.dll</OutputFile>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>Engine.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../xBase/zlib/;../xBase/src/;../xBase/mySQL5.5/;../xBase/databases/;../xBase/des/;../xGameData/;../xGame/;../xConfig/;../xCommand/;../xBase/;../xNet/;../xServer/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>Engine.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ModuleDefinitionFile>Engine.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ModuleDefinitionFile>Engine.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\..\Engine\src\xBase\makefile" />
+    <None Include="..\..\Engine\src\xCommand\makefile" />
+    <None Include="..\..\Engine\src\xConfig\makefile" />
+    <None Include="..\..\Engine\src\xGameData\makefile" />
+    <None Include="..\..\Engine\src\xGame\makefile" />
+    <None Include="..\..\Engine\src\xNet\makefile" />
+    <None Include="..\..\Engine\src\xServer\makefile" />
+    <None Include="..\..\Engine\src\xThiredTool\database\Makefile" />
+    <None Include="..\..\Engine\src\xThiredTool\des\makefile_d3des" />
+    <None Include="..\..\Engine\src\xThiredTool\zlib\Makefile" />
+    <None Include="..\..\Engine\src\xThiredTool\zlib\zlib2ansi" />
+    <None Include="Engine.def" />
+    <None Include="thirdlibrary\mySQL5.5\libmysql.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Engine\src\xBase\xExecutionTime.cpp" />
+    <ClCompile Include="..\..\Engine\src\xBase\xFunctionTime.cpp" />
+    <ClCompile Include="..\..\Engine\src\xBase\xLog.cpp" />
+    <ClCompile Include="..\..\Engine\src\xBase\xStringTool.cpp" />
+    <ClCompile Include="..\..\Engine\src\xBase\xThread.cpp" />
+    <ClCompile Include="..\..\Engine\src\xBase\xTime.cpp" />
+    <ClCompile Include="..\..\Engine\src\xBase\xTools.cpp" />
+    <ClCompile Include="..\..\Engine\src\xBase\xXMLParser.cpp" />
+    <ClCompile Include="..\..\Engine\src\xNet\xByteBuffer.cpp" />
+    <ClCompile Include="..\..\Engine\src\xNet\xNetProcessor.cpp" />
+    <ClCompile Include="..\..\Engine\src\xNet\xSocket.cpp" />
+    <ClCompile Include="..\..\Engine\src\xServer\xBalanceMgr.cpp" />
+    <ClCompile Include="..\..\Engine\src\xServer\xClient.cpp" />
+    <ClCompile Include="..\..\Engine\src\xServer\xServer.cpp" />
+    <ClCompile Include="..\..\Engine\src\xServer\xTask.cpp" />
+    <ClCompile Include="..\..\Engine\src\xServer\ZoneServer.cpp" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\database\xDBConnPool.cpp" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\des\d3des.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lapi.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lauxlib.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lbaselib.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lcode.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\ldblib.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\ldebug.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\ldo.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\ldump.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lfunc.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lgc.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\linit.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\liolib.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\llex.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lmathlib.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lmem.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\loadlib.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lobject.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lopcodes.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\loslib.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lparser.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lstate.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lstring.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lstrlib.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\ltable.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\ltablib.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\ltm.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lundump.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lvm.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\lua\lzio.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\adler32.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\compress.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\crc32.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\deflate.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\gzclose.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\gzlib.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\gzread.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\gzwrite.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\infback.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\inffast.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\inflate.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\inftrees.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\trees.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\uncompr.c" />
+    <ClCompile Include="..\..\Engine\src\xThiredTool\zlib\zutil.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Engine\src\xBase\LibraryDef.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\StdInc.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xCmdCrc.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xDefine.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xExecutionTime.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xFunctionTime.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xLog.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xPoolBase.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xSimpleAllocator.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xSingletonTemplate.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xStringTool.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xSynlock.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xThread.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xTime.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xTools.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xUniqueIDManager.h" />
+    <ClInclude Include="..\..\Engine\src\xBase\xXMLParser.h" />
+    <ClInclude Include="..\..\Engine\src\xCommand\LogCmd.h" />
+    <ClInclude Include="..\..\Engine\src\xCommand\LoginCmd.h" />
+    <ClInclude Include="..\..\Engine\src\xCommand\PressureTestCmd.h" />
+    <ClInclude Include="..\..\Engine\src\xCommand\SystemCmd.h" />
+    <ClInclude Include="..\..\Engine\src\xCommand\UserCmd.h" />
+    <ClInclude Include="..\..\Engine\src\xCommand\xCommand.h" />
+    <ClInclude Include="..\..\Engine\src\xNet\xByteBuffer.h" />
+    <ClInclude Include="..\..\Engine\src\xNet\xNetDefine.h" />
+    <ClInclude Include="..\..\Engine\src\xNet\xNetProcessor.h" />
+    <ClInclude Include="..\..\Engine\src\xNet\xSocket.h" />
+    <ClInclude Include="..\..\Engine\src\xServer\xBalanceMgr.h" />
+    <ClInclude Include="..\..\Engine\src\xServer\xClient.h" />
+    <ClInclude Include="..\..\Engine\src\xServer\xServer.h" />
+    <ClInclude Include="..\..\Engine\src\xServer\xSignal.h" />
+    <ClInclude Include="..\..\Engine\src\xServer\xState.h" />
+    <ClInclude Include="..\..\Engine\src\xServer\xStateMachine.h" />
+    <ClInclude Include="..\..\Engine\src\xServer\xTask.h" />
+    <ClInclude Include="..\..\Engine\src\xServer\ZoneServer.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\database\xDBConnPool.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\database\xDBMeta.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\des\d3des.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lapi.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lauxlib.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lcode.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\ldebug.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\ldo.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lfunc.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lgc.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\llex.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\llimits.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lmem.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lobject.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lopcodes.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lparser.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lstate.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lstring.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\ltable.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\ltm.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lua.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\luaconf.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lualib.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lundump.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lvm.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\lua\lzio.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\crc32.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\deflate.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\gzguts.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\inffast.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\inffixed.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\inflate.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\inftrees.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\trees.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\zconf.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\zlib.h" />
+    <ClInclude Include="..\..\Engine\src\xThiredTool\zlib\zutil.h" />
+    <ClInclude Include="thirdlibrary\mySQL5.5\mysql.h" />
+    <ClInclude Include="thirdlibrary\mySQL5.5\mysql_com.h" />
+    <ClInclude Include="thirdlibrary\mySQL5.5\mysql_time.h" />
+    <ClInclude Include="thirdlibrary\mySQL5.5\mysql_version.h" />
+    <ClInclude Include="thirdlibrary\mySQL5.5\my_alloc.h" />
+    <ClInclude Include="thirdlibrary\mySQL5.5\my_list.h" />
+    <ClInclude Include="thirdlibrary\mySQL5.5\typelib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="thirdlibrary\mySQL5.5\libmySQL.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -127,11 +127,12 @@ int main(int argc, char *argv[]) {
 
 #else
 
-    XERR("epoll_create() jjjjjjjjjjjjrjryj ");
 
     if (2 <= argc) {
         myServer = new MyServer("AllianceServer", argv[1]);
     }
+
+    XERR("epoll_create() jjjjjjjjjjjjrjryj ");
 
 #endif
 
