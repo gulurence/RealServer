@@ -1,0 +1,4 @@
+fieldname:2
+fielddesc:1
+typename:3
+datastart:6

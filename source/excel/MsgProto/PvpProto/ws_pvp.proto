@@ -1,0 +1,611 @@
+syntax = "proto3";
+
+option go_package = ".;ws_proto";
+
+package ws_proto;
+
+enum UserStatus{
+  US_None = 0;    		//默认(刚连接) TCP_CSUserLogin --> 10s ->dis
+  US_Init = 1;    		//连接确认Key  TCP_CSSessionJoin--> 10s ->dis
+  US_Session = 2;  		//进入Session  TCP_CSSessionReady--> 10s ->dis
+  US_Ready = 3;    		//客户端默认Ready，等待服务器Start 
+  US_Loading = 4;  		//客户端Loading状态 TCP_CSMatchLoading 服务器只转发
+  US_Completed = 5;  	//客户反发送Completed状态 TCP_CSMatchLoadCompleted 服务器判定所有人完成，
+  US_Running = 6;  		//客户端切入Runing状态 CSNetEvent 帧消息，服务器直接转发
+  US_StepResult = 7;  	//客户端本轮结束 所有人都会给我一个result才切换场景
+  US_LevelUp = 8;  		//选择自己掉落 升级属性，箱子..选择通用商店
+  US_MatchResult = 9;  	//战斗结束
+  US_Disconnect = 10;   //掉线
+  US_Watching = 11;		//中途加入
+  US_Compensated = 12;	//观战
+  US_Max = 13;
+}
+
+enum SessionStatus{
+  SS_None = 0;    //None
+  SS_Start = 1;    //Session 开始
+  SS_Completed = 2;  //Session LoadCompleted 等待大家Loading完成
+  SS_Running = 3;    //Session 比赛中
+  SS_TurnShop = 4;    //选箱子，商店等等
+  SS_End = 5;    //结束
+  SS_Destroy = 6;
+}
+
+enum CommondID{
+  Command_CSProtoMessage = 0;
+  //Command UDP Type
+  UDP_Init = 101;
+  UDP_Relay = 102;
+  UDP_Ping = 105;
+  UDP_Pong = 106;
+  UDP_Forward = 107;
+  UDP_TCP = 110;
+  //TCP Client Command
+  TCP_Init = 901;
+  TCP_Relay = 902;
+  TCP_CSPing = 905;
+  TCP_SCPong = 906;
+  TCP_CSUserLogin = 1000;
+  TCP_CSSessionJoin = 1013;
+  TCP_CSSessionJoinEx = 1014;
+  TCP_CSSessionExit = 1015;
+  TCP_CSSessionReady = 1016;
+  //TCP_CSSessionStart = 1017;  
+  TCP_CSMatchLoading = 1020;
+  TCP_CSMatchLoadCompleted = 1021;
+  //TCP_CSMatchStarted = 1022;  
+  TCP_CSMatchNotify = 1023;
+  TCP_CSCompensated = 1024;
+  TCP_CSPauseGame = 1025;
+  TCP_CSKillBoss = 1026;
+  TCP_CSWinLose = 1027;
+  TCP_CSStepResult = 1031;
+  TCP_CSMatchResult = 1032;
+  TCP_CSMatchEnd = 1033;
+  TCP_CSNetEvent = 1050;
+  TCP_CSNetGeneralEvent = 1060;
+  TCP_CSGMCommand = 1070;
+  //等级，商店系统
+  TCP_CSLevelUp = 1100;       //升级属性道具选择/刷新
+  TCP_CSBoxItem = 1101;       //选择自己掉落箱子
+  TCP_CSShopItem = 1102;      //购买，锁定，刷新商店操作
+  TCP_CSCompositeItem = 1103; //合成道具、武器等
+  TCP_CSSellWeapon = 1104;    //出售武器 
+  TCP_CSShopSelect = 1105;    //选择商品
+  //TCP Server Command
+  TCP_SCUserLogin = 2000;
+  TCP_SCSessionJoin = 2013;
+  TCP_SCSessionExit = 2015;
+  TCP_SCSessionReady = 2016;
+  TCP_SCSessionStart = 2017;
+  TCP_SCSessionTimeout = 2018;
+  TCP_SCMatchLoading = 2020;
+  TCP_SCMatchLoadCompleted = 2021;
+  TCP_SCMatchStarted = 2022;
+  TCP_SCMatchNotify = 2023;
+  TCP_SCPauseGame = 2025;
+  TCP_SCKillBoss = 2026;
+  TCP_SCWinLose = 2027;
+  TCP_SCMatchPassTime = 2030;
+  TCP_SCMatchDiscPeer = 2031;
+  TCP_SCStepResult = 2201;
+  TCP_SCLevelUp = 2202;
+  TCP_SCBoxItem = 2203;
+  TCP_SCShopItem = 2204;  
+  TCP_SCCompositeItem = 2205;
+  TCP_SCSellWeapon = 2206;
+  TCP_SCShopSelect = 2207;
+  TCP_SCShopRefresh = 2208;
+  TCP_SCMatchEnd = 2032;
+  TCP_SCMatchResult = 2033;
+  TCP_SCMatchDestroy = 2034;
+  TCP_SCTickNetEvent = 2050;
+  TCP_SCNetGeneralEvent = 2060;
+  //等级，商店系统
+  TCP_SCLevelUpInfo = 2210;
+  TCP_SCBoxItemInfo = 2211;
+  TCP_SCShopInfo = 2212;
+  TCP_SCWavesNotify = 2213;
+  TCP_SCCompensated = 2214;
+  TCP_SCGMCommand = 2070;
+}
+
+//--------------------Proto Struct----------------------------------
+//游戏Proto结构体
+message ItemInfo{
+  int64 item_id = 1;      //资源ID
+  int32 item_count = 2;
+}
+
+message WeaponInfo{
+  int32 slot_id = 1;
+  int32 weapon_id = 2;
+  int32 recv_coin = 3;
+}
+
+message ShopItemInfo{
+  int32 slot_idx = 1;
+  int32 item_id = 2;
+  int32 cost = 3;
+  int32 status = 4;    //0>none 1>lock
+  int64 player_id = 5;	//sold player_id
+}
+
+message RecvItem{
+  int32 item_id = 1;
+  int32 recv_coin = 2;
+}
+
+message GeneInfo{
+  int32 gene_slot = 1;
+  int32 gene_id = 2;
+  int32 quality = 3;
+  int32 level = 4;
+}
+
+message UserInfo {
+  int64 player_id = 1;
+  string nick_name = 2;
+  int32 character = 3;
+  repeated int32 level_ids = 4;			//解锁关卡、、未通
+  int32 index = 5;
+  int32 status = 6;
+  int32 hero_id = 7;
+  int64 cur_exp = 8;
+  int64 box_exp = 9;
+  repeated int32 item_ids = 10;
+  repeated WeaponInfo weapon_ids = 11;
+  //int64 com_coin = 12;		//个人补偿金币
+}
+
+message SessionInfo {
+  uint64 match_id = 1;
+  uint64 created_time = 2;
+  int32 levelId = 3;
+  int64 coin = 4;
+  int32 session_status = 5;
+  int32 session_waves = 6;
+  repeated UserInfo user_infos = 7;  
+  int32 book_level = 8;
+  repeated GeneInfo gene_infos = 9;
+  repeated GeneInfo is_gene_infos = 10;
+}
+
+message Vector2{
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message Vector2f{
+  float x = 1;
+  float y = 2;
+}
+
+message Vector3{
+  int32 x = 1;
+  int32 y = 2;
+  int32 z = 3;
+}
+
+message Vector3f{
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message NetEvent {
+  int64 player_id = 1;
+  int32 event_idx = 2;
+  bytes Data = 3;
+}
+
+message NetEventList {
+  uint32 tick_idx = 1;
+  repeated NetEvent event_list = 2;
+}
+
+message PauseTick{
+  uint32 tick_idx = 1;
+  int32 pause_status = 2;
+}
+
+message TickNetEvents {
+  repeated NetEventList tick_events = 1;
+  repeated PauseTick pause_tick = 2;  //key:tick value:status 0>pause 1>un_pause
+}
+
+//--------------------Client-TCP->Server-------------------------
+//游戏服务器登录请求
+message CSUserLogin{
+  int64 account_id = 1;
+  string acc_token = 2;
+  int64 player_id = 3;
+  string nick_name = 4;
+  uint32 conv_id = 5;
+}
+
+message CSPing{
+  int64 ping_time = 1;
+}
+
+message CSSessionJoin{
+  int64 match_id = 1;
+  int64 match_token = 2;
+  int32 hero_id = 3;
+  repeated int32 weapon_ids = 4;
+}
+
+message CSSessionJoinEx{
+  int64 room_id = 1;
+  int64 room_token = 2;
+  int32 character = 3;
+}
+
+message CSSessionExit{
+}
+
+message CSSessionReady{
+  int32 ready_status = 1; //1>ready 2>un_ready
+}
+
+message CSSessionStart{
+}
+
+message CSMatchLoading{
+  int64 player_id = 1;
+  int32 loading = 2;
+}
+
+message CSMatchLoadCompleted{
+  int64 player_id = 1;
+}
+
+message CSMatchNotify{
+  int32 notify_type = 1;
+  int64 value = 2;
+  string notify = 3;
+}
+
+message CSStepResult{
+  int64 player_id = 1;
+  int64 get_exp = 2;    //获得的经验
+  int64 get_box_exp = 3;  //获得的双倍经验
+  int64 get_coin = 4;    //获得的金币
+  repeated int32 box_ids = 5;  //获得的宝箱
+  repeated ItemInfo item_infos = 6; //获得的资源
+}
+
+message CSLevelUp{
+  int32 type = 1;     //0>Select Item 1>Refresh 2>Drop Item
+  int32 item_id = 2;
+}
+
+message CSBoxItem{
+  int32 type = 1;     //0>Select Item 1>Refresh 2>Drop Item
+  int32 item_id = 2;
+}
+
+message CSShopItem{
+  int32 type = 1;    //0>Buy Item 1>Refresh 2>LockId 3>UnlockId
+  int32 slot_id = 2;
+  int32 item_id = 3;
+}
+
+message CSSellWeapon{
+  int32 slot_id = 1;    //武器ID
+}
+
+message CSCompositeItem{
+  int32 slot_id = 1;    //武器ID
+}
+
+message CSShopSelect{
+  int32 slot_id = 1;
+}
+
+message CSMatchEnd{
+}
+
+message CSWinLose{
+  int32 win_lose = 1;		//0>lose 1>win
+  int32 match_score = 2;
+  repeated ItemInfo item_infos = 4; //获得的资源
+}
+
+message CSMatchResult{
+  int32 win_lose = 1;
+  int32 win_score = 2;
+  int32 lose_score = 3;
+  repeated ItemInfo item_infos = 4; //获得的资源
+}
+
+message CSNetEvent{
+  NetEvent net_event = 1;
+}
+
+message CSCompensated{
+}
+
+message CSPauseGame{
+  int32 status = 1; //0>un_pause 1>pause
+}
+
+message CSKillBoss{
+  int32 boss_id = 1;
+}
+
+message CSGMCommand{
+  int32 gm_cmd = 1; //1>add money 2>add item
+  int64 money = 2;	//money
+  int32 item_id = 3; //item_id item_id*10+quality
+}
+
+//--------------------PVPServer-UDP->Client-------------------------
+message SCUserLogin{
+  int32 result = 1;
+  int64 server_time = 2;
+}
+
+message SCPong{
+  int64 ping_time = 1;
+}
+
+message skillLevel {
+  int32 skillId = 1;		//技能ID
+  int32 quality = 2;		//颜色，品质
+  int32 level = 3;			//等级
+  int64 playerId = 4;		//收取
+}
+
+message IsPlayerInfo{
+  int64 player_id = 1;
+  string nick_name = 2;
+}
+
+message SCSessionJoin{
+  int32 result = 1;
+  SessionInfo session_info = 2;
+  repeated skillLevel skill_levels = 3;
+  repeated skillLevel is_skill_levels = 4;
+  int32 punishment = 5;		//惩罚难度
+  repeated IsPlayerInfo playerList = 6;		//岛屿玩家列表
+  int64 playerId = 7;
+}
+
+message SCSessionExit{
+  int32 result = 1;
+  int64 player_id = 2;
+}
+
+message SCSessionReady{
+  int32 result = 1;
+  SessionInfo session_info = 2;
+}
+
+message SCSessionStart{
+  int64 serverTime = 1;
+  int32 stepIdx = 2;
+  SessionInfo session_info = 3;
+}
+
+message SCSessionTimeout{
+  int32 result = 1;
+  int64 match_id = 2;
+}
+
+message SCMatchLoading{
+  int32 result = 1;
+  int64 player_id = 2;
+  int32 loading = 4;
+}
+
+message SCMatchLoadCompleted{
+  int32 result = 1;
+  int64 player_id = 2;
+}
+
+message SCMatchStarted{
+  int32 result = 1;
+  int64 player_id = 2;
+}
+
+message SCStepResult{
+  int32 result = 1;
+}
+
+message SCLevelUpInfo{
+  int64 player_id = 1;
+  int32 level = 2;
+  int32 up_level = 3;
+  int64 cur_coin = 4;
+  int32 re_coin = 5;
+  repeated int32 item_ids = 6;    //可选Item
+//  int32 com_coin = 7;		//个人补偿金
+}
+
+message SCLevelUp{
+  int32 result = 1;
+  int64 player_id = 2;
+  int32 item_id = 3;      //获得道具
+  int32 re_coin = 4;		//当前刷新
+  int64 cur_coin = 5;      //当前钱
+  int64 get_coin = 6;      //获得钱
+//  int32 com_coin = 7;		//个人补偿金
+}
+
+message SCBoxItemInfo{
+  int64 player_id = 1;
+  int64 cur_coin = 2;
+  repeated int32 box_ids = 3;		//未选箱子列表
+  RecvItem boxItem = 4;    //可选Item
+//  int32 com_coin = 5;		//个人补偿金
+}
+
+message SCBoxItem{
+  int32 result = 1;
+  int64 player_id = 2;
+  int32 item_id = 3;      //获得道具
+  int64 get_coin = 4;      //获得钱
+  int64 cur_coin = 5;      //当前钱
+//  int32 com_coin = 6;		//个人补偿金
+}
+
+message SelectInfo{
+  int64 player_id = 1;
+  int32 slot = 2;
+}
+
+message RefreshInfo{
+  int64 player_id = 1;
+  int32 refresh_status = 2;		//0>
+}
+
+message SCShopInfo{
+  int32 re_coin = 2;
+  int64 cur_coin = 3;      //当前钱
+  int32 free_fresh = 4;
+  repeated ShopItemInfo shop_infos = 5;
+//  int32 com_coin = 6;		//个人补偿金
+  repeated SelectInfo select_ids = 7; //key:player_id value:slot
+  repeated RefreshInfo refresh_infos = 8;	//刷新信息
+  int64 player_id = 9;		//某人进入ShopInfo状态
+}
+
+message SCShopRefresh{
+  int64 player_id = 1;
+  repeated RefreshInfo refresh_infos = 2;	//刷新信息
+}
+
+message SCShopItem{
+  int32 result = 1;
+  int64 player_id = 2;
+  int32 type = 3;    //0>Buy Item 1>Refresh 2>LockId 3>UnlockId
+  repeated WeaponInfo weapon_ids = 4;	//玩家武器
+  int32 item_id = 5;		//获得道具
+  int32 re_coin = 6;		//当前刷新
+  int64 cur_coin = 7;      	//当前钱
+  int32 cost_coin = 8;    	//花费的钱
+  ShopItemInfo shop_info = 9;
+  int32 free_fresh = 10;
+//  int32 com_coin = 11;		//个人补偿金`
+}
+
+message SCSellWeapon{
+  int32 result = 1;
+  int64 player_id = 2;
+  int32 slot_id = 3;
+  int32 weapon_id = 4;
+  int64 cur_coin = 5;   //当前钱
+  int32 get_coin = 6;   //花费的钱
+  repeated WeaponInfo weapon_ids = 7;
+//  int32 com_coin = 8;		//个人补偿金
+}
+
+message SCShopSelect{
+  int32 result = 1;
+  int64 player_id = 2;
+  int32 slot_id = 3;
+}
+
+message SCCompositeItem{
+  int32 result = 1;
+  int64 player_id = 2;
+  int32 slot = 3;
+  int32 weapon_id = 4;  
+  repeated WeaponInfo weapon_ids = 5;	//玩家武器
+}
+
+message SCMatchNotify{
+  int32 result = 1;
+  int64 player_id = 2;
+  int32 notify_type = 4;
+  int64 value = 5;
+  string notify = 6;
+}
+
+message SCPauseGame{
+  int32 result = 1;
+  int32 status = 2; //0>un_pause 1>pause
+  int64 tick_idx = 3; //帧消息
+}
+
+message SCKillBoss{
+  int32 result = 1;
+  int32 boss_id = 2;
+}
+
+message SCShopNotify{
+  int64 player_id = 1;
+  int32 act_type = 2;    //1>...
+  int32 re_coin = 3;
+  int64 cur_coin = 4;      //当前钱
+  ShopItemInfo shop_info = 5;
+//  int32 com_coin = 8;		//个人补偿金
+}
+
+message SCMatchPassTime{
+  int32 result = 1;
+  int64 match_id = 2;
+  int32 pass_time = 3;
+}
+
+message SCMatchConnPeer{
+  int32 result = 1;
+  int64 player_id = 2;
+  UserInfo user_info = 3;
+}
+
+message SCMatchDiscPeer{
+  int32 result = 1;
+  int64 player_id = 2;
+}
+
+message SCMatchEnd{
+  int32 result = 1;
+}
+
+message SCMatchResult{
+  int32 result = 1;
+  int32 win_lose = 2;
+  int32 win_score = 3;
+  int32 lose_score = 4;
+  repeated ItemInfo item_infos = 5; //获得的资源
+}
+
+message SCMatchDestroy{
+  int64 match_id = 1;
+  int64 match_token = 2;
+}
+
+message SCWinLose{
+  int32 result = 1;
+  int32 win_lose = 2;
+}
+
+message SCTickNetEvent{
+  uint32 time_tick = 1;
+  NetEventList event_list = 2;
+}
+
+message SCCompensated{
+  int32 result = 1;
+  SessionInfo session_info = 2;
+  uint32 cur_time_tick = 3;
+  TickNetEvents tick_events = 4;
+}
+
+message SCGMCommand{
+  int32 result = 1;
+  int32 gm_cmd = 2; //1>add money 2>add item
+  int64 player_id = 3;
+  int64 cur_money = 4;	//money
+  int32 type = 5;    //0>Buy Item 1>Refresh 2>LockId 3>UnlockId
+  repeated WeaponInfo weapon_ids = 6;	//玩家武器
+  int32 item_id = 7;		//获得道具
+}
+
+enum ResultCode {
+  Error_None = 0;
+  Error_Bind_Proto = 1;                 //消息解析错误
+  Error_User_Inited = 2;        //User已经注册
+}

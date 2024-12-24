@@ -1,68 +1,55 @@
-v:0.0.1
-d:2019-1-16 23:52:00
-e:gumy
-
-
-purpose:
-    game server template to all type game [ARPG/SLG/FPS/RTS/Chess/Sandbox/... .. .]
-    [different module function to different game type,just need add to your servertemplate]
-
-
-            *more see document dir*
-
-
-======================= introduce ====================
-
-Engine include :
-1.libxml2
-2.log4xx
-3.dbconnect[mysql->c++]
-4.net[window->iocp/linux->epoll]] 
-
-Tip: Server can easy to build and just need write game logic, have all base function
-
-
-======================= build ====================
-build in windows 
-
-   Use vs2017 Open Server.sln
-
-build in linux [linux centos 7.0]
-
-    1.clean all server build data use : 
-        sh clean_server 
-    2.make all server use :
-        sh make_server
-    3.run all server use :
-        sh run_server
-    4.stop all server use :
-        sh stop_server
-    
-
-======================= deployment ====================
 
 
 
-    1.db init
-        1.use '\Document\sql' dir files create databases; same dbname to file name, and import data to table
-
-    2.run param
-        2.in db[act_platform_new] table[serverlist] is the all server ip/port info to server name [(ip/port) edit to you self]
-        3.run in linux as [./GameServer -d -nGameServer1]  [-d run ad linux doman] [-n+ServerNodeName to get ip/port and config info]
-        4.run in windows see to (3), but not need '-d'
-
-    3.code edit
-        5.in function 'MyServer::init' code 'setConnectServerType("server type name");' is to this server, has link server type
-        6.in function 'MyServer::checkConnect' code 'checkConnectedServer("server type name");' is set this server need connect to target server type
-
-    2.config
-        7.in bin file dir log.xml is log4xx config file has all server config info
-        8.in bin file dir config.xml is db connect config info
+lib - core 生成lib以及include
+data - excel 配置文件数据 以及 proto 文件
+document - 文档目录
+third_part - 第三方库目录 直接使用 vcpkg 进行安装
+tools - 工具源码目录
+build - cmake 生成项目文件目录
+core - 封装进程核心
+service - 封装service基础接口
 
 
 
 
-[excuse me for my poor english :) ]
+
+
+RealServer/
+├── CMakeLists.txt       # 主 CMake 配置文件
+├── core/            # core 项目 提供给service依赖的库
+│   ├── CMakeLists.txt 生成core库的cmake文件
+│   └── src/
+│            ├── xAsio
+│            └── xBase
+├── source/            # source 定义协议目录 提供给service依赖的源码
+│   ├── ecxel protobuf 源码目录
+│   └── protocol protobuf 源码目录
+├── service/            # service目录
+│   ├── LoginService/            # LoginService 项目 依赖 core 项目 以及依赖 source 源码目录 
+│    |           ├── CMakeLists.txt
+│    |           └── src/
+│   └── GateService/            # GateService 项目 依赖 core 项目 以及依赖 source 源码目录 
+│                ├── CMakeLists.txt
+│                └── src/
+└── build/               # 总构建目录
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
