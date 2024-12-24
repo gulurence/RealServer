@@ -1,63 +1,68 @@
 ﻿#include "xLog.h"
-#include <string.h>
 
-Logcxx::Logcxx(void) {
-    _pImp = new Imp();
+#include <spdlog/spdlog.h>
+#include "spdlog/sinks/stdout_color_sinks.h"
+
+xLog::xLog(void) {
 }
 
-Logcxx::~Logcxx(void) {
-    if (_pImp) {
-        delete _pImp;
-    }
+xLog::~xLog(void) {
 }
 
-void Logcxx::Init(const char* prop) {
-    _pImp->Init(prop);
+void xLog::Init(const char* prop) {
+    service_name = "normal_service";
+    std::string logFileName = "logs/" + service_name + ".log";
+    // 文件日志
+    auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5, 400);
+    //sink->set_pattern("[%Y-%m-%d %H:%M:%S] [%^%L%$] %v");
+    // 前台日志
+    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    //console_sink->set_pattern("[%Y-%m-%d %H:%M:%S] [%^%L%$] %v");
+    //
+    spdlog::set_pattern("[%H:%M:%S %z] %v");
+    // 设置日志
+    std::vector<spdlog::sink_ptr> sinks = { sink, console_sink };
+    _logger = std::make_shared<spdlog::logger>(service_name, sinks.begin(), sinks.end());
+    spdlog::set_default_logger(_logger);
+    spdlog::set_level(spdlog::level::info);
 }
 
-void Logcxx::Print(const char* file, long line, const char* funtion, Level level, const char* format, ...) {
+void xLog::Print(const char* file, long line, const char* funtion, Level level, const char* format, ...) {
     char buff[4096] = { 0 };
     va_list ap;
     va_start(ap, format);
     vsnprintf_s(buff, 4096, format, ap);
     va_end(ap);
 
-    std::string strlog = (boost::format(" %s %s %s : %s") % file % line % funtion % buff).str();
+    auto filePatch = std::string(file);
+    std::string::size_type first = filePatch.rfind('\\');
+    if (first != std::string::npos) {
+        filePatch = filePatch.substr(first + 1, filePatch.size());
+    }
 
-    _pImp->Print(level, strlog);
-}
+    std::string strlog = (boost::format(" %s:%s - %s") % filePatch % line % buff).str();
 
-void Logcxx::Imp::Init(const char* prop) {
-    setlocale(LC_ALL, "");
-    log4cxx::PropertyConfigurator::configureAndWatch(prop);
-    log4cxx::LoggerPtr rootLogger = log4cxx::Logger::getRootLogger();
-    assert(rootLogger);
-}
-
-void Logcxx::Imp::Print(Logcxx::Level level, std::string& buff) {
-    log4cxx::LoggerPtr rootLogger(log4cxx::Logger::getRootLogger());
     switch (level) {
-    case Logcxx::ERR:
-        rootLogger->error(buff);
+    case Level::ERR:
+        _logger->error(strlog);
         break;
-    case Logcxx::WARN:
-        rootLogger->warn(buff);
+    case Level::WARN:
+        _logger->warn(strlog);
         break;
-    case Logcxx::DEBUG:
-        rootLogger->debug(buff);
+    case Level::DEBUG:
+        _logger->debug(strlog);
         break;
-    case Logcxx::INFO:
-        rootLogger->info(buff);
+    case Level::INFO:
+        _logger->info(strlog);
         break;
-    case Logcxx::TRACE:
-        rootLogger->trace(buff);
+    case Level::TRACE:
+        _logger->trace(strlog);
         break;
     default:
         assert(false);
-        rootLogger->info(buff);
+        _logger->error(strlog);
         break;
     }
+    _logger->flush();
 }
-
-
 
