@@ -14,7 +14,7 @@ xService::xService(const char* pszServiceName, uint16 u16Port) {
     //
     SetServiceState(XSERVICE_CREATE);
     //
-    XINF("xService::xService Create [%s]", pszServiceName);
+    XINF("Create [%s]", pszServiceName);
 }
 
 xService::~xService() {

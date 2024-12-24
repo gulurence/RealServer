@@ -5,12 +5,9 @@
 #include <stdarg.h>
 #include <boost/serialization/singleton.hpp> 
 #include <boost/format.hpp>
-#include <log4cxx/logger.h>  
-#include <log4cxx/basicconfigurator.h>  
-#include <log4cxx/propertyconfigurator.h>  
-#include <log4cxx/helpers/exception.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 
-class Logcxx : public boost::serialization::singleton<Logcxx>
+class xLog : public boost::serialization::singleton<xLog>
 {
 public:
     enum Level
@@ -25,32 +22,22 @@ public:
     class Imp;
 
 public:
-    void Init(const char* prop);
+    void Init(const char* prop = "log4cxx.properties");
     void Print(const char* file, long line, const char* funtion, Level level, const char* format, ...);
 
 protected:
-    Logcxx(void);
-    ~Logcxx(void);
+    xLog(void);
+    ~xLog(void);
 
 private:
-    Imp* _pImp;
+    std::string service_name;
+    std::shared_ptr<spdlog::logger> _logger;
 };
 
-class Logcxx::Imp
-{
-public:
-    Imp() {}
-    ~Imp() {}
-
-    void Init(const char* prop = "log4cxx.properties");
-    void Print(Logcxx::Level level, std::string& buff);
-};
-
-#define  XTRC(...) Logcxx::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, Logcxx::TRACE, __VA_ARGS__)
-#define  XDBG(...) Logcxx::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, Logcxx::DEBUG, __VA_ARGS__)
-#define  XLOG(...) Logcxx::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, Logcxx::INFO, __VA_ARGS__)
-#define  XINF(...) Logcxx::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, Logcxx::INFO, __VA_ARGS__)
-#define  XWRN(...) Logcxx::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, Logcxx::WARN, __VA_ARGS__)
-#define  XERR(...) Logcxx::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, Logcxx::ERR, __VA_ARGS__)
-
+#define  XTRC(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::TRACE, __VA_ARGS__)
+#define  XDBG(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::DEBUG, __VA_ARGS__)
+#define  XLOG(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::INFO, __VA_ARGS__)
+#define  XINF(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::INFO, __VA_ARGS__)
+#define  XWRN(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::WARN, __VA_ARGS__)
+#define  XERR(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::ERR, __VA_ARGS__)
 
