@@ -1,0 +1,213 @@
+syntax = "proto3";
+
+import public "tx_entity.proto";
+
+option go_package = "tx_proto";
+
+package tx_proto;
+
+/////////////////////////////////////////Local Test//////////////////////////////////////////////////////
+/////////////////////////////////////////Auth - Island Match////////////////////////////////////////////
+
+// 玩家队伍中的职责
+enum TeamPlayerOnusType {
+  TeamPlayerOnusType_Null = 0;
+  P_T = 1;
+  P_N = 2;
+  P_DPS = 3;
+}
+
+// 队伍职责类型用于匹配
+enum TeamOnusType {
+  TeamOnusType_Null = 0;
+  T_TN = 1;
+  T_T = 2;
+  T_N = 3;
+  T_DPS = 4;
+}
+
+// 玩家队伍信息
+message MPlayerTeamInfo {
+  int64 playerId = 1;
+  int32 teamIndex = 2; // 1 开始 房间中的位置
+  string nickName = 3;
+  MTeamPlayerStateType readyState = 4;
+  int32 character = 5; //职业形象
+  bool readyEnterBattle = 6; // 是否确认进入战斗
+}
+
+// island server -> match server
+message CSMatchTeamCreate {
+  int64 playerId = 1;
+  int32 sceneId = 2;
+  TeamPlayerOnusType onusType = 3;
+  // 服务器内部填写不用客户端上传
+  SMatchPlayerBattleData battleData = 4;
+}
+
+// match server -> island server
+message SCMatchTeamCreate {
+  int32 result = 1;
+  int64 teamOwner = 2;
+  int64 teamId = 3;
+  SMatchTeamData teamData = 4;
+}
+
+// 加入队伍
+message CSMatchTeamJoin {
+  int64 playerId = 1;
+  int64 teamId = 2;
+  TeamPlayerOnusType onusType = 3;
+  // 服务器内部填写不用客户端上传
+  SMatchPlayerBattleData battleData = 4;
+  
+}
+
+// 
+message SCMatchTeamJoin {
+  int32 result = 1;
+  int64 teamId = 2;
+  int64 teamOwner = 3;
+  repeated MPlayerTeamInfo playerInfos = 4;
+}
+
+// 设置队伍中的准备状态
+message CSMatchTeamReadyOption {
+  int64 playerId = 1;
+  int64 teamId = 2;
+  MTeamPlayerStateType state = 3;
+}
+
+// 
+message SCMatchTeamReadyOption {
+  int32 result = 1;
+  int64 teamId = 2;
+  
+}
+
+// 离开队伍
+message CSMatchTeamLeave {
+  int64 playerId = 1;
+  int64 teamId = 2;
+  int64 TargetPlayerId = 3;
+  
+}
+
+// 
+message SCMatchTeamLeave {
+  int32 result = 1;
+  int64 teamId = 2;
+  int64 TargetPlayerId = 3;
+  
+}
+
+// 踢出队伍
+message CSMatchTeamKickOut {
+  int64 playerId = 1;
+  int64 teamId = 2;
+  int64 targetPlayerId = 3;
+  
+}
+
+// 
+message SCMatchTeamKickOut {
+  int32 result = 1;
+  int64 teamId = 2;
+  int64 targetPlayerId = 3;
+  
+}
+
+// 开始匹配
+message CSMatchBeginMatch {
+  int64 playerId = 1;
+  int64 teamId = 2;
+  
+}
+
+// 
+message SCMatchBeginMatch {
+  int32 result = 1;
+  int64 teamId = 2;
+  
+}
+
+// 取消匹配
+message CSMatchCancelMatch {
+  int64 playerId = 1;
+  int64 teamId = 2;
+  
+}
+
+// 
+message SCMatchCancelMatch {
+  int32 result = 1;
+  int64 teamId = 2;
+  
+}
+
+// 匹配成功通知
+message SCMatchSuccessNotify {
+  int64 roomId = 1;
+  repeated MPlayerTeamInfo playerInfos = 2;
+}
+
+// 确认进入战斗
+message CSMatchEnterBattle {
+  int64 playerId = 1;
+  int64 roomId = 2;
+  bool isReady = 3; // 是否进入战斗
+  
+}
+
+// 
+message SCMatchEnterBattle {
+  int32 result = 1;
+  int64 teamId = 2;
+  
+}
+
+// 玩家切换islan之后需要向matchserver更新island room id
+// 玩家进入
+message CSMatchUpdateIslandRoomID {
+  int64 matchRoomId = 1;
+  int64 matchTeamId = 2;
+  int64 playerId = 3;
+  int64 islandRoomId = 4;
+}
+
+message SCMatchUpdateIslandRoomID {
+  int32 result = 1;
+  int64 matchRoomId = 2;
+  int64 matchTeamId = 3;
+  int64 playerId = 4;
+  int64 islandRoomId = 5;  
+}
+
+// 创建战斗房间通知
+message SCCreateBattleSuccessNotify {
+  int64 roomId = 1;
+  string pvpWsUrl = 2;
+  int64 token = 3;
+}
+
+// 战斗结算
+message SCBattleSettlementNotify {
+  int64 roomId = 1;
+  int64 teamId = 2;
+  
+}
+
+// 更新队伍信息
+message SCMatchTeamUpdateMsg {
+  int64 teamId = 1;
+  int64 teamOwner = 2;
+  repeated MPlayerTeamInfo players = 3;
+  repeated int64 removePlayers = 4;
+  MTeamStateType teamState = 5;
+}
+
+// 更新房间信息
+message SCMatchRoomUpdateMsg {
+  int64 roomID = 1;
+  repeated MPlayerTeamInfo playerInfos = 2;
+}

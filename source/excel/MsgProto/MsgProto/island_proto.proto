@@ -1,0 +1,1434 @@
+syntax = "proto3";
+
+import public "tx_entity.proto";
+
+option go_package = "tx_proto";
+
+package tx_proto;
+
+/////////////////////////////////////////Local Test//////////////////////////////////////////////////////
+// Client-Server Struct
+//注册账号
+message CSPlayerLogin{
+  int64 accountId = 1;
+  string jwtToken = 2;
+  int64 playerId = 3;
+  int64 islandId = 4;
+}
+
+message CSPlayerAvatar{
+  int64 avatarId = 1;
+}
+
+message CSPlayerNickName{
+  int64 playerId = 1;
+  string nickName = 2;
+  int32 type = 3;   //0昵称，1微信名
+}
+
+message CSPlayerLogout{
+
+}
+
+//List System
+message CSPlayerDetailInfo{
+
+}
+
+message CSPlayerBitStatus{
+  int32 Index = 1;  //Bit Index
+  int32 Type = 2;   //1>Set 2>Del
+}
+
+message CSPlayerRecordTime{
+  int32 recordType = 1;
+  int64 record_time = 2;
+}
+
+message CSPlayerTutorial{
+  int32 tutorial = 1;
+}
+
+message CSWsTickTime{
+  int64 time = 1;
+}
+
+message CSItemList{
+
+}
+
+message CSBinaryReq{
+  int32 msgID = 1;
+  bytes data = 2;
+}
+
+message CSChickList{
+}
+
+//Item System
+message CSItemGet{
+  int64 itemId = 1;
+  int32 itemCount = 2;
+}
+
+message CSItemUse{
+  int64 playerId = 1;
+  int64 dbId = 2;
+  int64 itemId = 3;
+  int32 count = 4;
+  int32 entityId = 5;   //目标EntityId
+}
+
+message CSItemSell{
+  int64 dbId = 1;
+  int64 itemId = 2;
+  int32 count = 3;
+}
+
+message CSItemMove{
+  int64 f_dbId = 1;
+  int64 f_itemId = 2;
+  int64 f_count = 4;
+  int64 t_dbId = 5;
+  int64 t_itemId = 6;
+}
+
+message CSItemPush{
+}
+
+message CSItemPop{
+  int64 dbId = 1;
+  int64 itemId = 2;
+  int64 count = 3;
+}
+//通用型请求，目前用来更改背包锁定
+message CSOptionSet{
+  int32 optionId = 1;
+  int32 optionValue = 2;
+  string optionString = 3;
+}
+
+enum ChickBuyType{
+  CBT_None = 0;
+  CBT_Coin = 1;
+  CBT_Gem = 2;
+}
+
+message CSChickOpen{
+  int64 chickId = 1;
+  ChickBuyType buyType = 2; //0>chick 1>Coin 2>Diamond
+}
+
+message CSGeneShopInfo{
+
+}
+
+message CSGeneShopBuy{
+
+}
+
+message CSGeneShopGet{
+
+}
+
+message CSGeneUpgrade{
+  int32 geneSlot = 1;
+}
+
+message CSTaskList{
+  TaskType taskType = 1;
+}
+
+message CSTaskCompleted{
+  int32 taskId = 1;
+  TaskType taskType = 2;
+}
+
+message CSTaskActive{
+  int32 taskId = 1;
+}
+
+message CSIslandTaskList{
+  TaskType taskType = 1;
+}
+
+message CSIslandTaskCompleted{
+  int32 taskId = 1;
+  TaskType taskType = 2;
+}
+
+message CSSkillPermitUpgrade{
+  int32 skillId = 1;
+  int32 level = 2;
+}
+
+message CSSkillPermitCharge{
+  int32 skillId = 1;
+}
+
+message CSSkillUpgrade{
+  int32 skillId = 1;
+}
+
+//Island
+message CSIslandInfo{
+}
+
+message CSIslandPlayerInfo{
+}
+
+message CSIslandPlayerInfoSearch{
+  repeated int64 playerIdList = 1;
+}
+
+message CSIslandItemList{
+  int64 playerId = 1;
+}
+
+message CSIslandEntityList{
+}
+
+message CSIslandCookSkillList{
+}
+
+message CSIslandGeneInfoList{
+}
+
+message CSIslandLevelList{
+}
+
+message CSIslandWeaponList{
+}
+
+message CSIslandConditionList{
+}
+
+message CSIslandFlowerList{
+}
+
+message CSIslandSkillList{
+  int32 groupId = 1;
+}
+
+message CSIslandSkillUpgrade{
+  int64 skillId = 1;
+  int32 skillLevel = 2;
+}
+
+message CSIslandBookActive{
+  int32 bookLevel = 1;
+}
+
+message CSIslandRescueNpc{
+  int64 playerId = 1;
+}
+
+message CSIslandRoomCreate{
+  string nickName = 1;
+  string qrCode = 2;
+  string advertise = 3;
+  string notice = 4;
+  string groupUrl = 5;//qrCode图片的url路径
+}
+
+message CSIslandRoomSearch{
+  int64 start = 1;
+  int32 search_type = 2;   //0> 排序 1>根据岛屿分数查询
+  int64 island_id = 3;    //指定Island查询
+}
+
+enum RoomJoinType{
+  RJT_None = 0;         //创建账号新岛
+  RJT_Search = 1;       //1>匹配加入
+  RJT_QuitSearch = 2;   //2>主动离岛匹配
+  RJT_MainSearch = 3;   //3>主界面跳岛
+  RJT_Found = 4;        //4>搜索指定加入
+  RJT_Kick = 5;         //5>被踢到新岛
+  RJT_Apply = 6;        //6>申请通过
+  RJT_Invita = 7;         //7>邀请加入
+  RJT_WxJoin = 8;         //8>微信直接加入
+}
+
+message CSIslandRoomJoin{
+  int64 islandId = 1;
+  int32 characterId = 2;
+  int64 time_code = 3;
+  int32 join_type = 4;    //1>匹配加入 2>主动离岛匹配 3>主界面跳岛 4>搜索指定加入 5>被踢到新岛
+  int64 targetPlayerId = 5; // 邀请的玩家Id
+  int64 invitationPlayerId = 6; // 被谁邀请的
+}
+
+message CSIslandRoomExit{
+}
+
+message CSIslandReplayJoin{
+  int64 playerId = 1;
+  int32 replay = 2;     //0>idle 1>accept 2>reject
+  string replaySub = 3;
+  int64 targetPlayerId = 4; // 邀请的玩家Id
+  int64 srcPlayerId = 5; // 被谁邀请加入的
+}
+
+// 创建社区的时候动态请求
+message CSIslandCreateCastConsume{
+  
+}
+
+// 改变自己的角色ID
+message CSIslandChangeRoleId{
+  int32 roleId = 1;
+}
+
+// 加入社区社区已满之后发送邮件给邀请方
+message CSJoinIslandFullSendMail{
+  int64 targetPlayerId = 1;
+  string myVxName = 2;
+}
+
+//Island Item
+//Item System
+message CSIslandItemUse{
+  int64 dbId = 1;
+  int64 itemId = 2;
+  int32 itemType = 3;
+  int32 count = 4;
+  int32 entityId = 5;   //目标EntityId
+}
+
+message CSIslandItemSell{
+  int64 dbId = 1;
+  int64 itemId = 2;
+  int32 itemType = 3;
+  int32 count = 4;
+}
+
+message CSIslandItemMove{
+  int64 f_dbId = 1;
+  int64 f_itemId = 2;
+  int32 f_itemType = 3;
+  int32 f_count = 4;
+  int64 t_dbId = 5;
+  int64 t_itemId = 6;
+  int32 t_itemType = 7;
+}
+
+message CSIslandItemCompost{
+  int64 dbId = 1;
+  int64 itemId = 2;
+  int32 itemType = 3;
+}
+
+message CSIslandCookItem{
+  int32 cookId = 1;
+}
+
+message CSIslandWeaponUpgradeList{
+}
+
+message CSIslandWeaponUpgrade{
+  int32 weaponId = 1;
+}
+
+message CSIslandWeaponCompleted{
+}
+
+//Player Mail
+message CSMailList{
+  int32 mailType = 1;
+  int64 mailDBId = 2;
+}
+
+message CSMailRead{
+  int64 mailId = 1;
+  MailType mailType = 2;
+}
+
+//message CSMailReadProcess{
+//  int64 mailId = 1;
+//  MailType mailType = 2;
+//}
+
+message CSMailProcess{
+  int64 mailId = 1;
+}
+
+message CSMailDelete{
+  int64 mailId = 1;
+  MailType mailType = 2;
+}
+
+
+//Player Mail
+message CSIslandMailList{
+  int32 mailType = 1;
+  int64 mailDBId = 2;   //From the dbId to list
+}
+
+message CSIslandMailRead{
+  int64 mailId = 1;
+  MailType mailType = 2;
+}
+
+//message CSIslandMailReadProcess{
+//  int64 mailId = 1;
+//  MailType mailType = 2;
+//}
+
+message CSIslandMailProcess{
+  int64 mailId = 1;
+  MailType mailType = 2;
+}
+
+message CSIslandMailDelete{
+  int64 mailId = 1;
+  MailType mailType = 2;
+}
+
+//Player Active
+message CSPlayerMove{
+  int32 moveType = 1;
+  Position position = 2;
+  int32  direction = 3;
+  int32  speed 	= 4; // */100
+  int64 targetEntityId = 5;
+}
+
+message CSPlayerEnterIsland{
+  int32 statue = 1;
+}
+
+message CSPlayerActive{
+  PlayerActiveType activeType = 1;
+  int32 targetId = 2;
+  repeated UseItem useItem = 3;
+}
+
+message CSPlayerCollect{
+  int32 targetId = 1;
+  int32 damageId = 2;
+}
+
+message CSPlayerPickUpMapItem{
+  int64 playerId = 1;
+  int32 itemType = 2; // 0> map item 1>map box item
+  repeated int64 idxList = 3;
+}
+
+message CSIslandNpcActive{
+  int64 playerId = 1;
+  int32 activeType = 2;
+}
+
+message CSBattleList{
+}
+
+message CSBattleCreate{
+  int32 levelId = 1;
+  int64 version = 2;
+  bool  privateRoom = 3;
+  bool  newBattle = 4;
+}
+
+message CSBattleJoin{
+  int64 battleIdx = 1;
+  int64 version = 2;
+}
+
+message CSBattleStart{
+  int64 battleIdx = 1;
+  bool  newBattle = 2;
+}
+
+message CSBattleResult{
+  int64 battleIdx = 1;
+}
+
+message CSBattleExit{
+  int64 battleIdx = 1;
+}
+
+message CSBattleHeroList{
+  int64 battleIdx = 1;
+}
+
+message CSBattleSelectHero{
+  int64 battleIdx = 1;
+  int32 heroId = 2;
+}
+
+message CSBattleWeaponList{
+  int64 battleIdx = 1;
+}
+
+message CSBattleSelectWeapon{
+  int64 battleIdx = 1;
+  int32 weaponId = 2;
+}
+
+// 排行榜拉取类型
+enum RankDataReqType{
+  RankDataReqTypeSelf = 0;     // 自己
+  RankDataReqTypeFirst = 1;     // 第一名
+  RankDataReqTypeAround = 2;     // 自己周围的
+  RankDataReqTypeFrontEight = 3;     // 前8名信息
+}
+
+message CSPlayerLeaderBoard{
+  LeaderboardType lbType = 1;
+  int64 lbBegin = 2;
+  int64 lbCount = 3;
+  int64 searchId = 4;
+  RankDataReqType reqType = 5;
+}
+
+message CSIslandLeaderBoard{
+  LeaderboardType lbType = 1;
+  int64 lbBegin = 2;
+  int64 lbCount = 3;
+  int64 searchId = 4;
+  RankDataReqType reqType = 5;
+}
+
+message CSBattleLastNoExit{
+
+}
+
+message CSBattleLastDelete{
+
+}
+
+message CSIslandUpdateQrCode{
+   string pic_url = 1;
+   string qr_code_url = 2;
+}
+
+message CSIslandGroupApply{
+  string wxNickName = 1;
+}
+
+message CSIslandGroupAccept{
+  int64 player_id = 1;
+  int32 apply_type = 2; //2>accept 3>reject
+}
+
+message CSIslandGroupKickPlayer{
+  int64 player_id = 1;  //kick player id
+}
+
+message CSIslandGroupReward{
+}
+
+
+////////////////////////////////////// Server-Client Struct ///////////////////////////////////
+message SCPlayerLogin{
+  int32 result = 1;
+  int64 serverTime = 2;
+  PlayerInfo playerInfo = 3;
+  Position position = 4;
+  PlayerDetail playerDetail = 5;
+  int64 DenyTime = 6;
+  string serverVersion = 7;
+  // 匹配服务器信息
+  int64 team_id = 8;
+  int64 room_id = 9;
+  int64 pvptoken = 10;
+  string pvpurl = 11;
+}
+
+message SCPlayerAvatar{
+  int32 result = 1;
+  int64 playerId = 2;
+  int64 avatarId = 3;
+}
+
+message SCPlayerNickName{
+  int32 result = 1;
+  int64 playerId = 2;
+  string nickName = 3;
+  int32 type = 4;
+  repeated string filterWords = 5;
+}
+
+message SCPlayerBitStatus{
+  int32 result = 1;
+  int64 bitStatus = 2;
+}
+
+message SCPlayerRecordTime{
+  int32 result = 1;
+  PlayerRecordTime recordTime = 2;
+}
+
+message SCPlayerTutorial{
+  int32 result = 1;
+  int64 playerId = 2;
+  int32 tutorial = 3;
+}
+
+message SCWsTickTime{
+  int64 time = 1;
+}
+
+message SCItemList{
+  repeated ItemInfo itemInfos = 1;
+}
+
+message SCChickList{
+  int32 result = 1;
+  ChickInfo chickInfo = 2;
+}
+
+//Item System
+message SCPlayerDetailInfo{
+  int32 result = 1;
+  repeated CurrencyInfo currencies = 2;
+  repeated GeneInfo geneInfos = 4;
+  repeated SkillInfo playerSkills = 5;
+  repeated ConditionInfo conditions = 6;
+  ChickInfo chickInfo = 7;
+  LevelInfo levelInfo = 8;
+  repeated PlayerRecordTime recordTimes = 9;
+  int64 bitStatus = 10;
+  int32 tutorial = 11;
+}
+
+//Item
+message SCItemGet{
+  int32 result = 1;
+  ItemInfo itemInfo = 2;
+}
+
+message SCItemUse{
+  int32 result = 1;
+  ItemInfo itemInfo = 2;
+  RewardInfo rewardInfo = 3;
+  RewardResult rewardResult = 4;
+}
+
+message SCItemSell{
+  int32 result = 1;
+  repeated ItemInfo itemInfo = 2;
+  RewardInfo rewardInfo = 3;
+  repeated CurrencyInfo currencies = 4;
+}
+
+message SCItemMove{
+  int32 result = 1;
+  repeated ItemInfo itemInfo = 2;
+}
+
+message SCItemPush{
+  int32 result = 1;
+  repeated ItemInfo itemInfos = 2;
+  repeated ItemInfo isItemInfos = 3;
+}
+
+message SCItemPop{
+  int32 result = 1;
+  repeated ItemInfo itemInfo = 2;
+  repeated ItemInfo isItemInfo = 3;
+}
+
+message SCOptionSet{
+  int32 result = 1;
+  int64 playerId = 2;
+  int32 optionId = 3;
+  int32 optionValue = 4;
+  string optionString = 5;
+}
+
+message SCChickOpen{
+  int32 result = 1;
+  ChickInfo chickInfo = 2;
+  repeated CurrencyInfo currencies = 3;
+  repeated SkillInfo playerSkills = 4;
+  repeated SkillInfo islandSkills = 5;
+  int64 rewardPower = 6;
+  repeated RewardSkill rewardSkills = 7;
+}
+
+message SCGeneShopInfo{
+  int32 result = 1;
+  int32 shopIdx = 2;
+  repeated GeneInfo shopGenes = 3;
+}
+
+message SCGeneShopBuy{
+  int32 result = 1;
+  int32 shopIdx = 2;
+  CurrencyInfo currency = 3;
+  repeated GeneInfo shopGenes = 4;
+  GeneInfo buyGene = 5;
+}
+
+message SCGeneShopGet{
+  int32 result = 1;
+  int32 shopIdx = 2;
+  repeated GeneInfo geneInfos = 3;
+  repeated CurrencyInfo currencies = 4;
+  int64 sellCoin = 5;
+  int64 sellGeneExp = 6;
+}
+
+message SCGeneUpgrade{
+  int32 result = 1;
+  int64 GeneExp = 2;
+  GeneInfo GeneInfo = 3;
+  repeated CurrencyInfo currencies = 4;
+  repeated ItemInfo itemInfos = 6;
+}
+
+message SCTaskList{
+  int32 result = 1;
+  TaskType taskType = 2;
+  repeated TaskInfo taskInfos = 3;
+}
+
+message SCTaskCompleted{
+  int32 result = 1;
+  TaskInfo TaskInfo = 2;            //完成任务，删除
+  repeated TaskInfo newTasks = 3;   //触发新任务
+  RewardResult rewardResult = 4;
+  repeated RewardInfo rewards = 5;
+}
+
+message SCTaskActive{
+  int32 result = 1;
+  TaskInfo TaskInfo = 2;
+}
+
+message SCIslandTaskList{
+  int32 result = 1;
+  TaskType taskType = 2;
+  repeated TaskInfo taskInfos = 3;
+}
+
+message SCIslandTaskCompleted{
+  int32 result = 1;
+  int32 taskId = 2;
+  TaskType taskType = 3;
+  TaskInfo taskInfo = 4;
+  RewardInfo rewardInfo = 5;
+  repeated CurrencyInfo currencies = 6;
+  repeated ItemInfo itemInfos = 7;
+}
+
+message SCSkillPermitUpgrade{
+  int32 result = 1;
+  SkillInfo skillInfo = 2;
+  repeated CurrencyInfo currencies = 3;
+  repeated ItemInfo itemInfos = 4;
+}
+
+message SCSkillPermitCharge{
+  int32 result = 1;
+  SkillInfo skillInfo = 2;
+  repeated CurrencyInfo currencies = 3;
+  repeated ItemInfo itemInfos = 4;
+}
+
+message SCSkillUpgrade{
+  int32 result = 1;
+  SkillInfo skillInfo = 2;
+  repeated CurrencyInfo currencies = 4;
+  repeated ItemInfo itemInfos = 5;
+  int32 bookLevel = 6;
+  int64 bookExp = 7;
+}
+
+//Island
+message SCIslandInfo{
+  int32 result = 1;
+  IslandInfo islandInfo = 2;
+  repeated CurrencyInfo currencies = 3;
+}
+
+message SCIslandPlayerInfo{
+  int32 result = 1;
+  repeated IslandPlayerInfo playerInfos = 2;
+}
+
+message SCIslandPlayerInfoSearch{
+  repeated IslandPlayerInfo playerInfos = 2;
+}
+
+message SCIslandItemList{
+  int32 result = 1;
+  ItemStorageType storageType = 2;
+  int32 flag = 3; //0:begin, 1:list, 2:end
+  repeated ItemInfo itemInfos = 4;
+}
+
+message SCIslandEntityList{
+  int32 result = 1;
+  int32 flag = 2; //0:begin, 1:list, 2:end
+  repeated IslandEntityInfo entityInfos = 3;
+  repeated MapItemInfo mapItems = 4;
+}
+
+message SCIslandCookSkillList{
+  int32 result = 1;
+  repeated IsCookSkillList isCookSkills = 2;
+}
+
+message SCIslandGeneInfoList{
+  int32 result = 1;
+  repeated IsGeneFullInfo isGeneInfos = 2;
+}
+
+message SCIslandSkillList{
+  int32 result = 1;
+  repeated IsSkillFullInfo skillInfos = 3;
+}
+
+message SCIslandLevelList{
+  int32 result = 1;
+  repeated PlayerLevelInfo isPlayerLevels = 2;
+}
+
+message SCIslandWeaponList{
+  int32 result = 1;
+  repeated IslandWeaponInfo weaponInfos = 2;
+}
+
+message SCIslandConditionList{
+  int32 result = 1;
+  repeated ConditionInfo conditions = 2;
+}
+
+message SCIslandFlowerList{
+  int32 result = 1;
+  repeated PlayerFlower playerFlowers = 2;
+}
+
+message SCIslandSkillUpgrade{
+  int32 result = 1;
+  SkillInfo skillInfo = 2;
+  repeated ItemInfo IslandItems = 3;
+  repeated CurrencyInfo currencies = 4;
+  int32 bookLevel = 5;
+  int64 bookExp = 6;
+}
+
+message SCIslandBookActive{
+  int32 result = 1;
+  int32 bookLevel = 2;
+  int64 bookExp = 3;
+  repeated CurrencyInfo currencies = 4;
+  repeated ItemInfo itemInfo = 5;
+}
+
+message SCIslandRescueNpc{
+  int32 result = 1;
+  int64 playerId = 2;
+  IslandPlayerInfo playerInfo = 3;
+  SkillInfo skillInfo = 4;
+}
+
+message SCIslandRoomCreate{
+  int32 result = 1;
+  int64 islandId = 2;
+  repeated string filterWords = 3;
+}
+
+message SCIslandRoomSearch{
+  int32 result = 1;
+  int32 search_type = 2;   //0> 排序 1>根据岛屿分数查询
+  repeated IslandMatchInfo islandInfos = 3;
+  repeated IslandPlayerInfo invitaPlayerList = 4; // 玩家推荐列表
+}
+
+message SCIslandRoomJoin{
+  int32 result = 1;
+  int64 islandId = 2;
+  string wsUrl = 3;
+  int32 characterId = 4;
+  int32 join_type = 5;    //1>匹配加入 2>主动离岛匹配 3>主界面跳岛 4>搜索指定加入 5>被踢到新岛
+  int64 targetPlayerId = 6; // 邀请的玩家Id
+  IslandPlayerInfo invitaPlayerInfo = 7; // 玩家推荐 拒绝
+}
+
+message SCIslandRoomExit{
+  int32 result = 1;
+  int64 islandId = 2;
+  string WsUrl = 3;
+}
+
+message SCIslandReplayJoin{
+  int64 playerId = 1;
+  int64 repPlayerId = 2;
+  int32 replay = 3;     //0>idle 1>accept 2>reject
+  int64 targetPlayerId = 4; // 邀请的玩家Id
+}
+
+// 创建社区的时候动态返回
+message SCIslandCreateCastConsume{
+  int64 itemId = 1;
+  int32 count = 2;
+}
+
+// 改变自己的角色ID
+message SCIslandChangeRoleId{
+  int32 roleId = 1;
+  int32 result = 2;
+}
+
+message SCJoinIslandFullSendMail{
+
+}
+
+//Island Item
+message SCIslandItemUse{
+  int32 result = 1;
+  ItemInfo itemInfo = 2;
+  RewardResult rewardResult = 4;
+}
+
+message SCIslandItemSell{
+  int32 result = 1;
+  ItemInfo itemInfo = 2;
+  RewardInfo rewardInfo = 3;
+  repeated CurrencyInfo currencies = 4;
+}
+
+message SCIslandItemMove{
+  int32 result = 1;
+  repeated ItemInfo itemInfo = 2;
+}
+
+message SCIslandItemCompost{
+  int32 result = 1;
+  repeated ItemInfo itemInfo = 2;
+  int64 delDBid = 3;
+}
+
+message SCIslandCookItem{
+  int32 result = 1;
+  SkillInfo cookSill = 2;
+  repeated ItemInfo itemInfos = 3;
+  repeated CurrencyInfo Currencies = 4;
+  int64 cookItemId = 5;
+}
+
+message SCIslandWeaponUpgrade{
+  int32 result = 1;
+  IslandWeaponInfo weaponInfo = 2;        //岛屿武器
+  repeated CurrencyInfo currencies = 3;   //当前货币
+  repeated ItemInfo itemInfos = 4;        //当前物品
+  repeated SmallItem useItems = 5;        //使用物品
+  repeated WeaponUpgradeInfo upgradeInfos = 6; //武器升级序列
+}
+
+message SCIslandWeaponUpgradeList{
+  int32 result = 1;
+  repeated WeaponUpgradeInfo upgradeInfos = 2; //武器升级序列
+}
+
+message SCIslandWeaponCompleted{
+  int32 result = 1;
+  repeated IslandWeaponInfo weaponInfos = 2;        //岛屿武器
+  repeated WeaponUpgradeInfo upgradeInfos = 3; //武器升级序列
+}
+
+//Player Mail
+message SCMailList{
+  int32 result = 1;
+  int32 flag = 2; //0:begin, 1:list, 2:end 3:begin|end
+  repeated PlayerMailInfo mailInfos = 3;
+}
+
+message SCMailRead{
+  int32 result = 1;
+  PlayerMailInfo mailInfo = 2;
+}
+
+//message SCMailReadProcess{
+//  int32 result = 1;
+//  PlayerMailInfo mailInfo = 2;
+//  RewardInfo rewardInfo = 4;
+//  repeated CurrencyInfo currencies = 5;
+//  repeated ItemInfo items = 6;
+//}
+
+message SCMailProcess{
+  int32 result = 1;
+  PlayerMailInfo mailInfo = 2;
+  RewardInfo rewardInfo = 4;
+  repeated CurrencyInfo currencies = 5;
+  repeated ItemInfo itemInfos = 6;
+}
+
+message SCMailDelete{
+  int32 result = 1;
+  PlayerMailInfo mailInfo = 2;
+}
+
+
+//Island Mail
+message SCIslandMailList{
+  int32 result = 1;
+  int32 flag = 2; //0:begin, 1:list, 2:end 3:begin|end
+  repeated IslandMailInfo mailInfos = 3;
+}
+
+message SCIslandMailRead{
+  int32 result = 1;
+  IslandMailInfo mailInfo = 2;
+}
+
+//message SCIslandMailReadProcess{
+//  int32 result = 1;
+//  IslandMailInfo mailInfo = 2;
+//  RewardInfo rewardInfo = 4;
+//  repeated CurrencyInfo currencies = 5;
+//  repeated ItemInfo items = 6;
+//}
+
+message SCIslandMailProcess{
+  int32 result = 1;
+  IslandMailInfo mailInfo = 2;
+  RewardInfo rewardInfo = 4;
+  repeated CurrencyInfo currencies = 5;
+  repeated ItemInfo items = 6;
+}
+
+message SCIslandMailDelete{
+  int32 result = 1;
+  IslandMailInfo mailInfo = 2;
+}
+
+//Player Active
+message SCPlayerMove{
+  int64 playerId = 1;
+  int32 moveType = 2;
+  Position position = 3;
+  int32  direction = 4;
+  int32  speed 	= 5; // */100
+  int64 targetEntityId = 6;
+}
+
+message SCPlayerActive{
+  int32 result = 1;
+  int64 playerId = 2;
+  IslandEntityInfo entityInfo = 3;
+  repeated ItemInfo itemInfos = 4;
+  repeated SkillInfo skillInfos = 5;
+  repeated MapItemInfo mapItems = 6;
+  repeated int64 delIds = 7;
+  repeated SmallItem dropItem = 8;
+}
+
+message SCPlayerCollect{
+  int32 result = 1;
+  int64 playerId = 2;
+  IslandEntityInfo entityInfo = 3;
+  SkillInfo permitSkills = 7;
+  repeated MapItemInfo mapItems = 8;
+  repeated int64 delIds = 9;
+  repeated SmallItem dropItem = 10;
+  int32 isDead = 11;
+}
+
+message SCPlayerPickUpMapItem{
+  int32 result = 1;
+  int64 playerId = 2;
+  repeated CurrencyInfo currencies = 3;
+  repeated ItemInfo ItemInfos = 4;
+  repeated int64 delIds = 5;
+  repeated SmallItem dropItems = 6;
+}
+
+message SCPlayerLogout{
+  int32 result = 1;
+  int64 playerId = 2;
+}
+
+message SCIslandNpcActive{
+  int32 result = 1;
+}
+
+message SCBattleList{
+  int32 result = 1;
+  repeated BattleMatchInfo matchInfos = 2;
+  int32 BattleResult = 3;
+}
+
+message SCBattleCreate{
+  int32 result = 1;
+  BattleMatchInfo matchInfo = 2;
+}
+
+message SCBattleJoin{
+  int32 result = 1;
+  BattleMatchInfo matchInfo = 2;
+}
+
+message SCBattleStart{
+  int32 result = 1;
+  string battleWsUrl = 2;
+  int64 playerId = 3;
+  int64 Token = 4;
+  bool newBattle = 5;
+}
+
+message SCBattleResult{
+  int32 result = 1;
+  int64 playerId = 2;
+  RewardResult rewardResult = 3;
+  repeated SmallItem dropItem = 4;    //Battle Drop Items
+  LevelInfo levelInfo = 5;
+}
+
+message SCBattleExit{
+  int32 result = 1;
+  int64 playerId = 2;
+  PlayerInfo playerInfo = 3;
+  Position position = 4;
+  PlayerDetail playerDetail = 5;
+}
+
+message SCBattleHeroList{
+  int32 result = 1;
+  repeated int32 heroIds = 2;
+}
+
+message SCBattleSelectHero{
+  int32 result = 1;
+  int32 heroId = 2;
+}
+
+message SCBattleWeaponList{
+  int32 result = 1;
+  repeated int32 weapons = 2;
+}
+
+message SCBattleSelectWeapon{
+  int32 result = 1;
+  int32 weaponId = 2;
+}
+
+message SCBattleLastNoExit{
+  int32 result = 1;
+  string battleWsUrl = 2;
+  int64 playerId = 3;
+  int64 Token = 4;
+}
+
+message SCBattleLastDelete{
+
+}
+
+message SCPlayerLeaderBoard{
+  int32 result = 1;
+  LeaderboardType lbType = 2;
+  repeated PlayerLBInfo infos = 3;
+  RankDataReqType reqType = 4;
+}
+
+message SCIslandLeaderBoard{
+  int32 result = 1;
+  LeaderboardType lbType = 2;
+  repeated IslandLBInfo infos = 3;
+  RankDataReqType reqType = 4;
+}
+
+message SCIslandUpdateQrCode{
+  int32 result = 1;
+  int64 master = 2;
+  string pic_url = 3;
+  string qr_code_url = 4;
+}
+
+message SCIslandGroupApply{
+  int32 result = 1;
+  IslandPlayerInfo player_info = 2;
+}
+
+message SCIslandGroupAccept{
+  int32 result = 1;
+  IslandPlayerInfo player_info = 2;
+}
+
+message SCIslandGroupKickPlayer{
+  int32 result = 1;
+  int64 master_id = 2;
+  string pic_url = 3;
+  string qr_code_url = 4;
+  IslandPlayerInfo player_info = 5;
+}
+
+message SCIslandGroupReward{
+  int32 result = 1;
+  int32 reward_type = 2; //0>Master Reward 1>Group Reward
+  int64 applyTime = 3;
+  int32 applyStatue = 4;
+  repeated ItemInfo itemInfos = 5;
+  repeated ItemInfo playerItemInfos = 6;
+  repeated ItemInfo rewards = 8;
+}
+
+////////////////////////////////////// Server-Client Struct ///////////////////////////////////
+message SCIslandJoinReq{
+  int64 playerId = 1;
+  int64 islandId = 2;
+  string nickName = 3;
+  int32 character = 4;
+  int32 levelId = 5;
+  int64 levelTime = 6;
+  string replySub = 7;
+  int64 targetPlayerId = 8; // 邀请的玩家Id
+  string targetWxName = 9; // 受邀请方的微信名称
+  int64 fightPower = 10;
+}
+
+//Server Notify
+enum MsgNotifyType{
+  MNT_None = 0;
+  MNT_Kick_Player = 1;
+  MNT_Kick_IP = 2;
+}
+
+message SCMessageNotify{
+  int64 playerId = 1;
+  int64 islandId = 2;
+  string nickName = 3;
+  int32 character = 4;
+  MsgNotifyType type = 5;
+  string message = 6;
+}
+
+enum NewTickType {
+  NTT_None = 0;
+  NTT_BattleLevel = 1;
+  NTT_PlayerItem = 2;
+  NTT_IslandItem = 3;
+  NTT_SystemNotice = 100;
+  NTT_MailNotice = 101;
+  NTT_SimpleMessage = 102;
+}
+
+message SCNewsTickerNotify{
+  int64 playerId = 1;
+  int64 islandId = 2;
+  string nickName = 3;
+  int32 character = 4;
+  NewTickType type = 5;       //1>BattleLevel 2>ItemId
+  int32 bLevel = 6;
+  int64 itemId = 7;
+  int32 quality = 8;
+  string message = 9;
+}
+
+message SCIslandRoleIdChangeNotify{
+  int64 playerId = 1;
+  int32 roleId = 2;
+}
+
+message SCItemNotify{
+  int64 playerId = 1;
+  ItemNotifyType notifyType = 2; //1>获得 2>使用
+  repeated ItemInfo itemInfos = 3;
+  int64 CookItemId = 4;
+}
+
+message SCIslandPlayerNotify{
+  int64 playerId = 1;
+  IsPlayerNotifyType notifyType = 2; //1>加入 2>离开 3>更新
+  IsPlayerStatus  status = 3;
+  PlayerInfo playerInfo = 4;
+  PlayerDetail playerDetail = 5;
+  PlayerActive playerActive = 6;
+  PlayerActive npcActive = 7;
+  LevelInfo battleLevel = 8;
+  repeated SkillInfo skillList = 9;
+  IslandPlayerInfo isPlayerInfo = 10;  
+}
+
+enum IslandNotifyType {
+  IsNT_None = 0; //GM
+  IsNT_GetCurrency = 1;
+  IsNT_BookLevel = 2;
+  IsNT_SkillLevel = 3;
+  IsNT_TaskReward = 4;
+  IsNT_GroupUpdate = 5;
+}
+
+message SCIslandInfoNotify{
+  int64 islandId = 1;
+  IslandNotifyType type = 2; //0>GM 1>获得货币 2>Book等级升级 3>SkillUpgrade 4>playerTask
+  IslandInfo islandInfo = 3;
+  repeated CurrencyInfo currencies = 4;
+}
+
+//message SCIslandItemNotify{
+//  int64 playerId = 1;
+//  IsItemNotifyType notifyType = 2; //1>获得 2>使用
+//  repeated ItemInfo itemInfos = 3;
+//  int64 CookItemId = 4;
+//}
+
+message SCIslandMapItemNotify{
+  int64 playerId = 1;
+  ItemNotifyType notifyType = 2; //1>获得 2>使用
+  IslandEntityInfo entityInfos = 3;
+  repeated MapItemInfo mapItems = 4;
+  repeated int64 delIds = 5;
+}
+
+message SCIslandEntityNotify{
+  int64 playerId = 1;
+  IsEntityNotifyType notifyType = 2;
+  IslandEntityInfo entityInfos = 3;
+  repeated ItemInfo itemInfos = 4;
+  int32 isDead = 5;
+}
+
+message SCIslandCookNotify{
+  int64 playerId = 1;
+  int32 cookId = 2;
+  repeated ItemInfo itemInfos = 3;
+  int64 cookItemId = 4;
+}
+
+message SCCookSillNotify{
+  int64 playerId = 1;
+  repeated SkillInfo cookSkills = 2;
+}
+
+message SCWeaponSkillNotify{
+  int64 playerId = 1;
+  int32 characterId = 2;
+  repeated SkillInfo weaponSkills = 3;
+}
+
+message SCConditionNotify{
+  int64 playerId = 1;
+  repeated ConditionInfo conditions = 2;
+}
+
+message SCIslandWeaponNotify{
+  int64 playerId = 1;
+  repeated IslandWeaponInfo weaponInfo = 2;
+}
+
+message SCIslandWeaponUpgradeNotify {
+  int64 playerId = 1;
+  int32 weaponId = 2;
+  int32 level = 3;
+  repeated WeaponUpgradeInfo upgradeInfos = 4;
+}
+
+message SCPlayerLoginKick{
+  int32 result = 1;
+  int64 playerId = 2;
+}
+
+message SCPlayerSystemKick{
+  int32 result = 1;
+  int64 playerId = 2;
+}
+
+enum BattleMatchNotifyType{
+  BMNT_None = 0;
+  BMNT_Join = 1;
+  BMNT_Select = 2;
+  BMNT_Ready = 3;
+  BMNT_Start = 4;
+  BMNT_Wave = 5;
+  BMNT_Exit = 10;
+}
+
+message SCBattleMatchNotify{
+  int64 playerId = 1;
+  BattleMatchNotifyType type = 2; //1>start 2>update 3>delete 4>wave
+  BattleMatchInfo match_info = 3;
+  string battleWsUrl = 5;
+  int64 Token = 6;
+}
+
+message SCPlayerLevelNotify{
+  int64 PlayerId = 1;
+  PlayerLevelInfo info = 2;
+}
+
+message SCTaskNotify{
+  int64 PlayerId = 1;
+  TaskType taskType = 2;
+  repeated TaskInfo taskInfos = 3;
+}
+
+message SCIslandTaskNotify{
+  int64 IslandId = 1;
+  TaskType taskType = 2;
+  repeated TaskInfo taskInfos = 3;
+}
+
+message SCIslandConditionNotify{
+  int64 IslandId = 1;
+  repeated ConditionInfo conditions = 2;
+}
+
+message SCIslandBoxEntityNotify{
+  int64 IslandId = 1;
+  int64 playerId = 2;
+  repeated IslandBoxEntity boxEntities = 3;
+  repeated IslandBoxEntity delEntities = 4;
+}
+
+message SCIslandMailNotify{
+  int64 islandId = 1;
+  int64 playerId = 2;
+  IslandMailInfo mailInfo = 3;
+  repeated ItemInfo itemInfos = 4;
+  repeated CurrencyInfo isCurrencies = 5;
+}
+
+message SCIslandGeneNotify{
+  int64 islandId = 1;
+  int64 playerId = 2;
+  repeated IsGeneFullInfo isGeneInfos = 3;
+}
+
+message SCIslandSkillNotify{
+  int64 IslandId = 1;
+  int64 playerId = 2;
+  int32 type = 3; //0>Get MapItem 1>Upgrade
+  IslandInfo islandInfo = 4;
+  repeated CurrencyInfo currencies = 6;
+  repeated SkillInfo skillInfos = 7;
+}
+
+message SCIslandBookNotify{
+  int64 IslandId = 1;
+  int64 playerId = 2;
+  int32 bookLevel = 3;
+  int64 bookExp = 4;
+  repeated CurrencyInfo currencies = 5;
+  repeated ItemInfo itemInfo = 6;
+}
+
+message SCIslandPlayerRemoveNotify{
+  int64 islandId = 1;
+  int64 playerId = 2;
+}
+
+message SCBinaryNotify{
+  int32 msgID = 1;
+  uint32 blockCount = 2;
+  bytes data = 3;
+}
+
+/////////////////////////////////////////////////////GM CMD/////////////////////////////////////////////////////////////
+message CSGmCommand{
+  GMCmdType gmCmdId = 1;
+  int64 itemId = 2;
+  int32 count = 3;
+  ItemStorageType storage = 4;
+  int32 levelId = 5;
+  string commandStr = 6;
+}
+
+message SCGmCommand{
+  int32 result = 1;
+  repeated ItemInfo itemInfos = 2;
+}

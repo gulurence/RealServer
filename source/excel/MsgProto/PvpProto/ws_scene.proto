@@ -1,0 +1,147 @@
+syntax = "proto3";
+
+import public "ws_entity_template.proto";
+
+option go_package = ".;ws_proto";
+
+package ws_proto;
+
+
+enum SceneCommondID{
+  SceneCommondID_NULL = 0;
+  // 为了与老游戏兼容 这里从 10000开始
+  TCP_S_SCPlayerData          = 10001; // 下发玩家数据
+  TCP_S_CSClientLoadSuccess   = 10002;
+  TCP_S_SCClientLoadSuccess   = 10003;
+  TCP_S_SCEntityEnterScene    = 11004;
+  TCP_S_SCEntityLeaveScene    = 11005;
+  TCP_S_CSEntityMoveReq       = 11006;
+  TCP_S_SCEntityMoveNotify    = 11007;
+  TCP_S_SCUpdateEntityAttribute = 11008;
+  TCP_S_CSUseSkill            = 11009;
+  TCP_S_SCEntityUseSkill      = 11010;
+  TCP_S_SCEntityBuffUpdate    = 11011;
+  TCP_S_SCDamageNotify        = 11012;
+  TCP_S_SCSingingNotify       = 11013; // 吟唱通知 包括 采集 场景交互道具
+  TCP_S_SCUpdateSkillInfo     = 11014; // 更新玩家技能信息
+  TCP_S_SCEntityReviveNotify  = 11015; // 对象复活
+  TCP_S_SCEntityBinaryMove    = 11016; // 二进制移动包
+}
+
+//--------------------entity type def----------------------------------
+
+//--------------------Client-TCP->Server-------------------------
+// 客户端加载完成
+message CSClientLoadSuccess{
+  
+}
+//--------------------PVPServer-UDP->Client-------------------------
+// 客户端加载完成 之后下发玩家数据
+message SCClientLoadSuccess{
+  SceneEntitys entitys = 1; // 场景可见对象列表
+}
+
+message SCPlayerData{
+  ScenePlayerData data = 1; // 
+  int32 MapID = 2;//目前就是scenes_cfg里的id
+  int64 RoomID = 3;//副本实例的ID
+}
+
+// 进入场景
+message SCEntityEnterScene{
+  SceneEntitys entitys = 1; // 对象列表
+}
+
+// 离开场景
+message SCEntityLeaveScene{
+  repeated int64 entity_ids = 1; // 需要删除的场景对象列表
+}
+
+// 移动请求
+message CSEntityMoveReq{
+  int64 entity_id = 1;
+  int32 dir = 2; // 移动方向
+  ScenePos cur_pos = 3; // 当前位置
+  uint64 time_tick = 4;
+  int32 speed = 5;
+  int32 move_type = 6; // 移动类型 参见 MoveType 枚举
+}
+
+// 移动广播
+message SCEntityMoveNotify{
+  int64 entity_id = 1;
+  int32 dir = 2; // 移动方向
+  ScenePos cur_pos = 3; // 当前位置
+  uint64 time_tick = 4; // 时间戳
+  int32 speed = 5;
+  int32 move_type = 6; // 移动类型 参见 MoveType 枚举
+}
+
+// 更新对象属性
+message SCUpdateEntityAttribute{
+  int64 entity_id = 1;
+  repeated EntityAttributeValue values = 2;
+}
+// 更新buff信息
+message SCEntityBuffUpdate{
+  int64 entity_id = 1;
+  // 更新的buff信息
+  repeated EntityBuffInfo buff_list = 2;
+  // 移除的buff列表
+  repeated int32 remove_buff_list = 3;
+}
+message SCDamageNotify{
+  repeated DamageInfo damage_list = 1;
+}
+// 使用技能
+message CSUseSkill{
+  // 目标列表
+  repeated int64 target_id_list = 1;
+  int32 skill_id = 2;
+  // 释放技能自己位置
+  ScenePos use_pos = 3;
+  // 释放技能目标位置
+  ScenePos target_pos = 4;
+  // 释放技能目标位置
+  repeated ScenePos target_pos_tmp = 5;
+}
+// 使用技能通知
+message SCEntityUseSkill{
+  int32 error_code = 1; // 参加 SceneErrorCodeDef 定义
+  int64 entity_id = 2;
+  int32 skill_id = 3;
+  repeated int64 target_id_list = 4;//第一个是首要目标
+  // 释放技能自己位置
+  ScenePos use_pos = 5;
+  // 释放技能目标位置
+  ScenePos target_pos = 6;
+  repeated ScenePos target_positions = 7;
+  int64 batch_id = 8; //技能批次id
+  int32 target_mode = 9;//0:目标 1:位置
+}
+// 吟唱通知
+message SCSingingNotify{
+  int64 entity_id = 1;
+  int32 skill_config_id = 2;
+  int32 singing_type = 3; // 吟唱类型
+  bool is_begin = 4; // true - 开始吟唱 ， false - 结束吟唱
+  int64 time_len = 5;  // 吟唱剩余时间
+  ScenePos pos = 6;
+  repeated int64 target_id_list = 7;
+  ScenePos target_pos = 8;
+  repeated ScenePos target_positions = 9;
+  int32 target_mode = 10;//0:目标 1:位置
+}
+// 更新玩家技能信息
+message SCUpdateSkillInfo {
+  int64 entity_id = 1;
+  // 技能列表
+  repeated EntitySkillInfo skill_list = 2;
+}
+// 对象复活
+message SCEntityReviveNotify {
+  int64 entity_id = 1;
+  int32 max_hp = 2;
+  int32 hp = 3;
+  ScenePos pos = 4;
+}
