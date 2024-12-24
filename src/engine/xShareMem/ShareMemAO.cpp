@@ -1,6 +1,6 @@
 ﻿#include "ShareMemAO.h"
 #include "ShareMemAPI.h"
-#include "xBase/xLog.h"
+#include "xLog/xLog.h"
 
 using namespace ShareMemAPI;
 

@@ -2,8 +2,8 @@
 #include "xService.h"
 
 #include "xBase/xXMLParser.h"
-#include "../xSConnect/xTask.h"
-#include "../xSConnect/xClient.h"
+#include "../xNet/xTask.h"
+#include "../xNet/xClient.h"
 
 
 xService::xService(const char* pszServiceName, uint16 u16Port) {

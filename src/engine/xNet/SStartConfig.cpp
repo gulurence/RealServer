@@ -1,7 +1,7 @@
 ﻿#include "SStartConfig.h"
 #include "../xBase/xFileTool.h"
 #include "../xBase/UTF8.h"
-#include "../xSconnect/GameServerRunShareMgr.h"
+#include "../xNet/GameServerRunShareMgr.h"
 //#include "../xServer/ZoneServer.h"
 
 

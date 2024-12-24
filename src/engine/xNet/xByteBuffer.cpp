@@ -1,5 +1,5 @@
 ﻿#include "xByteBuffer.h"
-#include "xBase/xLog.h"
+#include "xLog/xLog.h"
 
 
 xByteBuffer::xByteBuffer(tcp_socket stSocket) :m_stSocket(stSocket){

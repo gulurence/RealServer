@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "xLog.h"
+#include "xLog/xLog.h"
 
 #ifndef _WINDOWS
 #include <unistd.h>

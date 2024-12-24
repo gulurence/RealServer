@@ -1,6 +1,6 @@
 ﻿#include <time.h>
 #include "xFunctionTime.h"
-#include "xLog.h"
+#include "xLog/xLog.h"
 
 xFunctionTime FunctionTimeWrap::_ft(1000);
 void xFunctionTime::inc(const uint64 &addr, const uint64 &total)
