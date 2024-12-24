@@ -3,8 +3,8 @@
 #include "../xBase/xDefine.h"
 #include "../xCommand/xCommand.h"
 #include "../xBase/xSingleton.h"
-#include "../xSConnect/ServerPathTool.h"
-#include "../xSConnect/xServerMgrDataDef.h"
+#include "../xNet/ServerPathTool.h"
+#include "../xNet/xServerMgrDataDef.h"
 
 #define MECHINE_SMANAGER_SID 81
 #define MECHINE_SLAUNCHER_SID 82

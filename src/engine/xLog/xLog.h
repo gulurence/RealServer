@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "xDefine.h"
+#include "xBase/xDefine.h"
 
 #include <stdarg.h>
 #include <boost/serialization/singleton.hpp> 

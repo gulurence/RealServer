@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "ShareMemAO.h"
-#include "xBase/xLog.h"
+#include "xLog/xLog.h"
 
 
 enum SMPOOL_TYPE

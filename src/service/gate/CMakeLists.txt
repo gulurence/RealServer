@@ -41,11 +41,11 @@ endif()
 
 # 设置头文件目录
 target_include_directories(gate PUBLIC 
-    ${CMAKE_SOURCE_DIR}/src/engine   # 确保包含 core 目录下的所有头文件
+    ${CMAKE_SOURCE_DIR}/src/engine   # 确保包含 engine 目录下的所有头文件
     ${CMAKE_SOURCE_DIR}/third_part  # 如果需要第三方库头文件
     ${CMAKE_SOURCE_DIR}/third_part/mysql-connector-c-6.1.11-winx64
     #${CMAKE_SOURCE_DIR}/third_part/protobuf-3.19.2/src  # Protobuf 头文件路径
 )
 
-# 链接 core 库
-target_link_libraries(gate PRIVATE core)
+# 链接 engine 库
+target_link_libraries(gate PRIVATE engine)

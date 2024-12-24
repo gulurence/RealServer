@@ -1,8 +1,8 @@
 ﻿#include "xServerDispatcher.h"
 #include "../xNet/xNetDefine.h"
 #include "../xCommand/xServerRouteDefine.h"
-#include "../xSconnect/SStartConfig.h"
-#include "../xSconnect/xMsgDispatcher.h"
+#include "../xNet/SStartConfig.h"
+#include "../xNet/xMsgDispatcher.h"
 
 
 

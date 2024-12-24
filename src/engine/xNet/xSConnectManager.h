@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "xBase/xDefine.h"
-#include "xSConnect/ServerClient.h"
+#include "xNet/ServerClient.h"
 
 typedef std::map<std::string, ServerClient*> SConnectMap;
 

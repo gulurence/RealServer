@@ -97,9 +97,9 @@ private:
     std::string m_strModuleName;
 };
 
-void testttt() {
+inline void testttt() {
 
-    auto* pModule = new MNet("MNet#Client",);
+    //auto* pModule = new MNet("MNet#Client",);
 
 }
 
