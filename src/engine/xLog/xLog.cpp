@@ -10,7 +10,7 @@ xLog::~xLog(void) {
 }
 
 void xLog::Init(const char* prop) {
-    service_name = "normal_service";
+    service_name = "normal";
     std::string logFileName = "logs/" + service_name + ".log";
     // 文件日志
     auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5, 400);
@@ -24,8 +24,27 @@ void xLog::Init(const char* prop) {
     std::vector<spdlog::sink_ptr> sinks = { sink, console_sink };
     _logger = std::make_shared<spdlog::logger>(service_name, sinks.begin(), sinks.end());
     spdlog::set_default_logger(_logger);
-    spdlog::set_level(spdlog::level::info);
+
+
+    // 文件日志
+    //auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5, 400);
+    //auto logger = std::make_shared<spdlog::logger>("logger", sink);
+    //spdlog::set_default_logger(logger);
 }
+
+std::shared_ptr<spdlog::logger> xLog::CreateServiceLog(const std::string& strServiceName) {
+    std::string logFileName = "logs/" + strServiceName + "/" + strServiceName + ".log";
+    // 文件日志
+    auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5, 400);
+    auto logger = std::make_shared<spdlog::logger>(strServiceName, sink);
+    return logger;
+}
+
+bool xLog::RemoveServiceLog(const std::string& strServiceName) {
+
+    return true;
+}
+
 
 void xLog::Print(const char* file, long line, const char* funtion, Level level, const char* format, ...) {
     char buff[4096] = { 0 };

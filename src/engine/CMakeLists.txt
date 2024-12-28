@@ -16,6 +16,9 @@ file(GLOB X_DATABASE        "${SOURCE_DIR}/xDatabase/*.h"   "${SOURCE_DIR}/xData
 file(GLOB X_REDIS           "${SOURCE_DIR}/xRedis/*.h"      "${SOURCE_DIR}/xRedis/*.cpp")
 file(GLOB X_NATS            "${SOURCE_DIR}/xNats/*.h"       "${SOURCE_DIR}/xNats/*.cpp")
 file(GLOB X_COMMAND         "${SOURCE_DIR}/xCommand/*.h"    "${SOURCE_DIR}/xCommand/*.cpp")
+file(GLOB X_EVENT           "${SOURCE_DIR}/xEvent/*.h"      "${SOURCE_DIR}/xEvent/*.cpp")
+file(GLOB X_SCHEDULER       "${SOURCE_DIR}/xScheduler/*.h"  "${SOURCE_DIR}/xScheduler/*.cpp")
+file(GLOB X_RPC             "${SOURCE_DIR}/xRpc/*.h"        "${SOURCE_DIR}/xRpc/*.cpp")
 file(GLOB X_SERVICE         "${SOURCE_DIR}/xService/*.h"    "${SOURCE_DIR}/xService/*.cpp")
 file(GLOB X_WEBCONSOLE      "${SOURCE_DIR}/xWebConsole/*.h" "${SOURCE_DIR}/xWebConsole/*.cpp")
 
@@ -34,8 +37,11 @@ set(SOURCES
     ${X_NET}
     ${X_DATABASE}
     ${X_REDIS}
-    ${X_NATS}    
+    ${X_NATS}
     ${X_COMMAND}
+    ${X_EVENT}
+    ${X_SCHEDULER}
+    ${X_RPC}
     ${X_SERVICE}
     ${X_WEBCONSOLE}
 )
@@ -52,6 +58,9 @@ source_group("src/xDatabase"   FILES ${X_DATABASE})
 source_group("src/xRedis"      FILES ${X_REDIS})
 source_group("src/xNats"       FILES ${X_NATS})
 source_group("src/xCommand"    FILES ${X_COMMAND})
+source_group("src/xEvent"      FILES ${X_EVENT})
+source_group("src/xScheduler"  FILES ${X_SCHEDULER})
+source_group("src/xRpc"        FILES ${X_RPC})
 source_group("src/xService"    FILES ${X_SERVICE})
 source_group("src/xWebConsole" FILES ${X_WEBCONSOLE})
 
