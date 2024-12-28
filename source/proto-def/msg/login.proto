@@ -1,0 +1,17 @@
+﻿// my_service.proto
+
+syntax = "proto3";
+
+package PbMsg;
+
+// 请求消息
+message LoginRequest {
+  string name = 1;
+  int32 index = 2;
+}
+
+// 响应消息
+message LoginResponse {
+  string message = 1;
+  int32 index = 2;
+}

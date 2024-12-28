@@ -4,7 +4,7 @@
 
 
 
-class GateService : public xService
+class GateService /*: public xService*/
 {
 public:
     GateService(const char* pszServiceName, uint16 u16Port);

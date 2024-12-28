@@ -89,6 +89,11 @@ typedef unsigned long       uint64;
 #define countof(array) (sizeof(array) / sizeof((array)[0]))
 #endif
 
+
+typedef uint64 ServiceID;
+
+
+
 #include "LibraryDef.h"
 
 #include <cstdlib>
@@ -125,5 +130,9 @@ typedef unsigned long       uint64;
 #include <mutex>
 #include <assert.h>
 
+#include <atomic>
+#include <chrono>
+#include <algorithm>
 
+#include <coroutine>
 

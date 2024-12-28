@@ -2,38 +2,36 @@
 
 #include "xServiceDefine.h"
 
-#include "xBase/xDefine.h"
-#include "xBase/xThread.h"
-#include "xBase/xTime.h"
-#include "xNet/xSocket.h"
+#include "xService.h"
+
+#include "xBase/xSingleton.h"
 
 
-class xServiceMgr : public xThread
+
+
+class xServiceMgr : public xSingleton<xServiceMgr>
 {
 public:
-    xServiceMgr(const char* pszServiceName, uint16 u16Port);
+    xServiceMgr();
     virtual ~xServiceMgr();
 
+public:
+    bool Regist(xService *);
+    xService* Get(const ServiceID& u64ServiceID);
+    bool UnRegist();
 
 public:
-    void ServiceStop() {
-        SetServiceState(XSERVICE_STOP);
-    }
-    xServiceState GetServiceState() { 
-        return m_enServiceState; 
-    }
-    void SetServiceState(xServiceState enState) {
-        m_enServiceState = enState;
+    ServiceMap& GetServices() {
+        return m_mapService;
     }
 
 public:
-    virtual void thread_proc();
-
-protected:
     virtual void Release();
 
+    std::mutex m_stLock;
 private:
-    xServiceState m_enServiceState;
-    char m_pszServiceName[MAX_NAMESIZE] = { 0 };
-    uint16 m_u16Port = 0;
+    ServiceMap m_mapService;
 };
+
+
+

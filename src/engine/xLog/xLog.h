@@ -25,6 +25,10 @@ public:
     void Init(const char* prop = "log4cxx.properties");
     void Print(const char* file, long line, const char* funtion, Level level, const char* format, ...);
 
+public:
+    std::shared_ptr<spdlog::logger> CreateServiceLog(const std::string &strServiceName);
+    bool RemoveServiceLog(const std::string& strServiceName);
+
 protected:
     xLog(void);
     ~xLog(void);
