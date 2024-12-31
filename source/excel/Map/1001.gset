@@ -1,0 +1,10 @@
+# Obj file.
+f 1001.obj
+
+# Convex volumes.
+# v nVertex area hmin hmax
+# Area:
+#	0: Walkable
+#	1: Not Walkable
+#	2: Jump
+

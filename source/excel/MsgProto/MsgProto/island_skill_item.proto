@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+import public "tx_entity.proto";
+
+option go_package = "tx_proto";
+
+package tx_proto;
+
+/////////////////////////////////////////Local Test////////////////////////////////////////////////
+////////////////////////////////////Auth - Island Match////////////////////////////////////////////
+
+// 1.装备切换技能
+// 2.升级
+// 4.分解
+// 5.
+// 6.
+// 7.
+
+// 更新当前技能信息
+message SCSkillItemUpdateNotify {
+  SItemsData skills = 1;
+}
+
+// 更换技能
+message CSSkillItemChange {
+  int64 playerId = 1;
+  int32 skillSlot = 2; // 槽位 1 - 4
+  int32 skillConfigId = 3;
+}
+
+//
+message SCSkillItemChange {
+  int32 result = 1;
+  int32 skillSlot = 2;
+  int32 skillConfigId = 3;
+}
+
+// 一键技能分解
+message CSSkillItemDisintegrate {
+  int64 playerId = 1;
+}
+
+message SItemFragmentInfo {
+  int32 skillConfigId = 1;
+  int32 count = 2;
+}
+
+// 
+message SCSkillItemDisintegrate {
+  int32 result = 1;
+  repeated SItemFragmentInfo fragment_list = 2;
+}
+
+// 技能升级
+message CSSkillItemLevelUp {
+  int64 playerId = 1;
+  int32 skillConfigId = 2;
+}
+
+// 
+message SCSkillItemLevelUp {
+  int32 result = 1;
+  int32 skillConfigId = 2;
+}
+
+// 更新最新品质 用于取消红点
+message CSSkillItemSetPreMaxQuality {
+  int64 playerId = 1;
+  int32 skillConfigId = 2;
+}
+
+// 
+message SCSkillItemSetPreMaxQuality {
+  int32 result = 1;
+  int32 skillConfigId = 2;
+}

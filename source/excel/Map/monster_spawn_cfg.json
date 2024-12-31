@@ -1,0 +1,17 @@
+[
+	{"sceneid":8888,"spawnid":1000000499,"protoid":200001,"px":21.66,"py":-5.17,"h":0.04,"states":2,"dir":0},
+	{"sceneid":8888,"spawnid":1000000500,"protoid":200005,"px":6.59,"py":44.17,"h":0.04,"states":2,"dir":0},
+	{"sceneid":8888,"spawnid":1000000501,"protoid":200004,"px":0.25,"py":-6.42,"h":0.08,"states":2,"dir":0},
+	{"sceneid":8888,"spawnid":1000000503,"protoid":200009,"px":33.02,"py":3.43,"h":0.04,"states":2,"dir":0},
+	{"sceneid":8888,"spawnid":1000000513,"protoid":200011,"px":-17.94,"py":-13.65,"h":0.04,"states":1,"dir":0},
+	{"sceneid":8888,"spawnid":1000000514,"protoid":200012,"px":-30.87,"py":6.01,"h":0.04,"states":2,"dir":0},
+	{"sceneid":8888,"spawnid":1000000515,"protoid":200013,"px":14.91,"py":56.19,"h":0.08,"states":2,"dir":0},
+	{"sceneid":8888,"spawnid":1000000516,"protoid":200014,"px":36.08,"py":-7.70,"h":0.04,"states":1,"dir":0},
+	{"sceneid":8888,"spawnid":1000000541,"protoid":200015,"px":1.83,"py":5.21,"h":0.50,"states":1,"dir":0},
+	{"sceneid":8888,"spawnid":1000000546,"protoid":200016,"px":10.63,"py":-1.03,"h":0.04,"states":2,"dir":0},
+	{"sceneid":8888,"spawnid":1000000547,"protoid":200017,"px":-2.56,"py":29.17,"h":0.04,"states":1,"dir":0},
+	{"sceneid":8888,"spawnid":1000000548,"protoid":200018,"px":-16.85,"py":6.77,"h":0.04,"states":2,"dir":0},
+	{"sceneid":8888,"spawnid":1000000549,"protoid":200019,"px":39.27,"py":29.11,"h":0.04,"states":2,"dir":0},
+	{"sceneid":8888,"spawnid":1000000551,"protoid":200020,"px":-45.79,"py":14.97,"h":0.04,"states":1,"dir":0},
+	{"sceneid":8888,"spawnid":1000000552,"protoid":200021,"px":-27.34,"py":23.33,"h":0.04,"states":2,"dir":0}
+]

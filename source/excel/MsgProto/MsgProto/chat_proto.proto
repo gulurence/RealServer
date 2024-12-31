@@ -1,0 +1,362 @@
+syntax = "proto3";
+
+import public "tx_entity.proto";
+
+option go_package = "tx_proto";
+
+package tx_proto;
+
+/////////////////////////////////////////Local Test//////////////////////////////////////////////////////
+// Client-Chat Struct
+//注册账号
+//Player System
+//= 1000;    //玩家登陆
+message CTPlayerLogin{
+  int64 accountId = 1;
+  string jwtToken = 2;
+  int64 playerId = 3;
+}
+
+//= 1001;   //玩家头像更新
+message CTPlayerAvatar{
+
+}
+
+message CTPlayerIsland{
+  int64 islandId = 1;
+}
+
+//Item System
+// = 1100;   //世界聊天
+message CTMessageWorld{
+  string message = 1;
+}
+
+// = 1102;   //岛屿聊天
+message CTMessageIsland{
+  string message = 2;
+}
+
+// = 1103;  //好友聊天
+message CTMessageFriend{
+  int64 to_playerId = 1;
+  string message = 2;
+}
+
+// = 1104;  //邀请聊天
+message CTMessageRegion{
+  string message = 1;
+}
+
+message CTHistoryWorld{
+  string streamKey = 1;
+  int32 reqType = 2;    //0>pre 1>next
+}
+
+message CTHistoryIsland{
+  string streamKey = 1;
+  int32 reqType = 2;    //0>pre 1>next
+}
+
+message CTHistoryFriend{
+  int64 friendId = 1;
+  string streamKey = 2;
+  int32 reqType = 3;    //0>pre 1>next
+}
+
+message CTHistoryRegion{
+  string streamKey = 1;
+  int32 reqType = 2;    //0>pre 1>next
+}
+
+//Red Dot 红点信息
+// = 5140;     //普通红点信息
+message CTFriendChatList{
+
+}
+
+//Sim Info
+// = 5150;  //玩家简约信息
+message CTSimPlayerInfo{
+  repeated int64 playerIds = 1;
+}
+
+//= 5151;  //岛屿简约信息
+message CTSimIslandInfo{
+  int64 islandId = 1;
+}
+
+message CTBlackList{
+
+}
+
+message CTBlackLimit{
+  int64 playerId = 1;
+}
+
+message CTBlackUnLimit{
+  int64 playerId = 1;
+}
+
+//Channel System
+// = 1200; //频道聊天
+message CTChannelMessage{
+  string message = 1;
+}
+
+// = 1201;
+message CTChannelJoin{
+  int64 channelId = 1;
+}
+
+// = 1202;
+message CTChannelExit{
+  int64 channelId = 1;
+}
+
+// = 1203;
+message CTChannelCreate{
+  string nickName = 1;
+}
+
+//City Channel
+// = 1300;
+message CTCityMessage{
+  string message = 1;
+}
+
+// = 1301;
+message CTCityJoin{
+  int64 city_id = 1;
+}
+
+// = 1302;
+message CTCityExit{
+  int64 city_id = 1;
+}
+
+//GM Cmd
+// = 3001;   //GM Command
+message CTGmCommand{
+
+}
+
+////////////////////////////////////// Chat-Client Struct ///////////////////////////////////
+// = 5000;
+message TCPlayerLogin{
+  int32 result = 1;
+  int64 serverTime = 2;
+  repeated ChatCdTime cdTimes = 3;
+  int64 limitTime = 4;
+  //map<int64,int64> cdTimes = 3;
+}
+
+// = 5001;   //玩家头像更新
+message TCPlayerAvatar{
+  int32 result = 1;
+  int64 playerId = 2;
+  int64 avatar = 3;
+}
+
+message TCPlayerIsland{
+  int32 result = 1;
+  int64 islandId = 2;
+}
+
+//Item System
+// = 5100;
+message TCMessageWorld{
+  int32 result = 1;
+  ChatMessage msg = 2;
+  int64 LimitTime = 3;
+  repeated string filterWords = 4;
+}
+
+// = 5102;
+message TCMessageIsland{
+  int32 result = 1;
+  ChatMessage msg = 2;
+  int64 LimitTime = 3;
+  repeated string filterWords = 4;
+}
+
+// = 5103;
+message TCMessageFriend{
+  int32 result = 1;
+  ChatMessage msg = 2;
+  int64 LimitTime = 3;
+  repeated string filterWords = 4;
+}
+
+// = 5104;  //区域聊天
+message TCMessageRegion{
+  int32 result = 1;
+  ChatMessage msg = 2;
+  int64 LimitTime = 3;
+  repeated string filterWords = 4;
+}
+
+message TCHistoryWorld{
+  int32 result = 1;
+  repeated ChatMessage msgList = 2;
+}
+
+message TCHistoryIsland{
+  int32 result = 1;
+  repeated ChatMessage msgList = 2;
+}
+
+message TCHistoryFriend{
+  int32 result = 1;
+  int64 playerId = 2;
+  repeated ChatMessage msgList = 3;
+}
+
+message TCHistoryRegion{
+  int32 result = 1;
+  repeated ChatMessage msgList = 2;
+}
+
+//Red Dot 红点信息
+message FriendChatInfo{
+  int64 playerId = 1;
+  int64 lastTime = 2;
+}
+
+// = 5140;     //普通红点信息
+message TCFriendChatList{
+  repeated FriendChatInfo friendList = 1;
+}
+
+message ChatSimPlayerInfo {
+  int64 accountId = 1;
+  int64 playerId = 2;
+  int64 islandId = 3;
+  string nickName = 4;
+  int32 character = 5;
+  int64 satietyTime = 6;
+  int32 levelId = 7;
+  int64 levelTime = 8;
+  int32 status = 9;
+  int64 onlineTime = 10;
+  int64 offlineTime = 11;
+  int32 region = 12;
+}
+
+//Sim Info
+// = 5150;  //玩家简约信息
+message TCSimPlayerInfo{
+  int32 result = 1;
+  repeated ChatSimPlayerInfo playerInfos = 2;
+}
+
+//= 5151;  //岛屿简约信息
+message TCSimIslandInfo{
+  int32 result = 1;
+  int64 islandId = 2;
+  string nickName = 3;
+  int32 playerCount = 4;
+  repeated int64 playerIds = 5;
+  repeated int64 onlineIds = 6;
+  int64 createTime = 7;
+  int64 onlineTime = 8;
+  int64 offlineTime = 9;
+}
+
+message BPlayerInfo{
+  int64 playerId = 1;
+  string nickName = 2;
+  int32 character = 3;
+  int64 limitTime = 4;
+}
+
+message TCBlackList{
+  repeated BPlayerInfo playerList = 1;
+}
+
+message TCBlackLimit{
+  int32 result = 1;
+  int64 playerId = 2;
+}
+
+message TCBlackUnLimit{
+  int32 result = 1;
+  int64 playerId = 2;
+}
+
+//Channel System
+// = 5200; //频道聊天
+message TCChannelMessage{
+  int32 result = 1;
+  int64 playerId = 2;
+  string nickName = 3;
+  int32 character = 4;
+  string message = 5;
+}
+
+// = 5201;
+message TCChannelJoin{
+  int32 result = 1;
+  int64 playerId = 2;
+  string nickName = 3;
+  int32 character = 4;
+}
+
+// = 5202;
+message TCChannelExit{
+  int32 result = 1;
+  int64 playerId = 2;
+  string nickName = 3;
+  int32 character = 4;
+}
+
+// = 5203;
+message TCChannelCreate{
+  int32 result = 1;
+  int64 channelId = 2;
+  string nickName = 3;
+}
+
+//City Channel
+// = 5300;
+message TCCityMessage{
+  int32 result = 1;
+  int64 playerId = 2;
+  string nickName = 3;
+  int32 character = 4;
+  string message = 5;
+}
+
+// = 5301;
+message TCCityJoin{
+  int32 result = 1;
+  int64 playerId = 2;
+  string nickName = 3;
+  int32 character = 4;
+}
+
+// = 5302;
+message TCCityExit{
+  int32 result = 1;
+  int64 playerId = 2;
+  string nickName = 3;
+  int32 character = 4;
+}
+
+//GM Command
+// = 8001;
+message TCGmCommand{
+
+}
+
+message TCPlayerLoginKick{
+  int32 result = 1;
+  int64 playerId = 2;
+}
+
+message TCPlayerSystemKick{
+  int32 result = 1;
+  int64 playerId = 2;
+}
+
+/////////////////////////////////////////////////////GM CMD/////////////////////////////////////////////////////////////
