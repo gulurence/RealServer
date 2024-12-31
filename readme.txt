@@ -17,21 +17,35 @@ service - 封装service基础接口
 
 RealServer/
 ├── CMakeLists.txt       # 主 CMake 配置文件
-├── core/            # core 项目 提供给service依赖的库
+├── src/            # core 项目 提供给service依赖的库
 │   ├── CMakeLists.txt 生成core库的cmake文件
 │   └── src/
 │            ├── xAsio
 │            └── xBase
-├── source/            # source 定义协议目录 提供给service依赖的源码
-│   ├── ecxel protobuf 源码目录
-│   └── protocol protobuf 源码目录
-├── service/            # service目录
+
+|   ├── service/            # service目录
 │   ├── LoginService/            # LoginService 项目 依赖 core 项目 以及依赖 source 源码目录 
-│    |           ├── CMakeLists.txt
-│    |           └── src/
+│   |           ├── CMakeLists.txt
+│   |           └── src/
 │   └── GateService/            # GateService 项目 依赖 core 项目 以及依赖 source 源码目录 
 │                ├── CMakeLists.txt
 │                └── src/
+├── source/            # source 定义协议目录 提供给service依赖的源码
+│   │ 
+│   ├── proto-cpp 
+│   │     ├── excel #excel 配置目录
+│   │     ├── config #excel 配置源码生成目录
+│   │     └── protocol 
+│   │           ├── msg #msg协议生成目录
+│   │           └── rpc #rpc协议生成目录
+│   │ 
+│   └── proto-def 
+│         ├── msg #msg结构定义目录
+│         └── rpc #rpc结构定义目录
+│ 
+└── lib/               
+└── third_part/               
+└── document/               
 └── build/               # 总构建目录
 
 

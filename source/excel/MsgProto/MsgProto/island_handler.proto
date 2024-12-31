@@ -1,0 +1,350 @@
+syntax = "proto3";
+
+option go_package = "tx_proto";
+
+package tx_proto;
+
+//--------------------Handler-CMD-------------------------
+enum CSHandlerCMD{
+  CS_HandlerNone = 0;
+  CS_BinaryReq = 1;
+  CS_PlayerLogin = 1000;    //玩家登陆
+  CS_PlayerAvatar = 1003;
+  CS_PlayerNickName = 1004;
+  CS_PlayerLogout = 1009;
+  //CS_PlayerLevel = 1010;      //副本信息
+  CS_PlayerBitStatus = 1011;  //Player Info Status(Bit)
+  CS_PlayerRecordTime = 1012;     //Player Record Time
+  CS_PlayerTutorial = 1013;   //Player Save Tutorial
+  CS_OptionSet = 1014;   //修改选项配置
+  CS_WsTickTime = 1050;
+  //Item System
+  CS_PlayerDetailInfo = 1100; //玩家详细数据
+  CS_ItemList = 1101;
+  //CS_GeneList = 1102;
+  //CS_SkillList = 1103;        //技能列表
+  //CS_ConditionList = 1105;    //Condition
+  CS_ChickList = 1106;        //Chick
+  //CS_CurrencyList = 1107;     //Currency
+  //Item System
+  CS_ItemGet = 1200;        //获取物品
+  CS_ItemUse = 1201;        //使用物品
+  CS_ItemSell = 1202;       //丢弃或出售物品
+  CS_ItemMove = 1203;       //移动或合并物品
+  CS_ItemPush = 1204;       //上交物品到岛屿
+  CS_ItemPop = 1205;        //从岛屿获取物品
+  CS_ChickOpen = 1210;       //使用Chick
+  CS_GeneShopInfo = 1215;   //Gene商店信息
+  CS_GeneShopBuy = 1216;   //Gene购买
+  CS_GeneShopGet = 1217;   //Gene商店获取
+  CS_GeneUpgrade = 1218;   //Gene升级
+  //Task System
+  CS_TaskList = 1250;       //个人任务序列
+  CS_TaskCompleted = 1251;  //完成任务
+  CS_TaskActive = 1252;     //客户端激活任务
+  //Skill System
+  CS_SkillPermitUpgrade = 1300;   //采集证升级
+  CS_SkillPermitCharge = 1301;    //采集证补充
+  CS_SkillUpgrade = 1302;         //技能升级
+  //Island
+  CS_IslandInfo = 1600;
+  CS_IslandPlayerInfo = 1601;
+  CS_IslandItemList = 1602;
+  CS_IslandEntityList = 1603;
+  CS_IslandCookSkillList = 1604;
+  CS_IslandGeneInfoList = 1605;
+  //CS_IslandWeaponSkillList = 1605;
+  CS_IslandLevelList = 1606;
+  CS_IslandWeaponList = 1607;
+  CS_IslandConditionList = 1608;
+  CS_IslandFlowerList = 1609;
+  CS_IslandPlayerInfoSearch = 1610;
+  //Island Item
+  //CS_IslandItemUse = 1611;  //使用物品
+  //CS_IslandItemSell = 1612; //丢弃或出售物品
+  //CS_IslandItemMove = 1613; //移动或合并物品
+  //CS_IslandItemCompost = 1614; //物品堆肥
+  //Island Active
+  CS_IslandCookItem = 1620;           //烹饪
+  CS_IslandWeaponUpgradeList = 1621;  //岛屿武器升级队列
+  CS_IslandWeaponUpgrade = 1622;      //升级岛屿武器
+  CS_IslandWeaponCompleted = 1623;    //升级岛屿武器完成
+  //Island Skill
+  CS_IslandSkillList = 1630;
+  CS_IslandSkillUpgrade = 1631;
+  CS_IslandBookActive = 1632;
+  CS_IslandRescueNpc = 1633; //救援治疗NPC
+  //Island Room System
+  CS_IslandRoomCreate = 1650;
+  CS_IslandRoomSearch = 1651;
+  CS_IslandRoomJoin = 1652;
+  CS_IslandRoomExit = 1653;
+  CS_IslandReplayJoin = 1654;
+  CS_IslandJoinFullMail = 1655; // 邀请进入社区 社区满了 之后邮件通知邀请方
+  CS_IslandCreateCastConsume = 1656; // 动态请求社区创建消耗
+  CS_IslandChangeRoleId = 1657; // 修改角色ID
+  //Player Mail
+  CS_MailList = 1701;
+  CS_MailRead = 1702;
+  //CS_MailReadProcess = 1703;
+  CS_MailProcess = 1704;
+  CS_MailDelete = 1705;
+  //Island Mail
+  //CS_IslandMailList = 1710;
+  //CS_IslandMailRead = 1712;
+  //CS_IslandMailReadProcess = 1713;
+  //CS_IslandMailProcess = 1714;
+  //CS_IslandMailDelete = 1715;
+  //Island System
+  CS_IslandUpdateQrCode = 1720;
+  CS_IslandGroupApply = 1722;
+  CS_IslandGroupAccept = 1723;
+  CS_IslandGroupKickPlayer = 1725;
+  CS_IslandGroupReward = 1726;
+  //NPC System
+  CS_IslandNpcActive = 1751;    //暂未使用
+  //Task System
+  CS_IslandTaskList = 1800;
+  CS_IslandTaskCompleted = 1801;
+  //Leaderboard System
+  CS_PlayerLeaderBoard = 1810;
+  CS_IslandLeaderBoard = 1811;
+
+  //Battle
+  CS_BattleList = 2001;         //查询当前战斗副本信息
+  CS_BattleCreate = 2002;       //创建战斗
+  CS_BattleJoin = 2003;         //加入战斗
+  CS_BattleStart = 2004;        //开始战斗
+  CS_BattleResult = 2005;       //战斗奖励领取
+  CS_BattleExit = 2009;         //离开战斗
+  CS_BattleHeroList = 2010;     //查询可选英雄
+  CS_BattleSelectHero = 2011;   //选英雄
+  CS_BattleWeaponList = 2012;   //查询可选武器
+  CS_BattleSelectWeapon = 2013; //选武器
+  CS_BattleLastNoExit = 2015;   //获取最后一场未结束战斗
+  CS_BattleLastDelete = 2016;   //丢弃最后一场未结束战斗
+
+  // 匹配协议
+  CS_MatchTeamCreate = 2100;
+  CS_MatchTeamJoin = 2101;
+  CS_MatchTeamReadyOption = 2102;
+  CS_MatchTeamLeave = 2103;
+  CS_MatchTeamKickOut = 2104;
+  CS_MatchBeginMatch = 2105;
+  CS_MatchCancelMatch = 2106;
+  CS_MatchEnterBattle = 2108;
+  CS_MatchUpdateIslandRoomID = 2109;
+
+  // 技能操作
+  CS_SkillItemChange = 2150;
+  CS_SkillItemDisintegrate = 2151;
+  CS_SkillItemLevelUp = 2152;
+  CS_SkillItemSetPreMaxQuality = 2153;
+
+  //GM Cmd
+  CS_GmCommand = 3001;   //GM Command
+}
+
+enum CSProtoMessage{
+  CS_ProtoMessage = 0;
+  //Player Active
+  CS_PlayerMove = 4001;
+  CS_PlayerActive = 4002;
+  CS_PlayerCollect = 4003;    //采集地图资源(砍树,采集)
+  CS_PlayerPickUpMapItem = 4004; //地图拾取地图Item
+  CS_PlayerEnterIsland = 4010;  //玩家资源载入成功，回岛，同步消息标记位
+
+}
+
+enum SCHandlerCMD{
+  SC_HandlerNone = 0;
+  SC_PlayerLogin = 5000;
+  SC_PlayerAvatar = 5003;
+  SC_PlayerNickName = 5004;
+  //SC_PlayerLevel = 5010;      //副本信息
+  SC_PlayerBitStatus = 5011;
+  SC_PlayerRecordTime = 5012;     //Player Record Time
+  SC_PlayerTutorial = 5013;
+  SC_OptionSet = 5014;   //修改选项配置
+  SC_WsTickTime = 5050;
+  //Item System
+  SC_PlayerDetailInfo = 5100; //玩家详细信息
+  SC_ItemList = 5101;
+  //SC_GeneList = 5102;
+  //SC_SkillList = 5103;
+  //SC_ConditionList = 5105;
+  SC_ChickList = 5106;
+  //SC_CurrencyList = 5107;     //Currency
+  //Item System
+  SC_ItemGet = 5200;      //获取物品
+  SC_ItemUse = 5201;      //使用物品
+  SC_ItemSell = 5202;     //丢弃或出售物品
+  SC_ItemMove = 5203;     //移动或合并物品
+  SC_ItemPush = 5204;       //上交物品到岛屿
+  SC_ItemPop = 5205;        //从岛屿获取物品
+  SC_ChickOpen = 5210;       //使用Chick
+  SC_GeneShopInfo = 5215;   //装备商店信息
+  SC_GeneShopBuy = 5216;   //装备购买
+  SC_GeneShopGet = 5217;   //装备商店获取
+  SC_GeneUpgrade = 5218;   //装备升级
+  //Task System
+  SC_TaskList = 5250;       //个人任务序列
+  SC_TaskCompleted = 5251;  //完成任务
+  SC_TaskActive = 5252;     //客户端激活任务
+  //Skill System
+  SC_SkillPermitUpgrade = 5300;   //采集证升级
+  SC_SkillPermitCharge = 5301;    //采集证补充
+  SC_SkillUpgrade = 5302;         //技能升级
+  //Island
+  SC_IslandInfo = 5600;
+  SC_IslandPlayerInfo = 5601;
+  SC_IslandItemList = 5602;
+  SC_IslandEntityList = 5603;
+  SC_IslandCookSkillList = 5604;
+  SC_IslandGeneInfoList = 5605;
+  //SC_IslandWeaponSkillList = 5605;
+  SC_IslandLevelList = 5606;
+  SC_IslandWeaponList = 5607;
+  SC_IslandConditionList = 5608;
+  SC_IslandFlowerList = 5609;
+  SC_IslandPlayerInfoSearch = 5610;
+  //Island Item
+  //SC_IslandItemUse = 5611;  //使用物品
+  //SC_IslandItemSell = 5612; //丢弃或出售物品
+  //SC_IslandItemMove = 5613; //移动或合并物品
+  //SC_IslandItemCompost = 5614; //物品堆肥
+  //Island Active
+  SC_IslandCookItem = 5620;
+  SC_IslandWeaponUpgradeList = 5621;
+  SC_IslandWeaponUpgrade = 5622;  //升级岛屿武器
+  SC_IslandWeaponCompleted = 5623;
+  SC_IslandRescueNpc = 5633;
+  //Island Skill
+  SC_IslandSkillList = 5630;
+  SC_IslandSkillUpgrade = 5631;
+  SC_IslandBookActive = 5632;
+  //Island Room System
+  SC_IslandRoomCreate = 5650;
+  SC_IslandRoomSearch = 5651;
+  SC_IslandRoomJoin = 5652;
+  SC_IslandRoomExit = 5653;
+  SC_IslandReplayJoin = 5654;
+  SC_IslandCreateCastConsume = 5655; // 动态请求社区创建消耗
+  SC_IslandChangeRoleId = 5656; // 修改角色ID
+  //Player Mail
+  SC_MailList = 5701;
+  SC_MailRead = 5702;
+  //SC_MailReadProcess = 5703;
+  SC_MailProcess = 5704;
+  SC_MailDelete = 5705;
+  //Island Mail
+  //SC_IslandMailList = 5710;
+  //SC_IslandMailRead = 5712;
+  //SC_IslandMailReadProcess = 5713;
+  //SC_IslandMailProcess = 5714;
+  //SC_IslandMailDelete = 5715;
+  //Island System
+  SC_IslandUpdateQrCode = 5720;
+  SC_IslandGroupApply = 5722;
+  SC_IslandGroupAccept = 5723;
+  SC_IslandGroupKickPlayer = 5725;
+  SC_IslandGroupReward = 5726;
+  //NPC System
+  SC_IslandNpcActive = 5751;
+  //Task System
+  SC_IslandTaskList = 5800;
+  SC_IslandTaskCompleted = 5801;
+  //Leaderboard System
+  SC_PlayerLeaderBoard = 5810;
+  SC_IslandLeaderBoard = 5811;
+  //Battle
+  SC_BattleList = 6001;
+  SC_BattleCreate = 6002;
+  SC_BattleJoin = 6003;
+  SC_BattleStart = 6004;
+  SC_BattleResult = 6005;
+  SC_BattleExit = 6009;
+  SC_BattleHeroList = 6010;
+  SC_BattleSelectHero = 6011;
+  SC_BattleWeaponList = 6012;
+  SC_BattleSelectWeapon = 6013;
+  SC_BattleLastNoExit = 6015;
+  SC_BattleLastDelete = 6016;
+    
+  // 匹配协议
+  SC_MatchTeamCreate = 6101;
+  SC_MatchTeamJoin = 6102;
+  SC_MatchTeamReadyOption = 6103;
+  SC_MatchTeamLeave = 6104;
+  SC_MatchTeamKickOut = 6105;
+  SC_MatchBeginMatch = 6106;
+  SC_MatchCancelMatch = 6107;
+  SC_MatchEnterBattle = 6109;
+  SC_MatchUpdateIslandRoomID = 6110;
+
+  // 技能操作
+  SC_SkillItemChange = 6150;
+  SC_SkillItemDisintegrate = 6151;
+  SC_SkillItemLevelUp = 6152;
+  SC_SkillItemSetPreMaxQuality = 6153;
+
+  //GM Item
+  SC_GmCommand = 8001; //GM Command
+}
+
+enum SCProtoMessage{
+  SC_ProtoMessage = 0;
+  SC_BinaryNotify = 2;
+  //System Message
+  SC_ItemNotify = 10001;
+  SC_MessageNotify = 10002;
+  SC_NewsTickerNotify = 10003;
+  //Island
+  SC_IslandJoinReq = 10010;
+  //Island Message
+  SC_IslandInfoNotify = 11001;
+  SC_IslandPlayerNotify = 11002;
+  //SC_IslandItemNotify = 11003;
+  SC_IslandEntityNotify = 11004;
+  SC_IslandCookNotify = 11005;
+  SC_IslandMapItemNotify = 11006;
+  SC_IslandWeaponNotify = 11007;
+  SC_IslandWeaponUpgradeNotify = 11008;
+  SC_IslandConditionNotify = 11009;
+  SC_IslandBoxEntityNotify = 11010;
+  SC_IslandMailNotify = 11011;
+  SC_IslandGeneNotify = 11012;
+  SC_IslandRoleIdChangeNotify = 11013;
+  //Island Skill Notify
+  SC_CookSillNotify = 11050;
+  SC_WeaponSkillNotify = 11051;
+  SC_ConditionNotify = 11052;
+  //Task Notify
+  SC_TaskNotify = 11060;
+  SC_IslandTaskNotify = 11061;
+  //Island Skill
+  SC_IslandSkillNotify = 11065;
+  SC_IslandBookNotify = 11066;
+  //Player Active
+  SC_PlayerMove = 11101;
+  SC_PlayerActive = 11102;
+  SC_PlayerCollect = 11103;
+  SC_PlayerPickUpMapItem = 11104;
+  SC_PlayerLoginKick = 11200;
+  SC_PlayerSystemKick = 11201;
+  //Room Notify
+  SC_IslandPlayerRemoveNotify = 11301;
+  //Battle
+  SC_BattleMatchNotify = 12000;
+  SC_PlayerLevelNotify = 12001;
+  
+  // match
+  SC_MatchSuccessNotify = 12100;
+  SC_MatchTeamUpdateMsg = 12101;
+  SC_MatchRoomUpdateMsg = 12102;
+  SC_CreateBattleSuccessNotify = 12103;
+  SC_BattleSettlementNotify = 12104;
+
+  // 技能更新
+  SC_SkillItemUpdateNotify = 12150;
+}

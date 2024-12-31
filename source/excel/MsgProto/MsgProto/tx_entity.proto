@@ -1,0 +1,675 @@
+syntax = "proto3";
+
+import public "tx_enum.proto";
+
+option go_package = "tx_proto";
+
+package tx_proto;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//微信登录验证
+message WechatSession {
+  string openid = 1;
+  string session_key = 2;
+  string unionid = 3;
+  int32 errcode = 4;
+}
+
+//TipTap登录验证
+message TipTapSession {
+  string session_key = 1;
+  string openid = 2;
+  string anonymous_openid = 3;
+  int32 errcode = 4;
+}
+
+message CharacterCount{
+  int32 characterId = 1;
+  int32 count = 2;
+}
+
+message PlayerInfo {
+  int64 accountId = 1;
+  int64 playerId = 2;
+  int64 islandId = 3;
+  string nickName = 4;
+  int32 character = 5;
+  int64 satietyTime = 6;
+  int64 createTime = 7;
+  int32 vipLevel = 8;
+  int32 isNpc = 9;
+  int32 region = 10;
+  int32 age = 11;
+  int64 bitStatus = 12;
+  int32 Tutorial = 13;
+  int64 JoinTime = 14;
+  string wxName = 15;
+  int64 fightPower = 16;
+}
+
+//message PlayerAttribute{
+//  int32 attr_type = 1;
+//  int64 attr_value = 2;
+//  int64 last_time = 3;
+//}
+
+message PlayerRecordTime{
+  int32 recordType = 1;
+  int64 recordTime = 2;
+}
+
+message PlayerDetail{
+  int64 playerId = 1;
+  int64 equipExp = 2;
+  repeated PlayerRecordTime recordInfos = 4;  //客户端事件时间
+  repeated GeneInfo geneInfos = 5;
+  repeated PlayerRecordTime dailyRecords = 6;//日常信息
+}
+
+message Position{
+  int32 PosX = 1;
+  int32 PosY = 2;
+}
+
+message CurrencyInfo{
+  int32 currency = 1;   //类型
+  int64 count = 2;      //当前数量
+  int64 lastTime = 4;   //更新时间
+  int64 income = 5;     //增长值
+}
+
+message SmallItem{
+  int64 itemId = 1;
+  int32 count = 2;
+}
+
+message UseItem{
+  int64 dbId = 1;       //DBId
+  int64 itemId = 2;     //物品ID
+  int32 storage = 3;    //背包ID
+  int32 count = 4;      //数量
+}
+
+message ItemInfo{
+  int64 dbId = 1;       //DBId
+  int64 playerId = 2;   //玩家ID
+  int64 itemId = 3;     //物品ID
+  int32 storage = 4;    //背包ID
+  int32 count = 5;      //数量
+  int64 fresh = 6;      //新鲜度
+  int32 durable = 7;    //耐久度
+  int64 lastTime = 8;   //最后更新时间
+  int64 makeId = 9;     //制作者Id
+}
+
+message ChickInfo {
+  int64 nextTime = 1;
+  repeated int64 chickIds = 2;
+}
+
+message LevelInfo{
+  int32 levelId = 1;
+  int64 levelTime = 2;
+  repeated int32 levelIds = 3;
+}
+
+message GeneInfo{
+  int32 slot = 1;
+  int32 geneId = 2;
+  int32 quality = 3;
+  int32 level = 4;
+}
+
+message IsPlayerGeneInfo{
+  int64 playerId = 1;
+  GeneInfo geneInfo = 2;
+}
+
+message IsGeneFullInfo{
+  GeneInfo geneInfo = 1;
+  repeated IsPlayerGeneInfo playerGeneInfos = 2;
+}
+
+message SkillInfo{
+  int64 skillId = 1;
+  SkillType type = 2;
+  int32 quality = 3;
+  int32 level = 4;
+  int64 exp = 5;
+  int64 playerId = 6;
+}
+
+
+// 
+message SItemQualityCount{
+  int32 configID = 1;
+  int32 quality = 2;
+  int32 count = 3;
+}
+// 新技能系统 skill_index,品质,等级,数量,碎片数量,,
+message SItem{
+  int32 configID = 1;
+  int32 curLevel = 2; // 当前等级
+  int32 dressSlot = 3; // 穿戴位置
+  int32 PreMaxQuality = 4; // 上一个最高品质
+  int32 fragmentCount = 5; // 碎片数量
+  repeated SItemQualityCount quality_count = 6; // 每种品质对应数量
+}
+
+// 技能道具列表
+message SItemsData{
+  // 技能当前最高等级
+  repeated SItem skills = 1;
+}
+
+
+message IslandWeaponInfo{
+  int32 weaponId = 1;
+  int32 level = 2;
+}
+
+message SmallPlayer{
+  int64 playerId = 1;
+  string nickName = 2;
+  int32 character = 3;
+  int64 avatar = 4;
+}
+
+message IslandWeaponSkillInfo{
+  int32 weaponId = 1;
+  int64 level = 2;
+  repeated SmallPlayer learnedPlayers = 3;
+}
+
+message IsCookSkillList{
+  int64 playerId = 1;
+  int32 characterId = 2;
+  repeated int32 cookIds = 3;
+}
+
+message IsSkillFullInfo{
+  SkillInfo skillInfo = 1;
+  repeated SkillInfo plSkillInfos = 2;
+}
+
+message EquipSkillInfo{
+  int64 equipSkillId = 1;
+  int32 equipExp = 2;
+}
+
+message IslandInfo{
+  int64 islandId = 1;
+  string nickName = 2;
+  int64 startTime = 3;
+  int32 level = 4;
+  int32 status = 5;
+  int32 type = 6;
+  int32 book_level = 7;
+  int64 book_exp = 8;
+  int64 group_master = 9;
+  string group_url = 10;
+  string group_qrcode = 11;
+  int64 create_id = 12;
+  int32 create_region = 13;
+  string advertise = 14;
+  string notice = 15;
+  int64 fightPower = 16;
+}
+
+message PlayerFlower{
+  int32 idx = 1;
+  int64 playerId = 2;
+  int32 flower = 4;
+  int32 week_flower = 5;
+  int32 total_flower = 6;
+}
+
+message PlayerActive{
+  int32 active_type = 1;  //1>Move 2>Stay 3>Dance
+  Position start_pos = 2;
+  Position end_pos = 3;
+  int32  direction = 4;
+  int32  speed 	= 5; // */100
+  int64 last_time = 6;
+  int64 cd_time = 7;
+}
+
+message IslandPlayerInfo{
+  int64 playerId = 1;
+  string nickName = 2;
+  int32 character = 3;
+  int32 region = 5;
+  int32 age =  6;
+  int64 loginTime = 7;
+  int64 logoutTime = 8;
+  int64 Satiety = 9;
+  IsPlayerStatus  status = 10;   // >>
+  PlayerActive player_active = 11;
+  int64 applyTime = 12;
+  int32 applyStatue = 13;     //0>none 1>apply 2>accept 3>reject 4>reward
+  string wxNickName = 14;
+  int32 rescue = 15;         //救援次数
+  int64 rescueTime = 16;     //救援结束时间
+  int32 levelId = 17;
+  int64 levelTime = 18;
+  int64 fightPower = 19;
+  bool lockBag = 20;
+  int64 invitationPlayerId = 21;
+  int64 vxInvitationPlayerId = 22;
+}
+
+message PvpIsPlayerInfo{
+  int64 playerId = 1;
+  string nickName = 2;
+}
+
+message IslandDustInfo{
+  int32 dust_status = 1;
+  int64 dust_time = 2;
+  float dust_posX = 3;
+  float dust_posY = 4;
+}
+
+message IslandEntityInfo{
+  int32 entityId = 1;
+  int32 protoId = 2;
+  float posX = 3;
+  float posY = 4;
+  MapEntityStatus status = 5;     //0>正常 1>被采伐
+  int64 lastTime = 6;
+  int32 HP = 7;
+  int64 FarmId = 8;
+  IslandDustInfo dustInfo = 9;
+}
+
+message MapItemInfo{
+  int64 islandId = 1;
+  int64 playerId = 2;
+  int64 itemIdx = 3;
+  int64 itemId = 4;
+  int32 quality = 5;
+  int32 count = 6;
+  float posX = 7;
+  float posY = 8;
+  int64 lastTime = 9;
+  int32 personal = 10;
+  int32 type = 11;
+}
+
+message SimCurrency{
+  int32 currency = 1;
+  int64 count = 2;
+}
+
+message ShopCurrency{
+  int32 currency = 1;
+  int64 count = 2;
+  int64 rebate = 3;
+}
+
+message ShopEntity{
+  int32 shopId = 1;
+  int32 count = 2;
+  SimCurrency costCurrency = 3;
+}
+
+message TurnTimeInfo {
+  int32 turnType = 1;
+  int64 showTime = 2;
+  int64 beginTime = 3;
+  int64 endTime = 4;
+  int64 turnEndTime = 5;
+  int32 turnIndex = 6;
+}
+
+message RandomEntity {
+  int64 weight = 1;       //权重
+  repeated int64 ids = 2; //ID集合
+}
+
+message CardPoolBuyEntity{
+  int32 index = 1;
+  int32 cardPoolId = 2;
+  int32 buyCount = 3;  //0:free 1:half
+  int64 startTime = 4;
+  int64 endTime = 5;
+  int64 coolDown = 6;
+}
+
+message CardPoolRandomInfo {
+  float randomValue = 1;
+  int64 itemId = 2;
+  bool fullFourStar = 3;
+}
+
+message TaskCondition{
+  int32 condId = 1;
+  int32 condValue = 2;
+}
+
+message TaskInfo {
+  int32 taskId = 1;
+  int32 taskType = 2;   //0>Main 1>Side
+  int32 status = 3;     //0> None 1>Completed 2>Rewarded
+  int32 value = 4;
+  repeated TaskCondition conditions = 5;
+}
+
+message TaskReward {
+  SimCurrency currency = 1;       //元宝
+  repeated ItemInfo itemList = 2; //道具
+}
+
+message SignInfo {
+  int64 createTime = 1;
+  int64 lastSignTime = 2;
+  int64 signFlag = 3;
+  int64 totalFlag = 4;
+}
+
+message MonthlyInfo {
+  int64 monthType = 1;
+  int64 buyCardTime = 2;
+  int64 lastGetTime = 3;
+  int64 monthFlag = 4;
+}
+
+message ItemRandInfo{
+  int64 itemId =1;
+  int64 total =2;
+  int64 begin =3;
+  int64 end =4;
+}
+
+message RewardInfo{
+  int32 itemType = 1;
+  int64 itemId = 2;
+  int32 itemCount = 3;
+}
+
+//message RewardInfo {
+//  repeated SimCurrency currencies = 1;
+//  repeated ItemInfo itemInfos = 2;
+//}
+
+message MailAttachInfo {
+  int64 type = 1;
+  int64 id = 2;
+  int64 value = 3;
+}
+
+enum MailType {
+    MailType_None = 0;
+    MailType_System = 1;
+    MailType_Player = 2;
+    MailType_Island = 3;
+    MailType_GM = 4;
+}
+
+enum MailStatus{
+    MailStatus_None = 0;
+    MailStatus_Read = 1;
+    MailStatus_Reward = 2;
+    MailStatus_Expire = 3;
+    MailStatus_Delete = 4;
+}
+
+message PlayerMailInfo {
+  int64 mailId = 1;
+  int64 playerId = 2;
+  int64 sendId = 3;
+  string sendName = 4;
+  int32 state = 5;
+  int64 readTime = 6;
+  int64 sendTime = 7;
+  int64 processTime = 8;
+  int64 expireTime = 9;
+  MailType mailType = 10;
+  MailClass mailClass = 11;
+  string mailTitle = 12;
+  string mailContent = 13;
+  repeated MailAttachInfo attachInfos = 14;
+}
+
+message MailDetailInfo{
+  repeated int64 readIds = 1;
+  int64 rewardId = 2;
+}
+
+message IslandMailInfo {
+  int64 mailId = 1;
+  int64 islandId = 3;
+  int64 sendId = 4;
+  string sendName = 5;
+  int32 state = 6;
+  int64 readTime = 7;
+  int64 sendTime = 8;
+  int64 processTime = 9;
+  int64 expireTime = 10;
+  MailType mailType = 11;
+  string mailTitle = 14;
+  string mailContent = 15;
+  repeated MailAttachInfo attachInfos = 16;
+  MailDetailInfo detailInfo = 17;
+}
+
+message PlayerLevelInfo{
+  int64 playerId = 1;
+  string nickName = 2;
+  int64 satietyTime = 3;
+  int32 character = 4;
+  int32 levelId = 5;
+  int64 levelTime = 6;
+  int32 status = 7;
+}
+
+message BattlePlayerInfo {
+  int64 PlayerId = 1;
+  BattlePlayerStatus Status = 2;      //0>Init 1>Ready
+  string NickName = 3;
+  int64 SatietyTime = 4;
+  int32 Character = 5;
+  int32 LevelId  = 6;
+  int32 HeroId = 7;
+  int32 WeaponId = 8;
+  repeated int32 weapons = 9;
+  repeated int32 items = 10;
+}
+
+message BattleMatchInfo {
+  int64 BattleIdx = 1;
+  int64 IslandId = 2;
+  int64 CreateId = 3;
+  string NickName = 4;
+  int64 Avatar = 5;
+  int32 Character = 6;
+  int32 LevelId = 7;
+  int64 Token = 8;
+  repeated BattlePlayerInfo PlayerList = 9;
+  int64 CreateTime = 10;
+  int64 StartTime = 11;
+  MatchStatus Status = 12;
+  int32 Punishment = 13;
+  int32 WavesIndex = 14;    //波次
+  int64 version = 15;       //客户端版本识别
+  bool privateRoom = 16;//私有房间
+  int64 ownerFightPower = 17;
+  int64 roomFightPower = 18;
+  bool  newBattle = 19;
+}
+
+message WeaponUpgradeInfo{
+  int64 playerId = 1;
+  int32 characterId = 2;
+  int32 weaponId = 3;
+  int32 level = 4;
+  int64 endTime = 5;
+}
+
+message ConditionInfo{
+  int32 condId = 1;
+  int64 Value = 2;
+  repeated int64 VList = 3;
+  repeated string StrList = 4;
+}
+
+message PlayerBoxInfo{
+  int64 boxIdx = 1;   //Idx = create time
+  int32 boxId = 2;
+}
+
+message IslandBoxEntity{
+  int32 posIdx = 1;
+  int64 itemId = 2;
+  int32 count = 3;
+  int32 posX = 4;
+  int32 posY = 5;
+}
+
+message PlayerMatchInfo{
+  int64 playerId = 1;
+  string nickName = 2;
+  int32 characterId = 3;
+  int32 region = 4;
+  int32 age = 5;
+  int64 loginTime = 6;
+  int64 logoutTime = 7;
+  int32 battleLevel = 8;
+  int64 satiety = 9;
+  int64 fightPower = 10;
+}
+
+message IslandMatchInfo{
+  int64 islandId = 1;
+  string nickName = 2;
+  int32 monthId = 3;
+  int64 create_id = 4;
+  int32 create_region = 5;
+  string advertise = 6;
+  string notice = 7;
+  repeated PlayerMatchInfo playerList = 8;
+  float levelScore = 9;
+  int64 lastOnlineTime = 10;
+  int64 lastOfflineTime = 11;
+  int64 start_time = 12;
+  int64 fightPower = 13;
+}
+
+message IslandPlayerJoinInfo{
+  int64 playerId = 1;
+  int32 character = 2;
+  int32 region = 3;
+  int32 age = 4;
+  repeated CurrencyInfo currencies = 5;
+  LevelInfo pBattleLevel = 6;
+}
+
+//Island Leaderboard Info
+message PlayerLBInfo {
+  int64 rankIdx = 1;
+  int64 playerId = 2;
+  string nickName = 3;
+  double score = 4;
+  int64 lbTime = 5;
+}
+
+message IslandLBPlayerInfo{
+  int64 playerId = 1;
+  int64 score = 2;
+  string name = 3;
+  int64 lifeTime = 4;
+}
+
+//Island Leaderboard Info
+message IslandLBInfo {
+  int64 rankIdx = 1;
+  int64 islandId = 2;
+  string nickName = 3;
+  double score = 4;
+  int64 lbTime = 5;
+  repeated IslandLBPlayerInfo playerList = 6;
+}
+
+message RewardResult{
+  int64 Satiety = 1;
+  ChickInfo chickInfo = 2;
+  repeated CurrencyInfo currencies = 3;
+  repeated ItemInfo ItemInfos = 4;
+  repeated SkillInfo skillInfos = 5;
+}
+
+message RewardSkill{
+  int64 skillId = 1;
+  int32 quality = 2;
+  int32 count = 3;
+}
+
+message ChatCdTime{
+  ChatType cdType = 1;   //1>World 2>City 3>Island
+  int64 cdTime = 2;
+}
+
+message ChatMessage{
+  string streamKey = 1;
+  ChatType chatType = 2;
+  int64 playerId = 3;
+  int64 receiveId = 4;
+  string nickName = 5;
+  int32 character = 6;
+  int64 sendTime = 7;
+  string message = 8;
+}
+
+///////////////////////// match server /////////////////////// 
+
+// 玩家战斗信息
+message SMatchPlayerBattleData {
+  int32 groupId = 1;
+  int64 islandId = 2;
+  BattlePlayerInfo battleInfo = 3;  
+  SkillInfo isSkillInfo = 4;
+  SkillInfo skillInfo = 5;
+  PvpIsPlayerInfo playerInfo = 6;
+  GeneInfo isGeneInfo = 7;
+  GeneInfo geneInfo = 8;
+}
+
+// 队伍状态
+enum MTeamStateType {
+    MTeamStateType_Null = 0;
+    Normal = 1;     // 组队中
+    Matching = 2;   // 匹配中
+    InBattle = 3;   // 战斗中
+    Settlement = 4; // 结算中
+    Closed = 5;     // 已经关闭
+}
+
+// 队伍中的玩家状态
+enum MTeamPlayerStateType {
+    MTeamPlayerStateType_Null = 0;
+    Ready = 1;    // 准备中
+    NotReady = 2; // 未准备
+    Offline = 3;  // 离线
+}
+
+// 匹配服务器 房间 玩家数据
+message SMatchTeamPlayerData {
+  int64 playerId = 1; 
+  int32 teamIndex = 2; // 在房间中的位置
+  int64 token = 3;
+  MTeamPlayerStateType state = 4; // 在房间中的状态 MatchPlayerStateType
+  SMatchPlayerBattleData battleData = 5;
+
+}
+
+// 房间数据
+message SMatchTeamData {
+  int64 teamId = 1;
+  int32 sceneId = 2;
+  MTeamStateType state = 3; // MTeamStateType
+  repeated SMatchTeamPlayerData playerDatas = 4;
+
+}
+
+
+
