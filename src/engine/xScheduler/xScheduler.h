@@ -6,6 +6,16 @@
 
 
 class xService;
+
+
+#pragma once
+
+#include "xBase/xCircularPool.h"
+
+#include "xEvent/xEvent.h"
+
+
+class xService;
 // 协程任务的类
 struct SchedulerTask
 {
@@ -48,7 +58,7 @@ struct SchedulerTask::promise_type
     void unhandled_exception() { std::exit(1); }
 
 public:
-    xService* pService; 
+    xService* pService;
     PBEventPtr ptrEvent;
 };
 
@@ -100,18 +110,28 @@ public:
     }
 
     // 处理所有协议请求
-    SchedulerTask processRequests(ServiceScheduler *pScheduler) {
+    //SchedulerTask processRequests(ServiceScheduler *pScheduler) {
+    //    ServiceScheduler* pServiceScheduler = pScheduler;
+    //        MsgScheduler *request;
+    //        if (pServiceScheduler->requests_.Pop(request)) {
+    //            // 取出并处理当前协议请求
+    //            co_await (request->call)(request->pService, request->ptrEvent);  // 协程会在这里等待
+    //        } else {
+    //            //std::cout << "Player " << id_ << " has no more protocol to process, waiting for new ones..." << std::endl;
+    //            std::this_thread::sleep_for(std::chrono::microseconds(1)); // 模拟等待新协议
+    //        }
+    //}
+
+    SchedulerTask processRequests(ServiceScheduler* pScheduler) {
         ServiceScheduler* pServiceScheduler = pScheduler;
-        //while (true) {
-            MsgScheduler *request;
-            if (pServiceScheduler->requests_.Pop(request)) {
-                // 取出并处理当前协议请求
-                co_await (request->call)(request->pService, request->ptrEvent);  // 协程会在这里等待
-            } else {
-                //std::cout << "Player " << id_ << " has no more protocol to process, waiting for new ones..." << std::endl;
-                std::this_thread::sleep_for(std::chrono::microseconds(1)); // 模拟等待新协议
-            }
-        //}
+        MsgScheduler* request;
+        if (pServiceScheduler->requests_.Pop(request)) {
+            // 取出并处理当前协议请求
+            co_await (request->call)(request->pService, request->ptrEvent);  // 协程会在这里等待
+        } else {
+            //std::cout << "Player " << id_ << " has no more protocol to process, waiting for new ones..." << std::endl;
+            std::this_thread::sleep_for(std::chrono::microseconds(1)); // 模拟等待新协议
+        }
     }
 
 public:

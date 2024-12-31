@@ -6,11 +6,12 @@
 #include "xBase/xThread.h"
 
 
+
 #define GRPCRequest(ServerName,Namespace,Service,TRequest,TReply,TCallFun,request,reply,status){\
     auto channel___ = CRpcService::getMe().GetChannel(ServerName);\
     std::unique_ptr<Namespace::Service::Stub> stub___ = Namespace::Service::NewStub(channel___);\
     grpc::ClientContext context___;\
-    status = stub___->TCallFun(&context___, request, reply);\
+    status = stub___->TCallFun(&context___, request, &reply);\
     if (status.ok()) {\
         std::cout << "Server response: " << reply.message() << std::endl;\
     } else {\
@@ -19,31 +20,35 @@
 }
 
 
-struct CorutineContinue
+struct EmptyCorutine
 {
-    std::chrono::milliseconds duration;
-    bool await_ready() {
-        return false;  // 立即完成
-    }
-
-    void await_suspend(std::coroutine_handle<> h) {
-        std::cout << "RPC request started, will take " << duration.count() << " milliseconds." << std::endl;
-        std::thread([h, this] {
-            std::this_thread::sleep_for(std::chrono::seconds(100)); // 模拟RPC延迟
-            h.resume();  // RPC完成，恢复协程
-            }).detach();
-
-        //std::this_thread::sleep_for(std::chrono::seconds(2)); // 模拟RPC延迟
-        //h.resume();  // RPC完成，恢复协程
-    }
-
-    void await_resume() {
-        std::cout << "RPC request completed." << std::endl;
-    }
-
-    void Return_Value() {}
+    bool await_ready() {return true;}
+    void await_suspend(std::coroutine_handle<> h) {}
+    void await_resume() {}
+    void return_value() {}
 };
 
+#define GRPCRequestCall(ServerName,Namespace,Service,TRequest,TReply,TCallFun,request__, reply__, status__)\
+struct CorutineContinue\
+{\
+    Namespace::TRequest &request_;\
+    Namespace::TReply &reply_;\
+    grpc::Status &status_;\
+    bool await_ready() {\
+        return false; \
+    }\
+    void await_suspend(std::coroutine_handle<> h) {\
+        std::cout << "RPC request started, will take milliseconds." << std::endl;\
+        std::thread([h, this] {\
+            GRPCRequest(ServerName, Namespace, Service, TRequest, TReply, TCallFun, request_, reply_, status_)\
+            h.resume(); \
+            }).detach();\
+    }\
+    void await_resume() {\
+        std::cout << "RPC request completed." << std::endl;\
+    }\
+    void Return_Value() {}\
+};co_await CorutineContinue(request__,reply__,status__);
 
 class SRpcService : public xSingleton<SRpcService>, xThread
 {
