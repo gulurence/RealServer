@@ -1,20 +1,4 @@
 
-
-
-lib - engine 生成lib以及include
-data - excel 配置文件数据 以及 proto 文件
-document - 文档目录
-third_part - 第三方库目录 直接使用 vcpkg 进行安装
-tools - 工具源码目录
-build - cmake 生成项目文件目录
-core - 封装进程核心
-service - 封装service基础接口
-
-
-
-
-
-
 RealServer/
 ├── CMakeLists.txt                   # 主 CMake 配置文件
 ├── src/                             
