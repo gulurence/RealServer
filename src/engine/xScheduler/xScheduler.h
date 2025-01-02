@@ -28,17 +28,13 @@ struct SchedulerTask
     }
 
     bool await_ready() {
-        return true;  // 不立即完成
+        return false;  // 不立即完成
     }
     void await_resume() {
         //std::cout << "RPC request completed." << std::endl;
     }
     void await_suspend(std::coroutine_handle<> h) {
-        //std::cout << "RPC request started, will take " << std::chrono::milliseconds(100).count() << " milliseconds." << std::endl;
-        //std::thread([h, this] {
-        //    std::this_thread::sleep_for(std::chrono::milliseconds(10)); // 模拟RPC延迟
-        //    h.resume();  // RPC完成，恢复协程
-        //    }).detach();
+        //h.resume();  // RPC完成，恢复协程
     }
     handle_type handle;
 };
@@ -63,38 +59,18 @@ public:
 };
 
 // service handler
-typedef SchedulerTask(*OnServiceProtoMsgCallBack)(xService* pService, PBEventPtr msgPtr);
+typedef SchedulerTask(*OnServiceProtoMsgCoroutineCallBack)(xService* pService, PBEventPtr msgPtr);
+typedef void(*OnServiceProtoMsgCallBack)(xService* pService, PBEventPtr msgPtr);
 
-// 协程调度器，管理所有协程的调度
-class CoroutineScheduler
-{
-public:
-    void post(std::coroutine_handle<> coroutine) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        queue_.push(coroutine);
-    }
-
-    void run() {
-        while (!queue_.empty()) {
-            auto handle = queue_.front();
-            queue_.pop();
-            handle.resume(); // 恢复协程
-        }
-    }
-
-public:
-    std::mutex mutex_;
-    std::queue<std::coroutine_handle<>> queue_;
-};
 
 struct MsgScheduler
 {
-    MsgScheduler(xService* pService_, PBEventPtr ptrEvent_, OnServiceProtoMsgCallBack call_) 
+    MsgScheduler(xService* pService_, PBEventPtr ptrEvent_, OnServiceProtoMsgCoroutineCallBack call_)
         :pService(pService_), ptrEvent(ptrEvent_), call(call_) {
     }
     xService* pService; 
     PBEventPtr ptrEvent;
-    OnServiceProtoMsgCallBack call;
+    OnServiceProtoMsgCoroutineCallBack call;
 };
 typedef std::list<MsgScheduler*> MsgSchedulerList;
 
@@ -105,22 +81,9 @@ public:
     ServiceScheduler(int id) : id_(id) {}
 
     // 向 Player 添加协议任务
-    void postRequest(xService* pService, PBEventPtr ptrEvent, OnServiceProtoMsgCallBack call) {
+    void postRequest(xService* pService, PBEventPtr ptrEvent, OnServiceProtoMsgCoroutineCallBack call) {
         requests_.Push(new MsgScheduler(pService, ptrEvent, call));
     }
-
-    // 处理所有协议请求
-    //SchedulerTask processRequests(ServiceScheduler *pScheduler) {
-    //    ServiceScheduler* pServiceScheduler = pScheduler;
-    //        MsgScheduler *request;
-    //        if (pServiceScheduler->requests_.Pop(request)) {
-    //            // 取出并处理当前协议请求
-    //            co_await (request->call)(request->pService, request->ptrEvent);  // 协程会在这里等待
-    //        } else {
-    //            //std::cout << "Player " << id_ << " has no more protocol to process, waiting for new ones..." << std::endl;
-    //            std::this_thread::sleep_for(std::chrono::microseconds(1)); // 模拟等待新协议
-    //        }
-    //}
 
     SchedulerTask processRequests(ServiceScheduler* pScheduler) {
         ServiceScheduler* pServiceScheduler = pScheduler;
