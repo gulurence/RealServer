@@ -39,6 +39,16 @@ public:
 
         m_mapSchedulerTaskCallBack[u64MsgID] = callBack;
     }
+    void RegistProtoCoroutineCallBack(uint32 msgType, uint32 msgID, OnServiceProtoMsgCoroutineCallBack callBack) {
+        uint64 u64MsgID = msgType;
+        u64MsgID = (u64MsgID << 32) | msgID;
+
+        if (m_mapSchedulerTaskCoroutineCallBack.find(u64MsgID) != m_mapSchedulerTaskCoroutineCallBack.end()) {
+            XERR("xEventDispatcher RegistProtoCallBack msg id double regist [%ld] ", u64MsgID);
+        }
+
+        m_mapSchedulerTaskCoroutineCallBack[u64MsgID] = callBack;
+    }
 
 public:
     bool OnMsg(uint64 u64SrcServiceID, uint64 u64TargetServiceID , uint32 msgType, uint32 msgID, PBEventPtr ptrEvent) {
@@ -49,29 +59,33 @@ public:
         if (!pService) {
             XERR("xEventDispatcher OnMsg service not find [%ld] ", u64TargetServiceID);
             return false;
+        } else {
+            auto it = m_mapSchedulerTaskCallBack.find(u64MsgID);
+            if (it == m_mapSchedulerTaskCallBack.end()) {
+                auto it_coroutine = m_mapSchedulerTaskCoroutineCallBack.find(u64MsgID);
+                if (it_coroutine == m_mapSchedulerTaskCoroutineCallBack.end()) {
+                    XERR("xEventDispatcher OnMsg msg id not find regist [%ld] ", u64MsgID);
+                    return false;
+                } else {
+                    // 同步执行
+                    OnServiceProtoMsgCoroutineCallBack pCall = it_coroutine->second;
+
+                    auto pServiceScheduler = pService->GetServiceScheduler();
+                    pServiceScheduler->postRequest(pService, ptrEvent, pCall);
+                }
+            } else {
+                // 协程执行
+                OnServiceProtoMsgCallBack pCall = it->second;
+                pCall(pService, ptrEvent);
+            }
         }
 
-        auto it  = m_mapSchedulerTaskCallBack.find(u64MsgID);
-        if (it == m_mapSchedulerTaskCallBack.end()) {
-            XERR("xEventDispatcher OnMsg msg id not find regist [%ld] ", u64MsgID);
-            return false;
-        }
-
-        OnServiceProtoMsgCallBack pCall = it->second;
-
-        auto pServiceScheduler = pService->GetServiceScheduler();
-
-        //PbMsgPtr ptrRequest;// = std::make_shared<>();
-        //PbMsgPtr ptrResponse;// = std::make_shared<>();
-        //PBEventPtr ptrEvent = std::make_shared<xPBEvent>(ptrRequest, ptrResponse);
-
-        //pServiceScheduler->postRequest([&]() {xService* pServiceT = pService; PBEventPtr ptrEventT = ptrEvent; return pCall(pServiceT, ptrEventT); /*将response返回给请求段*/});
-        pServiceScheduler->postRequest(pService, ptrEvent, pCall);
         return true;
     }
 
 private:
     std::unordered_map<uint64, OnServiceProtoMsgCallBack> m_mapSchedulerTaskCallBack;
+    std::unordered_map<uint64, OnServiceProtoMsgCoroutineCallBack> m_mapSchedulerTaskCoroutineCallBack;
 };
 
 // 注册协议处理回调 开始
