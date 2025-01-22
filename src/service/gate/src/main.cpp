@@ -24,11 +24,14 @@
 #include "xRpc/xRpc.h"
 
 int main() {
+    // 初始化日志系统
     xLog::get_mutable_instance().Init();
 
-    CRpcService::getMe().ConnectToServer("test_rpc", 50051);
+    //  链接到grpc服务器
+    CRpcService::getMe().ConnectToLocalServer("test_rpc", 50051);
 
     {
+        // 定义注册 service 100
         ServiceLogin* pServiceLogin = new ServiceLogin(100, "service_100");
         bool bRegistRet = xServiceMgr::getMe().Regist(pServiceLogin);
         if (!bRegistRet) {
@@ -37,6 +40,7 @@ int main() {
     }
 
     {
+        // 定义注册 service 101
         ServiceLogin* pServiceLogin = new ServiceLogin(101, "service_101");
         bool bRegistRet = xServiceMgr::getMe().Regist(pServiceLogin);
         if (!bRegistRet) {
@@ -45,6 +49,7 @@ int main() {
     }
 
     {
+        // 定义注册 service 102
         ServiceLogin* pServiceLogin = new ServiceLogin(102, "service_102");
         bool bRegistRet = xServiceMgr::getMe().Regist(pServiceLogin);
         if (!bRegistRet) {
@@ -58,6 +63,7 @@ int main() {
     int index4 = 4000000;
     int index5 = 5000000;
     while (true) {
+        // 发送1000次消息
         if (index1 < 1001000) {
             {
                 PbMsg::LoginRequest* reqMsg = new PbMsg::LoginRequest();
@@ -67,7 +73,7 @@ int main() {
                 index1++;
 
                 PBEventPtr ptrEvent = std::make_shared<xPBEvent>(reqMsg, rspMsg);
-                // 
+                // 向service 100 发送 需要协程处理的 100号 消息
                 xEventDispatcher::getMe().OnMsg(1, 100, 100, 100, ptrEvent);
             }
 
@@ -78,7 +84,7 @@ int main() {
                 reqMsg->set_index(index2);
                 index2++;
                 PBEventPtr ptrEvent = std::make_shared<xPBEvent>(reqMsg, rspMsg);
-
+                // 向service 101 发送 需要协程处理的 101号 消息
                 xEventDispatcher::getMe().OnMsg(1, 101, 100, 101, ptrEvent);
             }
 
@@ -89,7 +95,7 @@ int main() {
                 reqMsg->set_index(index3);
                 index3++;
                 PBEventPtr ptrEvent = std::make_shared<xPBEvent>(reqMsg, rspMsg);
-
+                // 向service 100 发送 不需要协程处理的 102号 消息
                 xEventDispatcher::getMe().OnMsg(1, 100, 100, 102, ptrEvent);
             }
 
@@ -100,7 +106,7 @@ int main() {
                 reqMsg->set_index(index4);
                 index4++;
                 PBEventPtr ptrEvent = std::make_shared<xPBEvent>(reqMsg, rspMsg);
-
+                // 向service 101 发送 不需要协程处理的 102号 消息
                 xEventDispatcher::getMe().OnMsg(1, 101, 100, 102, ptrEvent);
             }
 
@@ -111,7 +117,7 @@ int main() {
                 reqMsg->set_index(index5);
                 index5++;
                 PBEventPtr ptrEvent = std::make_shared<xPBEvent>(reqMsg, rspMsg);
-
+                // 向service 102 发送 不需要协程处理的 102号 消息
                 xEventDispatcher::getMe().OnMsg(1, 102, 100, 102, ptrEvent);
             }
         }

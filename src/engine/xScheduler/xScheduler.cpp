@@ -34,14 +34,6 @@ void ServiceScheduler::RunEvent() {
             m_enSchedulerState = SchedulerStateType_Blocked;
             std::cout << "processRequests. begin" << std::endl;
             (m_ptrCurEvent->m_pCallCoroutine)(m_ptrCurEvent);
-            //if (m_enSchedulerState == SchedulerStateType_Blocked_End) {
-            //    // 释放消息
-            //    delete m_ptrCurEvent;
-            //    m_ptrCurEvent = nullptr;
-            //    // 重置调度状态
-            //    ResetScheduler();
-            //}
-            //std::cout << "processRequests. end" << std::endl;
         } else if (m_ptrCurEvent->m_enSchedulerType == SchedulerType_Synchronous) {
             // 同步执行
             m_enSchedulerState = SchedulerStateType_Running;

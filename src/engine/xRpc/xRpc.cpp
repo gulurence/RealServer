@@ -33,7 +33,22 @@ std::shared_ptr<grpc::Channel> CRpcService::GetChannel(const std::string& strSer
     return nullptr;
 }
 
-bool CRpcService::ConnectToServer(const std::string& strServerName, uint16 u16Port) {
+bool CRpcService::ConnectToServer(const std::string& strServerName, const std::string &strIp, uint16 u16Port) {
+    if (strServerName.empty()) {
+        return false;
+    }
+    char pszListenAddress[128] = { 0 };
+    sprintf_s(pszListenAddress, 100, "%s:%d", strIp.c_str(), u16Port);
+    auto channelPtr = grpc::CreateChannel(pszListenAddress, grpc::InsecureChannelCredentials());
+    if (channelPtr) {
+        m_mapChannel[strServerName] = channelPtr;
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool CRpcService::ConnectToLocalServer(const std::string& strServerName, uint16 u16Port) {
     if (strServerName.empty()) {
         return false;
     }
