@@ -22,7 +22,7 @@ SchedulerTask TestEventCall_1(EventScheduler* ptrEvent) {
 
     std::cout << "TestEventCall_1111 begin service id:" << pService->Id() <<" index:"<< pRequest->index() << std::endl ;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(60));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(60));
 
     char pszLog[128] = { 0 };
     sprintf(pszLog,"111 fun Req ServiceId:%ld,Index:%d", pService->Id(), pRequest->index());
@@ -91,7 +91,7 @@ SchedulerTask TestEventCall_2(EventScheduler* ptrEvent) {
 
     std::cout << "TestEventCall_222 begin service id:" << pService->Id() << " index:" << pRequest->index() << std::endl ;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(60));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(60));
 
     char pszLog[128] = { 0 };
     sprintf(pszLog, "222 fun Req ServiceId:%ld,Index:%d", pService->Id(), pRequest->index());
@@ -159,7 +159,7 @@ void TestEventCall_3(EventScheduler* ptrEvent) {
 
     std::cout << "TestEventCall_3333 begin service id:" << pService->Id() << " index:" << pRequest->index() << std::endl;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 
     std::cout << "TestEventCall_3333 end service id:" << pService->Id() << " index:" << pRequest->index() << std::endl;
