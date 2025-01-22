@@ -3,10 +3,10 @@
 #include "xSchedulerMgr.h"
 
 void RunLogic(xSchedulerProcess* pSchedulerNode) {
+    auto &listData = pSchedulerNode->GetList();
     while (pSchedulerNode->IsRunning()) {
-        auto &list = pSchedulerNode->GetList();
         ServiceScheduler* pScheduler = nullptr;
-        if (list.Pop(pScheduler)) {
+        if (listData.Pop(pScheduler)) {
             pScheduler->RunEvent();
         }
         //{
