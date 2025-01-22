@@ -1,9 +1,8 @@
 ﻿#pragma once
 
 #include "xBase/xCircularPool.h"
-
 #include "xEvent/xEvent.h"
-
+#include "xSchedulerDefine.h"
 
 class xService;
 
@@ -11,7 +10,6 @@ class xService;
 #pragma once
 
 #include "xBase/xCircularPool.h"
-
 #include "xEvent/xEvent.h"
 
 
@@ -31,7 +29,7 @@ struct SchedulerTask
         return false;  // 不立即完成
     }
     void await_resume() {
-        //std::cout << "RPC request completed." << std::endl;
+        std::cout << "RPC request completed. 3333333333 " << std::endl;
     }
     void await_suspend(std::coroutine_handle<> h) {
         //h.resume();  // RPC完成，恢复协程
@@ -58,51 +56,150 @@ public:
     PBEventPtr ptrEvent;
 };
 
+
+
+class ServiceScheduler;
+class EventScheduler;
+typedef std::shared_ptr<EventScheduler> EventSchedulerPtr;
+typedef std::list<EventScheduler*> MsgSchedulerList;
 // service handler
-typedef SchedulerTask(*OnServiceProtoMsgCoroutineCallBack)(xService* pService, PBEventPtr msgPtr);
-typedef void(*OnServiceProtoMsgCallBack)(xService* pService, PBEventPtr msgPtr);
+typedef SchedulerTask(*OnServiceProtoMsgCoroutineCallBack)(EventScheduler* msgPtr);
+typedef void(*OnServiceProtoMsgCallBack)(EventScheduler* msgPtr);
 
-
-struct MsgScheduler
+struct EventScheduler
 {
-    MsgScheduler(xService* pService_, PBEventPtr ptrEvent_, OnServiceProtoMsgCoroutineCallBack call_)
-        :pService(pService_), ptrEvent(ptrEvent_), call(call_) {
+    friend ServiceScheduler;
+public:
+    EventScheduler(const SchedulerType &enSchedulerType, xService* pService, ServiceScheduler* pScheduler, PBEventPtr ptrEvent, OnServiceProtoMsgCallBack pCallSync, OnServiceProtoMsgCoroutineCallBack pCallCoroutin)
+        :m_pService(pService), m_ptrEvent(ptrEvent), m_enSchedulerType(enSchedulerType), m_pCallSync(pCallSync), m_pCallCoroutine(pCallCoroutin),  m_pScheduler(pScheduler) {
     }
-    xService* pService; 
-    PBEventPtr ptrEvent;
-    OnServiceProtoMsgCoroutineCallBack call;
-};
-typedef std::list<MsgScheduler*> MsgSchedulerList;
 
-// Player 类，每个 Player 处理自己的协议请求
+public:
+    SchedulerType GetSchedulerType() {return m_enSchedulerType;}
+    ServiceScheduler* GetServiceScheduler() { return m_pScheduler; }
+
+public:
+    xService* m_pService = nullptr;
+    PBEventPtr m_ptrEvent = nullptr;
+
+private:
+    std::atomic<SchedulerType> m_enSchedulerType;
+
+private:
+    OnServiceProtoMsgCallBack m_pCallSync;
+    OnServiceProtoMsgCoroutineCallBack m_pCallCoroutine;
+
+private:
+    ServiceScheduler* m_pScheduler = nullptr;
+};
+
+
+class EventConroutineDefer;
 class ServiceScheduler
 {
+    friend EventConroutineDefer;
 public:
-    ServiceScheduler(int id) : id_(id) {}
-
-    // 向 Player 添加协议任务
-    void postRequest(xService* pService, PBEventPtr ptrEvent, OnServiceProtoMsgCoroutineCallBack call) {
-        requests_.Push(new MsgScheduler(pService, ptrEvent, call));
+    ServiceScheduler(int id) : id_(id) {
+        m_enSchedulerState = SchedulerStateType_Wait;  // 不再使用 std::atomic
     }
 
-    SchedulerTask processRequests(ServiceScheduler* pScheduler) {
-        ServiceScheduler* pServiceScheduler = pScheduler;
-        MsgScheduler* request;
-        if (pServiceScheduler->requests_.Pop(request)) {
-            // 取出并处理当前协议请求
-            co_await (request->call)(request->pService, request->ptrEvent);  // 协程会在这里等待
-        } else {
-            //std::cout << "Player " << id_ << " has no more protocol to process, waiting for new ones..." << std::endl;
-            std::this_thread::sleep_for(std::chrono::microseconds(1)); // 模拟等待新协议
+    // 全局调用
+    void PostRequest(const SchedulerType& enSchedulerType, xService* pService, PBEventPtr ptrEvent, OnServiceProtoMsgCallBack pCallSync, OnServiceProtoMsgCoroutineCallBack pCallCoroutin) {
+        m_poolEvent.Push(new EventScheduler(enSchedulerType, pService, this, ptrEvent, pCallSync, pCallCoroutin));
+
+        // 本地状态缓存
+        SchedulerStateType currentState = m_enSchedulerState;
+        if (currentState == SchedulerStateType_Wait) {
+            // 状态更新只在必要时才进行
+            ResetScheduler();
+            m_enSchedulerState = SchedulerStateType_Ready;
+        }
+    }
+
+    // 逻辑调度线程执行
+    void RunEvent() {
+        // 本地缓存状态
+        SchedulerStateType currentState = m_enSchedulerState;
+        if (currentState != SchedulerStateType_Ready) {
+            return;
+        }
+
+        if (m_ptrCurEvent) {
+            if (m_ptrCurEvent->m_enSchedulerType == SchedulerType_Coroutine) {
+                // 协程执行
+                m_enSchedulerState = SchedulerStateType_Blocked;
+                std::cout << "processRequests. begin" << std::endl;
+                (m_ptrCurEvent->m_pCallCoroutine)(m_ptrCurEvent);
+                //if (m_enSchedulerState == SchedulerStateType_Blocked_End) {
+                //    // 释放消息
+                //    delete m_ptrCurEvent;
+                //    m_ptrCurEvent = nullptr;
+                //    // 重置调度状态
+                //    ResetScheduler();
+                //}
+                //std::cout << "processRequests. end" << std::endl;
+            } else if (m_ptrCurEvent->m_enSchedulerType == SchedulerType_Synchronous) {
+                // 同步执行
+                m_enSchedulerState = SchedulerStateType_Running;
+                (m_ptrCurEvent->m_pCallSync)(m_ptrCurEvent);
+                // 释放消息
+                delete m_ptrCurEvent;
+                m_ptrCurEvent = nullptr;
+                // 重置调度状态
+                ResetScheduler();
+            }
+        }
+    }
+
+    void ResetScheduler() {
+        if (!m_ptrCurEvent) {
+            EventScheduler* pEventScheduler = nullptr;
+            m_poolEvent.Pop(pEventScheduler);
+            if (pEventScheduler) {
+                m_ptrCurEvent = pEventScheduler;
+                // 重置调度类型
+                SetSchedulerType(pEventScheduler->GetSchedulerType());
+                m_enSchedulerState = SchedulerStateType_Ready;
+            } else {
+                m_enSchedulerState = SchedulerStateType_Wait;
+            }
         }
     }
 
 public:
+    SchedulerType GetSchedulerStateType() {
+        return m_enSchedulerType;
+    }
+
+    void SetSchedulerType(const SchedulerType& enType) {
+        m_enSchedulerType = enType;
+    }
+
+    // 不再直接操作 atomic 状态，改为局部缓存
+    SchedulerStateType GetSchedulerState() {
+        return m_enSchedulerState;
+    }
+
+    void SetSchedulerState(const SchedulerStateType& enState) {
+        // 在这里如果不希望做多线程同步操作，可以使用局部变量来进行控制
+        m_enSchedulerState = enState;
+    }
+
+private:
     int id_;
-    xCircularPool<MsgScheduler*> requests_;
+
+private:
+    SchedulerType m_enSchedulerType;  // 去掉 std::atomic
+    SchedulerStateType m_enSchedulerState;  // 去掉 std::atomic
+
+private:
+    EventScheduler* m_ptrCurEvent=nullptr;
+    xCircularPool<EventScheduler*> m_poolEvent;
 };
 
+
 typedef std::shared_ptr<ServiceScheduler> ServiceSchedulerPtr;
+typedef std::list<ServiceSchedulerPtr> ServiceSchedulerList;
 
 /*
 
@@ -177,4 +274,13 @@ int main() {
 
 */
 
+class EventConroutineDefer
+{
+public:
+    EventConroutineDefer(ServiceScheduler *pScheduler) :m_pScheduler(pScheduler){}
+    ~EventConroutineDefer();
+
+private:
+    ServiceScheduler* m_pScheduler = nullptr;
+};
 

@@ -44,10 +44,12 @@ int main() {
         }
     }
 
-    int index1 = 1;
-    int index2 = 1000000;
+    int index1 = 1000000;
+    int index2 = 2000000;
+    int index3 = 3000000;
+    int index4 = 4000000;
     while (true) {
-        if (index1 < 1000) {
+        if (index1 < 1001000) {
             {
                 PbMsg::LoginRequest* reqMsg = new PbMsg::LoginRequest();
                 PbMsg::LoginResponse* rspMsg = new PbMsg::LoginResponse();
@@ -69,6 +71,28 @@ int main() {
                 PBEventPtr ptrEvent = std::make_shared<xPBEvent>(reqMsg, rspMsg);
 
                 xEventDispatcher::getMe().OnMsg(1, 101, 100, 101, ptrEvent);
+            }
+
+            {
+                PbMsg::LoginRequest* reqMsg = new PbMsg::LoginRequest();
+                PbMsg::LoginResponse* rspMsg = new PbMsg::LoginResponse();
+
+                reqMsg->set_index(index3);
+                index3++;
+                PBEventPtr ptrEvent = std::make_shared<xPBEvent>(reqMsg, rspMsg);
+
+                xEventDispatcher::getMe().OnMsg(1, 100, 100, 102, ptrEvent);
+            }
+
+            {
+                PbMsg::LoginRequest* reqMsg = new PbMsg::LoginRequest();
+                PbMsg::LoginResponse* rspMsg = new PbMsg::LoginResponse();
+
+                reqMsg->set_index(index4);
+                index4++;
+                PBEventPtr ptrEvent = std::make_shared<xPBEvent>(reqMsg, rspMsg);
+
+                xEventDispatcher::getMe().OnMsg(1, 101, 100, 102, ptrEvent);
             }
         }
 

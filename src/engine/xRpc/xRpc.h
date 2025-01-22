@@ -28,9 +28,10 @@ struct EmptyCorutine
     void return_value() {}
 };
 
-#define GRPCRequestCall(ServerName,Namespace,Service,TRequest,TReply,TCallFun,request__, reply__, status__)\
+#define GRPCRequestCall(ServerName,Namespace,Service,TRequest,TReply,TCallFun,pService__,request__, reply__, status__)\
 struct CorutineContinue\
 {\
+    xService* pService_;\
     Namespace::TRequest &request_;\
     Namespace::TReply &reply_;\
     grpc::Status &status_;\
@@ -40,15 +41,20 @@ struct CorutineContinue\
     void await_suspend(std::coroutine_handle<> h) {\
         std::cout << "RPC request started, will take milliseconds." << std::endl;\
         std::thread([h, this] {\
+            xService* pServiceTmp = pService_;\
             GRPCRequest(ServerName, Namespace, Service, TRequest, TReply, TCallFun, request_, reply_, status_)\
             h.resume(); \
+            auto pScheduler = pServiceTmp->GetServiceScheduler();\
+            pScheduler->running_ = nullptr;\
+            pScheduler->requests_.Pop(pScheduler->running_);\
+            pScheduler->SetSchedulerState(ServiceSchedulerRunning);\
             }).detach();\
     }\
     void await_resume() {\
         std::cout << "RPC request completed." << std::endl;\
     }\
     void Return_Value() {}\
-};co_await CorutineContinue(request__,reply__,status__);
+};co_await CorutineContinue(pService__,request__,reply__,status__);
 
 class SRpcService : public xSingleton<SRpcService>, xThread
 {

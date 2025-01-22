@@ -1,29 +1,10 @@
 ﻿
 #include "xServiceMgr.h"
+#include "xScheduler/xScheduler.h"
 
-
-void RunLogic(xServiceMgr *pxServiceMgr) {
-    while (true) {
-        {
-            std::lock_guard l(pxServiceMgr->m_stLock);
-
-            for (auto &it: pxServiceMgr->GetServices()) {
-                auto pService = it.second;
-                auto pScheduler = pService->GetServiceScheduler();
-                pScheduler->processRequests(pScheduler.get());
-            }
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
-}
 
 xServiceMgr::xServiceMgr() {
 
-    std::thread t(RunLogic,this);
-    t.detach();
-    //
-    //XINF("xServiceMgr::xServiceMgr Create [%s]", pszServiceName);
 }
 
 xServiceMgr::~xServiceMgr() {

@@ -16,7 +16,7 @@
 
 #include "xService/xServiceMgr.h"
 
-
+#include "xScheduler/xSchedulerMgr.h"
 
 // 大小协议合并前缀
 #define CMD_ID_PRIFX_ 10000
@@ -67,16 +67,25 @@ public:
                     XERR("xEventDispatcher OnMsg msg id not find regist [%ld] ", u64MsgID);
                     return false;
                 } else {
-                    // 同步执行
+                    // 协程执行
                     OnServiceProtoMsgCoroutineCallBack pCall = it_coroutine->second;
-
                     auto pServiceScheduler = pService->GetServiceScheduler();
-                    pServiceScheduler->postRequest(pService, ptrEvent, pCall);
+                    auto state = pServiceScheduler->GetSchedulerState();
+                    pServiceScheduler->PostRequest(SchedulerType_Coroutine, pService, ptrEvent, nullptr, pCall);
+                    if (state == SchedulerStateType_Wait) {
+                        xSchedulerMgr::getMe().AddScheduler(pServiceScheduler);
+                    }
                 }
             } else {
-                // 协程执行
+                // 同步执行
                 OnServiceProtoMsgCallBack pCall = it->second;
-                pCall(pService, ptrEvent);
+                auto pServiceScheduler = pService->GetServiceScheduler();
+                auto state = pServiceScheduler->GetSchedulerState();
+                pServiceScheduler->PostRequest(SchedulerType_Synchronous, pService, ptrEvent, pCall, nullptr);
+                if (state == SchedulerStateType_Wait) {
+                    xSchedulerMgr::getMe().AddScheduler(pServiceScheduler);
+                }
+                //pCall(pService, ptrEvent);
             }
         }
 
