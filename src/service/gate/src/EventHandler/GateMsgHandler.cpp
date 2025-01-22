@@ -33,44 +33,44 @@ SchedulerTask TestEventCall_1(EventScheduler* ptrEvent) {
     myservice::HelloReply reply;
 
     grpc::Status status;
-    //GRPCRequestCall("test_rpc", myservice, MyService, HelloRequest, HelloReply, SayHello, pService, request, reply, status);
+    GRPCRequestCall("test_rpc", myservice, MyService, HelloRequest, HelloReply, SayHello, ptrEvent, pService, request, reply, status);
 
-    struct CorutineContinue
-    {
-        EventScheduler* ptrEvent_;
-        myservice::HelloRequest& request_;
-        myservice::HelloReply& reply_;
-        grpc::Status& status_;
-        bool await_ready() {
-            return false;
-        }
-        void await_suspend(std::coroutine_handle<> h) {
-            std::cout << "RPC request started, will take milliseconds." << std::endl;
-            std::thread([this, h] {
-                EventScheduler* ptrEvent = ptrEvent_;
-                {
-                    auto channel___ = CRpcService::getMe().GetChannel("test_rpc");
-                    std::unique_ptr<myservice::MyService::Stub> stub___ = myservice::MyService::NewStub(channel___);
-                    grpc::ClientContext context___;
-                    request_.set_name("xxxxxxxxxxxx");
-                    status_ = stub___->SayHello(&context___, request_, &reply_);
-                    if (status_.ok()) {
-                        std::cout << "Server response: " << reply_.message() << std::endl;
-                    } else {
-                        std::cout << "gRPC failed: " << status_.error_message() << std::endl;
-                    }
-                }
-                // reset
-                auto pScheduler = ptrEvent->GetServiceScheduler();
-                pScheduler->SetSchedulerState(SchedulerStateType_Blocked_End);
-                h.resume();
-                }).detach();
-        }
-        void await_resume() {
-            std::cout << "RPC request completed." << std::endl;
-        }
-        void Return_Value() {}
-    }; co_await CorutineContinue(ptrEvent, request, reply, status);
+    //struct CorutineContinue
+    //{
+    //    EventScheduler* ptrEvent_;
+    //    myservice::HelloRequest& request_;
+    //    myservice::HelloReply& reply_;
+    //    grpc::Status& status_;
+    //    bool await_ready() {
+    //        return false;
+    //    }
+    //    void await_suspend(std::coroutine_handle<> h) {
+    //        std::cout << "RPC request started, will take milliseconds." << std::endl;
+    //        std::thread([this, h] {
+    //            EventScheduler* ptrEvent = ptrEvent_;
+    //            {
+    //                auto channel___ = CRpcService::getMe().GetChannel("test_rpc");
+    //                std::unique_ptr<myservice::MyService::Stub> stub___ = myservice::MyService::NewStub(channel___);
+    //                grpc::ClientContext context___;
+    //                request_.set_name("xxxxxxxxxxxx");
+    //                status_ = stub___->SayHello(&context___, request_, &reply_);
+    //                if (status_.ok()) {
+    //                    std::cout << "Server response: " << reply_.message() << std::endl;
+    //                } else {
+    //                    std::cout << "gRPC failed: " << status_.error_message() << std::endl;
+    //                }
+    //            }
+    //            // reset
+    //            auto pScheduler = ptrEvent->GetServiceScheduler();
+    //            pScheduler->SetSchedulerState(SchedulerStateType_Blocked_End);
+    //            h.resume();
+    //            }).detach();
+    //    }
+    //    void await_resume() {
+    //        std::cout << "RPC request completed." << std::endl;
+    //    }
+    //    void Return_Value() {}
+    //}; co_await CorutineContinue(ptrEvent, request, reply, status);
 
     // 处理响应
     if (status.ok()) {
@@ -102,44 +102,44 @@ SchedulerTask TestEventCall_2(EventScheduler* ptrEvent) {
     myservice::HelloReply reply;
 
     grpc::Status status;
-    //GRPCRequestCall("test_rpc", myservice, MyService, HelloRequest, HelloReply, SayHello, pService, request, reply, status);
+    GRPCRequestCall("test_rpc", myservice, MyService, HelloRequest, HelloReply, SayHello, ptrEvent, pService, request, reply, status);
 
-    struct CorutineContinue
-    {
-        EventScheduler* ptrEvent_;
-        myservice::HelloRequest& request_;
-        myservice::HelloReply& reply_;
-        grpc::Status& status_;
-        bool await_ready() {
-            return false;
-        }
-        void await_suspend(std::coroutine_handle<> h) {
-            std::cout << "RPC request started, will take milliseconds." << std::endl;
-            std::thread([this, h] {
-                EventScheduler* ptrEvent = ptrEvent_;
-                {
-                    auto channel___ = CRpcService::getMe().GetChannel("test_rpc");
-                    std::unique_ptr<myservice::MyService::Stub> stub___ = myservice::MyService::NewStub(channel___);
-                    grpc::ClientContext context___;
-                    request_.set_name("xxxxxxxxxxxx");
-                    status_ = stub___->SayHello(&context___, request_, &reply_);
-                    if (status_.ok()) {
-                        std::cout << "Server response: " << reply_.message() << std::endl;
-                    } else {
-                        std::cout << "gRPC failed: " << status_.error_message() << std::endl;
-                    }
-                }
-                // reset
-                auto pScheduler = ptrEvent->GetServiceScheduler();
-                pScheduler->SetSchedulerState(SchedulerStateType_Blocked_End);
-                h.resume();
-                }).detach();
-        }
-        void await_resume() {
-            std::cout << "RPC request completed." << std::endl;
-        }
-        void Return_Value() {}
-    }; co_await CorutineContinue(ptrEvent, request, reply, status);
+    //struct CorutineContinue
+    //{
+    //    EventScheduler* ptrEvent_;
+    //    myservice::HelloRequest& request_;
+    //    myservice::HelloReply& reply_;
+    //    grpc::Status& status_;
+    //    bool await_ready() {
+    //        return false;
+    //    }
+    //    void await_suspend(std::coroutine_handle<> h) {
+    //        std::cout << "RPC request started, will take milliseconds." << std::endl;
+    //        std::thread([this, h] {
+    //            EventScheduler* ptrEvent = ptrEvent_;
+    //            {
+    //                auto channel___ = CRpcService::getMe().GetChannel("test_rpc");
+    //                std::unique_ptr<myservice::MyService::Stub> stub___ = myservice::MyService::NewStub(channel___);
+    //                grpc::ClientContext context___;
+    //                request_.set_name("xxxxxxxxxxxx");
+    //                status_ = stub___->SayHello(&context___, request_, &reply_);
+    //                if (status_.ok()) {
+    //                    std::cout << "Server response: " << reply_.message() << std::endl;
+    //                } else {
+    //                    std::cout << "gRPC failed: " << status_.error_message() << std::endl;
+    //                }
+    //            }
+    //            // reset
+    //            auto pScheduler = ptrEvent->GetServiceScheduler();
+    //            pScheduler->SetSchedulerState(SchedulerStateType_Blocked_End);
+    //            h.resume();
+    //            }).detach();
+    //    }
+    //    void await_resume() {
+    //        std::cout << "RPC request completed." << std::endl;
+    //    }
+    //    void Return_Value() {}
+    //}; co_await CorutineContinue(ptrEvent, request, reply, status);
 
     // 处理响应
     if (status.ok()) {

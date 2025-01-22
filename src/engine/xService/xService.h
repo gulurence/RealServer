@@ -45,9 +45,6 @@ private:
 typedef std::unordered_map<ServiceID, xService*> ServiceMap;
 
 
-
-
-
 class ServiceLogin : public xService
 {
 public:
@@ -64,5 +61,4 @@ public:
 public:
 
 };
-
 
