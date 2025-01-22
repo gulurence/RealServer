@@ -70,21 +70,13 @@ public:
                     // 协程执行
                     OnServiceProtoMsgCoroutineCallBack pCall = it_coroutine->second;
                     auto pServiceScheduler = pService->GetServiceScheduler();
-                    auto state = pServiceScheduler->GetSchedulerState();
                     pServiceScheduler->PostRequest(SchedulerType_Coroutine, pService, ptrEvent, nullptr, pCall);
-                    if (state == SchedulerStateType_Wait) {
-                        xSchedulerMgr::getMe().AddScheduler(pServiceScheduler);
-                    }
                 }
             } else {
                 // 同步执行
                 OnServiceProtoMsgCallBack pCall = it->second;
                 auto pServiceScheduler = pService->GetServiceScheduler();
-                auto state = pServiceScheduler->GetSchedulerState();
                 pServiceScheduler->PostRequest(SchedulerType_Synchronous, pService, ptrEvent, pCall, nullptr);
-                if (state == SchedulerStateType_Wait) {
-                    xSchedulerMgr::getMe().AddScheduler(pServiceScheduler);
-                }
                 //pCall(pService, ptrEvent);
             }
         }
