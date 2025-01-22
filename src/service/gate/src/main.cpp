@@ -120,9 +120,9 @@ int main() {
                 // 向service 102 发送 不需要协程处理的 102号 消息
                 xEventDispatcher::getMe().OnMsg(1, 102, 100, 102, ptrEvent);
             }
+        } else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
     return 0;
@@ -157,7 +157,7 @@ int main() {
 //        printf("%d %s\n", index++,request->name().c_str());
 //        std::string prefix = "Hello ";
 //        reply->set_message(prefix + request->name());
-//        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+//        //std::this_thread::sleep_for(std::chrono::milliseconds(20));
 //        return Status::OK;
 //    }
 //};
@@ -180,7 +180,7 @@ int main() {
 //    RunServer();
 //    return 0;
 //}
-//
+
 
 
 
