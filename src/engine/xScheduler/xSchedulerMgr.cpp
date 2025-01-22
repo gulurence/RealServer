@@ -41,11 +41,11 @@ void xSchedulerMgr::AddScheduler(ServiceScheduler* pScheduler) {
 
     //XERR("xSchedulerMgr::AddScheduler \n");
 
-    if (pScheduler->GetSchedulerStateType() == SchedulerType_Coroutine) {
+    if (pScheduler->GetSchedulerType() == SchedulerType_Coroutine) {
         m_i32AddThreadCoroutineIndex++;
         m_i32AddThreadCoroutineIndex = m_i32AddThreadCoroutineIndex% m_u32CoroutineSchedulerCount;
         m_pSysSchedulerProcess[SchedulerType_Coroutine][m_i32AddThreadCoroutineIndex].AddScheduler(pScheduler);
-    } else if(pScheduler->GetSchedulerStateType() == SchedulerType_Synchronous) {
+    } else if(pScheduler->GetSchedulerType() == SchedulerType_Synchronous) {
         m_i32AddThreadSyncIndex++;
         m_i32AddThreadSyncIndex = m_i32AddThreadSyncIndex % m_u32SyncSchedulerCount;
         m_pSysSchedulerProcess[SchedulerType_Synchronous][m_i32AddThreadSyncIndex].AddScheduler(pScheduler);

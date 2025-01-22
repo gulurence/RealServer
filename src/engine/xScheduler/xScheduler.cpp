@@ -1,19 +1,7 @@
 ﻿
 #include "xScheduler.h"
-
-
-
 #include "xService/xService.h"
-
-
-
 #include "xSchedulerMgr.h"
-
-
-
-
-
-
 
 
 // 全局调用
@@ -86,7 +74,6 @@ void ServiceScheduler::ResetScheduler() {
         }
     }
 }
-
 
 EventConroutineDefer::~EventConroutineDefer() {
     if (m_pScheduler->m_enSchedulerState == SchedulerStateType_Blocked_End) {

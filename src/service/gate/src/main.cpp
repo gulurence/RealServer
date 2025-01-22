@@ -44,10 +44,19 @@ int main() {
         }
     }
 
+    {
+        ServiceLogin* pServiceLogin = new ServiceLogin(102, "service_102");
+        bool bRegistRet = xServiceMgr::getMe().Regist(pServiceLogin);
+        if (!bRegistRet) {
+            return 0;
+        }
+    }
+
     int index1 = 1000000;
     int index2 = 2000000;
     int index3 = 3000000;
     int index4 = 4000000;
+    int index5 = 5000000;
     while (true) {
         if (index1 < 1001000) {
             {
@@ -93,6 +102,17 @@ int main() {
                 PBEventPtr ptrEvent = std::make_shared<xPBEvent>(reqMsg, rspMsg);
 
                 xEventDispatcher::getMe().OnMsg(1, 101, 100, 102, ptrEvent);
+            }
+
+            {
+                PbMsg::LoginRequest* reqMsg = new PbMsg::LoginRequest();
+                PbMsg::LoginResponse* rspMsg = new PbMsg::LoginResponse();
+
+                reqMsg->set_index(index5);
+                index5++;
+                PBEventPtr ptrEvent = std::make_shared<xPBEvent>(reqMsg, rspMsg);
+
+                xEventDispatcher::getMe().OnMsg(1, 102, 100, 102, ptrEvent);
             }
         }
 
