@@ -18,9 +18,7 @@ xService::xService(const ServiceID& u64ServiceID, const char* pszServiceName) {
     //
     XINF("Create [%s]", pszServiceName);
 
-
-
-    m_ptrServiceScheduler = std::make_shared<ServiceScheduler>(u64ServiceID);
+    m_ptrServiceScheduler = new ServiceScheduler(u64ServiceID);
 }
 
 xService::~xService() {

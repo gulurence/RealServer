@@ -3,11 +3,7 @@
 #include "xEvent/xEvent.h"
 #include "xServiceDefine.h"
 #include "xBase/xCircularPool.h"
-
-
 #include "xScheduler/xScheduler.h"
-
-
 
 class xService
 {
@@ -29,19 +25,21 @@ public:
     }
 
 public:
-    ServiceSchedulerPtr GetServiceScheduler() {
+    ServiceScheduler* GetServiceScheduler() {
         return m_ptrServiceScheduler;
     }
+
 
 private:
     xCircularPool<xEvent*> m_stEventCircularPool;
 
 private:
-    ServiceSchedulerPtr m_ptrServiceScheduler;
+    ServiceScheduler* m_ptrServiceScheduler;
 
 private:
     ServiceID m_u64ServiceID;
     char m_pszServiceName[MAX_NAMESIZE] = { 0 };
+
 };
 
 typedef std::unordered_map<ServiceID, xService*> ServiceMap;
