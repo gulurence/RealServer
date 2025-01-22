@@ -4,14 +4,6 @@
 #include "xEvent/xEvent.h"
 #include "xSchedulerDefine.h"
 
-class xService;
-
-
-#pragma once
-
-#include "xBase/xCircularPool.h"
-#include "xEvent/xEvent.h"
-
 
 class xService;
 // 协程任务的类
@@ -55,7 +47,6 @@ public:
     xService* pService;
     PBEventPtr ptrEvent;
 };
-
 
 
 class ServiceScheduler;
@@ -109,7 +100,7 @@ public:
     void ResetScheduler();
 
 public:
-    SchedulerType GetSchedulerStateType() {
+    SchedulerType GetSchedulerType() {
         return m_enSchedulerType;
     }
 
@@ -138,7 +129,6 @@ private:
     EventScheduler* m_ptrCurEvent=nullptr;
     xCircularPool<EventScheduler*> m_poolEvent;
 };
-
 
 typedef std::shared_ptr<ServiceScheduler> ServiceSchedulerPtr;
 typedef std::list<ServiceSchedulerPtr> ServiceSchedulerList;
