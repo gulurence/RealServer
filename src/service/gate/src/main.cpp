@@ -31,7 +31,7 @@ int main() {
     xSchedulerMgr::getMe().Init(4,4);
 
     //  链接到grpc服务器
-    CRpcService::getMe().ConnectToLocalServer("test_rpc", 50051);
+    CRpcService::getMe().ConnectToLocalServer("test_rpc", 6, 50051);
 
     // 初始化rpc请求线程
     RpcCallMgr::getMe().Init();
