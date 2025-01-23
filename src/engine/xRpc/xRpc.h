@@ -4,7 +4,8 @@
 #include "xBase/xSingleton.h"
 #include <grpcpp/grpcpp.h>
 #include "xBase/xThread.h"
-
+#include "xBase/xCircularPool.h"
+#include "xScheduler/xScheduler.h"
 
 
 #define GRPCRequest(ServerName,Namespace,Service,TRequest,TReply,TCallFun,request,reply,status){\
@@ -28,6 +29,33 @@ struct EmptyCorutine
     void return_value() {}
 };
 
+
+
+typedef std::function<void()> OnEventRpcCallBack;
+class RpcCallMgr : public xSingleton<RpcCallMgr>
+{
+public:
+    RpcCallMgr(){}
+    ~RpcCallMgr(){}
+
+public:
+    SchedulerTask RpcCall(OnEventRpcCallBack pCall) {
+        pCall();
+        co_return;
+    }
+
+    void AddCall(OnEventRpcCallBack pCall);
+    void Init();
+    OnEventRpcCallBack PopCall();
+
+public:
+    std::atomic<bool> m_isRunning = true;
+
+private:
+    xCircularPool<OnEventRpcCallBack> m_poolEvent;
+};
+
+
 // 协程异步调用GRPC
 // ServerName - GRPC服务器名称
 #define GRPCRequestCall(ServerName,Namespace,Service,TRequest,TReply,TCallFun,ptrEvent__,pService__,request__,reply__,status__)\
@@ -42,13 +70,13 @@ struct CorutineContinue\
     }\
     void await_suspend(std::coroutine_handle<> h) {\
         std::cout << "RPC request started, will take milliseconds." << std::endl;\
-        std::thread([this,h] {\
+        RpcCallMgr::getMe().AddCall([this,h] {\
             EventScheduler* ptrEvent = ptrEvent_;\
             GRPCRequest(ServerName, Namespace, Service, TRequest, TReply, TCallFun, request_, reply_, status_)\
             auto pScheduler = ptrEvent->GetServiceScheduler();\
             pScheduler->SetSchedulerState(SchedulerStateType_Blocked_End);\
             h.resume();\
-            }).detach();\
+            });\
     }\
     void await_resume() {\
         std::cout << "RPC request completed." << std::endl;\
@@ -95,7 +123,7 @@ public:
     * strIp - 目标服务器IP
     * u16Port - 目标服务器端口
     */
-    bool ConnectToServer(const std::string& strServerName, const std::string& strIp, uint16 u16Port);
+    bool ConnectToServer(const std::string& strServerName, int32 i32PoolCount, const std::string& strIp, uint16 u16Port);
 
     /********
     * 链接到本地 GRPC 服务器
@@ -103,10 +131,11 @@ public:
     * strServerName - 服务器昵称
     * u16Port - 目标服务器端口
     */
-    bool ConnectToLocalServer(const std::string& strServerName, uint16 u16Port);
+    bool ConnectToLocalServer(const std::string& strServerName, int32 i32PoolCount, uint16 u16Port);
 
 private:
-    std::map<std::string, std::shared_ptr<grpc::Channel>> m_mapChannel;
+    std::map<std::string, std::pair<int32, int32> > m_mapChannelSize;
+    std::map<std::string, std::vector<std::shared_ptr<grpc::Channel>> > m_mapChannel;
 };
 
 

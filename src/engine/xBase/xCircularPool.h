@@ -66,12 +66,17 @@ private:
             head.store((head.load() + 1) % capacity, std::memory_order_relaxed);
         }
 
+        for (int i = 0; i < current_size; ++i) {
+            buffer[i] = nullptr;
+        }
+
         // 更新容量和指针
         delete[] buffer;
         buffer = new_buffer;
         capacity = new_capacity;
         head.store(0, std::memory_order_relaxed);
         tail.store(current_size, std::memory_order_relaxed);
+
     }
 
 private:

@@ -27,8 +27,14 @@ int main() {
     // 初始化日志系统
     xLog::get_mutable_instance().Init();
 
+    // 调度器初始化
+    xSchedulerMgr::getMe().Init(4,4);
+
     //  链接到grpc服务器
     CRpcService::getMe().ConnectToLocalServer("test_rpc", 50051);
+
+    // 初始化rpc请求线程
+    RpcCallMgr::getMe().Init();
 
     {
         // 定义注册 service 100
@@ -64,7 +70,7 @@ int main() {
     int index5 = 5000000;
     while (true) {
         // 发送1000次消息
-        if (index1 < 1001000) {
+        if (index1 < 2000000) {
             {
                 PbMsg::LoginRequest* reqMsg = new PbMsg::LoginRequest();
                 PbMsg::LoginResponse* rspMsg = new PbMsg::LoginResponse();
@@ -120,6 +126,7 @@ int main() {
                 // 向service 102 发送 不需要协程处理的 102号 消息
                 xEventDispatcher::getMe().OnMsg(1, 102, 100, 102, ptrEvent);
             }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
@@ -167,6 +174,7 @@ int main() {
 //    GreeterServiceImpl service;
 //
 //    ServerBuilder builder;
+//    builder.SetSyncServerOption(ServerBuilder::MAX_POLLERS, 4);
 //    builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
 //    builder.RegisterService(&service);
 //
@@ -180,7 +188,7 @@ int main() {
 //    RunServer();
 //    return 0;
 //}
-
+//
 
 
 

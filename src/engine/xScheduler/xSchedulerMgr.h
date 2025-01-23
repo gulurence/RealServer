@@ -11,10 +11,11 @@
 class xSchedulerMgr : public xSingleton<xSchedulerMgr>
 {
 public:
-    xSchedulerMgr(uint32 u32CoroutineSchedulerCount=2, uint32 u32SyncSchedulerCount = 2);
+    xSchedulerMgr();
     virtual ~xSchedulerMgr();
 
 public:
+    void Init(uint32 u32CoroutineSchedulerCount = 2, uint32 u32SyncSchedulerCount = 2);
     bool IsRunning() { return m_bIsRunning; }
 
 public:

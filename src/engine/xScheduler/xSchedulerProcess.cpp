@@ -9,17 +9,8 @@ void RunLogic(xSchedulerProcess* pSchedulerNode) {
         if (listData.Pop(pScheduler)) {
             pScheduler->RunEvent();
         } else {
-            std::this_thread::sleep_for(std::chrono::microseconds(2));
+            std::this_thread::sleep_for(std::chrono::microseconds(1));
         }
-        //{
-        //    for (auto &it: pxServiceMgr->GetServices()) {
-        //        auto pService = it.second;
-        //        auto pScheduler = pService->GetServiceScheduler();
-        //        if (pScheduler->GetSchedulerState() == ServiceSchedulerRunning) {
-        //            pScheduler->processRequests(pScheduler.get());
-        //        }
-        //    }
-        //}
     }
 }
 
