@@ -64,6 +64,9 @@ public:
     EventScheduler(const SchedulerType &enSchedulerType, xService* pService, ServiceScheduler* pScheduler, PBEventPtr ptrEvent, OnServiceProtoMsgCallBack pCallSync, OnServiceProtoMsgCoroutineCallBack pCallCoroutin)
         :m_pService(pService), m_ptrEvent(ptrEvent), m_enSchedulerType(enSchedulerType), m_pCallSync(pCallSync), m_pCallCoroutine(pCallCoroutin),  m_pScheduler(pScheduler) {
     }
+    ~EventScheduler() {
+        m_ptrEvent = nullptr;
+    }
 
 public:
     SchedulerType GetSchedulerType() {return m_enSchedulerType;}

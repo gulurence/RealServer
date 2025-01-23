@@ -6,12 +6,12 @@
 
 // 全局调用
 void ServiceScheduler::PostRequest(const SchedulerType& enSchedulerType, xService* pService, PBEventPtr ptrEvent, OnServiceProtoMsgCallBack pCallSync, OnServiceProtoMsgCoroutineCallBack pCallCoroutin) {
-    //XERR("PostRequest \n");
+    //XERR("PostRequest enSchedulerType:%d \n", enSchedulerType);
 
     m_poolEvent.Push(new EventScheduler(enSchedulerType, pService, this, ptrEvent, pCallSync, pCallCoroutin));
 
     // 本地状态缓存
-    SchedulerStateType currentState = m_enSchedulerState;
+    SchedulerStateType currentState = m_enSchedulerState.load();
     if (currentState == SchedulerStateType_Wait) {
         // 状态更新只在必要时才进行
         ResetScheduler();
@@ -38,7 +38,6 @@ void ServiceScheduler::RunEvent() {
             // 同步执行
             m_enSchedulerState = SchedulerStateType_Running;
             (m_ptrCurEvent->m_pCallSync)(m_ptrCurEvent);
-            m_enSchedulerState = SchedulerStateType_Wait;
             // 释放消息
             delete m_ptrCurEvent;
             m_ptrCurEvent = nullptr;
@@ -72,7 +71,6 @@ EventConroutineDefer::~EventConroutineDefer() {
         // 释放消息
         delete m_pScheduler->m_ptrCurEvent;
         m_pScheduler->m_ptrCurEvent = nullptr;
-        m_pScheduler->m_enSchedulerState = SchedulerStateType_Wait;
         // 重置调度状态
         m_pScheduler->ResetScheduler();
         //
