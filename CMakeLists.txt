@@ -7,7 +7,7 @@ project(RealServer)
 set(CMAKE_CXX_STANDARD 20)
 
 # 添加子目录
-add_subdirectory(src/engine)
-add_subdirectory(src/service)
+add_subdirectory(engine)
+add_subdirectory(application)
 
 # 可以根据需要添加更多的子目录
