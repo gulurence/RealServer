@@ -4,6 +4,13 @@ syntax = "proto3";
 
 package PbMsg;
 
+
+
+
+
+
+
+
 // 请求消息
 message LoginRequest {
   string name = 1;
