@@ -118,7 +118,7 @@ private:
 
 
 // 处理请求并发送响应的回调函数
-void requestHandler(natsConnection* nc, natsSubscription* sub, natsMsg* msg, void* closure) {
+inline void requestHandler(natsConnection* nc, natsSubscription* sub, natsMsg* msg, void* closure) {
     const char* reply_subject = "reply.subject";
     // 获取请求消息内容
     const char* request_data = (const char*)natsMsg_GetData(msg);

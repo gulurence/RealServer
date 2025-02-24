@@ -1,80 +1,56 @@
-﻿#include "xBase/xDefine.h"
+﻿//#include "xBase/xDefine.h"
 
 //#include "xScheduler/xScheduler.h"
 
-//#include "xRpc/xRpc.h"
+#include "rpc/myservice.grpc.pb.h"
 
-//#include "rpc/myservice.grpc.pb.h"
+#include "xRpc/xRpc.h"
+#include "xEvent/xEvent.h"
+#include "xService/xService.h"
+#include "xEvent/xEventDispatcher.h"
 
-
-
-//// 协议处理函数 1
-//Task messagecall1(Player* player, const std::string& message) {
-//    //std::cout << "Player " << player->id_ << " received message: " << message << std::endl;
-//    std::string tmp = message;
-//    std::cout << "+++messagecall 1 Logic begin for player " << player->id_ << " message: " << tmp << std::endl;
-//    co_await RpcAwaiter{ std::chrono::milliseconds(100) };  // 模拟RPC延迟
-//    std::cout << "---messagecall 1 Logic end for player " << player->id_ << " message: " << tmp << std::endl;
-//}
-//
-//// 协议处理函数 2
-//Task messagecall2(Player* player, const std::string& message) {
-//    //std::cout << "Player " << player->id_ << " received message: " << message << std::endl;
-//    std::string tmp = message;
-//    std::cout << "+++messagecall 2 Logic begin for player " << player->id_ << " message: " << tmp << std::endl;
-//    co_await RpcAwaiter{ std::chrono::milliseconds(100) };  // 模拟RPC延迟
-//    std::cout << "---messagecall 2 Logic end for player " << player->id_ << " message: " << tmp << std::endl;
-//}
+#include "msg/login.pb.h"
 
 
+// 协议处理函数 2
+SchedulerTask TestEventCall_2(EventScheduler* ptrEvent) {
+    EventConroutineDefer __defer(ptrEvent->GetServiceScheduler());
+    auto* pService = ptrEvent->m_pService;
+    auto* pRequest = (PbMsg::LoginRequest*)(ptrEvent->m_ptrEvent->Request());
+    auto* pResponse = (PbMsg::LoginResponse*)(ptrEvent->m_ptrEvent->Response());
 
-// 实现 MyService 服务
-//class MyServiceImpl final : public myservice::MyService::Service
-//{
-//public:
-//    // 实现 SayHello RPC 方法
-//    grpc::Status SayHello(grpc::ServerContext* context, const myservice::HelloRequest* request, myservice::HelloReply* reply) override {
-//
-//        //player1.postRequest([&]() {
-//        //    return rpc_messagecall1(&player1, [&]() {
-//        //        
-//        //        
-//        //    });
-//        //});
-//
-//        // 构造一个回复消息
-//        std::string prefix("Hello, ");
-//        reply->set_message(prefix + request->name());
-//
-//        // 返回成功状态
-//        return grpc::Status::OK;
-//    }
-//};
-//
-//
-//int smain() {
-//    // 创建 MyServiceImpl 的实例
-//    MyServiceImpl service;
-//
-//    // 创建 ServerBuilder
-//    grpc::ServerBuilder builder;
-//
-//    // 设置服务器监听地址（例如 localhost:50051）
-//    builder.AddListeningPort("localhost:50051", grpc::InsecureServerCredentials());
-//
-//    // 注册服务
-//    builder.RegisterService(&service);
-//
-//    // 构建并启动服务器
-//    std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-//
-//    std::cout << "Server listening on localhost:50051" << std::endl;
-//
-//    // 等待服务器完成
-//    server->Wait();
-//
-//    return 0;
-//}
+    std::cout << "TestEventCall_222 begin service id:" << pService->Id() << " index:" << pRequest->index() << std::endl;
 
+    //std::this_thread::sleep_for(std::chrono::milliseconds(60));
 
+    char pszLog[128] = { 0 };
+    sprintf(pszLog, "222 fun Req ServiceId:%ld,Index:%d", pService->Id(), pRequest->index());
+    // 构造请求
+    myservice::HelloRequest request;
+    request.set_name(pszLog);
+    // 构造响应
+    myservice::HelloReply reply;
+
+    grpc::Status status;
+    GRPCRequestCall("test_rpc", myservice, MyService, HelloRequest, HelloReply, SayHello, ptrEvent, pService, request, reply, status);
+
+    // 处理响应
+    if (status.ok()) {
+        std::cout << "Server response: " << reply.message() << std::endl;
+    } else {
+        std::cout << "gRPC failed: " << status.error_message() << std::endl;
+    }
+
+    std::cout << "TestEventCall_222 end service id:" << pService->Id() << std::endl;
+}
+
+//
+struct RegistRpcDispatcher___
+{
+    RegistRpcDispatcher___() {
+
+        xEventDispatcher::getMe().RegistProtoCoroutineCallBack(100, 101, TestEventCall_2);
+
+    }
+}registerRpc__;
 
