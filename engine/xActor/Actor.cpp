@@ -3,15 +3,3 @@
 
 
 
-
-CActor::CActor() {
-
-}
-
-
-
-CActor::~CActor() {
-
-}
-
-

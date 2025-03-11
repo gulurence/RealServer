@@ -67,7 +67,7 @@ public:
 
 // #define NatsRequestCall(const std::string& strSubject, google::protobuf::Message* reqMsg, google::protobuf::Message* respMsg)
 #define NatsRequestCall(strSubject, reqMsg, respMsg) {\
-    auto* pNatsCon = CNatsClients::getMe().GetNatsConnect();\
+    auto* pNatsCon = NatsConnPool::getMe().GetNatsConnect();\
     STProtoSerializeData stReqData(reqMsg->ByteSize());\
     reqMsg->SerializeToArray(stReqData.GetBuffer(), stReqData.Capacity());\
     STProtoSerializeData respData(65535);\

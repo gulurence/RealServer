@@ -22,6 +22,8 @@ file(GLOB X_SCHEDULER       "${SOURCE_DIR}/xScheduler/*.h"  "${SOURCE_DIR}/xSche
 file(GLOB X_RPC             "${SOURCE_DIR}/xRpc/*.h"        "${SOURCE_DIR}/xRpc/*.cpp")
 file(GLOB X_SERVICE         "${SOURCE_DIR}/xService/*.h"    "${SOURCE_DIR}/xService/*.cpp")
 file(GLOB X_ACTOR           "${SOURCE_DIR}/xActor/*.h"      "${SOURCE_DIR}/xActor/*.cpp")
+file(GLOB X_RECORD          "${SOURCE_DIR}/xRecord/*.h"     "${SOURCE_DIR}/xRecord/*.cpp")
+file(GLOB X_SERVER          "${SOURCE_DIR}/xServer/*.h"     "${SOURCE_DIR}/xServer/*.cpp")
 file(GLOB X_WEBCONSOLE      "${SOURCE_DIR}/xWebConsole/*.h" "${SOURCE_DIR}/xWebConsole/*.cpp")
 
 #message(STATUS "SOURCE_DIR: ${SOURCE_DIR}")
@@ -47,6 +49,8 @@ set(SOURCES
     ${X_RPC}
     ${X_SERVICE}
     ${X_ACTOR}
+    ${X_RECORD}
+    ${X_SERVER}
     ${X_WEBCONSOLE}
 )
 
@@ -68,6 +72,8 @@ source_group("src/xScheduler"  FILES ${X_SCHEDULER})
 source_group("src/xRpc"        FILES ${X_RPC})
 source_group("src/xService"    FILES ${X_SERVICE})
 source_group("src/xActor"      FILES ${X_ACTOR})
+source_group("src/xRecord"     FILES ${X_RECORD})
+source_group("src/xServer"     FILES ${X_SERVER})
 source_group("src/xWebConsole" FILES ${X_WEBCONSOLE})
 
 # 生成静态库（.lib 和 .a 文件）

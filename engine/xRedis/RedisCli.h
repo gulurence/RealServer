@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "RedisDefine.h"
-
+#include "xBase/xRecordDataDefine.h"
 
 #ifdef __USE_LOCK__
 #include <pthread.h>
@@ -29,33 +29,30 @@ public:
     int FlushDB();
     int FlushAll();
 
-    /*
-     * string类
-     */
-    int Set(const char* key, const char* format, ...);
-    int Get(const char* key, char* value, const int& len);
+public:
+    int Set(const std::string& key, const RecordDataST* data);
+    int Get(const std::string& key, RecordDataST*);
+
+public:
+    int HSet(const std::string& hash, const std::string& field, const RecordDataST* data);
+    int HGet(const std::string& hash, const std::string& field, RecordDataST*);
+
+public:
     int Del(const char* key);
 
-    /*
-     * 哈希类
-     */
-    int HMSet(const char* key, const char* format, ...);
-    int HMGet(const char* key, size_t* elements, char** element);
-
-    int HSetField(const char* key, const char* field, const char* format, ...);
-    int HGetField(const char* key, const char* field, char* value);
-
-    int HDel(const char* key);
+public:
+    bool Validate();
 
 private:
 #ifdef __USE_LOCK__
     pthread_mutex_t m_mutex;
 #endif
-    redisContext* m_context;
-    redisReply* m_reply;
-    char m_redisHost[32];
-    int m_redisPort;
-    char m_redisPswd[32];
+    redisContext* m_context = nullptr;
+    redisReply* m_reply = nullptr;
+    char m_redisHost[32] = {0};
+    int m_redisPort = 0;
+    char m_redisPswd[32] = { 0 };
+    int conn_timeout = 3;
 };
 
 typedef std::list<CRedisCli*> RedisCliList;

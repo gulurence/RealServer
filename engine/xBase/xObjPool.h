@@ -9,17 +9,17 @@ public:
     virtual ~xObjPoolBase() {}
 
 private:
-    uint32 m_u32PoolIndex = 0;
+    uint32 m_u32PoolIndex____ = 0;
 
 public:
     virtual void cleanUp(){}
 
 public:
-    uint32 GetPoolID() {
-        return m_u32PoolIndex;
+    uint32 GetPoolID___() {
+        return m_u32PoolIndex____;
     }
-    void SetPoolID(uint32 poolIndex) {
-        m_u32PoolIndex = poolIndex;
+    void SetPoolID___(uint32 poolIndex) {
+        m_u32PoolIndex____ = poolIndex;
     }
 };
 
@@ -99,7 +99,7 @@ public:
         }
 
         T *pObj = m_papObj[m_nPosition];
-        pObj->SetPoolID((uint32)m_nPosition);
+        pObj->SetPoolID___((uint32)m_nPosition);
         m_nPosition++;
 
         mFreeMap.erase(pObj);
@@ -150,7 +150,7 @@ public:
             return;
         }
 
-        uint32 uDelIndex = pObj->GetPoolID();
+        uint32 uDelIndex = pObj->GetPoolID___();
         //Assert(uDelIndex < (uint32)m_nPosition);
         if (uDelIndex >= (uint32)m_nPosition) {
             return;
@@ -166,8 +166,8 @@ public:
         m_papObj[uDelIndex] = m_papObj[m_nPosition];
         m_papObj[m_nPosition] = pDelObj;
 
-        m_papObj[uDelIndex]->SetPoolID(uDelIndex);
-        m_papObj[m_nPosition]->SetPoolID(-1);
+        m_papObj[uDelIndex]->SetPoolID___(uDelIndex);
+        m_papObj[m_nPosition]->SetPoolID___(-1);
 
         mFreeMap[pObj] = 1;
 

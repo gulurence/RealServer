@@ -40,7 +40,8 @@ int CRedisCli::ConnectDB() {
 #ifdef __USE_LOCK__
     pthread_mutex_lock(&m_mutex);
 #endif
-    m_context = redisConnect(m_redisHost, m_redisPort);
+    struct timeval tv { conn_timeout, 0 };
+    m_context = redisConnectWithTimeout(m_redisHost, m_redisPort, tv);
     if (m_context == NULL || m_context->err) {
         if (m_context) {
             fprintf(stderr, "Connection error: %s\n", m_context->errstr);
@@ -118,6 +119,16 @@ int CRedisCli::SelectDB(int no) {
     return ret;
 }
 
+bool CRedisCli::Validate() {
+    if (!m_context || m_context->err) return false;
+
+    // PING命令检测心跳‌:ml-citation{ref="3" data="citationList"}
+    redisReply* reply = (redisReply*)redisCommand(m_context, "PING");
+    bool valid = reply && (reply->type == REDIS_REPLY_STATUS);
+    freeReplyObject(reply);
+    return valid;
+}
+
 int CRedisCli::FlushDB() {
     int ret = REDIS_OK;
 #ifdef __USE_LOCK__
@@ -176,75 +187,75 @@ int CRedisCli::FlushAll() {
     return ret;
 }
 
-int CRedisCli::Set(const char* key, const char* format, ...) {
-    va_list ap;
-    va_start(ap, format);
-    char buf[512] = { 0x00 };
-    snprintf(buf, 512, "SET %s %s", key, format);
-
-    int ret = REDIS_OK;
-#ifdef __USE_LOCK__
-    pthread_mutex_lock(&m_mutex);
-#endif
-    m_reply = (redisReply*)redisvCommand(m_context, buf, ap);
-    va_end(ap);
-    if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
-        if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
-            freeReplyObject(m_reply);
-            m_reply = NULL;
-        } else {
-            fprintf(stderr, "redis error with null m_reply");
+int CRedisCli::Set(const std::string& key, const RecordDataST* data) {
+    redisReply* reply = (redisReply*)redisCommand(m_context, "SET %s %b", key.c_str(), data->Data(), data->Size());
+    bool success = false;
+    if (reply) {
+        if (reply->type == REDIS_REPLY_STATUS && std::string(reply->str) == "OK") {
+            success = true;
         }
-#ifdef __USE_LOCK__
-        pthread_mutex_unlock(&m_mutex);
-#endif
+        freeReplyObject(reply);
+    } else {
+        std::cerr << "Error executing command: " << m_context->errstr << std::endl;
+    }
+    if (success) {
+        return REDIS_OK;
+    } else {
         return REDIS_ERROR;
     }
-
-    freeReplyObject(m_reply);
-    m_reply = NULL;
-#ifdef __USE_LOCK__
-    pthread_mutex_unlock(&m_mutex);
-#endif
-    return ret;
 }
 
-int CRedisCli::Get(const char* key, char* value, const int &len) {
-    int ret = REDIS_OK;
-#ifdef __USE_LOCK__
-    pthread_mutex_lock(&m_mutex);
-#endif
-    m_reply = (redisReply*)redisCommand(m_context, "GET %s", key);
-
-    if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
-        if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
-            freeReplyObject(m_reply);
-            m_reply = NULL;
-        } else {
-            fprintf(stderr, "redis error with null m_reply");
+int CRedisCli::Get(const std::string& key, RecordDataST* data) {
+    redisReply* reply = (redisReply*)redisCommand(m_context, "GET %s", key.c_str());
+    if (reply) {
+        if (reply->type == REDIS_REPLY_STRING) {
+            data->Resize(reply->len);
+            memcpy(data->MutableData(), reply->str, reply->len);
+            data->SetSize(reply->len);
+            return REDIS_OK;
         }
-#ifdef __USE_LOCK__
-        pthread_mutex_unlock(&m_mutex);
-#endif
+        freeReplyObject(reply);
+    } else {
+        std::cerr << "Error executing command: " << m_context->errstr << std::endl;
+    }
+    return REDIS_ERROR;
+}
+
+int CRedisCli::HSet(const std::string& hash, const std::string& field, const RecordDataST* data) {
+    redisReply* reply = (redisReply*)redisCommand(m_context, "HSET %s %s %b", hash.c_str(), field.c_str(), data->Data(), data->Size());
+    bool success = false;
+    if (reply) {
+        if (reply->type == REDIS_REPLY_INTEGER && reply->integer == 1) {
+            success = true;
+        }
+        freeReplyObject(reply);
+    } else {
+        std::cerr << "Error executing command: " << m_context->errstr << std::endl;
+    }
+    if (success) {
+        return REDIS_OK;
+    } else {
         return REDIS_ERROR;
     }
+}
 
-    if (m_reply->type == REDIS_REPLY_STRING) {
-        memcpy(value, m_reply->str, (m_reply->len>len)?(len):(m_reply->len));
+int CRedisCli::HGet(const std::string& hash, const std::string& field, RecordDataST* data) {
+    redisReply* reply = (redisReply*)redisCommand(m_context, "HGET %s %s", hash.c_str(), field.c_str());
+    if (reply) {
+        if (reply->type == REDIS_REPLY_STRING) {
+            data->Resize(reply->len);
+            memcpy(data->MutableData(), reply->str, reply->len);
+            data->SetSize(reply->len);
+            return REDIS_OK;
+        }
+        freeReplyObject(reply);
+    } else {
+        std::cerr << "Error executing command: " << m_context->errstr << std::endl;
     }
-
-    freeReplyObject(m_reply);
-    m_reply = NULL;
-#ifdef __USE_LOCK__
-    pthread_mutex_unlock(&m_mutex);
-#endif
-    return ret;
+    return REDIS_ERROR;
 }
 
 int CRedisCli::Del(const char* key) {
-    int ret = REDIS_OK;
 #ifdef __USE_LOCK__
     pthread_mutex_lock(&m_mutex);
 #endif
@@ -269,147 +280,5 @@ int CRedisCli::Del(const char* key) {
 #ifdef __USE_LOCK__
     pthread_mutex_unlock(&m_mutex);
 #endif
-    return ret;
+    return REDIS_OK;
 }
-
-int CRedisCli::HMSet(const char* key, const char* format, ...) {
-    va_list ap;
-    va_start(ap, format);
-    char buf[512] = { 0x00 };
-    snprintf(buf, 512, "HMSet %s %s", key, format);
-    // printf("%s\n",buf);
-    int ret = REDIS_OK;
-#ifdef __USE_LOCK__
-    pthread_mutex_lock(&m_mutex);
-#endif
-    m_reply = (redisReply*)redisvCommand(m_context, buf, ap);
-    va_end(ap);
-
-    if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
-        if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
-            freeReplyObject(m_reply);
-            m_reply = NULL;
-        } else {
-            fprintf(stderr, "redis error with null m_reply");
-        }
-#ifdef __USE_LOCK__
-        pthread_mutex_unlock(&m_mutex);
-#endif
-        return REDIS_ERROR;
-    }
-
-    freeReplyObject(m_reply);
-    m_reply = NULL;
-#ifdef __USE_LOCK__
-    pthread_mutex_unlock(&m_mutex);
-#endif
-    return ret;
-}
-
-int CRedisCli::HMGet(const char* key, size_t* elements, char** element) {
-    int ret = REDIS_OK;
-#ifdef __USE_LOCK__
-    pthread_mutex_lock(&m_mutex);
-#endif
-    m_reply = (redisReply*)redisCommand(m_context, "HGETALL %s", key);
-    if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
-        if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
-            freeReplyObject(m_reply);
-            m_reply = NULL;
-        } else {
-            fprintf(stderr, "redis error with null m_reply");
-        }
-#ifdef __USE_LOCK__
-        pthread_mutex_unlock(&m_mutex);
-#endif
-        return REDIS_ERROR;
-    }
-
-    if (m_reply->type == REDIS_REPLY_ARRAY) {
-        int i = 0;
-        for (i = 0; i < m_reply->elements; i++) {
-            strncpy(element[i], m_reply->element[i]->str, m_reply->element[i]->len);
-        }
-    }
-
-    freeReplyObject(m_reply);
-    m_reply = NULL;
-#ifdef __USE_LOCK__
-    pthread_mutex_unlock(&m_mutex);
-#endif
-    return ret;
-}
-
-int CRedisCli::HSetField(const char* key, const char* field, const char* format, ...) {
-    va_list ap;
-    va_start(ap, format);
-    char buf[512] = { 0x00 };
-    snprintf(buf, 512, "HSet %s %s %s", key, field, format);
-    //printf("%s\n",buf);
-    int ret = REDIS_OK;
-#ifdef __USE_LOCK__
-    pthread_mutex_lock(&m_mutex);
-#endif
-    m_reply = (redisReply*)redisvCommand(m_context, buf, ap);
-    va_end(ap);
-
-    if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
-        if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
-            freeReplyObject(m_reply);
-            m_reply = NULL;
-        } else {
-            fprintf(stderr, "redis error with null m_reply");
-        }
-#ifdef __USE_LOCK__
-        pthread_mutex_unlock(&m_mutex);
-#endif
-        return REDIS_ERROR;
-    }
-
-    freeReplyObject(m_reply);
-    m_reply = NULL;
-#ifdef __USE_LOCK__
-    pthread_mutex_unlock(&m_mutex);
-#endif
-    return ret;
-}
-
-int CRedisCli::HGetField(const char* key, const char* field, char* value) {
-    int ret = REDIS_OK;
-#ifdef __USE_LOCK__
-    pthread_mutex_lock(&m_mutex);
-#endif
-    m_reply = (redisReply*)redisCommand(m_context, "HGET %s %s", key, field);
-    if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
-        if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
-            freeReplyObject(m_reply);
-            m_reply = NULL;
-        } else {
-            fprintf(stderr, "redis error with null m_reply");
-        }
-#ifdef __USE_LOCK__
-        pthread_mutex_unlock(&m_mutex);
-#endif
-        return REDIS_ERROR;
-    }
-
-    if (m_reply->type == REDIS_REPLY_STRING) {
-        strncpy(value, m_reply->str, m_reply->len);
-    }
-
-    freeReplyObject(m_reply);
-    m_reply = NULL;
-#ifdef __USE_LOCK__
-    pthread_mutex_unlock(&m_mutex);
-#endif
-    return ret;
-}
-
-int CRedisCli::HDel(const char* key) {
-    return Del(key);
-}
-

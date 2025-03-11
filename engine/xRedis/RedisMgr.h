@@ -3,24 +3,37 @@
 #include "RedisCli.h"
 #include "xBase/xSingleton.h"
 
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <hiredis/hiredis.h>
 
-class CRedisMgr : public xSingleton<CRedisMgr>
+
+class CRedisPool : public xSingleton<CRedisPool>
 {
 public:
-    CRedisMgr();
-    ~CRedisMgr();
+    struct Config
+    {
+        std::string host = "127.0.0.1";
+        int port = 6379;
+        int max_conn = 20;           // 最大连接数‌:ml-citation{ref="1,6" data="citationList"}
+        int conn_timeout = 3;        // 连接超时(秒)‌:ml-citation{ref="3" data="citationList"}
+        int retry_interval = 1;      // 重试间隔(秒)‌:ml-citation{ref="8" data="citationList"}
+    };
 
-public:
-    bool Init(const char* hostName, const int &port, const char* auth, const int &dbIndex, int32 i32PoolCount);
-    void Release();
+    CRedisPool(const RedisConfigST& cfg);
+    ~CRedisPool();
 
-public:
-    CRedisCli* PopRedisCli();
-    void PushRedisCli(CRedisCli*);
+    CRedisCli* GetConnection();
+    void ReleaseConnection(CRedisCli* conn);
 
 private:
-    int32 m_i32PoolCount = 0;
-    RedisCliList m_listRedisCli;
-    RedisCliList m_listRedisCliFree;
+    CRedisCli* CreateConnection();
+    bool Validate(CRedisCli* conn);
+
+    std::queue<CRedisCli*> pool_;
+    std::mutex mtx_;
+    std::condition_variable cv_;
+    RedisConfigST config_;
 };
 
