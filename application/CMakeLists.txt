@@ -15,15 +15,17 @@ file(GLOB X_MSGPROTO            "${CMAKE_CURRENT_SOURCE_DIR}/../source/proto-cpp
 file(GLOB X_MAIN                "${SOURCE_DIR}/*.h"                         "${SOURCE_DIR}/*.cpp")
 
 # service
+file(GLOB X_SERVICE_MGR         "${SOURCE_DIR}/service/*.h"                 "${SOURCE_DIR}/service/*.cpp")
 file(GLOB X_SERVICE_CONFIG      "${SOURCE_DIR}/service/config/*.h"          "${SOURCE_DIR}/service/config/*.cpp")
 file(GLOB X_SERVICE_LOG         "${SOURCE_DIR}/service/log/*.h"             "${SOURCE_DIR}/service/log/*.cpp")
 file(GLOB X_SERVICE_PLATFORM    "${SOURCE_DIR}/service/platform/*.h"        "${SOURCE_DIR}/service/platform/*.cpp")
 file(GLOB X_SERVICE_RECORD      "${SOURCE_DIR}/service/record/*.h"          "${SOURCE_DIR}/service/record/*.cpp")
 
 # actor
+file(GLOB X_ACTOR_MGR           "${SOURCE_DIR}/actor/*.h"                   "${SOURCE_DIR}/actor/*.cpp")
 file(GLOB X_ACTOR_GATE          "${SOURCE_DIR}/actor/gate/*.h"              "${SOURCE_DIR}/actor/gate/*.cpp")
-file(GLOB X_ACTOR_LOGIN         "${SOURCE_DIR}/actor/login/*.h"              "${SOURCE_DIR}/actor/login/*.cpp")
-file(GLOB X_ACTOR_PLAYER        "${SOURCE_DIR}/actor/player/*.h"             "${SOURCE_DIR}/actor/player/*.cpp")
+file(GLOB X_ACTOR_LOGIN         "${SOURCE_DIR}/actor/login/*.h"             "${SOURCE_DIR}/actor/login/*.cpp")
+file(GLOB X_ACTOR_PLAYER        "${SOURCE_DIR}/actor/player/*.h"            "${SOURCE_DIR}/actor/player/*.cpp")
 
 # handle
 file(GLOB X_HANDLE_GATE         "${SOURCE_DIR}/handle/gate/*.h"             "${SOURCE_DIR}/handle/gate/*.cpp")
@@ -37,11 +39,13 @@ set(SOURCES
     # main
     ${X_MAIN}
     # service
+    ${X_SERVICE_MGR}
     ${X_SERVICE_CONFIG}
     ${X_SERVICE_LOG}
     ${X_SERVICE_PLATFORM}
     ${X_SERVICE_RECORD}
     # actor
+    ${X_ACTOR_MGR}
     ${X_ACTOR_GATE}
     ${X_ACTOR_LOGIN}
     ${X_ACTOR_PLAYER}
@@ -57,11 +61,13 @@ source_group("protobuf/msg"         FILES ${X_MSGPROTO})
 # main
 source_group("main"                 FILES ${X_MAIN})
 # service
+source_group("service"              FILES ${X_SERVICE_MGR})
 source_group("service/config"       FILES ${X_SERVICE_CONFIG})
 source_group("service/log"          FILES ${X_SERVICE_LOG})
 source_group("service/platform"     FILES ${X_SERVICE_PLATFORM})
 source_group("service/record"       FILES ${X_SERVICE_RECORD})
 # actor
+source_group("actor"                FILES ${X_ACTOR_MGR})
 source_group("actor/gate"           FILES ${X_ACTOR_GATE})
 source_group("actor/login"          FILES ${X_ACTOR_LOGIN})
 source_group("actor/player"         FILES ${X_ACTOR_PLAYER})
