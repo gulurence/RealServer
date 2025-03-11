@@ -6,11 +6,19 @@
 #include "nats/nats.h"
 
 
+#include <condition_variable>
+
+
+
 class CNatsConnect
 {
 public:
-    CNatsConnect(natsConnection* pConnect):m_pConnect(pConnect){}
-    ~CNatsConnect(){}
+    CNatsConnect(natsConnection* pConnect) :m_pConnect(pConnect) {}
+    ~CNatsConnect() {
+        if (m_pConnect) {
+            natsConnection_Destroy(m_pConnect);
+        }
+    }
 
 public:
     void Release() {
@@ -18,7 +26,7 @@ public:
     }
 
 public:
-    natsStatus SendMsg(const char *pData, const uint32 &u32Len) {
+    natsStatus SendMsg(const char* pData, const uint32& u32Len) {
         // 发布消息到 "test.subject"
         const char* subject = "test.subject";
         //const char* message = "Hello, NATS from Publisher!";
@@ -31,7 +39,7 @@ public:
         return NATS_OK;
     }
 
-    natsStatus RequestMsg(const std::string &strSubject, const char* pData, const uint32& u32Len, char* pOutData, uint32& u32OutLen, uint64 u16WaitTimeTick=1000) {
+    natsStatus RequestMsg(const std::string& strSubject, const char* pData, const uint32& u32Len, char* pOutData, uint32& u32OutLen, uint64 u16WaitTimeTick = 1000) {
         // 发送请求并等待响应
         //const char* request_subject = "request.subject";
         //const char* request_message = "Hello, NATS server!";
@@ -62,59 +70,64 @@ public:
 typedef std::map<uint32, CNatsConnect*> NatsConnectMap;
 
 
-
-
-
-class CNatsClients : public xSingleton<CNatsClients>
+class NatsConnPool : public xSingleton<NatsConnPool>
 {
 public:
-    CNatsClients(){}
-    ~CNatsClients(){}
-
-private:
-
-public:
-    bool Init(uint32 u32ConnectCount = 2) {
-        m_u32ConnectCount = u32ConnectCount;
-        for (int i = 0;i< m_u32ConnectCount;++i) {
+    // "nats://NA2E6TH6H3545GAESKDYJ2OU2AZP3SIKTB2KPCGRPAVMUU2EDRK4H5LE@192.168.1.78:4222"
+    NatsConnPool(const std::string& server_url, size_t pool_size)
+        : server_url_(server_url), pool_size_(pool_size) {
+        for (size_t i = 0; i < pool_size_; ++i) {
             natsConnection* pConn = nullptr;
             // 连接到 NATS 服务器
-            auto status = natsConnection_ConnectTo(&pConn, "nats://NCXQMLYCJKQW2R64GEUVUVHRG2G4I4TUFVXUX5HDOLDTYESS7NCKVIOR@192.168.1.78:4222");
+            auto status = natsConnection_ConnectTo(&pConn, server_url_.c_str());
             if (status != NATS_OK) {
                 std::cerr << "Error connecting to NATS: " << natsStatus_GetText(status) << std::endl;
-
                 // 释放链接
                 Release();
-
-                return false;
+                return;
             }
-            m_mapConnect[i] = new CNatsConnect(pConn);
+            CNatsConnect *pCNatsConnect = new CNatsConnect(pConn);
+            connection_pool_.push(pCNatsConnect);
         }
-        return true;
+    }
+
+    ~NatsConnPool() {
+        Release();
     }
 
     void Release() {
-        for (auto &it: m_mapConnect) {
-            it.second->Release();
+        while (!connection_pool_.empty()) {
+            delete connection_pool_.front();
+            connection_pool_.pop();
         }
-        m_mapConnect.clear();
     }
 
-    void SendMsg() {
+    CNatsConnect* getConnection() {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cv_.wait(lock, [this] { return !connection_pool_.empty(); });
 
-
+        CNatsConnect* conn = connection_pool_.front();
+        connection_pool_.pop();
+        return conn;
     }
 
-    CNatsConnect* GetNatsConnect() {
-        return nullptr;
+    void releaseConnection(CNatsConnect* conn) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        connection_pool_.push(conn);
+        cv_.notify_one();
     }
 
 private:
-    uint32 m_u32ConnectCount = 0;
-
-private:
-    NatsConnectMap m_mapConnect;
+    std::string server_url_;
+    size_t pool_size_;
+    std::queue<CNatsConnect*> connection_pool_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
 };
+
+
+
+
 
 
 // 处理请求并发送响应的回调函数
