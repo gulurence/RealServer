@@ -16,7 +16,7 @@ void CRedisRecord::MakeActorKey(const RecordDataST* pData, std::string& strRedis
 bool CRedisRecord::Load(RecordDataST* pData) {
     std::string strRedisKey;
     MakeActorKey(pData, strRedisKey);
-    auto *pConnect = CRedisPool::getMe().GetConnection();
+    auto *pConnect = CRedisPoolMgr::getMe().GetConnection();
     if (!pConnect) {
         return false;
     }
@@ -26,7 +26,7 @@ bool CRedisRecord::Load(RecordDataST* pData) {
 bool CRedisRecord::Update(const RecordDataST* pData) {
     std::string strRedisKey;
     MakeActorKey(pData, strRedisKey);
-    auto* pConnect = CRedisPool::getMe().GetConnection();
+    auto* pConnect = CRedisPoolMgr::getMe().GetConnection();
     if (!pConnect) {
         return false;
     }
@@ -36,7 +36,7 @@ bool CRedisRecord::Update(const RecordDataST* pData) {
 bool CRedisRecord::Remove(const RecordDataST* pData) {
     std::string strRedisKey;
     MakeActorKey(pData, strRedisKey);
-    auto* pConnect = CRedisPool::getMe().GetConnection();
+    auto* pConnect = CRedisPoolMgr::getMe().GetConnection();
     if (!pConnect) {
         return false;
     }

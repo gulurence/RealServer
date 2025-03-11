@@ -53,6 +53,7 @@ private:
     int m_redisPort = 0;
     char m_redisPswd[32] = { 0 };
     int conn_timeout = 3;
+    int m_redisIndex = 0;
 };
 
 typedef std::list<CRedisCli*> RedisCliList;

@@ -36,6 +36,9 @@ int CRedisCli::ConnectDB(const char* hostName, const int port) {
 }
 
 int CRedisCli::ConnectDB() {
+
+    XINF("CRedisCli::ConnectDB [host:%s,port:%d] ", m_redisHost, m_redisPort);
+
     int ret = REDIS_OK;
 #ifdef __USE_LOCK__
     pthread_mutex_lock(&m_mutex);
@@ -44,11 +47,11 @@ int CRedisCli::ConnectDB() {
     m_context = redisConnectWithTimeout(m_redisHost, m_redisPort, tv);
     if (m_context == NULL || m_context->err) {
         if (m_context) {
-            fprintf(stderr, "Connection error: %s\n", m_context->errstr);
+            XWRN("CRedisCli::ConnectDB Connection error [host:%s,port:%d,error:%s] !!!", m_redisHost, m_redisPort, m_context->err);
             redisFree(m_context);
             m_context = NULL;
         } else {
-            fprintf(stderr, "Connection error: can't allocate redis context\n");
+            XERR("CRedisCli::ConnectDB Connection error: can't allocate redis context [host:%s,port:%d] !!!", m_redisHost, m_redisPort);
         }
         ret = REDIS_ERROR;
     }
@@ -59,6 +62,9 @@ int CRedisCli::ConnectDB() {
 }
 
 int CRedisCli::Auth(const char* password) {
+
+    XINF("CRedisCli::Auth [host:%s,port:%d,auth:%s] ", m_redisHost, m_redisPort, m_redisPswd);
+
     int ret = REDIS_OK;
 #ifdef __USE_LOCK__
     pthread_mutex_lock(&m_mutex);
@@ -69,11 +75,11 @@ int CRedisCli::Auth(const char* password) {
 
     if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
         if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
+            XWRN("CRedisCli::Auth redis error [host:%s,port:%d,auth:%s,error:%s] !!!", m_redisHost, m_redisPort, m_redisPswd, m_reply->str);
             freeReplyObject(m_reply);
             m_reply = NULL;
         } else {
-            fprintf(stderr, "redis error with null m_reply");
+            XERR("CRedisCli::Auth redis error with null m_reply [host:%s,port:%d,auth:%s] !!!", m_redisHost, m_redisPort, m_redisPswd);
         }
 #ifdef __USE_LOCK__
         pthread_mutex_unlock(&m_mutex);
@@ -90,20 +96,24 @@ int CRedisCli::Auth(const char* password) {
 }
 
 int CRedisCli::SelectDB(int no) {
+
+    XINF("CRedisCli::SelectDB [host:%s,port:%d,auth:%s,index:%d] ", m_redisHost, m_redisPort, m_redisPswd, no);
+
     int ret = REDIS_OK;
 #ifdef __USE_LOCK__
     pthread_mutex_lock(&m_mutex);
 #endif
 
-    m_reply = (redisReply*)redisCommand(m_context, "select %d", no);
+    m_redisIndex = no;
+    m_reply = (redisReply*)redisCommand(m_context, "select %d", m_redisIndex);
 
     if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
         if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
+            XWRN("CRedisCli::SelectDB redis error [host:%s,port:%d,auth:%s,error:%s] !!!", m_redisHost, m_redisPort, m_redisPswd, m_reply->str);
             freeReplyObject(m_reply);
             m_reply = NULL;
         } else {
-            fprintf(stderr, "redis error with null m_reply");
+            XERR("CRedisCli::SelectDB redis error with null m_reply [host:%s,port:%d,auth:%s] !!!", m_redisHost, m_redisPort, m_redisPswd);
         }
 #ifdef __USE_LOCK__
         pthread_mutex_unlock(&m_mutex);
@@ -121,7 +131,6 @@ int CRedisCli::SelectDB(int no) {
 
 bool CRedisCli::Validate() {
     if (!m_context || m_context->err) return false;
-
     // PING命令检测心跳‌:ml-citation{ref="3" data="citationList"}
     redisReply* reply = (redisReply*)redisCommand(m_context, "PING");
     bool valid = reply && (reply->type == REDIS_REPLY_STATUS);
@@ -130,6 +139,9 @@ bool CRedisCli::Validate() {
 }
 
 int CRedisCli::FlushDB() {
+
+    XINF("CRedisCli::FlushDB [host:%s,port:%d,auth:%s,index:%d] ", m_redisHost, m_redisPort, m_redisPswd, m_redisIndex);
+
     int ret = REDIS_OK;
 #ifdef __USE_LOCK__
     pthread_mutex_lock(&m_mutex);
@@ -138,11 +150,11 @@ int CRedisCli::FlushDB() {
 
     if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
         if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
+            XWRN("CRedisCli::Validate redis error [host:%s,port:%d,auth:%s,error:%s] !!!", m_redisHost, m_redisPort, m_redisPswd, m_reply->str);
             freeReplyObject(m_reply);
             m_reply = NULL;
         } else {
-            fprintf(stderr, "redis error with null m_reply");
+            XERR("CRedisCli::Validate redis error with null m_reply [host:%s,port:%d,auth:%s] !!!", m_redisHost, m_redisPort, m_redisPswd);
         }
 #ifdef __USE_LOCK__
         pthread_mutex_unlock(&m_mutex);
@@ -159,6 +171,9 @@ int CRedisCli::FlushDB() {
 }
 
 int CRedisCli::FlushAll() {
+
+    XINF("CRedisCli::FlushAll [host:%s,port:%d,auth:%s,index:%d] ", m_redisHost, m_redisPort, m_redisPswd, m_redisIndex);
+
     int ret = REDIS_OK;
 #ifdef __USE_LOCK__
     pthread_mutex_lock(&m_mutex);
@@ -167,11 +182,11 @@ int CRedisCli::FlushAll() {
 
     if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
         if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
+            XWRN("CRedisCli::FlushAll redis error [host:%s,port:%d,auth:%s,error:%s] !!!", m_redisHost, m_redisPort, m_redisPswd, m_reply->str);
             freeReplyObject(m_reply);
             m_reply = NULL;
         } else {
-            fprintf(stderr, "redis error with null m_reply");
+            XERR("CRedisCli::FlushAll redis error with null m_reply [host:%s,port:%d,auth:%s] !!!", m_redisHost, m_redisPort, m_redisPswd);
         }
 #ifdef __USE_LOCK__
         pthread_mutex_unlock(&m_mutex);
@@ -188,6 +203,9 @@ int CRedisCli::FlushAll() {
 }
 
 int CRedisCli::Set(const std::string& key, const RecordDataST* data) {
+
+    XDBG("CRedisCli::Set [host:%s,port:%d,key:%s,size:%d] ", m_redisHost, m_redisPort, key, data->Size());
+
     redisReply* reply = (redisReply*)redisCommand(m_context, "SET %s %b", key.c_str(), data->Data(), data->Size());
     bool success = false;
     if (reply) {
@@ -196,7 +214,7 @@ int CRedisCli::Set(const std::string& key, const RecordDataST* data) {
         }
         freeReplyObject(reply);
     } else {
-        std::cerr << "Error executing command: " << m_context->errstr << std::endl;
+        XERR("CRedisCli::Set Error executing command [host:%s,port:%d,auth:%s,key:%s,error:%s] !!!", m_redisHost, m_redisPort, m_redisPswd, key.c_str(), m_context->errstr);
     }
     if (success) {
         return REDIS_OK;
@@ -216,12 +234,15 @@ int CRedisCli::Get(const std::string& key, RecordDataST* data) {
         }
         freeReplyObject(reply);
     } else {
-        std::cerr << "Error executing command: " << m_context->errstr << std::endl;
+        XERR("CRedisCli::Get Error executing command [host:%s,port:%d,auth:%s,key:%s,error:%s] !!!", m_redisHost, m_redisPort, m_redisPswd, key.c_str(), m_context->errstr);
     }
     return REDIS_ERROR;
 }
 
 int CRedisCli::HSet(const std::string& hash, const std::string& field, const RecordDataST* data) {
+
+    XDBG("CRedisCli::HSet [host:%s,port:%d,key:%s,field:%s,size:%d] ", m_redisHost, m_redisPort, hash.c_str(), field.c_str(), data->Size());
+
     redisReply* reply = (redisReply*)redisCommand(m_context, "HSET %s %s %b", hash.c_str(), field.c_str(), data->Data(), data->Size());
     bool success = false;
     if (reply) {
@@ -230,7 +251,7 @@ int CRedisCli::HSet(const std::string& hash, const std::string& field, const Rec
         }
         freeReplyObject(reply);
     } else {
-        std::cerr << "Error executing command: " << m_context->errstr << std::endl;
+        XERR("CRedisCli::HSet Error executing command [host:%s,port:%d,auth:%s,key:%s,field:%s,error:%s] !!!", m_redisHost, m_redisPort, m_redisPswd, hash.c_str(), field.c_str(), m_context->errstr);
     }
     if (success) {
         return REDIS_OK;
@@ -250,12 +271,15 @@ int CRedisCli::HGet(const std::string& hash, const std::string& field, RecordDat
         }
         freeReplyObject(reply);
     } else {
-        std::cerr << "Error executing command: " << m_context->errstr << std::endl;
+        XERR("CRedisCli::HGet Error executing command [host:%s,port:%d,auth:%s,key:%s,field:%s,error:%s] !!!", m_redisHost, m_redisPort, m_redisPswd, hash.c_str(), field.c_str(), m_context->errstr);
     }
     return REDIS_ERROR;
 }
 
 int CRedisCli::Del(const char* key) {
+
+    XDBG("CRedisCli::Del [host:%s,port:%d,key:%s] ", m_redisHost, m_redisPort, key);
+
 #ifdef __USE_LOCK__
     pthread_mutex_lock(&m_mutex);
 #endif
@@ -263,11 +287,11 @@ int CRedisCli::Del(const char* key) {
 
     if (m_reply == NULL || m_reply->type == REDIS_REPLY_ERROR) {
         if (m_reply) {
-            fprintf(stderr, "redis error: %s\n", m_reply->str);
+            XWRN("CRedisCli::Del redis error [host:%s,port:%d,auth:%s,key:%s,error:%s] !!!", m_redisHost, m_redisPort, m_redisPswd, key, m_reply->str);
             freeReplyObject(m_reply);
             m_reply = NULL;
         } else {
-            fprintf(stderr, "redis error with null m_reply");
+            XERR("CRedisCli::Del redis error with null m_reply [host:%s,port:%d,auth:%s,key:%s] !!!", m_redisHost, m_redisPort, m_redisPswd, key);
         }
 #ifdef __USE_LOCK__
         pthread_mutex_unlock(&m_mutex);

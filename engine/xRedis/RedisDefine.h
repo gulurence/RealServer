@@ -2,7 +2,7 @@
 
 #include "hiredis/hiredis.h"
 #include "xBase/xDefine.h"
-
+#include "xLog/xLog.h"
 
 struct RedisConfigST
 {

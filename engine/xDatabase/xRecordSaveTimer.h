@@ -48,8 +48,7 @@ public:
         m_lockTimer.unlock();
 
         auto it_run = tmpList.begin();
-        for (; it_run != tmpList.end();++it_run)
-        {
+        for (; it_run != tmpList.end();++it_run) {
             OnSaveTimer((*it_run).u64DataID);
         }
     }
