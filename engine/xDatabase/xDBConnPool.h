@@ -10,7 +10,7 @@
 typedef uint8 DBConnID;
 #define DBErrConnID ((DBConnID)-1)
 #define DBErrReturn uint64(-1)
-//鏁版嵁搴撹繛鎺?
+//
 class DBConn
 {
     friend class DBConnPool;
@@ -26,7 +26,7 @@ public:
     uint64 exeInsertMany(const char *tableName, const dbCol *column, const unsigned char *data, uint32 num, const char *where);
     uint64 exeUpdate(const char *tableName, const dbCol *column, const unsigned char *data, const char *where);
     uint64 exeSelect(const char *tableName, const dbCol *column, unsigned char **data, const char *where, const char *extraOpt);
-    // 鏈嚱鏁?鐨刣ata 涓哄閮ㄤ紶鍏ョ殑缂撳瓨鍖烘寚閽堝紩鐢?
+    // 
     uint64 exeSelectEx(const char *tableName, const dbCol *column, unsigned char *data, const char *where, const char *extraOpt);
     uint64 exeDelete(const char *table, const char *where);
     uint64 exeSql(const char *sql);
@@ -36,7 +36,7 @@ public:
 private:
     MYSQL *mysql;
 };
-//杩炴帴姹?
+//
 class DBConnPool
 {
 public:
@@ -125,6 +125,5 @@ private:
 
     UniqueIDManager<DBConnID> *ids;
 };
-
-
+typedef std::unordered_map<std::string, DBConnPool*> DBConnPoolMap;
 

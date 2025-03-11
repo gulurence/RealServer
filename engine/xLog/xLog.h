@@ -39,9 +39,13 @@ private:
 };
 
 #define  XTRC(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::TRACE, __VA_ARGS__)
+// 调试日志
 #define  XDBG(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::DEBUG, __VA_ARGS__)
+// 运行日志
 #define  XLOG(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::INFO, __VA_ARGS__)
 #define  XINF(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::INFO, __VA_ARGS__)
+// 警告
 #define  XWRN(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::WARN, __VA_ARGS__)
+// 错误
 #define  XERR(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::ERR, __VA_ARGS__)
 

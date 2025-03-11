@@ -9,7 +9,7 @@
 #include <hiredis/hiredis.h>
 
 
-class CRedisPool : public xSingleton<CRedisPool>
+class CRedisPool
 {
 public:
     struct Config
@@ -25,15 +25,32 @@ public:
     ~CRedisPool();
 
     CRedisCli* GetConnection();
-    void ReleaseConnection(CRedisCli* conn);
+    void ReleaseConnection(CRedisCli* pConn);
 
 private:
     CRedisCli* CreateConnection();
-    bool Validate(CRedisCli* conn);
+    bool Validate(CRedisCli* pConn);
 
-    std::queue<CRedisCli*> pool_;
-    std::mutex mtx_;
-    std::condition_variable cv_;
-    RedisConfigST config_;
+private:
+    std::queue<CRedisCli*> m_qPool_;
+    std::mutex m_mLock_;
+    std::condition_variable m_condCv_;
+    RedisConfigST m_stConfig_;
+};
+typedef std::map<std::string, CRedisPool*> RedisPoolMap;
+
+// 链接池管理
+class CRedisPoolMgr : public xSingleton<CRedisPool>
+{
+public:
+    CRedisPoolMgr(){}
+    ~CRedisPoolMgr(){}
+
+private:
+    RedisPoolMap m_mapPool;
+
+public:
+    bool ConnectToRedis(const RedisConfigST& stConfig);
+    CRedisCli* GetRedisCli(const std::string& strTitle);
 };
 

@@ -819,8 +819,8 @@ bool DBConnPool::init()
     return true;
 }
 
-bool DBConnPool::init(const char *pIP, int iPort, const char *pDBName, const char *pUser, const char *pPassWd, int iPoolCount) {
-    _server = pIP;
+bool DBConnPool::init(const char *pHost, int iPort, const char *pDBName, const char *pUser, const char *pPassWd, int iPoolCount) {
+    _server = pHost;
     _port = iPort;
     _user = pUser;
     _password = pPassWd;
@@ -857,6 +857,3 @@ void DBConnPool::putDBConn(DBConnID con)
 #endif
     ids->putUniqueID(con);
 }
-
-
-
