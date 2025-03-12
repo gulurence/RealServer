@@ -4,25 +4,16 @@
 #include "ActorDefine.h"
 
 
-enum EnActorType
-{
-    ActorType_Null = 0,
-    ActorType_Player = 1,
-
-};
-
 class CActor
 {
 public:
-    CActor(EnActorType enActorType, ActorID i64ActorID, const std::string &strActorName):m_enActorType(enActorType), m_i64ActorID(i64ActorID), m_strActorName(strActorName){
-
+    CActor(ActorType i32ActorType, ActorID i64ActorID, const std::string &strActorName):m_i32ActorType(i32ActorType), m_i64ActorID(i64ActorID), m_strActorName(strActorName){
     }
     ~CActor() {
-
     }
 
 public:
-    EnActorType GetActorType() { return m_enActorType; }
+    ActorType GetActorType() { return m_i32ActorType; }
     ActorID GetActorID() { return m_i64ActorID; }
     const std::string& GetActorName() { return m_strActorName; }
 
@@ -34,12 +25,12 @@ public:
     virtual bool Init() = 0;
 
 public:
-    virtual int32 Install() = 0;
-    virtual int32 UnInstall() = 0;
-    virtual CActor* Create(EnActorType enActorType, ActorID i64ActorID, const std::string& strActorName) = 0;
+    virtual int32 OnRegist() = 0;
+    virtual int32 OnUnRegist() = 0;
+    virtual CActor* Create(ActorID i64ActorID) = 0;
 
 private:
-    EnActorType m_enActorType   = ActorType_Null;
+    ActorType   m_i32ActorType  = 0;
     ActorID     m_i64ActorID    = 0;
     std::string m_strActorName;
 
@@ -47,14 +38,14 @@ private:
     // 是否允许创建
     bool        m_bCreateEnable = true;
 };
-typedef std::map<EnActorType, CActor*> CActorTypeMap;
+typedef std::map<ActorType, CActor*> CActorTypeMap;
 typedef std::map<ActorID, CActor*> CActorMap;
 
 
 class Player : public CActor
 {
 public:
-    Player(EnActorType enActorType, ActorID i64ActorID, const std::string& strActorName) :CActor(enActorType, i64ActorID, strActorName) {}
+    Player(ActorType enActorType, ActorID i64ActorID, const std::string& strActorName) :CActor(enActorType, i64ActorID, strActorName) {}
     ~Player(){}
 
 private:
@@ -67,7 +58,7 @@ private:
 
 public:
     // 单例创建接口
-    CActor* Create(EnActorType enActorType, ActorID i64ActorID, const std::string& strActorName) {
+    CActor* Create(ActorType enActorType, ActorID i64ActorID, const std::string& strActorName) {
         auto pActor = new Player(enActorType, i64ActorID, strActorName);
         if (!pActor) {
             return nullptr;
@@ -113,7 +104,7 @@ private:
         }
         m_mapActorType[actor->GetActorType()] = actor;
     }
-    static void SetCreateEnable(EnActorType enActorType, bool bEnable){
+    static void SetCreateEnable(ActorType enActorType, bool bEnable){
         auto it = m_mapActorType.find(enActorType);
         if (it != m_mapActorType.end()) {
             return ;
@@ -126,7 +117,7 @@ private:
     }
 
 public:
-    static CActor *Create(EnActorType enActorType, ActorID i64ActorID, const std::string& strActorName) {
+    static CActor *Create(ActorType enActorType, ActorID i64ActorID, const std::string& strActorName) {
         auto it = m_mapActorType.find(enActorType);
         if (it == m_mapActorType.end()) {
             return nullptr;
