@@ -22,10 +22,18 @@ file(GLOB X_SERVICE_PLATFORM    "${SOURCE_DIR}/service/platform/*.h"        "${S
 file(GLOB X_SERVICE_RECORD      "${SOURCE_DIR}/service/record/*.h"          "${SOURCE_DIR}/service/record/*.cpp")
 
 # actor
-file(GLOB X_ACTOR_MGR           "${SOURCE_DIR}/actor/*.h"                   "${SOURCE_DIR}/actor/*.cpp")
+file(GLOB X_ACTOR               "${SOURCE_DIR}/actor/*.h"                   "${SOURCE_DIR}/actor/*.cpp")
 file(GLOB X_ACTOR_GATE          "${SOURCE_DIR}/actor/gate/*.h"              "${SOURCE_DIR}/actor/gate/*.cpp")
+file(GLOB X_ACTOR_GATE_DB       "${SOURCE_DIR}/actor/gate/Database/*.h"     "${SOURCE_DIR}/actor/gate/Database/*.cpp")
+file(GLOB X_ACTOR_GATE_LOGIC    "${SOURCE_DIR}/actor/gate/Logic/*.h"        "${SOURCE_DIR}/actor/gate/Logic/*.cpp")
+
 file(GLOB X_ACTOR_LOGIN         "${SOURCE_DIR}/actor/login/*.h"             "${SOURCE_DIR}/actor/login/*.cpp")
+file(GLOB X_ACTOR_LOGIN_DB      "${SOURCE_DIR}/actor/login/Database/*.h"    "${SOURCE_DIR}/actor/login/Database/*.cpp")
+file(GLOB X_ACTOR_LOGIN_LOGIC   "${SOURCE_DIR}/actor/login/Logic/*.h"       "${SOURCE_DIR}/actor/login/Logic/*.cpp")
+
 file(GLOB X_ACTOR_PLAYER        "${SOURCE_DIR}/actor/player/*.h"            "${SOURCE_DIR}/actor/player/*.cpp")
+file(GLOB X_ACTOR_PLAYER_DB     "${SOURCE_DIR}/actor/player/Database/*.h"   "${SOURCE_DIR}/actor/player/Database/*.cpp")
+file(GLOB X_ACTOR_PLAYER_LOGIC  "${SOURCE_DIR}/actor/player/Logic/*.h"      "${SOURCE_DIR}/actor/player/Logic/*.cpp")
 
 # handle
 file(GLOB X_HANDLE_GATE         "${SOURCE_DIR}/handle/gate/*.h"             "${SOURCE_DIR}/handle/gate/*.cpp")
@@ -45,10 +53,16 @@ set(SOURCES
     ${X_SERVICE_PLATFORM}
     ${X_SERVICE_RECORD}
     # actor
-    ${X_ACTOR_MGR}
+    ${X_ACTOR}
     ${X_ACTOR_GATE}
+    ${X_ACTOR_GATE_DB}
+    ${X_ACTOR_GATE_LOGIC}
     ${X_ACTOR_LOGIN}
+    ${X_ACTOR_LOGIN_DB}
+    ${X_ACTOR_LOGIN_LOGIC}
     ${X_ACTOR_PLAYER}
+    ${X_ACTOR_PLAYER_DB}
+    ${X_ACTOR_PLAYER_LOGIC}
     # handle
     ${X_HANDLE_GATE}
     ${X_HANDLE_LOGIN}
@@ -56,25 +70,31 @@ set(SOURCES
 )
 
 # 将源文件分组（在 Visual Studio 中显示为目录结构）
-source_group("protobuf/rpc"         FILES ${X_GRPCPROTO})
-source_group("protobuf/msg"         FILES ${X_MSGPROTO})
+source_group("protobuf/rpc"             FILES ${X_GRPCPROTO})
+source_group("protobuf/msg"             FILES ${X_MSGPROTO})
 # main
-source_group("main"                 FILES ${X_MAIN})
+source_group("main"                     FILES ${X_MAIN})
 # service
-source_group("service"              FILES ${X_SERVICE_MGR})
-source_group("service/config"       FILES ${X_SERVICE_CONFIG})
-source_group("service/log"          FILES ${X_SERVICE_LOG})
-source_group("service/platform"     FILES ${X_SERVICE_PLATFORM})
-source_group("service/record"       FILES ${X_SERVICE_RECORD})
+source_group("service"                  FILES ${X_SERVICE_MGR})
+source_group("service/config"           FILES ${X_SERVICE_CONFIG})
+source_group("service/log"              FILES ${X_SERVICE_LOG})
+source_group("service/platform"         FILES ${X_SERVICE_PLATFORM})
+source_group("service/record"           FILES ${X_SERVICE_RECORD})
 # actor
-source_group("actor"                FILES ${X_ACTOR_MGR})
-source_group("actor/gate"           FILES ${X_ACTOR_GATE})
-source_group("actor/login"          FILES ${X_ACTOR_LOGIN})
-source_group("actor/player"         FILES ${X_ACTOR_PLAYER})
+source_group("actor"                    FILES ${X_ACTOR})
+source_group("actor/gate"               FILES ${X_ACTOR_GATE})
+source_group("actor/gate/database"      FILES ${X_ACTOR_GATE_DB})
+source_group("actor/gate/logic"         FILES ${X_ACTOR_GATE_LOGIC})
+source_group("actor/login"              FILES ${X_ACTOR_LOGIN})
+source_group("actor/login/database"     FILES ${X_ACTOR_LOGIN_DB})
+source_group("actor/login/logic"        FILES ${X_ACTOR_LOGIN_LOGIC})
+source_group("actor/player"             FILES ${X_ACTOR_PLAYER})
+source_group("actor/player/database"    FILES ${X_ACTOR_PLAYER_DB})
+source_group("actor/player/logic"       FILES ${X_ACTOR_PLAYER_LOGIC})
 # handle
-source_group("handle/gate"          FILES ${X_HANDLE_GATE})
-source_group("handle/login"         FILES ${X_HANDLE_LOGIN})
-source_group("handle/player"        FILES ${X_HANDLE_PLAYER})
+source_group("handle/gate"              FILES ${X_HANDLE_GATE})
+source_group("handle/login"             FILES ${X_HANDLE_LOGIN})
+source_group("handle/player"            FILES ${X_HANDLE_PLAYER})
 
 # 生成静态库（.lib 和 .a 文件）
 if (MSVC)
