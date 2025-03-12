@@ -5,5 +5,8 @@
 
 
 
+typedef int32 ActorType;
 typedef int64 ActorID;
+
+
 

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "../xBase/xDefine.h"
+#include "xDatabaseDefine.h"
 
 enum
 {

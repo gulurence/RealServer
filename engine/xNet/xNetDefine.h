@@ -68,6 +68,50 @@ namespace this_coro = boost::asio::this_coro;
 typedef std::shared_ptr<NetPackageST> NetPackageSharedPtr;
 typedef NetPackageHeadST* NetPackageHeadSharedPtr;
 
-typedef std::function<uint64(tcp_socket&)> NetPackageAcceptPtr;
-typedef std::function<void(tcp_socket&, uint64, NetPackageSharedPtr)> NetPackageCallPtr;
+// 客户端链接ID
+typedef uint64 NetCID;
+
+
+// 返回上层给出的唯一ID用于后续的发送消息
+typedef std::function<NetCID(void *,tcp_socket&)> NetPackageAcceptPtr;
+typedef std::function<void(void*, tcp_socket&, uint64, NetPackageSharedPtr)> NetPackageCallPtr;
+typedef std::function<void(void*, NetCID)> NetDisconnectPtr;
+
+
+
+
+// xNetAgent 配置结构
+struct NetAgentConfigST {
+    NetAgentConfigST(){}
+    NetAgentConfigST(const NetAgentConfigST &stConfig) {
+        if (this==&stConfig) {
+            return;
+        }
+        strServiceName = stConfig.strServiceName;
+        strHost = stConfig.strHost;
+        u16Port = stConfig.u16Port;
+        pAcceptCall = stConfig.pAcceptCall;
+        pPackageCall = stConfig.pPackageCall;
+        pDisconnect = stConfig.pDisconnect;
+        u16CacheBuffSize = stConfig.u16CacheBuffSize;
+    }
+
+public:
+    std::string strServiceName;
+
+public:
+    std::string strHost;
+    uint16 u16Port = 0;
+
+public:
+    NetPackageAcceptPtr pAcceptCall;
+    NetPackageCallPtr pPackageCall;
+    NetDisconnectPtr pDisconnect;
+
+public:
+    uint16 u16CacheBuffSize = 1024;
+
+public:
+    void* pParam = nullptr;
+};
 

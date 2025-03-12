@@ -77,6 +77,16 @@ typedef unsigned long       uint64;
 #define MAX_BINDATA_SIZE        (1<<17)
 #define MAX_DBDATA_SIZE         (1<<22)
 
+
+#define MAX_DNAMESIZE           64
+#define MAX_SNUIDSIZE           64
+#define MAX_SGUIDSIZE           64
+#define MAX_DBCHAR128_SIZE      128
+#define MAX_DBCHAR256_SIZE      256
+#define MAX_DBCHAR512_SIZE      512
+#define SHA1_LEN                40
+
+
 #ifndef M_PI
 #  define M_PI          3.14159265358979323846
 #endif

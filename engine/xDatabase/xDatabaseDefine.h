@@ -2,7 +2,10 @@
 
 #include "../xBase/xDefine.h"
 
-
+#pragma pack(1)
+struct DatabaseTableCol{
+}__attribute__((packed));
+#pragma pack()
 
 
 struct DBConfigST

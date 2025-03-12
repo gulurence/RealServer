@@ -1,25 +1,20 @@
 ﻿
-#include "xNet.h"
+#include "xNetAgent.h"
 
 
-xNet::xNet(const char* pszServiceName, uint16 u16Port, NetPackageAcceptPtr pAcceptCall, NetPackageCallPtr pPackageCall, uint16 u16CacheBuffSize) {
-    m_u16Port = u16Port;
-    m_pAcceptCall = pAcceptCall;
-    m_pPackageCall = pPackageCall;
-    m_u16CacheBuffSize = u16CacheBuffSize;
-    bzero(m_pszServiceName, sizeof(m_pszServiceName));
-    strncpy(m_pszServiceName, pszServiceName, MAX_NAMESIZE - 1);
+xNetAgent::xNetAgent(const NetAgentConfigST& stConfig) {
+    m_stConfig = stConfig;
     //
-    XINF("Create Service Net [%s]", pszServiceName);
+    XINF("Create Service Net [%s]", m_stConfig.strServiceName.c_str());
 }
 
-xNet::~xNet() {
+xNetAgent::~xNetAgent() {
 }
 
-void xNet::Release() {
+void xNetAgent::Release() {
 }
 
-void PackageCheck(tcp_socket* socket, uint64* u64CID, NetPackageCallPtr pPackageCall, xCircularBuffer* pCircularBuffer, std::atomic<bool>* bIsExit) {
+void PackageCheck(void** pParam, tcp_socket* socket, uint64* u64CID, NetPackageCallPtr pPackageCall, xCircularBuffer* pCircularBuffer, std::atomic<bool>* bIsExit) {
     while (!(*bIsExit)) {
         auto packageFullSize = pCircularBuffer->HaveFullPackage();
         if (packageFullSize > 0) {
@@ -27,7 +22,7 @@ void PackageCheck(tcp_socket* socket, uint64* u64CID, NetPackageCallPtr pPackage
             pCircularBuffer->Read(pPackagePtr->pPackageData, packageFullSize);
             pCircularBuffer->Put(packageFullSize);
             if (pPackageCall) {
-                pPackageCall(*socket, *u64CID, pPackagePtr);
+                pPackageCall(*pParam, *socket, *u64CID, pPackagePtr);
             }
         } else {
             std::this_thread::sleep_for(std::chrono::microseconds(100));
@@ -35,16 +30,16 @@ void PackageCheck(tcp_socket* socket, uint64* u64CID, NetPackageCallPtr pPackage
     }
 }
 
-awaitable<void> xNet::Accept(tcp_socket socket) {
-    uint64 u64CID = 0;
-    if (m_pAcceptCall) {
+awaitable<void> xNetAgent::Accept(tcp_socket socket) {
+    NetCID u64CID = 0;
+    if (m_stConfig.pAcceptCall) {
         std::atomic<bool> bIsExit = false;
-        xCircularBuffer* pCircularBuffer = new xCircularBuffer(m_u16CacheBuffSize);
+        xCircularBuffer* pCircularBuffer = new xCircularBuffer(m_stConfig.u16CacheBuffSize);
         // 0.获取新连接ID
-        u64CID = m_pAcceptCall(socket);
+        u64CID = m_stConfig.pAcceptCall(m_stConfig.pParam, socket);
         XINF("Accept client u64CID [%ld] !!!", u64CID);
         // 1.开启解包线程
-        std::thread t(PackageCheck, &socket, &u64CID, m_pPackageCall, pCircularBuffer, &bIsExit);
+        std::thread t(PackageCheck, &(m_stConfig.pParam), &socket, &u64CID, m_stConfig.pPackageCall, pCircularBuffer, &bIsExit);
         //
         NetPackageHeadST stPackageHead;
         // 2.监听 接收数据
@@ -61,12 +56,20 @@ awaitable<void> xNet::Accept(tcp_socket socket) {
                     // 如果连接被关闭，可以做相应的处理
                     std::cerr << "Socket is not connected!" << std::endl;
                 }
+                // 断开链接
+                if (m_stConfig.pDisconnect) {
+                    m_stConfig.pDisconnect(m_stConfig.pParam, u64CID);
+                }
                 break;
             } else {
                 // 成功读取数据
                 if (nread == 0) {
                     // 如果没有读取到数据，表明连接可能已经关闭
                     std::cerr << "No data read, connection might be closed!" << std::endl;
+                    // 断开链接
+                    if (m_stConfig.pDisconnect) {
+                        m_stConfig.pDisconnect(m_stConfig.pParam, u64CID);
+                    }
                     break;
                 } else {
                     // 处理读取到的数据
@@ -83,7 +86,7 @@ awaitable<void> xNet::Accept(tcp_socket socket) {
     }
 }
 
-awaitable<void> xNet::Listener(uint16 u16Port) {
+awaitable<void> xNetAgent::Listener(uint16 u16Port) {
     auto executor = co_await this_coro::executor;
     tcp_acceptor acceptor(executor, { tcp::v4(), u16Port });
     for (;;) {
@@ -93,12 +96,12 @@ awaitable<void> xNet::Listener(uint16 u16Port) {
     }
 }
 
-void xNet::thread_proc() {
+void xNetAgent::thread_proc() {
     try {
         boost::asio::io_context io_context(1);
         boost::asio::signal_set signals(io_context, SIGINT, SIGTERM);
         signals.async_wait([&](auto, auto) { io_context.stop(); });
-        co_spawn(io_context, Listener(m_u16Port), detached);
+        co_spawn(io_context, Listener(m_stConfig.u16Port), detached);
         io_context.run();
     } catch (std::exception& e) {
         XERR("xService::thread_proc Exception: %s", e.what());

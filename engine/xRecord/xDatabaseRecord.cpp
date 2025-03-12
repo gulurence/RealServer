@@ -13,6 +13,14 @@ bool CDatabaseRecord::Load(RecordDataST* pData) {
     pOperatorNode->m_pCol;
 
 
+    pOperatorNode->m_stTitle;
+    pOperatorNode->m_enOpType = ODOT_NULL;
+    pOperatorNode->m_strTableName;
+    pOperatorNode->m_strWhere;
+    pOperatorNode->m_pCol = nullptr;
+    pOperatorNode->m_stData;
+
+
     COperatorMgr::getMe().PushOperator(pOperatorNode);
     return true;
 }
@@ -26,3 +34,4 @@ bool CDatabaseRecord::Remove(const RecordDataST* pData) {
 
     return true;
 }
+
