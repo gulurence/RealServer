@@ -73,9 +73,11 @@ typedef std::map<uint32, CNatsConnect*> NatsConnectMap;
 class NatsConnPool : public xSingleton<NatsConnPool>
 {
 public:
+    NatsConnPool() {}
     // "nats://NA2E6TH6H3545GAESKDYJ2OU2AZP3SIKTB2KPCGRPAVMUU2EDRK4H5LE@192.168.1.78:4222"
-    NatsConnPool(const std::string& server_url, size_t pool_size)
-        : server_url_(server_url), pool_size_(pool_size) {
+    bool Init(const std::string& server_url, size_t pool_size) {
+        server_url_ = server_url;
+        pool_size_ = pool_size;
         for (size_t i = 0; i < pool_size_; ++i) {
             natsConnection* pConn = nullptr;
             // 连接到 NATS 服务器
@@ -84,11 +86,12 @@ public:
                 std::cerr << "Error connecting to NATS: " << natsStatus_GetText(status) << std::endl;
                 // 释放链接
                 Release();
-                return;
+                return false;
             }
             CNatsConnect *pCNatsConnect = new CNatsConnect(pConn);
             connection_pool_.push(pCNatsConnect);
         }
+        return true;
     }
 
     ~NatsConnPool() {

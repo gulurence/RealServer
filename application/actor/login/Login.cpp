@@ -5,14 +5,14 @@
 
 
 
-uint64 OnAccept(tcp_socket& s) {
+NetCID OnAccept(void*, tcp_socket& s) {
 
 
     return 0;
 }
 
 
-void OnPackageCall(tcp_socket& s, uint64 u64CID, NetPackageSharedPtr pPackage) {
+void OnPackageCall(void*, tcp_socket& s, uint64 u64CID, NetPackageSharedPtr pPackage) {
 
 
 

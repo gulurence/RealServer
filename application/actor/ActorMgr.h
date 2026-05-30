@@ -3,7 +3,7 @@
 #include "xService/xService.h"
 
 
-class CActorMgr
+class CActorMgr : public xSingleton<CActorMgr>
 {
 public:
     CActorMgr(){}

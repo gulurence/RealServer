@@ -7,7 +7,8 @@
 class CActor
 {
 public:
-    CActor(ActorType i32ActorType, ActorID i64ActorID, const std::string &strActorName):m_i32ActorType(i32ActorType), m_i64ActorID(i64ActorID), m_strActorName(strActorName){
+    CActor(ActorType i32ActorType, ActorID i64ActorID, const std::string &strActorName)
+        : m_i32ActorType(i32ActorType), m_i64ActorID(i64ActorID), m_strActorName(strActorName) {
     }
     ~CActor() {
     }
@@ -25,8 +26,11 @@ public:
     virtual bool Init() = 0;
 
 public:
-    virtual int32 OnRegist() = 0;
-    virtual int32 OnUnRegist() = 0;
+    // 进程负载 环境初始化
+    virtual bool Install() = 0;
+    virtual bool UnInstall() = 0;
+
+public:
     virtual CActor* Create(ActorID i64ActorID) = 0;
 
 private:
@@ -36,100 +40,87 @@ private:
 
 private:
     // 是否允许创建
-    bool        m_bCreateEnable = true;
+    bool m_bCreateEnable = true;
 };
+
 typedef std::map<ActorType, CActor*> CActorTypeMap;
 typedef std::map<ActorID, CActor*> CActorMap;
 
+//
+//class CActorPlayer : public CActor
+//{
+//public:
+//    CActorPlayer(ActorID i64ActorID) : CActor(ACTOR_TYPE_PLAYER, i64ActorID, "CActorPlayer") {}
+//    ~CActorPlayer(){}
+//
+//private:
+//    // 负责 从mysql redis 加载数据
+//    virtual bool Init() {
+//
+//        return true;
+//    }
+//
+//public:
+//    // 单例创建接口
+//    CActor* Create(ActorID i64ActorID) {
+//        auto pActor = new CActorPlayer(i64ActorID);
+//        if (!pActor) {
+//            return nullptr;
+//        }
+//        // can not create
+//        if (!pActor->CreateIsEnable()) {
+//            delete pActor;
+//            return nullptr;
+//        }
+//        if (!pActor->Init()) {
+//            delete pActor;
+//            return nullptr;
+//        }
+//        return pActor;
+//    }
+//};
+//
+//class CActorScene : public CActor
+//{
+//public:
+//    CActorScene(ActorID i64ActorID) : CActor(ACTOR_TYPE_PLAYER, i64ActorID, "CActorScene") {}
+//    ~CActorScene() {}
+//
+//private:
+//    // 负责 从mysql redis 加载数据
+//    virtual bool Init() {
+//
+//        return true;
+//    }
+//
+//public:
+//    // 单例创建接口
+//    CActor* Create(ActorID i64ActorID) {
+//        auto pActor = new CActorScene(i64ActorID);
+//        if (!pActor) {
+//            return nullptr;
+//        }
+//        // can not create
+//        if (!pActor->CreateIsEnable()) {
+//            delete pActor;
+//            return nullptr;
+//        }
+//        if (!pActor->Init()) {
+//            delete pActor;
+//            return nullptr;
+//        }
+//        return pActor;
+//    }
+//};
 
-class Player : public CActor
-{
-public:
-    Player(ActorType enActorType, ActorID i64ActorID, const std::string& strActorName) :CActor(enActorType, i64ActorID, strActorName) {}
-    ~Player(){}
 
-private:
-    // 负责 从mysql redis 加载数据
-    virtual bool Init() {
+/*
+void test() {
 
+    //auto actor = ActorCreator::getMe().Create(ACTOR_TYPE_PLAYER, 100);
 
-        return true;
-    }
+    
 
-public:
-    // 单例创建接口
-    CActor* Create(ActorType enActorType, ActorID i64ActorID, const std::string& strActorName) {
-        auto pActor = new Player(enActorType, i64ActorID, strActorName);
-        if (!pActor) {
-            return nullptr;
-        }
-        // can not create
-        if (!pActor->CreateIsEnable()) {
-            delete pActor;
-            return nullptr;
-        }
-        if (!pActor->Init()) {
-            delete pActor;
-            return nullptr;
-        }
-        return pActor;
-    }
-    // 负责进行Actor的信息注册
-    virtual int32 Install() {
-
-        return 0;
-    }
-    // 负责进行Actor的信息注销
-    virtual int32 UnInstall() {
-
-        return 0;
-    }
-};
-
-
-class ActorCreator
-{
-public:
-    ActorCreator() {}
-    ~ActorCreator() {}
-
-private:
-    static bool RegistActor(CActor* actor) {
-        if (!actor) {
-            return false;
-        }
-        auto it = m_mapActorType.find(actor->GetActorType());
-        if (it != m_mapActorType.end()) {
-            return false;
-        }
-        m_mapActorType[actor->GetActorType()] = actor;
-    }
-    static void SetCreateEnable(ActorType enActorType, bool bEnable){
-        auto it = m_mapActorType.find(enActorType);
-        if (it != m_mapActorType.end()) {
-            return ;
-        }
-        auto* pActor = it->second;
-        if (!pActor) {
-            return ;
-        }
-        pActor->SetCreateEnable(bEnable);
-    }
-
-public:
-    static CActor *Create(ActorType enActorType, ActorID i64ActorID, const std::string& strActorName) {
-        auto it = m_mapActorType.find(enActorType);
-        if (it == m_mapActorType.end()) {
-            return nullptr;
-        }
-        auto* pActor = it->second;
-        if (!pActor) {
-            return nullptr;
-        }
-        return pActor->Create(enActorType, i64ActorID, strActorName);
-    }
-
-private:
-    static CActorTypeMap m_mapActorType;
-};
+}
+*/
 

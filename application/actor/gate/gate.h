@@ -1,17 +1,12 @@
 ﻿#pragma once
 
 #include "xService/xService.h"
-
 #include "xActor/Actor.h"
+#include "xNet/xNetAgent.h"
+#include "xDatabase/xDatabaseDefine.h"
+#include "GateClient.h"
 
 #include "../ActorGlobalDefine.h"
-
-#include "xNet/xNetAgent.h"
-
-
-#include "xDatabase/xDatabaseDefine.h"
-
-#include "GateClient.h"
 
 
 class CGate : public CActor
@@ -24,21 +19,25 @@ private:
 
 
 public:
-
-
-public:
     virtual bool Init();
+
+    virtual bool Install() {
+
+        return true;
+    }
+
+    virtual bool UnInstall() {
+
+        return true;
+    }
 
 public:
     virtual int32 OnRegist() {
-
 
         return 0;
     }
 
     virtual int32 OnUnRegist() {
-
-
 
         return 0;
     }

@@ -23,18 +23,28 @@
 
 #include "xRpc/xRpc.h"
 
+#include "actor/ActorMgr.h"
+
 int main() {
     // 初始化日志系统
     xLog::get_mutable_instance().Init();
 
     // 调度器初始化
-    xSchedulerMgr::getMe().Init(4,4);
+#define CoroutineSchedulerCount 4 // 协程调度器数量
+#define SyncSchedulerCount 4 // 同步调度器数量
+    xSchedulerMgr::getMe().Init(CoroutineSchedulerCount, SyncSchedulerCount);
 
     //  链接到grpc服务器
+    SRpcService::getMe().Start(50051);
     CRpcService::getMe().ConnectToLocalServer("test_rpc", 6, 50051);
 
-    // 初始化rpc请求线程
+    // 初始化rpc请求线程 用于异步处理 function 执行
     RpcCallMgr::getMe().Init();
+
+
+
+    //CActorMgr::getMe().Install();
+
 
     {
         // 定义注册 service 100
@@ -70,7 +80,7 @@ int main() {
     int index5 = 5000000;
     while (true) {
         // 发送1000次消息
-        if (index1 < 2000000) {
+        if (index1 < 1000020) {
             {
                 PbMsg::LoginRequest* reqMsg = new PbMsg::LoginRequest();
                 PbMsg::LoginResponse* rspMsg = new PbMsg::LoginResponse();

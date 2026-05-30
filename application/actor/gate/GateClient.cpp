@@ -1,18 +1,17 @@
 ﻿#pragma once
 
-#include "Gate.h"
+#include "GateClient.h"
 
 
 
-
-uint64 OnAccept(tcp_socket& s) {
+NetCID GateClientOnAccept(void*, tcp_socket& s) {
 
 
     return 0;
 }
 
 
-void OnPackageCall(tcp_socket& s, uint64 u64CID, NetPackageSharedPtr pPackage) {
+void GateClientOnPackageCall(void*, tcp_socket& s, uint64 u64CID, NetPackageSharedPtr pPackage) {
 
     // 消息转发
 
@@ -24,14 +23,14 @@ void OnPackageCall(tcp_socket& s, uint64 u64CID, NetPackageSharedPtr pPackage) {
 
 }
 
-bool CGate::Init() {
+bool CGateClient::Init() {
     // 启动网络监听
     NetAgentConfigST stAgentConfig;
     stAgentConfig.strServiceName = "";
     stAgentConfig.strHost = "0.0.0.0";
     stAgentConfig.u16Port = 5261;
-    stAgentConfig.pAcceptCall = OnAccept;
-    stAgentConfig.pPackageCall = OnPackageCall;
+    stAgentConfig.pAcceptCall = GateClientOnAccept;
+    stAgentConfig.pPackageCall = GateClientOnPackageCall;
     stAgentConfig.u16CacheBuffSize = 1024;
     m_pNetAgent = new xNetAgent(stAgentConfig);
     m_pNetAgent->thread_start();

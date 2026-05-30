@@ -3,7 +3,7 @@
 #include "Gate.h"
 
 
-NetCID OnAccept(void *pParam, tcp_socket& s) {
+NetCID GateOnAccept(void *pParam, tcp_socket& s) {
     CGate* pGate = (CGate*)pParam;
 
 
@@ -12,7 +12,7 @@ NetCID OnAccept(void *pParam, tcp_socket& s) {
 }
 
 
-void OnPackageCall(void* pParam, tcp_socket& s, uint64 u64CID, NetPackageSharedPtr pPackage) {
+void GateOnPackageCall(void* pParam, tcp_socket& s, uint64 u64CID, NetPackageSharedPtr pPackage) {
     CGate* pGate = (CGate*)pParam;
 
     // 消息转发
@@ -30,8 +30,8 @@ bool CGate::Init() {
     stAgentConfig.strServiceName = "";
     stAgentConfig.strHost = "0.0.0.0";
     stAgentConfig.u16Port = 5261;
-    stAgentConfig.pAcceptCall = OnAccept;
-    stAgentConfig.pPackageCall = OnPackageCall;
+    stAgentConfig.pAcceptCall = GateOnAccept;
+    stAgentConfig.pPackageCall = GateOnPackageCall;
     stAgentConfig.u16CacheBuffSize = 1024;
     stAgentConfig.pParam = this;
     m_pNetAgent = new xNetAgent(stAgentConfig);

@@ -6,6 +6,7 @@
 #pragma warning(disable:4200)
 #pragma warning(disable:4355)
 #pragma warning(disable:4819)
+#pragma warning(disable:4251)
 #endif
 
 
@@ -50,7 +51,9 @@ typedef unsigned long       uint64;
 #include <windows.h>
 #define bzero(p1,p2) memset(p1,0,p2)
 #define bcopy(p1,p2,p3) memcpy((void*)p2,(void*)p1,p3)
-#define __attribute__(p) ;
+//#ifdef __attribute__
+//#define __attribute__(p) ;
+//#endif
 #define usleep(t) Sleep(t/1000)
 #endif
 
@@ -100,7 +103,10 @@ typedef unsigned long       uint64;
 #endif
 
 
+#define NATS_RESPONSE_BUFF_SIZE 65535
+
 typedef uint64 ServiceID;
+typedef int32 ActorType;
 
 
 #include "xErrorCode/xErrorCode.h"

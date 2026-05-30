@@ -40,7 +40,7 @@ public:
     }
 
 public:
-    void Resize(const int32& i32Len) {
+    void Resize(const uint32& i32Len) {
         if (i32Len > m_u32Len) {
             if (m_pData) {
                 delete[]m_pData; m_pData = nullptr;
@@ -66,11 +66,11 @@ public:
 
 
 // #define NatsRequestCall(const std::string& strSubject, google::protobuf::Message* reqMsg, google::protobuf::Message* respMsg)
-#define NatsRequestCall(strSubject, reqMsg, respMsg) {\
-    auto* pNatsCon = NatsConnPool::getMe().GetNatsConnect();\
+#define NatsRequestCall(strSubject, reqMsg, respMsg, status_) {\
+    auto* pNatsCon = NatsConnPool::getMe().getConnection();\
     STProtoSerializeData stReqData(reqMsg->ByteSize());\
     reqMsg->SerializeToArray(stReqData.GetBuffer(), stReqData.Capacity());\
-    STProtoSerializeData respData(65535);\
+    STProtoSerializeData respData(NATS_RESPONSE_BUFF_SIZE);\
     status_ = pNatsCon->RequestMsg("", stReqData.GetBuffer(), stReqData.Capacity(), respData.GetBuffer(), respData.MutableSize());\
     if (status_ == NATS_OK) {\
         request_->SerializeToArray(respData.GetBuffer(),respData.Size());\

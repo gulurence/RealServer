@@ -30,7 +30,7 @@ struct MarketDBOrderQueryData : public DatabaseTableCol
     void CleanUp() {
         bzero(this, sizeof(MarketDBOrderQueryData));
     }
-}__attribute__((packed));
+}/*__attribute__((packed))*/;
 #pragma pack()
 
 

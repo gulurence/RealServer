@@ -93,6 +93,12 @@ target_include_directories(engine PUBLIC
     ${SOURCE_DIR}   # 确保包含 engine 目录下的所有头文件
     ${CMAKE_SOURCE_DIR}/third_part  # 如果需要第三方库头文件
     ${CMAKE_SOURCE_DIR}/third_part/mysql-connector-c-6.1.11-winx64
+    ${CMAKE_SOURCE_DIR}/third_part/nats.c-main  # nats 头文件路径	
+    ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src   
+    ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src/sw/redis++/cxx17
+    ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src/sw/redis++/no_tls
+    ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src/sw/redis++/future
+    ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src/sw/redis++/future/boost
     #${CMAKE_SOURCE_DIR}/third_part/protobuf-3.19.2/src  # Protobuf 头文件路径
 )
 
