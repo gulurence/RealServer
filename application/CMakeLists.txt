@@ -35,10 +35,16 @@ file(GLOB X_ACTOR_PLAYER        "${SOURCE_DIR}/actor/player/*.h"            "${S
 file(GLOB X_ACTOR_PLAYER_DB     "${SOURCE_DIR}/actor/player/Database/*.h"   "${SOURCE_DIR}/actor/player/Database/*.cpp")
 file(GLOB X_ACTOR_PLAYER_LOGIC  "${SOURCE_DIR}/actor/player/Logic/*.h"      "${SOURCE_DIR}/actor/player/Logic/*.cpp")
 
+file(GLOB X_ACTOR_WORLD         "${SOURCE_DIR}/actor/world/*.h"             "${SOURCE_DIR}/actor/world/*.cpp")
+file(GLOB X_ACTOR_WORLD_DB      "${SOURCE_DIR}/actor/world/Database/*.h"    "${SOURCE_DIR}/actor/world/Database/*.cpp")
+file(GLOB X_ACTOR_WORLD_LOGIC   "${SOURCE_DIR}/actor/world/Logic/*.h"       "${SOURCE_DIR}/actor/world/Logic/*.cpp")
+file(GLOB X_ACTOR_WORLD_SRPC    "${SOURCE_DIR}/actor/world/SRpc/*.h"        "${SOURCE_DIR}/actor/world/SRpc/*.cpp")
+
 # handle
 file(GLOB X_HANDLE_GATE         "${SOURCE_DIR}/handle/gate/*.h"             "${SOURCE_DIR}/handle/gate/*.cpp")
 file(GLOB X_HANDLE_LOGIN        "${SOURCE_DIR}/handle/login/*.h"            "${SOURCE_DIR}/handle/login/*.cpp")
 file(GLOB X_HANDLE_PLAYER       "${SOURCE_DIR}/handle/player/*.h"           "${SOURCE_DIR}/handle/player/*.cpp")
+file(GLOB X_HANDLE_WORLD        "${SOURCE_DIR}/handle/world/*.h"            "${SOURCE_DIR}/handle/world/*.cpp")
 
 # 将所有源文件添加到一个变量中
 set(SOURCES
@@ -63,10 +69,15 @@ set(SOURCES
     ${X_ACTOR_PLAYER}
     ${X_ACTOR_PLAYER_DB}
     ${X_ACTOR_PLAYER_LOGIC}
+    ${X_ACTOR_WORLD}
+    ${X_ACTOR_WORLD_DB}
+    ${X_ACTOR_WORLD_LOGIC}
+    ${X_ACTOR_WORLD_SRPC}
     # handle
     ${X_HANDLE_GATE}
     ${X_HANDLE_LOGIN}
     ${X_HANDLE_PLAYER}
+    ${X_HANDLE_WORLD}
 )
 
 # 将源文件分组（在 Visual Studio 中显示为目录结构）
@@ -91,10 +102,15 @@ source_group("actor/login/logic"        FILES ${X_ACTOR_LOGIN_LOGIC})
 source_group("actor/player"             FILES ${X_ACTOR_PLAYER})
 source_group("actor/player/database"    FILES ${X_ACTOR_PLAYER_DB})
 source_group("actor/player/logic"       FILES ${X_ACTOR_PLAYER_LOGIC})
+source_group("actor/world"              FILES ${X_ACTOR_WORLD})
+source_group("actor/world/database"     FILES ${X_ACTOR_WORLD_DB})
+source_group("actor/world/logic"        FILES ${X_ACTOR_WORLD_LOGIC})
+source_group("actor/world/srpc"         FILES ${X_ACTOR_WORLD_SRPC})
 # handle
 source_group("handle/gate"              FILES ${X_HANDLE_GATE})
 source_group("handle/login"             FILES ${X_HANDLE_LOGIN})
 source_group("handle/player"            FILES ${X_HANDLE_PLAYER})
+source_group("handle/world"             FILES ${X_HANDLE_WORLD})
 
 # 生成静态库（.lib 和 .a 文件）
 if (MSVC)
@@ -114,6 +130,10 @@ target_include_directories(application PUBLIC
     ${CMAKE_SOURCE_DIR}/src/engine   # 确保包含 engine 目录下的所有头文件
     ${CMAKE_SOURCE_DIR}/third_part  # 如果需要第三方库头文件
     ${CMAKE_SOURCE_DIR}/third_part/mysql-connector-c-6.1.11-winx64
+    ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src    
+    ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src/sw/redis++/cxx17
+    ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src/sw/redis++/no_tls
+    ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src/sw/redis++/future
     ${CMAKE_CURRENT_SOURCE_DIR}/../source/proto-cpp/protocol
     #${CMAKE_SOURCE_DIR}/third_part/protobuf-3.19.2/src  # Protobuf 头文件路径
 )

@@ -58,7 +58,7 @@ void xSchedulerMgr::Init(uint32 u32CoroutineSchedulerCount, uint32 u32SyncSchedu
 
 void xSchedulerMgr::AddScheduler(ServiceScheduler* pScheduler) {
 
-    XERR("xSchedulerMgr::AddScheduler \n");
+    XINF("xSchedulerMgr::AddScheduler \n");
 
     if (pScheduler->GetSchedulerType() == SchedulerType_Coroutine && m_u32CoroutineSchedulerCount > 0) {
         m_i32AddThreadCoroutineIndex++;
@@ -75,14 +75,14 @@ void xSchedulerMgr::Stop() {
     for (uint32 i = 0; i < SchedulerType_Max; ++i) {
         if (i == SchedulerType_Coroutine) {
             if (m_u32CoroutineSchedulerCount > 0) {
-                for (int m = 0; m < m_u32CoroutineSchedulerCount; ++m) {
+                for (uint32 m = 0; m < m_u32CoroutineSchedulerCount; ++m) {
                     m_pSysSchedulerProcess[i][m].Stop();
                 }
             }
         }
         if (i == SchedulerType_Synchronous) {
             if (m_u32SyncSchedulerCount > 0) {
-                for (int m = 0; m < m_u32SyncSchedulerCount; ++m) {
+                for (uint32 m = 0; m < m_u32SyncSchedulerCount; ++m) {
                     m_pSysSchedulerProcess[i][m].Stop();
                 }
             }

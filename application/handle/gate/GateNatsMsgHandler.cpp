@@ -26,7 +26,7 @@ SchedulerTask TestNatsCall_1(EventScheduler* ptrEvent) {
     //std::this_thread::sleep_for(std::chrono::milliseconds(60));
 
     char pszLog[128] = { 0 };
-    sprintf(pszLog, "111 fun Req ServiceId:%ld,Index:%d", pService->Id(), pRequest->index());
+    sprintf(pszLog, "111 fun Req ServiceId:%lld,Index:%d", pService->Id(), pRequest->index());
     // 构造请求
     myservice::HelloRequest request;
     request.set_name(pszLog);

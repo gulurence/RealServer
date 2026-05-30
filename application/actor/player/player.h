@@ -10,17 +10,25 @@
 
 
 
-class CPlayer : public CActor
+class CActorPlayer : public CActor
 {
 public:
-    CPlayer(ActorID i64ActorID):CActor(ActorType_Player, i64ActorID, "ActorPlayer") { }
-    ~CPlayer(){}
+    CActorPlayer(ActorID i64ActorID):CActor(ActorType_Player, i64ActorID, "ActorPlayer") { }
+    ~CActorPlayer(){}
 
 private:
 
 
 public:
+    virtual bool Install() {
 
+        return true;
+    }
+
+    virtual bool UnInstall() {
+
+        return true;
+    }
 
 public:
     virtual bool Init() {
@@ -42,7 +50,7 @@ public:
     }
 
     virtual CActor* Create(ActorID i64ActorID) {
-        return new CPlayer(i64ActorID);
+        return new CActorPlayer(i64ActorID);
     }
 
 public:

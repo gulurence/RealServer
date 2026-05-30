@@ -22,12 +22,12 @@ void TestEventCall_(EventScheduler* ptrEvent) {
     auto* pResponse = (PbMsg::LoginResponse*)(ptrEvent->m_ptrEvent->Response());
 
 
-    std::cout << "TestEventCall_ begin service id:" << pService->Id() << " index:" << pRequest->index() << std::endl;
+    std::cout << "TestEventCall_000 begin service id:" << pService->Id() << " index:" << pRequest->index() << std::endl;
 
-    //std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 
-    std::cout << "TestEventCall_ end service id:" << pService->Id() << " index:" << pRequest->index() << std::endl;
+    std::cout << "TestEventCall_000 end service id:" << pService->Id() << " index:" << pRequest->index() << std::endl;
 }
 
 //

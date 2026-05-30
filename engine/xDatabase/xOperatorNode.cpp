@@ -22,7 +22,7 @@ bool DatabaseOpNode::OnCallLogic() {
     }
     XERR("DatabaseOpNode::OnCallLogic m_enOpType :%d", m_enOpType);
 
-    // 异步回调
+    // 寮傛鍥炶皟
     if (m_pDBOpCallBack) {
         m_pDBOpCallBack(bRet);
     }
@@ -45,7 +45,7 @@ bool DatabaseOpNode::onInsert() {
         uint64 ret = m_pDBConnPool->exeInsert(connID, m_strTableName.c_str(), (const dbCol *)m_pCol, (const uint8*)m_stData.mBuffer);
         m_pDBConnPool->putDBConn(connID);
         if (UInt64_MAX != ret) {
-            //XLOG("[保存数据],DatabaseOpNode::onInsert - tablename:%s,success", m_strTableName.c_str());
+            //XLOG("[淇濆瓨鏁版嵁],DatabaseOpNode::onInsert - tablename:%s,success", m_strTableName.c_str());
             return true;
         }
     }
@@ -111,12 +111,12 @@ bool DatabaseOpNode::onUpdate() {
         uint64 ret = m_pDBConnPool->exeUpdate(connID, m_strTableName.c_str(), (const dbCol *)m_pCol, (const uint8*)m_stData.mBuffer, m_strWhere.c_str());
         m_pDBConnPool->putDBConn(connID);
         if (UInt64_MAX != ret) {
-            //XLOG("[数据库操作],DatabaseOpNode::onUpdate - tableName:%s,where:%s.success", m_strTableName.c_str(), m_strWhere.c_str());
+            //XLOG("[鏁版嵁搴撴搷浣淽,DatabaseOpNode::onUpdate - tableName:%s,where:%s.success", m_strTableName.c_str(), m_strWhere.c_str());
             return true;
         }
     }
 
-    XERR("[数据库操作],DatabaseOpNode::onUpdate - tableName:%s,where:%s.fail", m_strTableName.c_str(), m_strWhere.c_str());
+    XERR("[鏁版嵁搴撴搷浣淽,DatabaseOpNode::onUpdate - tableName:%s,where:%s.fail", m_strTableName.c_str(), m_strWhere.c_str());
     return false;
 }
 

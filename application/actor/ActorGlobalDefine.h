@@ -18,6 +18,7 @@ enum EnActorType
     ActorType_Log       = 102,
 
     ActorType_Player    = 201,
+    ActorType_World     = 202,
 
 };
 

@@ -1,16 +1,12 @@
 ﻿#pragma once
 
 #include "xService/xService.h"
-
 #include "xActor/Actor.h"
-
+#include "xNet/xNetAgent.h"
+#include "xDatabase/xDatabaseDefine.h"
+#include "Database/LoginTableDefine.h"
 
 #include "../ActorGlobalDefine.h"
-
-
-#include "xNet/xNetAgent.h"
-
-
 
 
 
@@ -22,9 +18,16 @@ public:
 
 private:
 
-
 public:
+    virtual bool Install() {
 
+        return false;
+    }
+
+    virtual bool UnInstall() {
+
+        return false;
+    }
 
 public:
     virtual bool Init();
@@ -50,8 +53,6 @@ public:
 public:
     void Serialize(DatabaseTableCol* pColData) {
 
-
-
     }
 
     void UnSerialize(const DatabaseTableCol* pColData) {
@@ -59,7 +60,6 @@ public:
         MarketDBOrderQueryData* pData = (MarketDBOrderQueryData*)pColData;
 
         pData->orderid;
-
 
     }
 

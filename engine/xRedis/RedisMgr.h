@@ -8,6 +8,9 @@
 #include <condition_variable>
 #include <hiredis/hiredis.h>
 
+#include "sw/redis++/async_redis.h"
+#include "sw/redis++/redis_cluster.h"
+
 
 class CRedisPool
 {
@@ -40,7 +43,7 @@ private:
 typedef std::map<std::string, CRedisPool*> RedisPoolMap;
 
 // 链接池管理
-class CRedisPoolMgr : public xSingleton<CRedisPool>
+class CRedisPoolMgr : public xSingleton<CRedisPoolMgr>
 {
 public:
     CRedisPoolMgr(){}
@@ -54,3 +57,35 @@ public:
     CRedisCli* GetRedisCli(const std::string& strTitle);
 };
 
+typedef std::map<std::string, sw::redis::AsyncRedis*> AsyncRedisMap;
+typedef std::map<std::string, sw::redis::RedisCluster*> RedisClusterMap;
+
+class CRedisClusterMgr : public xSingleton<CRedisClusterMgr>
+{
+public:
+    CRedisClusterMgr(){}
+    ~CRedisClusterMgr(){}
+
+private:
+    RedisClusterMap m_mapRedis;
+
+public:
+    // "tcp://127.0.0.1:7000"
+    bool ConnectToCluster(const std::string &key, const std::string &url);
+    sw::redis::RedisCluster* GetConnect(const std::string& key);
+};
+
+class CRedisAsyncMgr : public xSingleton<CRedisAsyncMgr>
+{
+public:
+    CRedisAsyncMgr() {}
+    ~CRedisAsyncMgr() {}
+
+private:
+    AsyncRedisMap m_mapAsyncRedisCluster;
+
+public:
+    // "tcp://127.0.0.1:7000"
+    bool ConnectToAsyncRedis(const std::string& key, const std::string& url);
+    sw::redis::AsyncRedis* GetConnect(const std::string& key);
+};

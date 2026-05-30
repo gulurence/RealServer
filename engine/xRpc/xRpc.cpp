@@ -1,6 +1,5 @@
 ﻿#include "xRpc.h"
 
-
 void SRpcService::Start(uint16 u16Port) {
     m_u16Port = u16Port;
     char pszListenAddress[128] = { 0 };
@@ -12,6 +11,9 @@ void SRpcService::Start(uint16 u16Port) {
     m_pServicePtr = builder.BuildAndStart();
 
     std::cout << "Server listening on localhost:50051" << std::endl;
+
+    // 启动线程
+    thread_start();
 }
 
 void SRpcService::thread_proc() {
@@ -24,6 +26,10 @@ void SRpcService::thread_proc() {
 void SRpcService::RegistService(grpc::Service* pService) {
     builder.RegisterService(pService);
 }
+
+
+
+
 
 std::shared_ptr<grpc::Channel> CRpcService::GetChannel(const std::string& strServerName) {
     int32 index = 0;

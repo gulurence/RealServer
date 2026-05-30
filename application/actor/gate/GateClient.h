@@ -1,10 +1,8 @@
 ﻿#pragma once
 
 #include "xService/xService.h"
-
 #include "xNet/xNetAgent.h"
-
-
+#include "xActor/ActorDefine.h"
 
 
 
@@ -23,11 +21,7 @@ public:
     }
 
 public:
-    virtual bool Init() {
-
-
-        return true;
-    }
+    virtual bool Init();
 
 private:
     xNetAgent* m_pNetAgent = nullptr;
