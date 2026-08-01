@@ -1,0 +1,7 @@
+-- init.lua — Login actor config (prod)
+require("common.include")
+require("actors.login.login")
+require("actors.login.net_msg.include")
+require("actors.login.on_event.include")
+require("actors.login.on_rpc.include")
+xEngine.Log.info("[Login:prod] ready")

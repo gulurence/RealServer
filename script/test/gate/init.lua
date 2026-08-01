@@ -1,0 +1,7 @@
+-- init.lua — Gate actor config (test)
+require("common.include")
+require("actors.gate.gate")
+require("actors.gate.net_msg.include")
+require("actors.gate.on_event.include")
+require("actors.gate.on_rpc.include")
+xEngine.Log.info("[Gate:test] ready")
