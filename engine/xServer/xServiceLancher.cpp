@@ -1,4 +1,4 @@
-﻿
+
 #include "xServiceLancher.h"
 
 

@@ -1,4 +1,4 @@
-﻿#include "xTools.h"
+#include "xTools.h"
 #include "xXMLParser.h"
 
 
@@ -9,22 +9,22 @@ bool Tools::initGlobal()
     xXMLParser p;
     if (!p.parseDoc("config.xml"))
     {
-        XERR("[Tools]闁瑰灚鎸哥槐鎴︽煀瀹ュ洨鏋傚鎯扮簿鐟?config.xml");
+        XERR("[Tools] Failed to parse config.xml");
         return false;
     }
-    XDBG("[Tools] 闁告梻濮惧ù?config.xml");
+    XDBG("[Tools] Loaded config.xml");
 
     xmlNodePtr root = p.getRoot();
     if (!root)
     {
-        XERR("[Tools] 闂佹澘绉堕悿鍡涘棘閸ワ附顐介梺鎸庣懆椤?婵炲备鍓濆﹢涔簅ot闁煎搫鍊婚崑?");
+        XERR("[Tools] XML root node not found");
         return false;
     }
 
     xmlNodePtr globalNode = p.getChild(root,"global");
     if (!globalNode)
     {
-        XERR("[Tools] 婵炲备鍓濆﹢涔琹obal闁煎搫鍊婚崑?");
+        XERR("[Tools] Global node not found");
         return false;
     }
     std::string ss;
@@ -38,7 +38,7 @@ bool Tools::initGlobal()
             XDBG("[global] %s, %s", (char *)node->name, ss.c_str());
         }
         //else
-            //XERR("[global] %s 婵炲备鍓濆﹢?value 闁煎搫鍊婚崑?, (char *)node->name);
+            //XERR("[global] %s missing value attribute", (char *)node->name);
 
         node = p.getNext(node);
     }
@@ -74,7 +74,7 @@ uint32 split(std::string str,std::string pattern,std::vector<std::string> &resul
 {
     std::string::size_type pos;
     //std::vector<std::string> result;
-    str+=pattern;//闁圭鏅涢惈宥団偓娑欘殘椤戜焦绋夐煫顓濈鞍闁哄倿鈧稓鈹掗柟鍨С缂?
+    str+=pattern; // append separator pattern
     size_t size=str.size();
 
     for(size_t i=0; i<size; i++)

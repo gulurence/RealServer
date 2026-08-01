@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "ShareMemAO.h"
 #include "xLog/xLog.h"

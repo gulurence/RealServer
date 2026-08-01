@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "xLog/xLog.h"
 
@@ -34,9 +34,7 @@ inline void* constructInPlace(T* p)
 }
 */
 
-#define SAFE_DELETE(p) do {delete p; p = NULL;} while(false)
-
-#define SAFE_DELETE_VEC(p) do {delete[] p; p = NULL;} while(false)
+// SAFE_DELETE / SAFE_DELETE_VEC moved to xDefine.h to break circular include
 
 inline void SAFE_CLOSE_SOCKET(int& fd) {
     //XDBG("[Socket]close %d", fd);

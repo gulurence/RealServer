@@ -1,4 +1,4 @@
-﻿#include "xDBConnPool.h"
+#include "xDBConnPool.h"
 
 #include "../xBase/xTools.h"
 #include "../xBase/xXMLParser.h"
@@ -36,7 +36,7 @@ bool DBConn::reconnect(const char *server, const char *user, const char *passwor
 {
     if (mysql_ping(mysql)) 
     {
-//        mysql_close(mysql); // 鍏堝叧闂潪姝ｅ父杩炴帴
+//        mysql_close(mysql); // close abnormal connection first
 
         if (!mysql_real_connect(mysql, server, user, password, database, 0, NULL, 0))
         {
@@ -522,7 +522,7 @@ uint64 DBConn::exeSelect(const char *tableName, const dbCol *column, unsigned ch
 #endif
             if (MAX_DBDATA_SIZE <= count)
             {   
-                XERR("[MYSQL],%s鏌ヨ鏁版嵁澶у皬瓒呰繃闄愬埗!",tableName);
+                XERR("[MYSQL] %s query data size exceeds limit!",tableName);
                 SAFE_DELETE_VEC(*data);
                 mysql_free_result(res);   
                 return DBErrReturn;
@@ -573,7 +573,7 @@ uint64 DBConn::exeSelect(const char *tableName, const dbCol *column, unsigned ch
                         count += lengths[i];
                         if (MAX_DBDATA_SIZE <= count)
                         {   
-                            XERR("[MYSQL],%s鏌ヨ鏁版嵁澶у皬瓒呰繃闄愬埗!",tableName);
+                            XERR("[MYSQL] %s query data size exceeds limit!",tableName);
                             SAFE_DELETE_VEC(*data);
                             mysql_free_result(res);   
                             return DBErrReturn;
@@ -647,7 +647,7 @@ uint64 DBConn::exeSelectEx(const char *tableName, const dbCol *column, unsigned 
 #endif
             if (MAX_DBDATA_SIZE <= count)
             {
-                XERR("[MYSQL],%s鏌ヨ鏁版嵁澶у皬瓒呰繃闄愬埗!", tableName);
+                XERR("[MYSQL] %s query data size exceeds limit!", tableName);
                 //SAFE_DELETE_VEC(*data);
                 mysql_free_result(res);
                 return DBErrReturn;
@@ -698,7 +698,7 @@ uint64 DBConn::exeSelectEx(const char *tableName, const dbCol *column, unsigned 
                 count += lengths[i];
                 if (MAX_DBDATA_SIZE <= count)
                 {
-                    XERR("[MYSQL],%s鏌ヨ鏁版嵁澶у皬瓒呰繃闄愬埗!", tableName);
+                    XERR("[MYSQL] %s query data size exceeds limit!", tableName);
                     //SAFE_DELETE_VEC(*data);
                     mysql_free_result(res);
                     return DBErrReturn;

@@ -1,10 +1,12 @@
-﻿#pragma once
+#pragma once
 
 #include "xDefine.h"
 
 #include <libxml/parser.h>
-#include <libxml/encoding.h>
-#include <iconv.h>
+// iconv_t is used privately; real <iconv.h> included in .cpp
+#ifndef _ICONV_H
+typedef void* iconv_t;
+#endif
 
 
 //XML婢跺嫮鎮?
@@ -44,11 +46,11 @@ public:
         char *conv = (char *) xmlMalloc(len);
         if (0==code_convert("UTF-8", "GBK", (char *)utf, xmlStrlen(utf), conv, len))
         {
-            //        XDBG("xml 鏉烆剛鐖滈崥?%s size:%u", conv, xmlStrlen(utf));
+            //        XDBG("xml converted: %s size:%u", conv, xmlStrlen(utf));
             bcopy(conv, (void *)utf, (size_t)xmlStrlen(utf));
         }
         else
-        XERR("xml 鏉烆剛鐖滄径杈Е... %s", name);
+        XERR("xml conversion error: %s", name);
 
         std::stringstream ss((char *)conv);
 

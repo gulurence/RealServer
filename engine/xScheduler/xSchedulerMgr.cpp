@@ -1,5 +1,6 @@
-﻿
+
 #include "xSchedulerMgr.h"
+#include "xLog/xLog.h"
 
 
 
@@ -13,6 +14,8 @@ xSchedulerMgr::~xSchedulerMgr() {
 }
 
 void xSchedulerMgr::Init(uint32 u32CoroutineSchedulerCount, uint32 u32SyncSchedulerCount) {
+    XLOG("[INIT] SchedulerMgr starting: coroutine=%u sync=%u",
+         u32CoroutineSchedulerCount, u32SyncSchedulerCount);
 
     m_u32CoroutineSchedulerCount = u32CoroutineSchedulerCount;
     m_u32SyncSchedulerCount = u32SyncSchedulerCount;
@@ -54,6 +57,9 @@ void xSchedulerMgr::Init(uint32 u32CoroutineSchedulerCount, uint32 u32SyncSchedu
             }
         }
     }
+
+    XLOG("[INIT] SchedulerMgr ready: %u coroutine + %u sync threads started",
+         m_u32CoroutineSchedulerCount, m_u32SyncSchedulerCount);
 }
 
 void xSchedulerMgr::AddScheduler(ServiceScheduler* pScheduler) {

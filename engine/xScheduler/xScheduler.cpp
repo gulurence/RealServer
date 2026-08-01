@@ -1,4 +1,4 @@
-﻿
+
 #include "xScheduler.h"
 #include "xService/xService.h"
 #include "xSchedulerMgr.h"

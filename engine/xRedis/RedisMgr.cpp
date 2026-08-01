@@ -1,10 +1,12 @@
-﻿#include "RedisMgr.h"
+#include "RedisMgr.h"
 #include "xBase/xXMLParser.h"
-//#include "xSConnect/SStartConfig.h"
+// Temporarily disabled: async redis requires libuv which is not available
+// #include "sw/redis++/async_redis.h"
+// #include "sw/redis++/redis_cluster.h"
 
 
-CRedisPool::CRedisPool(const RedisConfigST& cfg) : m_stConfig_(cfg) {
-    for (int i = 0; i < cfg.max_conn / 2; ++i) { // 初始创建半数连接‌:ml-citation{ref="3" data="citationList"}
+CRedisPool::CRedisPool(const ThridRedisConfig& cfg) : m_stConfig_(cfg) {
+    for (int i = 0; i < cfg.max_conn / 2; ++i) { // 初始创建半数连接
         CreateConnection();
     }
 }
@@ -35,13 +37,13 @@ CRedisCli* CRedisPool::GetConnection() {
             auto* pConn = CreateConnection();
             if (pConn) m_qPool_.push(pConn);
         }
-        m_condCv_.wait_for(lk, std::chrono::seconds(m_stConfig_.retry_interval)); // ‌:ml-citation{ref="8" data="citationList"}
+        m_condCv_.wait_for(lk, std::chrono::seconds(m_stConfig_.retry_interval));
     }
 
     auto* pConn = m_qPool_.front();
     m_qPool_.pop();
 
-    if (!Validate(pConn)) {       // 失效连接重建‌:ml-citation{ref="2,3" data="citationList"}
+    if (!Validate(pConn)) {       // 失效连接重建
         delete pConn;
         //redisFree(pConn);
         pConn = CreateConnection();
@@ -61,17 +63,17 @@ void CRedisPool::ReleaseConnection(CRedisCli* pConn) {
     std::lock_guard<std::mutex> lk(m_mLock_);
 
     if (Validate(pConn)) {
-        m_qPool_.push(pConn);  // 有效连接回池‌:ml-citation{ref="1" data="citationList"}
+        m_qPool_.push(pConn);  // 有效连接回池
     }
     else {
         delete pConn;
-        //redisFree(pConn);    // 失效连接销毁‌:ml-citation{ref="2" data="citationList"}
+        //redisFree(pConn);    // 失效连接销毁
     }
     m_condCv_.notify_one();
 }
 
 
-bool CRedisPoolMgr::ConnectToRedis(const RedisConfigST& stConfig) {
+bool CRedisPoolMgr::ConnectToRedis(const ThridRedisConfig& stConfig) {
     if (stConfig.title.empty()) {
         XERR("CRedisPoolMgr::ConnectToRedis titile is empty !!!");
         return false;
@@ -97,49 +99,9 @@ CRedisCli* CRedisPoolMgr::GetRedisCli(const std::string& strTitle) {
 
 
 
-#include <sw/redis++/redis++.h>
-#include <sw/redis++/async_redis++.h>
-#include <iostream>
-
-int test_main() {
-    try {
-        sw::redis::AsyncRedis redis("tcp://127.0.0.1:6379");
-
-        //redis.set("async_key", "async_value", [](const sw::redis::Error* err) {
-        //    if (err) {
-        //        std::cerr << "Error: " << err->what() << std::endl;
-        //        return false;
-        //    }
-        //    else {
-        //        std::cout << "Set successfully!" << std::endl;
-        //        return true;
-        //    }
-        //});
-
-        //redis.get("async_key", [](const sw::redis::Error* err, const std::optional<std::string>& val) {
-        //    if (err) {
-        //        std::cerr << "Error: " << err->what() << std::endl;
-        //    }
-        //    else if (val) {
-        //        std::cout << "Get value: " << *val << std::endl;
-        //    }
-        //    else {
-        //        std::cout << "Key not found" << std::endl;
-        //    }
-        //});
-
-        // 等待异步操作完成
-        //redis.wait();
-    }
-    catch (const sw::redis::Error& e) {
-        std::cerr << "Redis error: " << e.what() << std::endl;
-        return 1;
-    }
-    return 0;
-}
 
 
-
+#if 0 // Temporarily disabled: async redis requires libuv
 bool CRedisClusterMgr::ConnectToCluster(const std::string& key, const std::string& url) {
     if (key.empty()) {
         XERR("CRedisClusterMgr::ConnectToCluster key.empty()");
@@ -192,3 +154,4 @@ sw::redis::AsyncRedis* CRedisAsyncMgr::GetConnect(const std::string& key) {
     }
     return it->second;
 }
+#endif // Temporarily disabled: async redis requires libuv

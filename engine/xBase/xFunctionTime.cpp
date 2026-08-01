@@ -1,4 +1,4 @@
-﻿#include <time.h>
+#include <time.h>
 #include "xFunctionTime.h"
 #include "xLog/xLog.h"
 
@@ -23,7 +23,7 @@ void xFunctionTime::reset(const bool force_print)
                         it->second.__total_time / 1000000L, it->second.__times, 
                         it->second.__total_time / 1000000L / it->second.__times);
                 // */
-                //XDBG("[閸戣姤鏆熼弮鍫曟？缂佺喕顓竇閸︽澘娼?%llx, %llu瀵邦喚顫? %u濞? %u瀵邦喚顫?濞? ", it->first, 
+                //XDBG("[？︽%llx, %llu %u %u ", it->first, 
                 //        it->second.__total_time / 1000L, it->second.__times, 
                 //        it->second.__total_time / 1000L / it->second.__times);
             }

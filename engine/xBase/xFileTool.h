@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "xDefine.h"
 
@@ -105,9 +105,9 @@ inline std::string GMakeCurProcessRelativePathEx(const std::string &basePath, co
     std::string mLauncherBasePath;
     mLauncherBasePath = basePath;
     mLauncherBasePath = mLauncherBasePath.substr(0, mLauncherBasePath.rfind('\\') + 1);
-    // 缂佹繂顕捄顖氱窞閸滃瞼娴夌€电鐭惧鍕閸掗绔寸挧?
+    // Append relative path to launcher base
     mLauncherBasePath = mLauncherBasePath + relativePath;
-    // 閸樼粯甯€鐠侯垰绶炴稉顓犳畱閻╃顕捄顖氱窞 ".." 閸?"."
+    // Normalize path: resolve ".." and "."
     return GMakePathToSort(mLauncherBasePath);
 #else
     
@@ -126,10 +126,10 @@ inline bool GSetProcessRunPath(const char * pszPath) {
 
     if (!SetCurrentDirectoryA(pszPath)) {
         char tempLog[512] = { 0 };
-        sprintf_s(tempLog, "[%s] 鐠佸墽鐤嗛幍褑顢戦惄顔肩秿闁挎瑨顕?!!!\n", pszPath);
+        sprintf_s(tempLog, "[%s] Failed to set working directory!!!\n", pszPath);
         wchar_t tchar[512] = { 0 };
         MultiByteToWideChar(CP_ACP, 0, tempLog, -1, tchar, 256 * sizeof(TCHAR));
-        //MessageBox(nullptr, tchar, "閹绘劗銇?!! ", 0);
+        //MessageBox(nullptr, tchar, "Error!!!", 0);
         return false;
     }
 

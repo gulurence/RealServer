@@ -1,4 +1,4 @@
-﻿#include "RedisCli.h"
+#include "RedisCli.h"
 
 
 CRedisCli::CRedisCli() {

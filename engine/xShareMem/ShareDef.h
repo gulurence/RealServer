@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 
 typedef    unsigned long        SM_KEY;

@@ -1,9 +1,10 @@
-﻿#pragma once
+#pragma once
 
 #include "xDBConnPool.h"
 #include "xBase/xSingleton.h"
 #include "xOperatorNode.h"
 #include "xDatabaseDefine.h"
+#include "tService/tThridServiceConfig.h"
 
 
 class COperatorMgr : public xSingleton<COperatorMgr>
@@ -17,7 +18,7 @@ public:
     void PushOperatorNode(DatabaseOpNode* pNode);
 
 public:
-    bool ConnectToDB(const DBConfigST& stConfig);
+    bool ConnectToDB(const ThridMysqlConfig& stConfig);
     bool PushOperator(DatabaseOpNode* pNode);
 
 public:
@@ -29,4 +30,3 @@ private:
 private:
     DBOperatorMap m_mapDBOperator;
 };
-

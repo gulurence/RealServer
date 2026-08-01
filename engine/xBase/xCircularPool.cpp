@@ -1,4 +1,4 @@
-﻿#include "xCircularPool.h"
+#include "xCircularPool.h"
 
 
 

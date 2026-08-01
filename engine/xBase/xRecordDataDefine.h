@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "xDefine.h"
 #include "xObjPool.h"
@@ -9,6 +9,7 @@
 struct RecordDataST : public xObjPoolBase
 {
 public:
+    RecordDataST() : m_i32Type(0), m_i64Id(0), m_i32DataLen(0), m_pData(nullptr), m_i32Capacity(0) {}
     RecordDataST(const int32& i32Len, const char* pData) {
         m_i32DataLen = i32Len;
         m_i32Capacity = i32Len;

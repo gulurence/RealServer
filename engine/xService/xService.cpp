@@ -1,4 +1,4 @@
-﻿
+
 #include "xService.h"
 
 #include "xBase/xXMLParser.h"

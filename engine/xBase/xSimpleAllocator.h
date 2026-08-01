@@ -1,20 +1,16 @@
-﻿/********************************************************************
-            Copyright (c) 2009, XXXXXX鐠侊紕鐣婚張铏诡潠閹垛偓閼测€插敜閺堝妾洪崗顒€寰?
+/********************************************************************
+            Copyright (c) 2009, XXXXXX
                    All rights reserved
 
-    閸掓稑缂撻弮銉︽埂閿?2009楠?2閺?0閺?10閺?5閸?
-    閺傚洣娆㈤崥宥囆為敍?SimpleAllocator.h
-    鐠?   閺勫函绱?缁犫偓閸楁洜娈戦崘鍛摠閸掑棝鍘ら崳?
-                濞? 鐎圭偟骞囬崣鍌濃偓鍐х啊Tom Gambill, NCsoft閻ㄥ嫯顔曠拋鈽呯礉楠炶泛婀崗璺虹唨绾偓娑撳﹨绻樼悰?
-                    娴滃棔绱崠鏍ф嫲娣囶喗顒?
+    文件名: SimpleAllocator.h
+    功能: 简单内存分配器，基于块式策略进行内存管理
+          参考: Tom Gambill, NCsoft 的内存池实现
 
-    瑜版挸澧犻悧鍫熸拱閿?1.00
-    娴?   閼板拑绱?
-    濮?   鏉╁府绱?閸掓稑缂?
+    版本: 1.00
+    创建: 2009-12-05
 
-    瑜版挸澧犻悧鍫熸拱閿?1.01
-    娴?   閼板拑绱?
-    濮?   鏉╁府绱?婢х偛濮炴径姘卞殠缁嬪鍞寸€涙ê鍨庨柊宥呮珤閿涙瓉TSimpleAllocator
+    版本: 1.01
+    更新: 增加 MTSimpleAllocator 线程安全变体
 *********************************************************************/
 #pragma once
 
@@ -23,8 +19,8 @@
 using namespace std;
 
 template <
-    typename T,              // 閸愬懎鐡ㄩ崚鍡涘帳閻ㄥ嫮琚崹?
-    size_t blocksPerBatch    // 濮ｅ繑顐煎鈧潏鐔奉樋鐏忔垳閲淭閸愬懎鐡ㄧ粚娲？
+    typename T,              // 
+    size_t blocksPerBatch    // 
 >
 class SimpleAllocator
 {
@@ -38,17 +34,17 @@ public:
 
     ~SimpleAllocator();
 
-    // 閻㈠疇顕稉鈧稉鐚呮径褍鐨惃鍕敶鐎涙鈹栭梻?
+    // 分配一个新的对象块
     T* allocateBlock();
-    // 闁插﹥鏂?
+    // 释放对象块
     void releaseBlock(T* pBlock);
 
 private:
-    // 閻劋绨€涙ê鍋嶉悽瀹狀嚞閸掓壆娈慣缁屾椽妫?
+    // 对象向量：存储所有分配的对象
     TVector objectVector;
-    // 閻劋绨€涙ê鍋嶉悽瀹狀嚞閸掓壆娈戠粚娲？閸︽澘娼冮敍灞肩┒娴滃酣鍣撮弨?
+    // 批次向量：存储已分配的批次
     ByteVector batchVector;
-    // 鐠佹澘缍嶆稉瀣╃娑撶寘閻㈠疇顕惃鍕秴缂?
+    // 下一个可用对象索引
     size_t nextAllocation;
 };
 
@@ -91,8 +87,8 @@ T* SimpleAllocator<T, blocksPerBatch>::allocateBlock() {
 }
 
 template <
-    typename T,              // 閸愬懎鐡ㄩ崚鍡涘帳閻ㄥ嫮琚崹?
-    size_t blocksPerBatch    // 濮ｅ繑顐煎鈧潏鐔奉樋鐏忔垳閲淭閸愬懎鐡ㄧ粚娲？
+    typename T,              // 分配的对象类型
+    size_t blocksPerBatch    // 每次分配的块数量
 >
 class MTSimpleAllocator
 {
@@ -106,19 +102,19 @@ public:
 
     ~MTSimpleAllocator();
 
-    // 閻㈠疇顕稉鈧稉鐚呮径褍鐨惃鍕敶鐎涙鈹栭梻?
+    // 分配一个新的对象块（线程安全）
     T* allocateBlock();
-    // 闁插﹥鏂?
+    // 释放对象块（线程安全）
     void releaseBlock(T* pBlock);
 
 private:
-    // 閻劋绨€涙ê鍋嶉悽瀹狀嚞閸掓壆娈慣缁屾椽妫?
+    // 对象向量：存储所有分配的对象
     TVector objectVector;
-    // 閻劋绨€涙ê鍋嶉悽瀹狀嚞閸掓壆娈戠粚娲？閸︽澘娼冮敍灞肩┒娴滃酣鍣撮弨?
+    // 批次向量：存储已分配的批次
     ByteVector batchVector;
-    // 鐠佹澘缍嶆稉瀣╃娑撶寘閻㈠疇顕惃鍕秴缂?
+    // 下一个可用对象索引
     size_t nextAllocation;
-    // 闁?
+    // 临界区锁（保证线程安全）
     SynLock::CCriticalSection cslocker;
 };
 

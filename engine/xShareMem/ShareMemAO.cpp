@@ -1,4 +1,4 @@
-﻿#include "ShareMemAO.h"
+#include "ShareMemAO.h"
 #include "ShareMemAPI.h"
 #include "xLog/xLog.h"
 

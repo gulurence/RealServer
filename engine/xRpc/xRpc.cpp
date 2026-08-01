@@ -1,16 +1,22 @@
-﻿#include "xRpc.h"
+#include "xRpc.h"
+#include "xLog/xLog.h"
 
 void SRpcService::Start(uint16 u16Port) {
     m_u16Port = u16Port;
     char pszListenAddress[128] = { 0 };
-    sprintf_s(pszListenAddress, 100, "localhost:%d", m_u16Port);
-    // 设置服务器监听地址（例如 localhost:50051）
+    snprintf(pszListenAddress, 100, "localhost:%d", m_u16Port);
+    XLOG("[INIT] gRPC server binding to %s", pszListenAddress);
+
     builder.AddListeningPort(pszListenAddress, grpc::InsecureServerCredentials());
 
     // 构建并启动服务器
     m_pServicePtr = builder.BuildAndStart();
-
-    std::cout << "Server listening on localhost:50051" << std::endl;
+    if (m_pServicePtr) {
+        XLOG("[INIT] gRPC server started on port %u", m_u16Port);
+    } else {
+        XERR("[INIT] gRPC server failed to start on port %u", m_u16Port);
+        return;
+    }
 
     // 启动线程
     thread_start();
@@ -25,6 +31,7 @@ void SRpcService::thread_proc() {
 
 void SRpcService::RegistService(grpc::Service* pService) {
     builder.RegisterService(pService);
+    XLOG("[INIT] gRPC service registered");
 }
 
 
@@ -58,16 +65,19 @@ bool CRpcService::ConnectToServer(const std::string& strServerName, int32 i32Poo
     m_mapChannelSize[strServerName] = std::make_pair(i32PoolCount,0);
 
     char pszListenAddress[128] = { 0 };
-    sprintf_s(pszListenAddress, 100, "%s:%d", strIp.c_str(), u16Port);
+    snprintf(pszListenAddress, 100, "%s:%d", strIp.c_str(), u16Port);
+    XLOG("[INIT] RPC client connecting to %s (%s) x%d channels",
+         strServerName.c_str(), pszListenAddress, i32PoolCount);
+
     for (int i = 0;i< i32PoolCount;++i) {
         auto channelPtr = grpc::CreateChannel(pszListenAddress, grpc::InsecureChannelCredentials());
         if (channelPtr) {
             m_mapChannel[strServerName].push_back(channelPtr);
-        } else {
-
         }
     }
 
+    XLOG("[INIT] RPC client '%s' ready: %zu channels",
+         strServerName.c_str(), m_mapChannel[strServerName].size());
     return true;
 }
 
@@ -79,15 +89,18 @@ bool CRpcService::ConnectToLocalServer(const std::string& strServerName, int32 i
     m_mapChannelSize[strServerName] = std::make_pair(i32PoolCount, 0);
 
     char pszListenAddress[128] = { 0 };
-    sprintf_s(pszListenAddress, 100, "localhost:%d", u16Port);
+    snprintf(pszListenAddress, 100, "localhost:%d", u16Port);
+    XLOG("[INIT] RPC client connecting to %s (%s) x%d channels",
+         strServerName.c_str(), pszListenAddress, i32PoolCount);
 
     for (int i = 0; i < i32PoolCount; ++i) {
         auto channelPtr = grpc::CreateChannel(pszListenAddress, grpc::InsecureChannelCredentials());
         if (channelPtr) {
             m_mapChannel[strServerName].push_back(channelPtr);
-        } else {
         }
     }
+    XLOG("[INIT] RPC client '%s' ready: %zu channels",
+         strServerName.c_str(), m_mapChannel[strServerName].size());
     return true;
 }
 
@@ -108,8 +121,10 @@ void RpcCallMgr::AddCall(OnEventRpcCallBack pCall) {
 }
 
 void RpcCallMgr::Init() {
+    XLOG("[INIT] RpcCallMgr starting async RPC thread");
     std::thread t(RpcCallProcess, this);
     t.detach();
+    XLOG("[INIT] RpcCallMgr async RPC thread started");
 }
 
 OnEventRpcCallBack RpcCallMgr::PopCall() {

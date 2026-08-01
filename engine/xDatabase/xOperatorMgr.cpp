@@ -1,4 +1,4 @@
-﻿#include "xOperatorMgr.h"
+#include "xOperatorMgr.h"
 
 
 DatabaseOpNode* COperatorMgr::PopOperatorNode() {
@@ -10,15 +10,15 @@ void COperatorMgr::PushOperatorNode(DatabaseOpNode* pNode) {
     m_pDatabaseOpNodePool.DeleteObj(pNode);
 }
 
-bool COperatorMgr::ConnectToDB(const DBConfigST& stConfig) {
+bool COperatorMgr::ConnectToDB(const ThridMysqlConfig& stConfig) {
     auto it = m_mapDBOperator.find(stConfig.title);
     if (it != m_mapDBOperator.end()) {
         XWRN("COperatorMgr::ConnectToDB have same connect pool [title:%s] !!!", stConfig.title.c_str());
         return false;
     }
     auto* pConnect = new DBOperator();
-    if (!pConnect->Init(stConfig.host.c_str(), stConfig.port, stConfig.name.c_str(), stConfig.user.c_str(), stConfig.passwd.c_str(), stConfig.poolCount)) {
-        XWRN("COperatorMgr::ConnectToDB pConnect->init error [title:%s,host:%s,port:%d,name:%s,user:%s,passwd:%s,poolCount:%d] !!!", stConfig.title.c_str(), stConfig.host.c_str(), stConfig.port, stConfig.name.c_str(), stConfig.user.c_str(), stConfig.passwd.c_str(), stConfig.poolCount);
+    if (!pConnect->Init(stConfig.host.c_str(), stConfig.port, stConfig.dbName.c_str(), stConfig.user.c_str(), stConfig.passwd.c_str(), stConfig.poolCount)) {
+        XWRN("COperatorMgr::ConnectToDB pConnect->init error [title:%s,host:%s,port:%d,dbName:%s,user:%s,passwd:%s,poolCount:%d] !!!", stConfig.title.c_str(), stConfig.host.c_str(), stConfig.port, stConfig.dbName.c_str(), stConfig.user.c_str(), stConfig.passwd.c_str(), stConfig.poolCount);
         return false;
     }
     m_mapDBOperator[stConfig.title] = pConnect;
@@ -38,4 +38,3 @@ bool COperatorMgr::PushOperator(DatabaseOpNode* pNode) {
     pDBOperator->PushOperator(pNode);
     return true;
 }
-

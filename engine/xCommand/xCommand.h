@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "../xBase/xTools.h"
 #include "../xCommand/xMsgToolMac.h"
@@ -50,9 +50,9 @@ struct xCommand
  *  <nid>濞戞挾顕癷d濞戞挸顑囧▓鎴犫偓娑欏姌婵☆參鎮欑粵鐧查柨娑樼灱濞村宕ョ€圭杯d濞戞挻姊诲ù澶愬触鐎圭剾d妤犵偞婀圭粭鏉梚d濞戞挸绉撮幃鎾寸閿濆牄鈧啴鎯勭粙鎸庡€辩紓鍥ュ€楃划宥嗙▔椤撶姵鐣遍悗娑欏姌婵☆參鎮欑憴鍕疀闁告柡鈧櫕鐝?
  *
  */
-// 闁哄牃鍋撳鍫嗗懏鐣遍柕鍡樺姇閻℃瑩鎳為崒婊冧化闁哄牆绉存慨鐔煎闯閵婏絺鍋?濞寸姰鍎卞?闁靛棙鍔掔粭澶屾暜閿曗偓閻℃瑩鎳為崒婊冧化闁汇劌瀚懙鎴ｇ疀閸愵厼螡闁绘劘顫夊﹢鍥礉閳ヨ櫕鐝ら柕?sid
+// 
 #define CENTER_SERVER_CHILD_MAX_SID 80
-// 閻㈩垽绠戦悺娆撴嚍閸屾粌浠柣銊ュ閼垫垼绠涢崘顓炍濋柣鎰暉id闊洤鎳橀妴蹇斿緞瑜岀花顒佺▔鐎ｎ喗妗ㄩ悗瑙勭煯缁?
+// 
 #define CENTER_SERVER_BASE_SID 100
 struct SGUID_UINT32
 {
@@ -113,28 +113,28 @@ public:
     }
 
 public:
-    // 闁哄嫷鍨伴幆渚€寮伴娑欑疀闁告柡鈧櫕鐝ょ紒顐ヮ嚙閻庣兘姊块崱娆忓弮濞戞搩鍙冨Λ鍧楁嚍閸屾粌浠?
+    // 
     bool isSCenter() const {
         return ID._data.sid > CENTER_SERVER_BASE_SID || getNodeID() == 0;
     }
     uint32 getSGUID() const {
         return ID.u32Data;
     }
-    // 闁哄牆绉存慨鐔煎闯閵娧嗩潶闁?闁糕晞娅ｉ、鍖
+    // 
     uint32 getServerID() const {
         return ID._data.sid;
     }
-    // 闂傚棗妫涢崗顢疍
+    // 
     uint32 getGroupID() const {
         return (uint16)ID._data.gid;
     }
-    // 闂傚棗妫涢崗銏ゆ嚍閸屾粌浠疘D
+    // 
     uint32 getNodeID() const {
         return (uint8)ID._data.nid;
     }
 
 public:
-    // 閺夌儐鍓氬畷鏌ュ礆?SGUID_UINT32
+    // ュSGUID_UINT32
     static SGUID_UINT32 ToSGUID(const int &guid) {
         SGUID_UINT32 stSGUID(guid);
         return stSGUID;
@@ -150,20 +150,20 @@ public:
 // save route info
 struct RouteInfo
 {
-    // 闁告瑯鍨禍鎺旀崉椤栨粍鏆犻柣銊ュ閻壆鐥?婵絽绻楃换鍐╃▔閳ь剚绋夐鍛疀闁告柡鈧櫕鐝ら柛鎴濈箰閻? 闂侇剙鐏濋崢銈咁潰鐠囧弶鍎曢柣婊庡灟缁卞爼鏌?    // 濠㈠爢鍌滆壘0閻炴稏鍔庨妵姘跺矗椤栨瑤绨扮紓浣堝懐鏁惧ù鑲╁█閳?缂佹稑顦花?闁汇劌瀚鍌炲磹?闁哄牆绉存慨鐔煎闯閵娿儳娈哄☉鎾卞灩缁辨梻鎷犻妷褏绉圭紓浣圭矊鐎?
+    // 
     char cNodeLevel = ROUTE_NODE_LEVEL_NORMAL;
-    // 闁哄嫷鍨伴幆渚€宕ｉ幋锔瑰亾娴ｈ櫣鑸跺ù婊冪灱妤犲洭鎳為崒婊冧化
+    // 
     char cIsToChiled = 0;
-    // 闁哄嫷鍨伴幆渚€寮伴姘辩暛闁?濞撴碍绻冨畵渚€濡撮幁鐖刣 + cIsToChiled闁靛棙鍨跺鍨交濞戞粠鏀介弶鍫涘妼閸?
+    // 
     char cIsBroadCast = 0;
-    // 濞戞挸锕ｇ粩瀵哥棯瑜忓▓?SGUID 闁活潿鍔嬬花顒勭嵁閹稿孩灏￠柟鐑樺浮濞?濞戞挸绉撮崯鈧鐐村閹歌京绱掑▎搴ｇ憪缂佺嫏鍕疀闁告柡鈧櫕鐝?
+    // 
     SGUID_UINT32 stPreSGUID[ROUTE_NODE_LEVEL_NORMAL];
-    // 婵犙勨偓鐩橴ID
+    // 
     SGUID_UINT32 stSrcSGUID;
-    // 闁烩晩鍠楅悥顤橤UID
+    // 
     SGUID_UINT32 stTargetSGUID;
 
-    // 闁兼儳鍢茶ぐ鍥ㄧ▔閳ь剚绋夐鍡忔晞闁煎搫鍊婚崑?
+    // 
     bool InPreNode(const uint32 &sguid) {
         for (int i = 0; i < ROUTE_NODE_LEVEL_NORMAL; ++i) {
             if (sguid == stPreSGUID[i].getSGUID()) {
@@ -195,11 +195,11 @@ struct RouteInfo
 struct xServerDispatcherMsg
 {
     xCommand cmdID;
-    // 闁荤偛妫涢弫杈ㄧ┍閳╁啩绱?
+    // 
     RouteInfo stRouteInfo;
-    // 閺夆晜鐟╅崳鐑藉及閻も暜otoBuff String 闁轰胶澧楀畵?
+    // 
     uint32 msg_len = 0;
-    char msg_data[0];// proto -闁?tostring
+    char msg_data[0];// proto -tostring
 
     void Init(uint8 cmd, uint8 param) {
         cmdID.cmd = cmd;

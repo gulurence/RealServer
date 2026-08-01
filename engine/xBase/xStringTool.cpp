@@ -1,6 +1,6 @@
-﻿#include "xStringTool.h"
+#include "xStringTool.h"
 
-/// @brief 缁岃櫣娅х€涙顑?娓氭繃顐兼稉? 缁岀儤鐗? 濮樻潙閽╅崚鎯般€冪粭? 閸ョ偠婧? 閹广垼顢? 鐠ф壆鐒婇幑銏ｎ攽, 閸ㄥ倻娲块崚鎯般€冪粭?
+//
 const std::string StringTool::WHITE_SPACE = " \t\r\n\f\v";
 
 
@@ -41,7 +41,7 @@ std::string& StringTool::vformat(std::string& resultOUT, const char *fmt, va_lis
 }
 bool StringTool::format_index(std::string& resultOUT, const char* fmt, const std::vector<std::string>& argList)
 {
-    // 鐟欙絾鐎介悩鑸碘偓浣规簚閻ㄥ嫮濮搁幀?
+    // 
     enum FormatState
     {
         FS_NORMAL,
@@ -50,7 +50,7 @@ bool StringTool::format_index(std::string& resultOUT, const char* fmt, const std
         FS_NUMBER,
     };
 
-    // 閸戞椽鏁婃径鍕倞娴狅絿鐖?
+    // 
 #ifdef _DEBUG
 #define FS_ERROR_MESSAGE(msg) \
     do{\
@@ -65,11 +65,11 @@ bool StringTool::format_index(std::string& resultOUT, const char* fmt, const std
     } while(0)
 #endif
 
-    // 妫板嫬顦╅悶?
+    // 
     resultOUT.clear();
     if(fmt == NULL || fmt[0] == 0)
         return true;
-    // 濮濓絽绱＄憴锝嗙€?
+    // 
     const char* p = fmt;
     FormatState state = FS_NORMAL;
     std::string index;
@@ -79,9 +79,8 @@ bool StringTool::format_index(std::string& resultOUT, const char* fmt, const std
         if(c == 0)
         {
             if(state == FS_NORMAL)
-                break; // OK 缁犳纭堕幍褑顢戠€瑰本鐦?
-            else
-                FS_ERROR_MESSAGE("ERROR閿涗焦鐗稿蹇撳鐎涙顑侀張顐㈢啲閸欘垵鍏橀張澶嬬暙缂傜尨绱濇稉宥堝厴濮濓絿鈥樼憴锝嗙€?");
+                break;            else
+                FS_ERROR_MESSAGE("ERROR: format string syntax error");
         }
         switch(state)
         {
@@ -107,7 +106,7 @@ bool StringTool::format_index(std::string& resultOUT, const char* fmt, const std
                 }
                 else
                 {
-                    FS_ERROR_MESSAGE("ERROR閿涗礁婀弽鐓庣础閸栨牕鐡х粭锔胯娑擃厼褰傞悳棰佺瑝閹存劕顕惃鍒?}\'鐎涙 ");
+                    FS_ERROR_MESSAGE("ERROR: format string syntax error");
                 }
                 break;
             case FS_L_BRACKE:
@@ -123,7 +122,7 @@ bool StringTool::format_index(std::string& resultOUT, const char* fmt, const std
                 }
                 else
                 {
-                    FS_ERROR_MESSAGE("ERROR閿涗礁婀弽鐓庣础閸栨牕鐡х粭锔胯娑擃厼褰傞悳鐧?{\'閸氬海娈戦棃鐐存殶鐎涙鐡х粭? ");
+                    FS_ERROR_MESSAGE("ERROR: format string syntax error");
                 }
                 break;
             case FS_NUMBER:
@@ -139,12 +138,12 @@ bool StringTool::format_index(std::string& resultOUT, const char* fmt, const std
                         }
                         else
                         {
-                            FS_ERROR_MESSAGE("ERROR閿涗礁婀弽鐓庣础閸栨牕鐡х粭锔胯娑擃厾娈戦崣鍌涙殶娑撳鐖ｇ搾鍛毉閸欏倹鏆熼崚妤勩€冮懠鍐ㄦ纯 ");
+                            FS_ERROR_MESSAGE("ERROR: format string syntax error");
                         }
                     }
                     else
                     {
-                        FS_ERROR_MESSAGE("ERROR閿涗礁婀弽鐓庣础閸栨牕鐡х粭锔胯娑擃厾娈戦崣鍌涙殶娑撳鐖ｆ稉宥堝厴濮濓絿鈥樻潪顒佸床娑撶儤鏆熺€? ");
+                        FS_ERROR_MESSAGE("ERROR: format string syntax error");
                     }
                 }
                 else if(is_numeric(c))
@@ -153,11 +152,11 @@ bool StringTool::format_index(std::string& resultOUT, const char* fmt, const std
                 }
                 else
                 {
-                    FS_ERROR_MESSAGE("ERROR閿涗礁婀弽鐓庣础閸栨牕鐡х粭锔胯娑擃厼褰傞悳鐧?{\'閸氬海娈戦棃鐐存殶鐎涙鐡х粭? ");
+                    FS_ERROR_MESSAGE("ERROR: format string syntax error");
                 }
                 break;
             default:
-                assert(0);//閹碘偓閺堝濮搁幀浣侯劮閸氬秴鍑＄紒蹇撳瘶閸氼偓绱濈粙瀣碍娑撳秴绨茬拠銉﹀⒔鐞涘苯鍩屽銈咁槱
+                assert(0);//
                 break;
         }
     }
@@ -242,9 +241,9 @@ void StringTool::split_white_space(const std::string& str, std::vector<std::stri
 bool StringTool::split_fix_size(const std::string& str, std::string::size_type fix_size, std::vector<std::string>& resultOUT)
 {
     resultOUT.clear();
-    if(fix_size == 0)//闂€鍨娑?閺冭埖妫ゅ▔鏇烆槱閻?
+    if(fix_size == 0)//
         return false;
-    else if(fix_size == 1)// 瑜版捇鏆辨惔锔胯礋1閺冩湹绗夐懗钘夘槱閻炲棙鐪界€?
+    else if(fix_size == 1)// 
     {
         for(std::string::const_iterator iter = str.begin(); iter != str.end(); ++iter)
         {
@@ -252,14 +251,14 @@ bool StringTool::split_fix_size(const std::string& str, std::string::size_type f
                 return false;
         }
     }
-    else if(fix_size >= str.size())//闂€鍨鐡掑啿顧勬径褎妞傛稉宥呯箑鐟曚礁顦╅悶?
+    else if(fix_size >= str.size())//
     {
         resultOUT.push_back(str);
         return true;
     }
     resultOUT.reserve(str.size() / fix_size + 1);
 
-    bool fullword = true;// 閺勵垰鎯侀弰顖氱暚閺佹潙鐡ч惃鍕垼韫囨绱濋悽銊ょ艾婢跺嫮鎮婄€瑰本鏆ｉ惃鍕溄鐎?
+    bool fullword = true;// 
     std::string::const_iterator it = str.begin();
     std::string::const_iterator last = it;
     for (; it != str.end(); ++it)
@@ -270,7 +269,7 @@ bool StringTool::split_fix_size(const std::string& str, std::string::size_type f
             fullword = !fullword;
         if (it - last == static_cast<int>(fix_size))
         {
-            // 閸欐垹骞囬崚鍡欐櫕婢跺嫭婀佸Ч澶婄摟閺傤厼鐡ч悳鎷岃杽閸掓瑥娲栭柅鈧稉鈧稉顏勭摟閼?
+            // 
             if(fullword && *it < 0)
             {
                 --it;

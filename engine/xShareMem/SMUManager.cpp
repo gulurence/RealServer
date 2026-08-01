@@ -1,4 +1,4 @@
-﻿#include "SMUManager.h"
+#include "SMUManager.h"
 
 
 // SMUPool<HumanSMU>*    g_pHumanSMUPool = NULL;;

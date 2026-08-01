@@ -1,4 +1,4 @@
-﻿#include "xLog.h"
+#include "xLog.h"
 
 #include <spdlog/spdlog.h>
 #include "spdlog/sinks/stdout_color_sinks.h"
@@ -25,6 +25,7 @@ void xLog::Init(const char* prop) {
     _logger = std::make_shared<spdlog::logger>(service_name, sinks.begin(), sinks.end());
     spdlog::set_default_logger(_logger);
 
+    XLOG("[INIT] xLog initialized — console + rotating file: %s", logFileName.c_str());
 
     // 文件日志
     //auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5, 400);
@@ -50,16 +51,20 @@ void xLog::Print(const char* file, long line, const char* funtion, Level level, 
     char buff[4096] = { 0 };
     va_list ap;
     va_start(ap, format);
-    vsnprintf_s(buff, 4096, format, ap);
+    vsnprintf(buff, 4096, format, ap);
     va_end(ap);
 
     auto filePatch = std::string(file);
-    std::string::size_type first = filePatch.rfind('\\');
-    if (first != std::string::npos) {
-        filePatch = filePatch.substr(first + 1, filePatch.size());
-    }
+    std::string::size_type pos = filePatch.rfind('\\');
+    std::string::size_type pos2 = filePatch.rfind('/');
+    if (pos2 != std::string::npos && (pos == std::string::npos || pos2 > pos))
+        pos = pos2;
+    if (pos != std::string::npos)
+        filePatch = filePatch.substr(pos + 1);
 
-    std::string strlog = (boost::format(" %s:%s - %s") % filePatch % line % buff).str();
+    char fmtBuf[4352] = { 0 };
+    snprintf(fmtBuf, sizeof(fmtBuf), " %s:%ld - %s", filePatch.c_str(), line, buff);
+    std::string strlog = fmtBuf;
 
     switch (level) {
     case Level::ERR:
