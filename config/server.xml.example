@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- RealServer Configuration Template -->
+<!-- Copy to server.xml and adjust for your environment -->
+<server>
+    <!-- Deployment environment: dev / test / prod -->
+    <platform>dev</platform>
+
+    <!-- gRPC server port for inter-process actor management -->
+    <grpc port="50051"/>
+
+    <!-- ================================================================= -->
+    <!-- Process Identity                                                   -->
+    <!--   type: 100=Gate 101=Login 201=Player 202=World                   -->
+    <!--   name: unique process name within the cluster                    -->
+    <!--   host: IP to bind gRPC server (0.0.0.0 = all interfaces)         -->
+    <!-- ================================================================= -->
+    <process type="100" name="gate-01" host="0.0.0.0"/>
+
+    <!-- ================================================================= -->
+    <!-- Cluster Fallback (when Redis is unavailable)                       -->
+    <!-- Used for local dev/test without Redis                              -->
+    <!-- ================================================================= -->
+    <cluster>
+        <!-- Local process identity (used when Redis ID gen fails) -->
+        <local type="100" id="1" name="gate-dev-01"/>
+
+        <!-- Peers to connect to (static config, no service discovery) -->
+        <peer type="101" host="127.0.0.1" port="50052"/>
+        <peer type="201" host="127.0.0.1" port="50053"/>
+        <peer type="202" host="127.0.0.1" port="50054"/>
+    </cluster>
+
+    <!-- ================================================================= -->
+    <!-- Redis Connection Pools                                             -->
+    <!-- ================================================================= -->
+    <redis>
+        <!-- Actor cache (runtime data) -->
+        <pool
+            title="actor_cache"
+            host="127.0.0.1"
+            port="6379"
+            max_conn="20"
+            conn_timeout="3"
+            retry_interval="1"
+            user=""
+            authkey=""
+        />
+
+        <!-- Service discovery pool (cluster registry) -->
+        <pool
+            title="cluster_discovery"
+            host="127.0.0.1"
+            port="6379"
+            max_conn="5"
+            conn_timeout="3"
+            retry_interval="1"
+            user=""
+            authkey=""
+        />
+    </redis>
+
+    <!-- ================================================================= -->
+    <!-- MySQL Connection Pools                                             -->
+    <!-- ================================================================= -->
+    <db>
+        <pool
+            title="actor_db"
+            host="127.0.0.1"
+            port="3306"
+            name="realserver"
+            user="root"
+            passwd=""
+            poolCount="10"
+        />
+    </db>
+
+    <!--
+      NATS messaging (future).
+    <nats url="nats://token@host:4222" pool_size="10"/>
+    -->
+</server>
