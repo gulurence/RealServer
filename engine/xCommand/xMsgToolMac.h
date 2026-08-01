@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #define BUFFER_CMD(send, type) \
     char send##buf_3g[MAX_BUFSIZE];\

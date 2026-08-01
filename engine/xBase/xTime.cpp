@@ -1,4 +1,4 @@
-﻿#ifndef _WINDOWS
+#ifndef _WINDOWS
 #include <sys/time.h>
 #endif
 
@@ -40,7 +40,7 @@ time_t xTime::getDayStart(time_t time)
 {
     struct tm tm;
     getLocalTime(tm, time);
-    return time - (tm.tm_hour * 60 + tm.tm_min) * 60 - tm.tm_sec;//闁烩晛鐡ㄧ敮瀵告媼閿涘嫮鏆慨锝嗘煣婵炲洭鎮介埡锕宼ime闁告垼濮ら弳鐔煎极閸垹鑺抽柡鍥ㄦ尦閻?
+    return time - (tm.tm_hour * 60 + tm.tm_min) * 60 - tm.tm_sec;//
 }
 
 time_t xTime::getDayStart(uint32 year, uint32 month, uint32 day)
@@ -56,7 +56,7 @@ time_t xTime::getDayStart(uint32 year, uint32 month, uint32 day)
     return mktime(&tm);
 }
 
-//濞寸姰鍎遍幊鍡樼▔閳ь剟寮埡鈧粭?闁绘劙鈧稖绀嬮悹褍鍢查～鎰板籍閸洘锛?
+//
 time_t xTime::getWeekStart(time_t time)
 {
     struct tm tm;

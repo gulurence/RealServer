@@ -1,6 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#include "xTools.h"
+#include "xDefine.h"
 
 template <typename T>
 class xSingleton
@@ -32,6 +32,10 @@ public:
             _instance = new T;
         }
         return *_instance;
+    }
+    // Alias for compatibility with boost::serialization::singleton pattern
+    static T& get_mutable_instance() {
+        return getMe();
     }
     class CGarbo
     {

@@ -1,6 +1,6 @@
 #include "xOperatorNode.h"
-
 #include "xOperatorMgr.h"
+#include "xLog/xLog.h"
 
 
 DatabaseOpNode::~DatabaseOpNode() {
@@ -140,10 +140,13 @@ void DatabaseOpNode::CleanUp() {
 }
 
 bool DBOperator::Init(const char* pHost, int iPort, const char* pDBName, const char* pUser, const char* pPassWd, int iPoolCount) {
+    XLOG("[INIT] DBOperator connecting to %s:%d/%s (pool=%d)", pHost, iPort, pDBName, iPoolCount);
     m_pConnPool = new DBConnPool();
     if (!m_pConnPool->init(pHost, iPort, pDBName, pUser, pPassWd, iPoolCount)) {
+        XERR("[INIT] DBOperator failed to connect to %s:%d/%s", pHost, iPort, pDBName);
         return false;
     }
+    XLOG("[INIT] DBOperator connected to %s:%d/%s", pHost, iPort, pDBName);
     return true;
 }
 

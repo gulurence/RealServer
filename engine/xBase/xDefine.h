@@ -1,6 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#if 1
+#ifdef _MSC_VER
 #pragma warning(disable:4099)//LNK4099
 #pragma warning(disable:4996)
 #pragma warning(disable:4200)
@@ -74,7 +74,7 @@ typedef unsigned long       uint64;
 #define UInt64_MAX  ((uint64)0xffffffffffffffff)   //18446744073709551615
 
 
-//鏉╃偞甯撮崥搴ｇ搼瀵板懎褰傞柅浣圭Х閹垳娈戦張鈧梹鎸庢闂?
+// Max wait time for sending command (seconds)
 #define MAX_WAIT_SEND_CMD_TIME  30
 #define MAX_NAMESIZE            32
 #define MAX_BINDATA_SIZE        (1<<17)
@@ -151,6 +151,10 @@ typedef int32 ActorType;
 #include <atomic>
 #include <chrono>
 #include <algorithm>
+
+// 基础宏定义
+#define SAFE_DELETE(p) do {delete p; p = NULL;} while(false)
+#define SAFE_DELETE_VEC(p) do {delete[] p; p = NULL;} while(false)
 
 #include <coroutine>
 

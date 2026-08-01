@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "xTime.h"
 #include "xTools.h"
@@ -14,8 +14,8 @@ class xFunctionTime
     private:
         struct _stTimes
         {
-            uint32 __times;    //婵炲棌鍓濋弳?
-            uint64 __total_time;    //闁诡剚妲掗埀顒侇殕濡?
+            uint32 __times;    //
+            uint64 __total_time;    //
             _stTimes() { bzero(this, sizeof(*this)); }
         };
         typedef std::map<uint64, _stTimes> _Times;

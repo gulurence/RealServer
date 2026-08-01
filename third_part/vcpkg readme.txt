@@ -19,3 +19,4 @@ vcpkg install pbc:x64-windows
 
 vcpkg install protobuf-c:x64-windows
 vcpkg install protobuf:x64-windows
+vcpkg install swig:x64-windows

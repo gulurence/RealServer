@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "xState.h"
 
@@ -52,11 +52,11 @@ class xStateMachine
         }
 
     private:
-        entity_type * const owner; //闁绘鍩栭埀顑跨劍濠р偓闁归晲鐒﹀﹢渚€鎳?
+        entity_type * const owner; //
 
-        xState<entity_type> *prevState;        //闁告挸绉崇粩鎾偐閼哥鍋?
-        xState<entity_type> *curState;        //鐟滅増鎸告晶鐘绘偐閼哥鍋?
-        xState<entity_type> *globalState;    //闁稿繈鍔岄惇顒勬偐閼哥鍋?
+        xState<entity_type> *prevState;        //
+        xState<entity_type> *curState;        //
+        xState<entity_type> *globalState;    //
 
 };
 

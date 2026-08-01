@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "xDefine.h"
 
@@ -37,7 +37,7 @@ public:
 
 public:
     bool bInit = false;
-    // 娣囨繂鐡ㄧ粚娲＝閻ㄥ嫯濡悙褰掓Щ濮濄垹顦垮▎鈥崇秺鏉?
+    // 
     std::map<T*, int> mFreeMap;
 
 public:
@@ -116,11 +116,11 @@ public:
         m_nMaxCount = nMaxCount;
         T **m_papObjT = new T*[m_nMaxCount];
 
-        // 閺冄呮畱閺佺増宓佺拋鍓х枂鏉╁洦娼? 
+        // 
         for (int32 i = 0; i < i32PreMaxCount; i++) {
             m_papObjT[i] = m_papObj[i];
         }
-        // 閺傛壆鏁电拠椋庢畱閺佷即鍣? 
+        // 
         for (int32 i = i32PreMaxCount; i < m_nMaxCount; i++) {
             m_papObjT[i] = new T;
             if (m_papObjT[i] == nullptr) {
@@ -141,7 +141,7 @@ public:
         if (pObj == nullptr) {
             return;
         }
-        // 閼哄倻鍋ｅ鑼病閸︺劎鈹栭梻鎻掑灙鐞涖劋鑵戞禍?
+        // 
         if (mFreeMap.find(pObj)!= mFreeMap.end()) {
             return;
         }
@@ -157,9 +157,9 @@ public:
         }
 
         //------------------------------------------------------------//
-        //|   ...   |  ...      |        uDelIndex     |     ...       |      m_nPosition-1  |     m_nPosition (瀵板懎鍨庨柊宥嗙潨 ) |
+        //|   ...   |  ...      |        uDelIndex     |     ...       |      m_nPosition-1  |     m_nPosition ( ) |
 
-        //|   ...   |  ...      |      m_nPosition -1 | ...            |   m_nPosition(瀵板懘顥ｉ柊宥嗙潨) |
+        //|   ...   |  ...      |      m_nPosition -1 | ...            |   m_nPosition(ｉ) |
 
         m_nPosition--;
         T *pDelObj = m_papObj[uDelIndex];

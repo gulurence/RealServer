@@ -1,9 +1,9 @@
-﻿#pragma once
+#pragma once
 #include "UserCmd.h"
 #pragma pack(1)
 
 namespace Cmd {
-//    /************************* 闁谎嗩嚙缂嶅秹骞愰崶锔藉Б *****************************/
+//    /************************* Б *****************************/
 //    struct LoginCmd : public UserCmd
 //    {
 //        LoginCmd(uint8 p) :UserCmd(LOGIN_CMD, p) {
@@ -45,7 +45,7 @@ namespace Cmd {
 //        uint32 ip;
 //        int port;
 //        uint16 len;
-//        uint8 loginData[0];    //闁谎冾煼濡句即寮悧鍫濈ウ: sha1|accid|loginTime ...
+//        uint8 loginData[0];    //ウ: sha1|accid|loginTime ...
 //    };
 //
 //    struct LoginData
@@ -73,10 +73,10 @@ namespace Cmd {
 //            loginType = 0;
 //            len = 0;
 //        }
-//        uint8 loginType;        // 闁谎冾煼濡炬壆鐚剧拠鑼偓?1: 閻庡箍鍨洪崺娑氱博? 2: 缂傚啯鍨块妴澶岀博?
-//        //        char minloginType[MAX_BUFFER_LEN];//闁谎嗩嚙缂嶅秶鈧稒鍔曢崹搴ｇ尵?
+//        
+//        //        char minloginType[MAX_BUFFER_LEN];//ｇ
 //        uint16 len;
-//        uint8 loginData[0];    //闁谎冾煼濡句即寮悧鍫濈ウ: sha1|accid|loginTime ...
+//        uint8 loginData[0];    //ウ: sha1|accid|loginTime ...
 //    };
 //
 //#define REG_ERR_USER_CMD 5
@@ -120,17 +120,17 @@ namespace Cmd {
 //        LoginResultUserCmd() : LoginCmd(LOGIN_RESULT_USER_CMD) {
 //            ret = 0;
 //        }
-//        uint8 ret;    //2闁告瑯鍨禍鎺撴交濞戞ê寮抽柛锔惧劋濞?
+//        
 //    };
 //
-//    //闁告帗绋戠紓鎾舵喆閹烘洖顥?
+//    
 //#define CREATE_CHAR_USER_CMD 9
 //    struct CreateCharUserCmd : public LoginCmd
 //    {
-//        char name[MAX_ROLENAMESIZE]; // 闁告艾绉惰ⅷ
-//        uint8 role_career; // 闁煎崬濂旂粭?
+//        char name[MAX_ROLENAMESIZE]; // ⅷ
+//        uint8 role_career; // 
 //        uint16 len;
-//        uint8 loginData[0];    //闁谎冾煼濡句即寮悧鍫濈ウ: sha1|accid|loginTime ...
+//        uint8 loginData[0];    //ウ: sha1|accid|loginTime ...
 //        CreateCharUserCmd() : LoginCmd(CREATE_CHAR_USER_CMD) {
 //            bzero(name, sizeof(name));
 //            role_career = 0;
@@ -138,7 +138,7 @@ namespace Cmd {
 //        }
 //    };
 //
-//    //闁告帞濞€濞呭海鎲撮幒鏇烆棌
+//    
 //#define DELETE_CHAR_USER_CMD 10
 //    struct DeleteCharUserCmd : public LoginCmd
 //    {
@@ -150,12 +150,12 @@ namespace Cmd {
 //
 //    enum
 //    {
-//        CREATE_ERROR_NAME_USED = 0,    //闂佹彃绉撮幃?
-//        CREATE_ERROR_CAN_NOT_USE = 1,//闁告凹鍋呭﹢渚€寮箛鏂垮Τ閻犲洤绉甸惇?
-//        CREATE_ERROR_HAVE_SPACE = 2,//闁告凹鍋呭﹢浣虹矚閻戞澹?
+//        CREATE_ERROR_NAME_USED = 0,    //
+//        CREATE_ERROR_CAN_NOT_USE = 1,//﹢渚€寮Τ
+//        CREATE_ERROR_HAVE_SPACE = 2,//﹢
 //    };
 //
-//    //闂佹彃绉撮幃?
+//    
 //#define NAME_USED_CHAR_USER_CMD 11
 //    struct NameUsedCharUserCmd : public LoginCmd
 //    {
@@ -165,7 +165,7 @@ namespace Cmd {
 //        }
 //    };
 //
-//    //閻犲洭鏀遍惇鎷岀疀椤愩倕寮?
+//    
 //#define REQ_SNAP_CHAR_USER_CMD 12
 //    struct ReqSnapCharUserCmd : public LoginCmd
 //    {

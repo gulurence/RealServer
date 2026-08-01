@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "xDefine.h"
 
@@ -31,7 +31,7 @@ public:
     static bool        isSameDay(time_t t1, time_t t2);
     static bool        isSameWeek(time_t t1, time_t t2);
     static bool        isSameMonth(time_t t1, time_t t2);
-    static bool        isValidDate(uint32 year, uint32 month, uint32 day);    //濡偓閺屻儲妫╅張鐔告Ц閸氾箑鎮庡▔?
+    static bool        isValidDate(uint32 year, uint32 month, uint32 day);    //
     static bool        isLeapYear(uint32 year);
     static int        getDay(time_t time);
     static int        getMonth(time_t time);
@@ -58,6 +58,7 @@ public:
 class xTimer
 {
 public:
+    xTimer() : elapse(0) {}
     xTimer(uint32 t) {
         elapse = t;
     }
@@ -77,6 +78,7 @@ private:
 class xMilliTimer
 {
 public:
+    xMilliTimer() : elapse(0) {}
     xMilliTimer(uint32 t) {
         elapse = t;
     }

@@ -1,13 +1,12 @@
-﻿#pragma once
+#pragma once
 
 #include "xBase/xDefine.h"
+#include "xBase/xSingleton.h"
 
 #include <stdarg.h>
-#include <boost/serialization/singleton.hpp> 
-#include <boost/format.hpp>
 #include <spdlog/sinks/rotating_file_sink.h>
 
-class xLog : public boost::serialization::singleton<xLog>
+class xLog : public xSingleton<xLog>
 {
 public:
     enum Level
@@ -29,7 +28,7 @@ public:
     std::shared_ptr<spdlog::logger> CreateServiceLog(const std::string &strServiceName);
     bool RemoveServiceLog(const std::string& strServiceName);
 
-protected:
+public:
     xLog(void);
     ~xLog(void);
 

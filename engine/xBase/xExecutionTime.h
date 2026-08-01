@@ -1,10 +1,10 @@
-﻿#pragma once
+#pragma once
 
 #include "xTime.h"
 #include "xDefine.h"
 
 
-class xTimeTest    //缂佺姭鍋撻柛妤佹礈濞堟垿骞嶈椤㈡垿寮崼鏇燂紵婵炴潙顑堥惁顖炲礄閼恒儲娈?
+class xTimeTest    //
 {
     public:
         xTimeTest(const std::string &logName);
@@ -25,8 +25,8 @@ class xExecutionTime
     private:
         struct _stTimes
         {
-            uint32 __times;    //婵炲棌鍓濋弳?
-            uint64 __total_time;    //闁诡剚妲掗埀顒侇殕濡?
+            uint32 __times;    //
+            uint64 __total_time;    //
             bool __addFlag;
             _stTimes() { bzero(this, sizeof(*this)); }
         };

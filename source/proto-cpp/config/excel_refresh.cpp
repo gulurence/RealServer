@@ -1,4 +1,4 @@
-﻿#include "excel_refresh.h"
+#include "excel_refresh.h"
 #include "../excel/excel_mgr.h"
 
 namespace ws_relay{

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "xDefine.h"
 
@@ -6,6 +6,7 @@ template <typename T>
 class UniqueIDManager
 {
 public:
+    UniqueIDManager() : _min(0), _max((T)-2), _next(0), _num(0), _count(0) {}
     UniqueIDManager(T min, T max = (T)-2) :_min(min), _max(max - 1) {
         _next = _min;
         _num = (_max - _min + 1);
@@ -50,7 +51,6 @@ public:
     }
 
 private:
-    UniqueIDManager();
     T _min;
     T _max;
     T _next;

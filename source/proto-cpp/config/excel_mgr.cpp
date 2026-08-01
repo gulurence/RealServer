@@ -1,4 +1,4 @@
-﻿#include "excel_mgr.h"
+#include "excel_mgr.h"
 
 #include "log4cxx.h"
 

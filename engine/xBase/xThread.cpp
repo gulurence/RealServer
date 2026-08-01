@@ -1,4 +1,4 @@
-﻿#include "xThread.h"
+#include "xThread.h"
 #include "xTools.h"
 
 

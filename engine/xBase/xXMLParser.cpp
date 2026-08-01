@@ -1,5 +1,6 @@
-﻿#include "xXMLParser.h"
+#include "xXMLParser.h"
 #include "xTools.h"
+#include <iconv.h>
 
 iconv_t xXMLParser::iconv_utf8_gbk;
 iconv_t xXMLParser::iconv_gbk_utf8;
@@ -13,26 +14,26 @@ xXMLParser::~xXMLParser() {
     if (doc) xmlFreeDoc(doc);
     if (docBuffer) free(docBuffer);
 #ifdef _LX_DEBUG
-    XLOG("[xXMLParser],闁哄鍔栭悗?);
+    XLOG("[xXMLParser] destroyed");
 #endif
 }
 
 void xXMLParser::initSystem() {
     xmlInitParser();
-    XLOG("[xXMLParser],闁告帗绻傞～鎰板礌?");
+    XLOG("[xXMLParser] initialized");
     /*
     LIBXML_TEST_VERSION;
     iconv_utf8_gbk = iconv_open("UTF-8", "GBK");
     iconv_gbk_utf8 = iconv_open("GBK", "UTF-8");
 
     xmlCharEncodingHandlerPtr h = 0;
-    h = xmlNewCharEncodingHandler("GB2312", gbk_input, gbk_output);//婵烇綀顕ф慨鐎廱2312缂傚倹鐗滈悥婊堝绩椤栨稑鐦?
+    h = xmlNewCharEncodingHandler("GB2312", gbk_input, gbk_output);// register GB2312 encoding handler
     if (!h)
-        XERR("婵炲鍔岄崬绱綛2312缂傚倹鐗滈悥婊勫緞鏉堫偉袝");
-    h = xmlNewCharEncodingHandler("GBK", gbk_input, gbk_output);//婵烇綀顕ф慨鐎廱k缂傚倹鐗滈悥婊堝绩椤栨稑鐦?
+        XERR("Failed to create GB2312 encoding handler");
+    h = xmlNewCharEncodingHandler("GBK", gbk_input, gbk_output);// register GBK encoding handler
     if (!h)
-        XERR("婵炲鍔岄崬绱綛K缂傚倹鐗滈悥婊勫緞鏉堫偉袝");
-    XLOG("[XML]婵炲鍔岄崬鐣屾喆閿濆洨鍨抽柛?GB2312 GBK");
+        XERR("Failed to create GBK encoding handler");
+    XLOG("[XML] Registered custom encoding handlers: GB2312 GBK");
     */
 }
 
@@ -49,7 +50,7 @@ int xXMLParser::gbk_input(unsigned char* out, int* outlen, const unsigned char* 
     char* outbuf = (char*)out;
     char* inbuf = (char*)in;
     size_t          rslt;
-    XDBG("[XML]gbk_input 閺夌儐鍓涢悥婊堝礈?%d %s", *inlen, in);
+    XDBG("[XML] gbk_input before: inlen=%d in=%s", *inlen, in);
 
     rslt =
 #ifndef _WINDOWS
@@ -60,13 +61,13 @@ int xXMLParser::gbk_input(unsigned char* out, int* outlen, const unsigned char* 
             &outbuf, (size_t*)outlen);
 #endif
     if (rslt < 0) {
-        XERR("[XML]gbk_input 閺夌儐鍓涢悥婊勫緞鏉堫偉袝 %d", rslt);
+        XERR("[XML] gbk_input iconv failed: %d", rslt);
         return rslt;
     }
-    XDBG("[XML]gbk_input 閺夌儐鍓涢悥婊堝触?%d %s", *outlen, out);
+    XDBG("[XML] gbk_input after: outlen=%d out=%s", *outlen, out);
     *outlen = ((unsigned char*)outbuf - out);
     *inlen = ((unsigned char*)inbuf - in);
-    XDBG("[XML]gbk_input 閺夌儐鍓涢悥?ret=%d inlen=%d outlen=%d", rslt, *inlen, *outlen);
+    XDBG("[XML] gbk_input result: ret=%d inlen=%d outlen=%d", rslt, *inlen, *outlen);
     return *outlen;
 }
 
@@ -85,12 +86,12 @@ int xXMLParser::gbk_output(unsigned char* out, int* outlen, const unsigned char*
 #endif
 
     if (rslt < 0) {
-        XERR("[XML]gbk_output 閺夌儐鍓涢悥婊勫緞鏉堫偉袝 %d", rslt);
+        XERR("[XML] gbk_output iconv failed: %d", rslt);
         return rslt;
     }
     *outlen = ((unsigned char*)outbuf - out);
     *inlen = ((unsigned char*)inbuf - in);
-    XDBG("[XML]gbk_output 閺夌儐鍓涢悥?ret=%d inlen=%d outlen=%d", rslt, *inlen, *outlen);
+    XDBG("[XML] gbk_output result: ret=%d inlen=%d outlen=%d", rslt, *inlen, *outlen);
     return *outlen;
 }
 
@@ -147,14 +148,14 @@ bool xXMLParser::toUTF8()
     xmlNodePtr root = getRoot();
     if (!root) return false;
 
-    xmlChar *utf = xmlNodeGetContent(root);//闂傚洠鍋撻悷鏇氱窔閸ｆ挳寮ㄩ幆褍鏁堕悗?
-    XDBG("xml 閺夌儐鍓涢悥婊堝礈?%s", (char *)utf);
+    xmlChar *utf = xmlNodeGetContent(root);
+    XDBG("xml node content: %s", (char *)utf);
     size_t len = xmlStrlen(utf);
     char *out = (char *) xmlMalloc(len);
     bzero(out, len);
     if (0==code_convert("GB2312", "UTF-8", (char *)utf, xmlStrlen(utf), out, len))
     {
-        XDBG("xml 閺夌儐鍓涢悥婊堝触?%s", out);
+        XDBG("xml converted output: %s", out);
         bcopy(out, (void *)utf, len);
         return true;
     }

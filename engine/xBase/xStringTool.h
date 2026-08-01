@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "xTools.h"
 
@@ -108,12 +108,23 @@ public:
     static inline std::string trimbegin(std::string& str, const std::string& whiteSpace = WHITE_SPACE) {
         return str.erase(0, str.find_first_not_of(whiteSpace));
     }
+    static inline std::string trimbegin(const std::string& str, const std::string& whiteSpace = WHITE_SPACE) {
+        std::string s = str; s.erase(0, s.find_first_not_of(whiteSpace)); return s;
+    }
     static inline std::string trimend(std::string& str, const std::string& whiteSpace = WHITE_SPACE) {
         return str.erase(str.find_last_not_of(whiteSpace) + 1);
+    }
+    static inline std::string trimend(const std::string& str, const std::string& whiteSpace = WHITE_SPACE) {
+        std::string s = str; s.erase(s.find_last_not_of(whiteSpace) + 1); return s;
     }
     static inline std::string trim(std::string& str, const std::string& whiteSpace = WHITE_SPACE) {
         str.erase(str.find_last_not_of(whiteSpace) + 1);
         return str.erase(0, str.find_first_not_of(whiteSpace));
+    }
+    static inline std::string trim(const std::string& str, const std::string& whiteSpace = WHITE_SPACE) {
+        std::string s = str;
+        s.erase(s.find_last_not_of(whiteSpace) + 1);
+        return s.erase(0, s.find_first_not_of(whiteSpace));
     }
     static inline bool contains(const std::string& str, const std::string& tosearch) {
         return str.find(tosearch) != std::string::npos;
@@ -129,6 +140,9 @@ public:
     static inline bool endwith(const std::string& str, const std::string& needle) {
         std::string::size_type size = needle.size();
         return str.compare(str.size() - size, size, needle) == 0;
+    }
+    static inline bool endswith(const std::string& str, const std::string& needle) {
+        return endwith(str, needle);
     }
     static inline std::string& padleft(std::string& str, std::string::size_type size, std::string::value_type paddingchar = ' ') {
         if (size > str.size())
@@ -232,8 +246,14 @@ public:
         return repeat(str, times, resultOUT);
     }
     static std::string& tolower(std::string& str);
+    static inline std::string tolower(const std::string& str) {
+        std::string s = str; tolower(s); return s;
+    }
     static inline char tolower(char c) { return is_upper(c) ? c - 'A' + 'a' : c; }
     static std::string& toupper(std::string& str);
+    static inline std::string toupper(const std::string& str) {
+        std::string s = str; toupper(s); return s;
+    }
     static inline char toupper(char c) { return is_lower(c) ? c - 'a' + 'A' : c; }
     static std::string& swapcase(std::string& str);
     static inline char swapcase(char c) {

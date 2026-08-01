@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "RedisDefine.h"
 #include "xBase/xRecordDataDefine.h"
@@ -42,6 +42,9 @@ public:
 
 public:
     bool Validate();
+
+    // 获取底层 hiredis 上下文 (供 ServiceDiscovery 等模块执行自定义命令)
+    redisContext* GetRedisContext() { return m_context; }
 
 private:
 #ifdef __USE_LOCK__

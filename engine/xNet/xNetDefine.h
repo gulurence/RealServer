@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "xBase/xDefine.h"
 #include "xBase/xThread.h"

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 // 榛樿璺敱灞傜骇
 #define ROUTE_NODE_LEVEL_NORMAL 3

@@ -1,5 +1,6 @@
-﻿#include "ShareMemAPI.h"
+#include "ShareMemAPI.h"
 #include "ShareDef.h"
+#include "xLog/xLog.h"
 
 #ifndef _WIN32
 #include <sys/types.h> 

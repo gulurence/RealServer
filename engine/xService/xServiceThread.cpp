@@ -1,4 +1,4 @@
-﻿
+
 #include "xServiceThread.h"
 
 #include "xLog/xLog.h"
