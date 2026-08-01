@@ -1,0 +1,325 @@
+================================================================================
+                        luacore API Reference
+             C++ → Lua bridge (SWIG-generated bindings)
+================================================================================
+
+All functions/types below are accessed via the global `luacore` table,
+registered at startup by LuaVM::InitLuacoreModule().
+
+Version: Lua 5.4.7  |  SWIG 4.3  |  RealServer Engine
+================================================================================
+
+
+1. TYPE CONVERSION HELPERS
+================================================================================
+
+  Lua 5.4 numeric literals (e.g. 100) are floats by default. SWIG wrappers
+  expect integer subtype. Use these to explicitly cast before C++ calls.
+
+    luacore.toint32(n)          -- Cast Lua number → int32  (ActorType, etc.)
+    luacore.toint64(n)          -- Cast Lua number → int64  (ActorID, etc.)
+
+  Usage:
+    luacore.si_actor_mgr_add_hosted_type(luacore.toint32(actorType))
+
+
+2. LOGGING
+================================================================================
+
+    luacore.si_log_trace(msg)   -- XTRC  trace
+    luacore.si_log_debug(msg)   -- XDBG  debug
+    luacore.si_log_info(msg)    -- XLOG  info
+    luacore.si_log_warn(msg)    -- XWRN  warning
+    luacore.si_log_error(msg)   -- XERR  error
+
+  All messages are prefixed with "[Lua]" in the log output.
+  Wrapped by xEngine.Log (common/util/log.lua).
+
+
+3. TIME UTILITIES
+================================================================================
+
+  -- Free functions
+    luacore.si_time_cur_sec()           → int64   Current Unix second
+    luacore.si_time_cur_usec()          → int64   Current Unix microsecond
+    luacore.si_time_day_start(t)        → int64   Midnight of day containing t
+    luacore.si_time_is_same_day(a, b)   → bool    Same calendar day?
+    luacore.si_time_is_leap_year(y)     → bool    Leap year?
+
+  -- Timers (%nodefaultctor — must provide threshold at construction)
+    t = luacore.si_timer_wrap(sec)      → timer   Second-resolution timer
+    t:timeUp()                          → bool
+    t:reset()
+
+    t = luacore.si_milli_timer_wrap(ms) → timer   Millisecond-resolution timer
+    t:timeUp()                          → bool
+    t:reset()
+
+  -- xTime class (static methods)
+    luacore.xTime.getCurSec()           → uint32  Current Unix second
+    luacore.xTime.getCurUSec()          → uint64  Current Unix microsecond
+    luacore.xTime.getDayStart(time)     → time_t  Midnight of timestamp
+    luacore.xTime.getDayStart(y,m,d)    → time_t  Midnight of date
+    luacore.xTime.getWeekStart(time)    → time_t  Monday 00:00
+    luacore.xTime.getMonthStart(time)   → time_t  1st of month 00:00
+    luacore.xTime.isSameDay(t1,t2)      → bool
+    luacore.xTime.isSameWeek(t1,t2)     → bool
+    luacore.xTime.isSameMonth(t1,t2)    → bool
+    luacore.xTime.isValidDate(y,m,d)    → bool
+    luacore.xTime.isLeapYear(y)         → bool
+    luacore.xTime.getDay(time)          → int     Day of month
+    luacore.xTime.getMonth(time)        → int     Month
+    luacore.xTime.getYear(time)         → int     Year
+    luacore.xTime.getWeek(time)         → int     Week number
+    luacore.xTime.getHour(time)         → int     Hour
+    luacore.xTime.getMin(time)          → int     Minutes
+    luacore.getAscTime(dwTime)          → string  Timestamp → readable
+
+  -- xTimer / xMilliTimer / xDayTimer classes
+    t = luacore.xTimer(sec)     -- or luacore.xTimer() for zero-threshold
+    t:timeUp()                  → bool
+    t:reset()
+    t:getElapse()               → uint32
+
+    t = luacore.xMilliTimer(ms)
+    t:timeUp()                  → bool
+    t:reset()
+
+    t = luacore.xDayTimer(hour, delay_minutes)
+    t:timeUp(tm)                → bool   (tm: struct tm&, limited Lua use)
+
+
+4. STRING TOOLS
+================================================================================
+
+  -- Free functions (const-safe wrappers)
+    luacore.si_str_trim(s)              → string  Trim both ends
+    luacore.si_str_trimbegin(s)         → string  Trim left
+    luacore.si_str_trimend(s)           → string  Trim right
+    luacore.si_str_contains(s, sub)     → bool    Substring check
+    luacore.si_str_startswith(s, pre)   → bool    Prefix check
+    luacore.si_str_endswith(s, suf)     → bool    Suffix check
+    luacore.si_str_tolower(s)           → string  To lowercase
+    luacore.si_str_toupper(s)           → string  To uppercase
+    luacore.si_str_replace(s, old, new) → string  Replace all occurrences
+
+  -- StringTool class (static methods, via luacore.StringTool.*)
+    StringTool.WHITE_SPACE              → string  " \t\r\n"
+    StringTool.trim(str)                → string
+    StringTool.trimbegin(str)           → string
+    StringTool.trimend(str)             → string
+    StringTool.contains(str, sub)       → bool
+    StringTool.startswith(str, pre)     → bool
+    StringTool.endswith(str, suf)       → bool
+    StringTool.endwith(str, suf)        → bool    (alt name)
+    StringTool.tolower(str)             → string  (copy)
+    StringTool.toupper(str)             → string  (copy)
+    StringTool.swapcase(str)            → string
+    StringTool.is_lower(str)            → bool
+    StringTool.is_upper(str)            → bool
+    StringTool.is_alpha(str)            → bool
+    StringTool.is_numeric(str)          → bool
+    StringTool.is_alnum(str)            → bool
+    StringTool.count(str, module)       → size_t
+    StringTool.compare(s1, s2)          → int
+    StringTool.icompare(s1, s2)         → int     Case-insensitive
+    StringTool.compare_nature(s1,s2)    → int     Natural sort
+    StringTool.match_wildcard(s, wc)    → bool    Wildcard match
+    StringTool.empty(s)                 → bool
+    StringTool.strlen(s)                → size_t
+    StringTool.try_parse_int(s, out)    → bool
+    StringTool.split(str, sep, result)  → void
+    StringTool.split_white_space(s, r)  → void
+    StringTool.split_fix_size(s,sz,r)   → bool
+    StringTool.replace(str, from, to)   → string
+    StringTool.integer(str)             → long    Parse integer
+    StringTool.repeat(str, times)       → string
+    StringTool.format_index_string(...) → string
+    StringTool.tostring_int32(v)        → string
+    StringTool.tostring_uint32(v)       → string
+    StringTool.tostring_int64(v)        → string
+    StringTool.tostring_uint64(v)       → string
+    StringTool.tostring_bool(v)         → string
+    StringTool.tostring_double(v)       → string
+
+
+5. RANDOM / GENERAL TOOLS
+================================================================================
+
+    luacore.si_rand_between(min, max)       → int32   Random in [min,max]
+    luacore.si_select_by_percent(pct)       → bool    True pct% of the time
+    luacore.si_select_by_thousand(th)       → bool    True th/1000
+    luacore.si_get_readable_ip(ip)          → string  uint32 → dotted-quad
+
+    luacore.randBetween(min, max)           → int
+    luacore.selectByPercent(value)          → bool
+    luacore.selectByThousand(value)         → bool
+    luacore.selectByTenThousand(value)      → bool
+    luacore.getLocalTime(tm)                → void
+    luacore.parseTime(str, time)            → void
+    luacore.addslashes(str)                 → void    Escape quotes
+    luacore.abs(value)                      → uint32
+    luacore.getReadableIP(ip)               → string
+    luacore.getLanguage(id)                 → string
+    luacore.printBinary(data, len)          → string  Hex dump
+    luacore.stringTok(str, delim, vec)      → uint32  Tokenize
+    luacore.split(str, pattern, result)     → uint32  Split
+    luacore.MyGetCurrentThreadID()          → ulong   Thread ID
+
+
+6. UNIQUE ID POOLS
+================================================================================
+
+    mgr = luacore.si_uid32_mgr(min, max)    → pool    Create [min,max] pool
+    mgr:getUniqueID()                       → uint32  Allocate ID
+    mgr:putUniqueID(val)                    → void    Return ID
+
+    mgr = luacore.UniqueUInt32IDManager(min, max)
+    mgr:getUniqueID(out)                    → T&      Allocate (passes by ref)
+    mgr:putUniqueID(val)                    → void
+    mgr:getMin() / mgr:getMax() / mgr:clear()
+
+    mgr = luacore.UniqueUInt16IDManager(min, max)   -- same, with uint16
+
+
+7. SYNCHRONIZATION
+================================================================================
+
+    cs = luacore.CCriticalSection()         -- Critical section
+    cs:Lock() / cs:Unlock()
+
+    mtx = luacore.CMutexLock()              -- Mutex
+    mtx:Lock() / mtx:Unlock()
+    mtx = luacore.CMutexLock.CreateNew(name, existTest)  -- Named/static
+
+    lock = luacore.CSingleLock(pLock)       -- RAII scoped lock
+    -- auto-locks on construction, auto-unlocks on destruction
+
+
+8. ACTOR — CORE BRIDGE
+================================================================================
+
+  -- CActor class (luacore.CActor)
+  -- %feature("director") enables Lua subclassing; C++ calls are forwarded
+  -- to Lua overrides.
+
+    actor = luacore.CActor(type, id, name)  → CActor
+
+  -- Instance methods:
+    actor:GetActorType()        → int32     actor:SetCreateEnable(bool)
+    actor:GetActorID()          → int64     actor:CreateIsEnable() → bool
+    actor:GetActorName()        → string    actor:GetLoadScore() → int32
+    actor:SetLoadScore(v)                   actor:GetCreateTime() → int64
+    actor:SetCreateTime(v)                  actor:GetState() → int32
+    actor:SetState(v)                       actor:GetOwnerID() → int64
+    actor:SetOwnerID(v)
+
+  -- Pure virtual (override in Lua subclass):
+    actor:Init()                → bool      Called once at creation
+    actor:Install()             → bool      Install environment/services
+    actor:UnInstall()           → bool      Teardown
+    actor:Create(newID)         → CActor*   Clone/factory
+
+  -- ActorCreator (static wrappers, luacore.ActorCreator.*)
+    ActorCreator.RegistActor(actor)         → bool    Register prototype
+    ActorCreator.CreateActor(type, id)      → CActor* Create from prototype
+    ActorCreator.SetCreateEnableProxy(t, b) → void    Enable/disable type
+
+  -- ActorPtr accessors (luacore.si_get_* / si_set_*)
+    luacore.si_get_type(actor)              → int32
+    luacore.si_get_id(actor)                → int64
+    luacore.si_get_load_score(actor)        → int32
+    luacore.si_get_create_time(actor)       → int64
+    luacore.si_get_state(actor)             → int32
+    luacore.si_get_owner_id(actor)          → int64
+    luacore.si_set_load_score(actor, v)
+    luacore.si_set_create_time(actor, v)
+    luacore.si_set_state(actor, v)
+    luacore.si_set_owner_id(actor, v)
+
+  -- Actor lifecycle (luacore.si_actor_*)
+    luacore.si_actor_regist(type, actor)            → bool
+    luacore.si_actor_create(type, id)               → ActorPtr
+    luacore.si_lua_actor_create(type, id, name)     → ActorPtr
+    luacore.si_actor_dispatch_rpc(ptr, rpc, data)   → bool
+
+
+9. ACTOR MANAGER — INSTANCE MANAGEMENT
+================================================================================
+
+  All operate on CActorMgr singleton.
+
+    luacore.si_actor_mgr_add_hosted_type(type)          → void
+    luacore.si_actor_mgr_can_host_type(type)            → bool
+    luacore.si_actor_mgr_add_instance(actor)            → bool
+    luacore.si_actor_mgr_remove_instance(type, id)      → ActorPtr
+    luacore.si_actor_mgr_install(type, id)              → bool
+    luacore.si_actor_mgr_uninstall(type, id)            → bool
+    luacore.si_actor_mgr_find(type, id)                 → ActorPtr
+    luacore.si_actor_mgr_get_instance_count()           → int32
+
+
+10. ACTOR CREATOR — CROSS-PROCESS RPC
+================================================================================
+
+  -- Local operations
+    luacore.si_actor_creator_create(type, id)           → ActorPtr
+    luacore.si_actor_creator_delete(type, id)           → bool
+    luacore.si_actor_creator_get_process_load()         → int32
+    luacore.si_actor_creator_get_local_count(type)      → int32
+
+  -- gRPC forwarding (cross-process)
+    luacore.si_actor_creator_grpc_create(svr, type, id)             → bool
+    luacore.si_actor_creator_grpc_find(svr, type, id, &found, &rt)  → bool
+    luacore.si_actor_creator_grpc_uninstall(svr, type, id)          → bool
+
+
+11. REDIS (Synchronous)
+================================================================================
+
+  Uses pool "actor_cache". Blocking calls.
+
+    luacore.si_redis_get(key)           → string  Value, or "" on miss
+    luacore.si_redis_set(key, value)    → bool    True on success
+    luacore.si_redis_del(key)           → bool    True on success
+
+
+12. DATABASE (Async)
+================================================================================
+
+  Operations are queued via COperatorMgr; results arrive via DB callback
+  (not directly visible to Lua). Table schema: (id BIGINT, data BLOB).
+
+    luacore.si_db_select(table, where)          → string (empty)
+    luacore.si_db_insert(table, data)           → bool
+    luacore.si_db_update(table, data, where)    → int32 (always 0)
+    luacore.si_db_delete(table, where)          → int32 (always 0)
+
+
+13. RECORD NOTIFICATION
+================================================================================
+
+    luacore.si_record_notify(type, id, saveType)   → bool
+      saveType: 1=insert, 2=update, 3=delete
+
+
+14. RPC SEND (Stub)
+================================================================================
+
+    luacore.si_rpc_send(targetActorID, msgData)    → bool  (always true)
+      TODO: integrate with engine gRPC subsystem
+
+
+================================================================================
+                         CONSTANTS & TYPES
+================================================================================
+
+  luacore.INVALID_ID    = -1
+  luacore.MAX_NAMESIZE  = 32
+
+  Type aliases (for SWIG):
+    int8, int16, int32, int64, uint8, uint16, uint32, uint64
+    ActorType (= int32), ActorID (= int64), ServiceID (= uint64)
+    NetCID (= uint64), GateID (= uint64), ActorPtr (= void*)
+
+================================================================================

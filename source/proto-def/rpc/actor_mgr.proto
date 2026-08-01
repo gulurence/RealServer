@@ -1,0 +1,56 @@
+// actor_mgr.proto — Cross-process actor management RPC service
+//
+// Enables ActorMgr to create, find, and uninstall actors on remote processes.
+// Each process registers this service on its gRPC server at startup.
+
+syntax = "proto3";
+
+package actormgr;
+
+// ---------------------------------------------------------------------------
+// CreateActor — request a remote process to create an actor instance
+// ---------------------------------------------------------------------------
+message CreateActorRequest {
+    int32 actor_type = 1;   // ActorType enum value
+    int64 actor_id   = 2;   // Unique actor instance ID
+}
+
+message CreateActorReply {
+    bool  success     = 1;
+    int32 error_code  = 2;  // 0 = ok, nonzero = xErrorCode
+}
+
+// ---------------------------------------------------------------------------
+// FindActor — query whether a remote process has an actor instance
+// ---------------------------------------------------------------------------
+message FindActorRequest {
+    int32 actor_type = 1;
+    int64 actor_id   = 2;
+}
+
+message FindActorReply {
+    bool  found       = 1;
+    int32 remote_type = 2;  // The type of the remote process hosting it (if found)
+}
+
+// ---------------------------------------------------------------------------
+// UninstallActor — request a remote process to uninstall an actor
+// ---------------------------------------------------------------------------
+message UninstallActorRequest {
+    int32 actor_type = 1;
+    int64 actor_id   = 2;
+}
+
+message UninstallActorReply {
+    bool  success    = 1;
+    int32 error_code = 2;
+}
+
+// ---------------------------------------------------------------------------
+// Service definition
+// ---------------------------------------------------------------------------
+service ActorMgrService {
+    rpc CreateActor     (CreateActorRequest)     returns (CreateActorReply);
+    rpc FindActor       (FindActorRequest)       returns (FindActorReply);
+    rpc UninstallActor  (UninstallActorRequest)  returns (UninstallActorReply);
+}

@@ -1,0 +1,6 @@
+-- init.lua — World actor config (prod)
+require("common.include")
+require("actors.world.world")
+require("actors.world.on_event.include")
+require("actors.world.on_rpc.include")
+xEngine.Log.info("[World:prod] ready")
