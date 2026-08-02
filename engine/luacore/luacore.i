@@ -22,6 +22,8 @@
 
 // ================================================================
 // Real C++ headers (SWIG does NOT parse these)
+// MUST come before %include "base/xDefine.i" so that int32/int64
+// are #included before the toint32/toint64 %inline functions.
 // ================================================================
 %{
 #include "xBase/xDefine.h"
@@ -40,6 +42,13 @@
 #include "xRpc/xRpc.h"
 #include "rpc/actor_mgr.grpc.pb.h"
 %}
+
+// ================================================================
+// Base type aliases, typemaps, and conversion helpers
+// (from base/xDefine.i — typemaps must be applied before any
+//  %inline blocks below that use int32/int64/ActorType/etc.)
+// ================================================================
+%include "base/xDefine.i"
 
 // ================================================================
 // 1. Log functions — si_log_*

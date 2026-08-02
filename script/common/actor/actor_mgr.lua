@@ -91,6 +91,12 @@ function xEngine.ActorMgr.registerPrototype(actorType, classTable)
         return false
     end
 
+    -- Add prototype to ActorMgr so Install can find it
+    if not luacore.si_actor_mgr_add_instance(cppProto) then
+        xEngine.Log.error("[ActorMgr] add_instance (proto) failed type=%d", actorType)
+        return false
+    end
+
     protoRegistry[actorType] = {
         classTable = classTable,
         instance   = protoInstance,
@@ -197,6 +203,9 @@ function xEngine.ActorMgr.createLocal(actorType, actorID)
     luaInstance._cpp_actor = cppActor
     luaInstance._lua_ref = luaInstance
 
+    -- Add to C++ ActorMgr BEFORE install so Find() can locate it
+    luacore.si_actor_mgr_add_instance(cppActor)
+
     -- Install environment
     xEngine.ActorMgr.install(actorType, actorID)
 
@@ -209,8 +218,6 @@ function xEngine.ActorMgr.createLocal(actorType, actorID)
     if type(luaInstance.onInit) == "function" then
         if not luaInstance:onInit() then return nil end
     end
-
-    luacore.si_actor_mgr_add_instance(cppActor)
 
     if not localInstances[actorType] then
         localInstances[actorType] = {}
