@@ -1,4 +1,30 @@
+# Build directories
 build/
 build2/
 build_vcpkg/
 third_part/
+
+# CMake generated files (root in-tree build)
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+
+# Bundled third-party library build dirs (Linux)
+nats-build/
+redispp-build/
+
+# Build output / binaries
+lib/
+bin/
+
+# Engine in-tree build artifacts
+engine/CMakeFiles/
+engine/Makefile
+engine/cmake_install.cmake
+engine/RealServer
+
+# Runtime config with credentials — copy server.xml.example → server.xml
+config/server.xml
