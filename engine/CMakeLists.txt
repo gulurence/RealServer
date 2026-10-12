@@ -337,7 +337,7 @@ endif()
 if(MSVC)
     add_custom_command(TARGET RealServer POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/windows"
-        COMMAND powershell -NoProfile -Command "Copy-Item '$<TARGET_FILE:RealServer>' '${CMAKE_SOURCE_DIR}/bin/windows/RealServer.exe' -Force -ErrorAction SilentlyContinue"
+        COMMAND powershell -NoProfile -Command "try { Copy-Item '$<TARGET_FILE:RealServer>' '${CMAKE_SOURCE_DIR}/bin/windows/RealServer.exe' -Force -ErrorAction Stop } catch { }; exit 0"
         COMMENT "Deploying RealServer.exe -> bin/windows (best-effort)")
 endif()
 
