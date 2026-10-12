@@ -1,9 +1,6 @@
 [submodule "third_part/grpc"]
 	path = third_part/grpc
 	url = https://github.com/grpc/grpc.git
-[submodule "third_part/hiredis"]
-	path = third_part/hiredis
-	url = https://gitee.com/mirrors/hiredis.git
 [submodule "third_part/protobuf"]
 	path = third_part/protobuf
 	url = https://github.com/protocolbuffers/protobuf.git
