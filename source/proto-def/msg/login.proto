@@ -1,24 +1,82 @@
-﻿// my_service.proto
-
+// =============================================================================
+// login.proto — 登录模块协议 (一级 Actor 类型 = AT_LOGIN = 101)
+//
+// 结构规范: 消息ID枚举 => 子数据定义 => 协议定义
+// 协议定义每条消息前两个字段为 uint32 BigType / uint32 SmallType (消息路由):
+//   BigType   = 一级 actor 类型 (固定 101 = AT_LOGIN)
+//   SmallType = 本模块内消息 ID (LoginMsgId 枚举)
+// 后续接消息数据。
+// =============================================================================
 syntax = "proto3";
 
-package PbMsg;
+package PbLogin;
 
+import "msg/msg_id.proto";
+import "msg/account.proto";
 
-
-
-
-
-
-
-// 请求消息
-message LoginRequest {
-  string name = 1;
-  int32 index = 2;
+// ---------------------------------------------------------------------------
+// 消息 ID 枚举 (SmallType 路由字段取值)
+// ---------------------------------------------------------------------------
+enum LoginMsgId {
+  LOGIN_MSG_NONE             = 0;
+  LOGIN_MSG_LOGIN_REQ        = 1;   // 客户端 -> Gate: 携带 Session 登录
+  LOGIN_MSG_LOGIN_RSP        = 2;   // Gate -> 客户端: 账号信息 + 角色列表
+  LOGIN_MSG_SELECT_ROLE_REQ  = 3;   // 客户端 -> Gate: 选角
+  LOGIN_MSG_SELECT_ROLE_RSP  = 4;   // Gate -> 客户端: 选角结果 + Player 信息
+  LOGIN_MSG_CREATE_ROLE_REQ  = 5;   // 客户端 -> Gate: 创角
+  LOGIN_MSG_CREATE_ROLE_RSP  = 6;   // Gate -> 客户端: 创角结果 + RoleInfo
 }
 
-// 响应消息
-message LoginResponse {
-  string message = 1;
-  int32 index = 2;
+// ---------------------------------------------------------------------------
+// 协议定义
+// ---------------------------------------------------------------------------
+
+// 登录请求 (客户端 -> Gate)
+message PBMsgLoginReq {
+  uint32 big_type   = 1;   // = AT_LOGIN (101)
+  uint32 small_type = 2;   // = LOGIN_MSG_LOGIN_REQ (1)
+  string token      = 3;   // WebPlatform 签发的 Session token
+  int64  account_id = 4;   // 可选: 若已知 account_id 可直接带上
+}
+
+// 登录响应 (Gate -> 客户端)
+message PBMsgLoginRsp {
+  uint32 big_type   = 1;   // = AT_LOGIN (101)
+  uint32 small_type = 2;   // = LOGIN_MSG_LOGIN_RSP (2)
+  PbID.ErrorCode error_code = 3;
+  PbAccount.AccountInfo        account = 4;   // 账号信息
+  repeated PbAccount.RoleInfo  roles   = 5;   // 角色列表
+}
+
+// 选角请求 (客户端 -> Gate)
+message PBMsgSelectRoleReq {
+  uint32 big_type   = 1;   // = AT_LOGIN (101)
+  uint32 small_type = 2;   // = LOGIN_MSG_SELECT_ROLE_REQ (3)
+  int64  account_id = 3;
+  int64  role_id    = 4;
+}
+
+// 选角响应 (Gate -> 客户端)
+message PBMsgSelectRoleRsp {
+  uint32 big_type   = 1;   // = AT_LOGIN (101)
+  uint32 small_type = 2;   // = LOGIN_MSG_SELECT_ROLE_RSP (4)
+  PbID.ErrorCode error_code = 3;
+  PbAccount.PlayerInfo player = 4;   // Player actor 创建完成后的玩家信息
+}
+
+// 创角请求 (客户端 -> Gate)
+message PBMsgCreateRoleReq {
+  uint32 big_type   = 1;   // = AT_LOGIN (101)
+  uint32 small_type = 2;   // = LOGIN_MSG_CREATE_ROLE_REQ (5)
+  int64  account_id = 3;
+  string role_name  = 4;   // 角色名
+  int32  job        = 5;   // 职业
+}
+
+// 创角响应 (Gate -> 客户端)
+message PBMsgCreateRoleRsp {
+  uint32 big_type   = 1;   // = AT_LOGIN (101)
+  uint32 small_type = 2;   // = LOGIN_MSG_CREATE_ROLE_RSP (6)
+  PbID.ErrorCode error_code = 3;
+  PbAccount.RoleInfo role = 4;   // 创建成功的角色摘要
 }

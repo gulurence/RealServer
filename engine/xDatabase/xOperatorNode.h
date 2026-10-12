@@ -6,44 +6,59 @@
 #include "xDatabase/xDBConnPool.h"
 #include "xBase/xThread.h"
 
-
 struct DBDataNode : public xObjPoolBase
 {
-    unsigned short mLen = 0;
-    unsigned short mMaxLen = 0;
-    unsigned char *mBuffer = nullptr;
+    uint16 mLen = 0;
+    uint16 mMaxLen = 0;
+    uint8 *mBuffer = nullptr;
 
-    DBDataNode() {}
-    DBDataNode(const DBDataNode& In) {
-        if (In.mLen > 0) {
+    DBDataNode()
+    {
+    }
+    DBDataNode(const DBDataNode &In)
+    {
+        if (In.mLen > 0)
+        {
             Init(In.mBuffer, In.mLen);
         }
     }
-    DBDataNode &operator=(const DBDataNode& In) {
-        if (this == &In)return *this;
-        if (In.mLen > 0) {
+    DBDataNode &operator=(const DBDataNode &In)
+    {
+        if (this == &In)
+        {
+            return *this;
+        }
+        if (In.mLen > 0)
+        {
             Init(In.mBuffer, In.mLen);
         }
         return *this;
     }
-    void Init(unsigned char *buffer, unsigned short len) {
-        if (!buffer || !len) {
+    void Init(uint8 *buffer, uint16 len)
+    {
+        if (!buffer || !len)
+        {
             return;
         }
 
         mLen = len;
-        if (mMaxLen < len) {
+        if (mMaxLen < len)
+        {
             if (mBuffer)
-                delete[]mBuffer;
+            {
+                delete[] mBuffer;
+            }
             mMaxLen = len;
-            mBuffer = new unsigned char[mMaxLen];
+            mBuffer = new uint8[mMaxLen];
         }
 
         memcpy(mBuffer, buffer, mLen);
     }
-    ~DBDataNode() {
-        if (mBuffer) {
-            delete[]mBuffer;
+    ~DBDataNode()
+    {
+        if (mBuffer)
+        {
+            delete[] mBuffer;
             mBuffer = nullptr;
         }
     }
@@ -64,7 +79,9 @@ typedef std::function<void(bool)> DBOpCallBack;
 class DatabaseOpNode : public xObjPoolBase
 {
 public:
-    DatabaseOpNode(){}
+    DatabaseOpNode()
+    {
+    }
     ~DatabaseOpNode();
 
 public:
@@ -87,7 +104,10 @@ public:
     uint64 m_u64SteamID = 0;
 
 public:
-    void SetDatabasePool(DBConnPool* pPool) { m_pDBConnPool = pPool; }
+    void SetDatabasePool(DBConnPool *pPool)
+    {
+        m_pDBConnPool = pPool;
+    }
 
 public:
     void CleanUp();
@@ -100,25 +120,28 @@ private:
     bool onDelete();
 
 private:
-    DBConnPool* m_pDBConnPool = nullptr;
+    DBConnPool *m_pDBConnPool = nullptr;
 };
 
-typedef std::list<DatabaseOpNode*> DatabaseOpNodeList;
-
-
+typedef std::list<DatabaseOpNode *> DatabaseOpNodeList;
 
 class DBOperator : public xThread
 {
 public:
-    DBOperator() {}
-    ~DBOperator() {}
+    DBOperator()
+    {
+    }
+    ~DBOperator()
+    {
+    }
 
 private:
-    DBConnPool* m_pConnPool = nullptr;
+    DBConnPool *m_pConnPool = nullptr;
 
 public:
-    bool Init(const char* pHost, int iPort, const char* pDBName, const char* pUser, const char* pPassWd, int iPoolCount);
-    void PushOperator(DatabaseOpNode* pNode);
+    bool Init(const char *pHost, int32 iPort, const char *pDBName, const char *pUser,
+              const char *pPassWd, int32 iPoolCount);
+    void PushOperator(DatabaseOpNode *pNode);
     void Run();
 
 private:
@@ -131,6 +154,4 @@ private:
     std::mutex m_mLock_;
     std::condition_variable m_condCv_;
 };
-typedef std::unordered_map<std::string, DBOperator*> DBOperatorMap;
-
-
+typedef std::unordered_map<std::string, DBOperator *> DBOperatorMap;

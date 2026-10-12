@@ -1,0 +1,52 @@
+# RealServer 编码规范 —— 版式（源自 document/C++_C.pdf《高质量 C++/C 编程指南》v1.0）
+# 仅管版式（空格/括号/空行/缩进/换行），语义项见 document/C++编码规范.md。
+# 与项目 CLAUDE.md 冲突处以 CLAUDE.md 为准；本文件只覆盖 PDF 中可机械化的规则。
+
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++20
+
+# 缩进：4 空格（PDF 示例；与现有代码一致）
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ContinuationIndentWidth: 4
+
+# 行宽：PDF 建议 70~80，工程折中取 100（长日志/中文注释更友好）
+ColumnLimit: 100
+
+# 规则 2-4-1：{ 与 } 各自独占一行（Allman，含函数/控制语句）
+BreakBeforeBraces: Allman
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+# 规则 2-2-2：if/for/while 等执行语句不论多少都加 {}
+InsertBraces: true
+
+# 规则 2-6-1：修饰符 * 和 & 紧靠变量名
+PointerAlignment: Right
+ReferenceAlignment: Right
+DerivePointerAlignment: false
+
+# 访问控制符与 class 左对齐（column 0，与现有代码一致）
+AccessModifierOffset: -4
+
+# 规则 2-3-1/2-3-2：if/for/while 等关键字后留空格再跟 '('，函数名后紧跟 '('
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpacesInAngles: false
+
+# 规则 2-5-2：长表达式在低优先级操作符处换行，操作符放在新行之首
+BreakBeforeBinaryOperators: All
+
+# 规则 2-1-1/2-1-2：空行分隔段落，但不过多
+MaxEmptyLinesToKeep: 1
+
+# include 保持既有顺序（工程头文件/标准库分组与相对路径加载约定），不做重排
+SortIncludes: false
+
+# 类型转换后不留空格，如 (int32)x
+SpaceAfterCStyleCast: false

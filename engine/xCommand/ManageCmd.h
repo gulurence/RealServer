@@ -5,19 +5,13 @@
 
 namespace Cmd
 {
-    struct ManageCmd : public xCommand
+struct ManageCmd : public xCommand
+{
+    ManageCmd(uint8 p) : xCommand(MANAGE_CMD, p)
     {
-        ManageCmd(uint8 p) : xCommand(MANAGE_CMD, p) {
-        }
-    };
-    
-}
+    }
+};
+
+} // namespace Cmd
 
 #pragma pack()
-
-
-
-
-
-
-

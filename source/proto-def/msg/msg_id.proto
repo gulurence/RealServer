@@ -1,0 +1,55 @@
+// =============================================================================
+// msg_id.proto — 全局消息 ID 枚举
+// 一级 Actor 类型 (BigType 路由字段取值) + 系统级枚举
+//
+// 对应 C++ 侧 engine/xBase/xTypeDefine.h (经 xDefine.h include):
+//   - EActorType (A 前缀语义): Gate=100 / Login=101 / Friend=102 / Room=103 / Chat=104 /
+//     Player=201 / Battle=203 / Spectator=204
+//   - EProcessType (P 前缀语义): Gate=100 / Login=101 / Global=102 / Game=201
+// 两者解耦: Actor 类型决定协议路由, 进程类型决定容器身份与 Actor 动态负载。
+// =============================================================================
+syntax = "proto3";
+
+package PbID;
+
+// ---------------------------------------------------------------------------
+// 一级 Actor 类型 — 协议 BigType 字段取值 (消息路由目标)
+// ---------------------------------------------------------------------------
+enum ActorType {
+  AT_NONE      = 0;
+  AT_GATE      = 100;   // 网关 Actor (客户端接入)
+  AT_LOGIN     = 101;   // 登录 Actor (登录/选角逻辑)
+  AT_FRIEND    = 102;   // 好友 Actor (Global 进程, 单例)
+  AT_ROOM      = 103;   // 房间 Actor (Global 进程, 单例)
+  AT_CHAT      = 104;   // 聊天 Actor (Global 进程, 单例)
+  AT_CONFIG    = 105;   // 配置 Actor (Global 进程, 单例, 配置热更拉取/推送)
+  AT_PLAYER    = 201;   // 玩家 Actor (由 Game 进程承载)
+  AT_BATTLE    = 203;   // 战斗 Actor (Game 进程, 多实例)
+  AT_SPECTATOR = 204;   // 观战 Actor (Game 进程, 多实例)
+}
+
+// ---------------------------------------------------------------------------
+// 账户状态机 — 需求里反复出现的「更新游戏账户状态」
+//   Created -> LoggedIn -> RoleListed -> RoleSelected -> InGame
+// ---------------------------------------------------------------------------
+enum AccountState {
+  ACCOUNT_STATE_CREATED        = 0;   // 已创建 (WebPlatform 建号)
+  ACCOUNT_STATE_LOGGED_IN      = 1;   // 已登录 (Gate 校验 Session 通过)
+  ACCOUNT_STATE_ROLE_LISTED    = 2;   // 已拉取角色列表
+  ACCOUNT_STATE_ROLE_SELECTED  = 3;   // 已选角
+  ACCOUNT_STATE_IN_GAME        = 4;   // 已进入游戏 (Player actor 创建完成)
+}
+
+// ---------------------------------------------------------------------------
+// 通用错误码
+// ---------------------------------------------------------------------------
+enum ErrorCode {
+  ERR_NONE                  = 0;
+  ERR_SESSION_INVALID       = 1001;   // Session 无效/过期
+  ERR_ACCOUNT_NOT_FOUND     = 1002;   // 账户不存在
+  ERR_ROLE_NOT_FOUND        = 1003;   // 角色不存在
+  ERR_NO_AVAILABLE_PROCESS  = 1004;   // 无可用 Game 进程承载 Player
+  ERR_ROLE_NAME_TAKEN       = 1005;   // 角色名已被占用
+  ERR_ROLE_NAME_INVALID     = 1006;   // 角色名非法 (空/超长/含非法字符)
+  ERR_INTERNAL              = 1999;   // 内部错误
+}

@@ -1,0 +1,7 @@
+{
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "lua-lsp@claude-plugins-official": true
+  }
+}

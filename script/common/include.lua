@@ -10,18 +10,19 @@
 
 xEngine = xEngine or {}
 
-package.loaded["common.actor_type"] = nil
-package.loaded["common.class"] = nil
-package.loaded["common.redis"] = nil
-package.loaded["common.db"] = nil
-package.loaded["common.rpc"] = nil
-package.loaded["common.util.include"] = nil
-package.loaded["common.actor.include"] = nil
-
+-- 幂等 require: 不再清 package.loaded。否则热更链路 (LuaHotFix 重跑业务 chunk 时其内部
+-- require("common.include")) 会重建 common.class 等框架模块的 file-local 注册表
+-- (ClassRegistry / protoRegistry / localInstances), 导致既有实例失去类表引用而断链。
+-- 标准 require 尊重 package.loaded 缓存, 框架模块首次加载后即常驻。
 require("common.actor_type")
+require("common.msg_id")
 require("common.class")
 require("common.redis")
 require("common.db")
 require("common.rpc")
+require("common.account")
 require("common.util.include")
 require("common.actor.include")
+
+-- LuaHotFix 热更插件 (全局公共模块): xEngine.HotFix
+xEngine.HotFix = require("common.hotfix")

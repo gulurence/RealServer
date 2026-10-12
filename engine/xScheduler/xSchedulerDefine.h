@@ -2,7 +2,6 @@
 
 #include "../xBase/xDefine.h"
 
-
 // 调度器类型
 enum SchedulerType
 {
@@ -13,8 +12,6 @@ enum SchedulerType
     // 同步调用
     SchedulerType_Max,
 };
-
-
 
 // 调度状态
 enum SchedulerStateType
@@ -33,34 +30,3 @@ enum SchedulerStateType
     // 重置调度中
     SchedulerStateType_Reset,
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

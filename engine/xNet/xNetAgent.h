@@ -7,7 +7,7 @@
 class xNetAgent : public xThread
 {
 public:
-    xNetAgent(const NetAgentConfigST& stConfig);
+    xNetAgent(const NetAgentConfigST &stConfig);
     virtual ~xNetAgent();
 
 public:
@@ -23,4 +23,3 @@ protected:
 private:
     NetAgentConfigST m_stConfig;
 };
-

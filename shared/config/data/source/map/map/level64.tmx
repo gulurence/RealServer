@@ -1,0 +1,869 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="22" height="13" tilewidth="64" tileheight="64">
+ <tileset firstgid="1" name="bg06" tilewidth="64" tileheight="64">
+  <image source="bg06.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="65" name="06jianzhu_menL01" tilewidth="57" tileheight="205">
+  <image source="06jianzhu_menL01.png" width="57" height="205"/>
+ </tileset>
+ <tileset firstgid="66" name="06jianzhu_menR01" tilewidth="57" tileheight="205">
+  <image source="06jianzhu_menR01.png" width="57" height="205"/>
+ </tileset>
+ <tileset firstgid="67" name="06jianzhu_men01" tilewidth="140" tileheight="116">
+  <image source="06jianzhu_men01.png" width="140" height="116"/>
+ </tileset>
+ <tileset firstgid="68" name="06jianzhu_men02" tilewidth="91" tileheight="41">
+  <image source="06jianzhu_men02.png" width="91" height="41"/>
+ </tileset>
+ <tileset firstgid="69" name="06jianzhu_sxt01L" tilewidth="59" tileheight="61">
+  <image source="06jianzhu_sxt01L.png" width="59" height="61"/>
+ </tileset>
+ <tileset firstgid="70" name="06jianzhu_sxt01R" tilewidth="59" tileheight="61">
+  <image source="06jianzhu_sxt01R.png" width="59" height="61"/>
+ </tileset>
+ <tileset firstgid="71" name="banmaxian_b" tilewidth="64" tileheight="128">
+  <image source="banmaxian_b.png" width="64" height="128"/>
+ </tileset>
+ <tileset firstgid="72" name="hengxian" tilewidth="128" tileheight="64">
+  <image source="hengxian.png" width="128" height="64"/>
+ </tileset>
+ <tileset firstgid="73" name="che4.1" tilewidth="152" tileheight="196">
+  <image source="che4.1.png" width="152" height="196"/>
+ </tileset>
+ <tileset firstgid="74" name="che6.1" tilewidth="204" tileheight="114">
+  <image source="che6.1.png" width="204" height="114"/>
+ </tileset>
+ <tileset firstgid="75" name="che1" tilewidth="194" tileheight="120">
+  <image source="che1.png" width="194" height="120"/>
+ </tileset>
+ <tileset firstgid="76" name="che5.1" tilewidth="148" tileheight="188">
+  <image source="che5.1.png" width="148" height="188"/>
+ </tileset>
+ <tileset firstgid="77" name="xiaoche" tilewidth="328" tileheight="253">
+  <image source="xiaoche.png" width="328" height="253"/>
+ </tileset>
+ <tileset firstgid="78" name="che2" tilewidth="192" tileheight="113">
+  <image source="che2.png" width="192" height="113"/>
+ </tileset>
+ <tileset firstgid="79" name="luzhang5" tilewidth="128" tileheight="128">
+  <image source="luzhang5.png" width="128" height="128"/>
+ </tileset>
+ <tileset firstgid="80" name="luzhang3" tilewidth="128" tileheight="128">
+  <image source="luzhang3.png" width="128" height="128"/>
+ </tileset>
+ <tileset firstgid="81" name="luntai" tilewidth="81" tileheight="78">
+  <image source="luntai.png" width="81" height="78"/>
+ </tileset>
+ <tileset firstgid="82" name="64x64_luntai" tilewidth="64" tileheight="64">
+  <image source="64x64_luntai.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="83" name="che3" tilewidth="97" tileheight="186">
+  <image source="che3.png" width="97" height="186"/>
+ </tileset>
+ <tileset firstgid="84" name="che6" tilewidth="204" tileheight="114">
+  <image source="che6.png" width="204" height="114"/>
+ </tileset>
+ <tileset firstgid="85" name="06jianzhu_keng01" tilewidth="61" tileheight="57">
+  <image source="06jianzhu_keng01.png" width="61" height="57"/>
+ </tileset>
+ <tileset firstgid="86" name="06jianzhu_keng02" tilewidth="63" tileheight="57">
+  <image source="06jianzhu_keng02.png" width="63" height="57"/>
+ </tileset>
+ <tileset firstgid="87" name="heng2" tilewidth="100" tileheight="58">
+  <image source="heng2.png" width="100" height="58"/>
+ </tileset>
+ <tileset firstgid="88" name="wan1.2" tilewidth="108" tileheight="132">
+  <image source="wan1.2.png" width="108" height="132"/>
+ </tileset>
+ <tileset firstgid="89" name="zhi1" tilewidth="73" tileheight="127">
+  <image source="zhi1.png" width="73" height="127"/>
+ </tileset>
+ <tileset firstgid="90" name="xueji31" tilewidth="64" tileheight="192">
+  <image source="xueji31.png" width="64" height="192"/>
+ </tileset>
+ <tileset firstgid="91" name="xueji6" tilewidth="128" tileheight="128">
+  <image source="xueji6.png" width="128" height="128"/>
+ </tileset>
+ <tileset firstgid="92" name="xueji4" tilewidth="256" tileheight="64">
+  <image source="xueji4.png" width="256" height="64"/>
+ </tileset>
+ <tileset firstgid="93" name="xueji1" tilewidth="128" tileheight="128">
+  <image source="xueji1.png" width="128" height="128"/>
+ </tileset>
+ <tileset firstgid="94" name="xueji5" tilewidth="256" tileheight="192">
+  <image source="xueji5.png" width="256" height="192"/>
+ </tileset>
+ <tileset firstgid="95" name="yinjing" tilewidth="64" tileheight="64">
+  <image source="yinjing.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="96" name="luzhang2" tilewidth="128" tileheight="128">
+  <image source="luzhang2.png" width="128" height="128"/>
+ </tileset>
+ <tileset firstgid="97" name="jianzhu_256x64_xj2" tilewidth="256" tileheight="64">
+  <image source="jianzhu_256x64_xj2.png" width="256" height="64"/>
+ </tileset>
+ <tileset firstgid="98" name="05jianzhu_x_ce01" tilewidth="71" tileheight="124">
+  <image source="05jianzhu_x_ce01.png" width="71" height="124"/>
+ </tileset>
+ <tileset firstgid="99" name="05jianzhu_x_ce02" tilewidth="51" tileheight="92">
+  <image source="05jianzhu_x_ce02.png" width="51" height="92"/>
+ </tileset>
+ <tileset firstgid="100" name="baozhi01" tilewidth="64" tileheight="64">
+  <image source="baozhi01.png" width="64" height="64"/>
+ </tileset>
+ <tileset firstgid="101" name="06jianzhu_menL02" tilewidth="57" tileheight="205">
+  <image source="06jianzhu_menL02.png" width="57" height="205"/>
+ </tileset>
+ <tileset firstgid="102" name="04jianzhu_bili" tilewidth="57" tileheight="124">
+  <image source="04jianzhu_bili.png" width="57" height="124"/>
+ </tileset>
+ <layer name="background" width="22" height="13">
+  <data encoding="base64" compression="zlib">
+   eJztzElXgQEAheGPDEVCA4pQiOaQMdP//1WexbdwOuIcy47Fs7v3jQRBEOWEGHESJDnlmRdeQ2+87/l8cEaKNOdkuCBLji49+qFvBtxyR5kK91SpUSfPJVdcc0OBIiUmTPkJzZjzwCMNmrR4ok0n7C5Y/mHE+Jfhjv1qo/u15Xuoz2P32P0H3TX4sjTc
+  </data>
+ </layer>
+ <objectgroup name="buildlayer1" width="22" height="13">
+  <object name="build1" type="build" gid="65" x="27" y="617">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="06jianzhu_menL01.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer2" width="22" height="13">
+  <object name="build1" type="build" gid="66" x="1325" y="627">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="06jianzhu_menR01.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer4" width="22" height="13">
+  <object name="build1" type="build" gid="68" x="650" y="168">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="06jianzhu_men02.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer3" width="22" height="13">
+  <object name="build1" type="build" gid="67" x="680" y="204">
+   <properties>
+    <property name="buh" value="3"/>
+    <property name="filename" value="06jianzhu_men01.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer5" width="22" height="13">
+  <object name="build1" type="build" gid="69" x="36" y="342">
+   <properties>
+    <property name="filename" value="06jianzhu_sxt01L.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer6" width="22" height="13">
+  <object name="build1" type="build" gid="70" x="1318" y="358">
+   <properties>
+    <property name="filename" value="06jianzhu_sxt01R.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer7" width="22" height="13">
+  <object name="build1" type="build" gid="71" x="196" y="405">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="71" x="503" y="402">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build3" type="build" gid="71" x="503" y="516">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build4" type="build" gid="71" x="503" y="627">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build5" type="build" gid="71" x="196" y="515">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build6" type="build" gid="71" x="196" y="627">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build7" type="build" gid="71" x="838" y="404">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build8" type="build" gid="71" x="838" y="514">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build9" type="build" gid="71" x="838" y="626">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build10" type="build" gid="71" x="1145" y="401">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build11" type="build" gid="71" x="1145" y="515">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build12" type="build" gid="71" x="1145" y="626">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build13" type="build" gid="71" x="195" y="866">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build14" type="build" gid="71" x="502" y="863">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build15" type="build" gid="71" x="836" y="869">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+  <object name="build16" type="build" gid="71" x="1143" y="866">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="banmaxian_b.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer8" width="22" height="13">
+  <object name="build1" type="build" gid="72" x="216" y="319">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="72" x="332" y="319">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build3" type="build" gid="72" x="416" y="319">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build4" type="build" gid="72" x="407" y="429">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build7" type="build" gid="72" x="297" y="429">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build5" type="build" gid="72" x="407" y="549">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build6" type="build" gid="72" x="229" y="429">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build8" type="build" gid="72" x="305" y="549">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build9" type="build" gid="72" x="225" y="549">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build10" type="build" gid="72" x="418" y="661">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build11" type="build" gid="72" x="310" y="661">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build12" type="build" gid="72" x="216" y="661">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build22" type="build" gid="72" x="858" y="660">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build16" type="build" gid="72" x="871" y="428">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build20" type="build" gid="72" x="947" y="548">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build24" type="build" gid="72" x="1060" y="660">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build15" type="build" gid="72" x="1058" y="318">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build19" type="build" gid="72" x="867" y="548">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build21" type="build" gid="72" x="1049" y="548">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build18" type="build" gid="72" x="1049" y="428">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build13" type="build" gid="72" x="858" y="318">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build23" type="build" gid="72" x="952" y="660">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build14" type="build" gid="72" x="974" y="318">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build17" type="build" gid="72" x="939" y="428">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build27" type="build" gid="72" x="415" y="780">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build26" type="build" gid="72" x="331" y="780">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build25" type="build" gid="72" x="215" y="780">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build30" type="build" gid="72" x="1056" y="783">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build29" type="build" gid="72" x="972" y="783">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+  <object name="build28" type="build" gid="72" x="856" y="783">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="hengxian.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer20" width="22" height="13">
+  <object name="build1" type="build" gid="81" x="1140" y="256">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="luntai.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="81" x="313" y="770">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="luntai.png"/>
+   </properties>
+  </object>
+  <object name="build3" type="build" gid="81" x="413" y="803">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="luntai.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer16" width="22" height="13">
+  <object name="build1" type="build" gid="80" x="691" y="851">
+   <properties>
+    <property name="filename" value="luzhang3.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="80" x="1121" y="360">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="luzhang3.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer9" width="22" height="13">
+  <object name="build1" type="build" gid="73" x="1178" y="363">
+   <properties>
+    <property name="buh" value="5"/>
+    <property name="filename" value="che4.1.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="73" x="72" y="888">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="che4.1.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer10" width="22" height="13">
+  <object name="build2" type="build" gid="74" x="325" y="487">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="che6.1.png"/>
+   </properties>
+  </object>
+  <object name="build1" type="build" gid="74" x="516" y="841">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="che6.1.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer28" width="22" height="13">
+  <object name="build1" type="build" gid="92" x="759" y="591">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="xueji4.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer33" width="22" height="13">
+  <object name="build1" type="build" gid="97" x="199" y="273">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="jianzhu_256x64_xj2.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer11" width="22" height="13">
+  <object name="build1" type="build" gid="75" x="886" y="548">
+   <properties>
+    <property name="buh" value="3"/>
+    <property name="filename" value="che1.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="75" x="85" y="296">
+   <properties>
+    <property name="buh" value="3"/>
+    <property name="filename" value="che1.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer13" width="22" height="13">
+  <object name="build1" type="build" gid="77" x="78" y="947">
+   <properties>
+    <property name="buh" value="3"/>
+    <property name="filename" value="xiaoche.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer14" width="22" height="13">
+  <object name="build1" type="build" gid="78" x="1154" y="847">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="che2.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer15" width="22" height="13">
+  <object name="build1" type="build" gid="79" x="404" y="848">
+   <properties>
+    <property name="buh" value="3"/>
+    <property name="filename" value="luzhang5.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer12" width="22" height="13">
+  <object name="build2" type="build" gid="76" x="472" y="564">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="che5.1.png"/>
+   </properties>
+  </object>
+  <object name="build1" type="build" gid="76" x="764" y="914">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="che5.1.png"/>
+   </properties>
+  </object>
+  <object name="build3" type="build" gid="76" x="695" y="91">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="che5.1.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer19" width="22" height="13">
+  <object name="build1" type="build" gid="82" x="414" y="518">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="64x64_luntai.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer18" width="22" height="13">
+  <object name="build1" type="build" gid="83" x="1075" y="924">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="che3.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer17" width="22" height="13">
+  <object name="build1" type="build" gid="84" x="882" y="603">
+   <properties>
+    <property name="buh" value="4"/>
+    <property name="filename" value="che6.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="84" x="938" y="273">
+   <properties>
+    <property name="buh" value="5"/>
+    <property name="filename" value="che6.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer21" width="22" height="13">
+  <object name="build2" type="build" gid="85" x="751" y="579">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="06jianzhu_keng01.png"/>
+   </properties>
+  </object>
+  <object name="build3" type="build" gid="85" x="103" y="694">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="06jianzhu_keng01.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer22" width="22" height="13">
+  <object name="build1" type="build" gid="86" x="894" y="254">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="06jianzhu_keng02.png"/>
+   </properties>
+  </object>
+  <object name="build1" type="build" gid="86" x="1084" y="729">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="06jianzhu_keng02.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer23" width="22" height="13">
+  <object name="build1" type="build" gid="87" x="805" y="426">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="heng2.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer24" width="22" height="13">
+  <object name="build1" type="build" gid="88" x="646" y="140">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="wan1.2.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer25" width="22" height="13">
+  <object name="build1" type="build" gid="89" x="241" y="433">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="zhi1.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer26" width="22" height="13">
+  <object name="build1" type="build" gid="90" x="967" y="820">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="xueji31.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer27" width="22" height="13">
+  <object name="build1" type="build" gid="91" x="593" y="744">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="xueji6.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="91" x="1014" y="386">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="xueji6.png"/>
+   </properties>
+  </object>
+  <object name="build3" type="build" gid="91" x="932" y="897">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="xueji6.png"/>
+   </properties>
+  </object>
+  <object name="build4" type="build" gid="91" x="74" y="775">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="xueji6.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer29" width="22" height="13">
+  <object name="build1" type="build" gid="93" x="148" y="536">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="xueji1.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="93" x="631" y="64">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="xueji1.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer30" width="22" height="13">
+  <object name="build1" type="build" gid="94" x="551" y="377">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="xueji5.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer31" width="22" height="13">
+  <object name="build1" type="build" gid="95" x="1261" y="443">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="yinjing.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="95" x="84" y="438">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="yinjing.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer32" width="22" height="13">
+  <object name="build1" type="build" gid="96" x="328" y="562">
+   <properties>
+    <property name="buh" value="2"/>
+    <property name="filename" value="luzhang2.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer34" width="22" height="13">
+  <object name="build1" type="build" gid="98" x="1320" y="301">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="05jianzhu_x_ce01.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="98" x="1318" y="739">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="05jianzhu_x_ce01.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer35" width="22" height="13">
+  <object name="build1" type="build" gid="99" x="25" y="413">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="05jianzhu_x_ce02.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer36" width="22" height="13">
+  <object name="build1" type="build" gid="100" x="475" y="253">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="baozhi01.png"/>
+   </properties>
+  </object>
+  <object name="build2" type="build" gid="100" x="206" y="703">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="baozhi01.png"/>
+   </properties>
+  </object>
+  <object name="build3" type="build" gid="100" x="788" y="494">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="baozhi01.png"/>
+   </properties>
+  </object>
+  <object name="build4" type="build" gid="100" x="1192" y="541">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="baozhi01.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer37" width="22" height="13">
+  <object name="build1" type="build" gid="101" x="28" y="619">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="06jianzhu_menL02.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="buildlayer38" width="22" height="13">
+  <object name="build1" type="build" gid="102" x="86" y="589">
+   <properties>
+    <property name="buh" value="1"/>
+    <property name="filename" value="04jianzhu_bili.png"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="collide_people" width="22" height="13">
+  <object name="collide1" type="collide" x="-30" y="688" width="435" height="171"/>
+  <object name="collide2" type="collide" x="346" y="723" width="580" height="800"/>
+  <object name="collide3" type="collide" x="1053" y="731" width="389" height="781"/>
+  <object name="collide4" type="collide" x="863" y="426" width="239" height="172"/>
+  <object name="collide5" type="collide" x="925" y="79" width="238" height="191"/>
+  <object name="collide6" type="collide" x="1119" y="167" width="238" height="193"/>
+  <object name="collide7" type="collide" x="1309" y="279" width="140" height="523"/>
+  <object name="collide8" type="collide" x="-40" y="230" width="140" height="523"/>
+  <object name="collide9" type="collide" x="56" y="124" width="239" height="172"/>
+  <object name="collide10" type="collide" x="318" y="371" width="306" height="116"/>
+  <object name="collide11" type="collide" x="363" y="445" width="233" height="117"/>
+  <object name="collide12" type="collide" x="238" y="-74" width="358" height="281"/>
+  <object name="collide13" type="collide" x="808" y="-78" width="358" height="281"/>
+  <object name="collide14" type="collide" x="666" y="-5" width="238" height="191"/>
+  <object name="collide15" type="collide" x="537" y="-15" width="196" height="54"/>
+ </objectgroup>
+ <objectgroup name="collide_bullet" width="22" height="13" visible="0">
+  <object name="collide1" type="collide_bullet" x="393" y="374" width="159" height="133"/>
+  <object name="collide2" type="collide_bullet" x="539" y="398" width="43" height="52"/>
+  <object name="collide3" type="collide_bullet" x="-82" y="691" width="459" height="149"/>
+  <object name="collide4" type="collide_bullet" x="283" y="724" width="596" height="144"/>
+  <object name="collide5" type="collide_bullet" x="1073" y="729" width="310" height="127"/>
+  <object name="collide6" type="collide_bullet" x="1351" y="245" width="139" height="540"/>
+  <object name="collide7" type="collide_bullet" x="912" y="464" width="121" height="96"/>
+  <object name="collide8" type="collide_bullet" x="1150" y="155" width="208" height="165"/>
+  <object name="collide9" type="collide_bullet" x="970" y="126" width="204" height="103"/>
+  <object name="collide10" type="collide_bullet" x="691" y="1" width="300" height="172"/>
+  <object name="collide11" type="collide_bullet" x="221" y="-68" width="361" height="240"/>
+  <object name="collide12" type="collide_bullet" x="49" y="115" width="186" height="135"/>
+  <object name="collide13" type="collide_bullet" x="-129" y="232" width="187" height="544"/>
+ </objectgroup>
+ <objectgroup name="entry" width="22" height="13">
+  <object name="entry3" type="entry" x="633" y="45" width="40" height="37"/>
+  <object name="entry1" type="entry" x="992" y="807" width="68" height="63"/>
+  <object name="entry2" type="entry" x="106" y="499" width="20" height="22"/>
+ </objectgroup>
+ <objectgroup name="hero" width="22" height="13">
+  <object name="out1" x="674" y="270" width="41" height="32"/>
+ </objectgroup>
+ <objectgroup name="drop_point" width="22" height="13">
+  <object name="drop_1" x="677" y="499" width="86" height="79">
+   <properties>
+    <property name="drop_jl" value="100"/>
+   </properties>
+  </object>
+  <object name="drop_2" x="694" y="385" width="73" height="62">
+   <properties>
+    <property name="add_hp" value="100"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="gift_point" width="22" height="13">
+  <object x="481" y="298" width="35" height="46">
+   <properties>
+    <property name="giftid" value="6"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

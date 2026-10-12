@@ -1,0 +1,6 @@
+#pragma once
+
+// 进程二进制版本 (git 派生, CMake configure 时生成, 勿手改)。
+// 格式: 短提交哈希-提交时间(YYYYMMDDHHMM)。每次提交必然变化, 进程注册 hash 的
+// version 字段随之变化, NodeManager 灰度滚动据此比对是否需升级。
+#define GIT_VERSION "@GIT_VERSION@"

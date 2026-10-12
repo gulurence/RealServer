@@ -1,0 +1,94 @@
+// =============================================================================
+// spectator.proto — 观战模块协议 (一级 Actor 类型 = AT_SPECTATOR = 204)
+//
+// 观战玩家只读帧流、不参与模拟: 进入时快照对齐, 之后追帧播放。
+//
+// 结构规范: 消息ID枚举 => 子数据定义 => 协议定义
+// 协议定义每条消息前两个字段为 uint32 BigType / uint32 SmallType (消息路由):
+//   BigType   = 一级 actor 类型 (固定 204 = AT_SPECTATOR)
+//   SmallType = 本模块内消息 ID (SpectatorMsgId 枚举)
+// =============================================================================
+syntax = "proto3";
+
+package PbSpectator;
+
+import "msg/msg_id.proto";
+import "msg/battle.proto";
+
+// ---------------------------------------------------------------------------
+// 消息 ID 枚举 (SmallType 路由字段取值)
+// ---------------------------------------------------------------------------
+enum SpectatorMsgId {
+  SPECTATOR_MSG_NONE      = 0;
+  SPECTATE_ENTER_REQ      = 1;   // 客户端 -> Spectator: 请求观战
+  SPECTATE_ENTER_RSP      = 2;   // Spectator -> 客户端: 进入结果
+  SPECTATE_LEAVE_REQ      = 3;   // 客户端 -> Spectator: 退出观战
+  SPECTATE_LEAVE_RSP      = 4;   // Spectator -> 客户端: 退出结果
+  SPECTATE_SNAPSHOT_NTF   = 5;   // Spectator -> 客户端: 快照对齐
+  SPECTATE_FRAME_NTF      = 6;   // Spectator -> 客户端: 帧流追帧
+  SPECTATE_END_NTF        = 7;   // Spectator -> 客户端: 观战结束
+}
+
+// ---------------------------------------------------------------------------
+// 协议定义
+// ---------------------------------------------------------------------------
+
+// 请求观战 (客户端 -> Spectator)
+message PBSpectateEnterReq {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = SPECTATE_ENTER_REQ (1)
+  int64  battle_id  = 3;   // 目标战斗房
+  int64  player_id  = 4;   // 观战玩家 ID
+}
+
+// 进入结果 (Spectator -> 客户端)
+// 字段号刻意对齐 battle.proto 的 PBBattleEnterRsp (seed=5/players=6/level_id=8/difficulty=9),
+// 使客户端复用同一套花名册解析代码进入战斗场景; 字段 7 跳过 (= battle 的 max_frame, 观战不需)。
+message PBSpectateEnterRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = SPECTATE_ENTER_RSP (2)
+  PbID.ErrorCode error_code = 3;
+  int64  battle_id          = 4;
+  uint32 seed               = 5;   // 确定性种子 (battleId % 0xFFFFFFFF)+1
+  repeated PbBattle.PBBattlePlayer players = 6;  // 花名册 (与 PBBattleEnterRsp.players 同构)
+  uint32 level_id           = 8;   // 本场关卡 (battle:level:{battleId} 读出)
+  uint32 difficulty         = 9;   // 本场难度
+}
+
+// 退出观战 (客户端 -> Spectator)
+message PBSpectateLeaveReq {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = SPECTATE_LEAVE_REQ (3)
+  int64  battle_id  = 3;
+  int64  player_id  = 4;
+}
+
+// 退出结果 (Spectator -> 客户端)
+message PBSpectateLeaveRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = SPECTATE_LEAVE_RSP (4)
+  PbID.ErrorCode error_code = 3;
+}
+
+// 快照对齐 (Spectator -> 客户端)
+message PBSpectateSnapshotNtf {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = SPECTATE_SNAPSHOT_NTF (5)
+  uint32 frame_id   = 3;
+  bytes  state      = 4;   // BattleCore 全量序列化状态
+}
+
+// 帧流追帧 (Spectator -> 客户端)
+message PBSpectateFrameNtf {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = SPECTATE_FRAME_NTF (6)
+  uint32 frame_id   = 3;
+  bytes  frame      = 4;   // 单帧帧命令序列化数据
+}
+
+// 观战结束 (Spectator -> 客户端)
+message PBSpectateEndNtf {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = SPECTATE_END_NTF (7)
+  int64  battle_id  = 3;
+}

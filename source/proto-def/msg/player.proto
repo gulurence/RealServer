@@ -1,0 +1,49 @@
+// =============================================================================
+// player.proto — 玩家模块协议 (一级 Actor 类型 = AT_PLAYER = 201)
+// Player 是 Actor 类型, 由 Game 进程承载 (与进程类型解耦)。
+// =============================================================================
+syntax = "proto3";
+
+package PbPlayer;
+
+import "msg/msg_id.proto";
+import "msg/account.proto";
+
+// ---------------------------------------------------------------------------
+// 消息 ID 枚举 (SmallType 路由字段取值)
+// ---------------------------------------------------------------------------
+enum PlayerMsgId {
+  PLAYER_MSG_NONE      = 0;
+  PLAYER_MSG_ENTER_REQ = 1;   // 进入游戏
+  PLAYER_MSG_ENTER_RSP = 2;
+  PLAYER_MSG_LEAVE_REQ = 3;
+  PLAYER_MSG_LEAVE_RSP = 4;
+  PLAYER_MSG_SAVE_LOADOUT_REQ = 5;   // 客户端 -> Player: 上传/持久化枪械载具
+}
+
+// ---------------------------------------------------------------------------
+// 协议定义
+// ---------------------------------------------------------------------------
+
+// 进入游戏请求
+message PBMsgPlayerEnterReq {
+  uint32 big_type   = 1;   // = AT_PLAYER (201)
+  uint32 small_type = 2;   // = PLAYER_MSG_ENTER_REQ (1)
+  int64  player_id  = 3;
+}
+
+// 进入游戏响应
+message PBMsgPlayerEnterRsp {
+  uint32 big_type   = 1;   // = AT_PLAYER (201)
+  uint32 small_type = 2;   // = PLAYER_MSG_ENTER_RSP (2)
+  PbID.ErrorCode error_code = 3;
+  PbAccount.PlayerInfo player = 4;
+}
+
+// 上传枪械载具 (客户端 -> Player, 服务端权威持久化)
+message PBMsgPlayerSaveLoadoutReq {
+  uint32 big_type    = 1;   // = AT_PLAYER (201)
+  uint32 small_type  = 2;   // = PLAYER_MSG_SAVE_LOADOUT_REQ (5)
+  string equip       = 3;   // 6 槽载具 "g0,g1,...,g5" (客户端 GunType 原始值, NONE=22)
+  uint32 primary_gun = 4;   // 主枪内核类别 (kGun*: 0/1/2/3/16/17)
+}

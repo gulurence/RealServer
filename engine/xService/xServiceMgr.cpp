@@ -2,24 +2,24 @@
 #include "xServiceMgr.h"
 #include "xScheduler/xScheduler.h"
 
-
-xServiceMgr::xServiceMgr() {
-
+xServiceMgr::xServiceMgr()
+{
 }
 
-xServiceMgr::~xServiceMgr() {
-
+xServiceMgr::~xServiceMgr()
+{
 }
 
-void xServiceMgr::Release() {
-
+void xServiceMgr::Release()
+{
 }
 
-
-bool xServiceMgr::Regist(xService* pService) {
+bool xServiceMgr::Regist(xService *pService)
+{
     std::lock_guard l(m_stLock);
     auto it = m_mapService.find(pService->Id());
-    if (it != m_mapService.end()) {
+    if (it != m_mapService.end())
+    {
         XERR("double regist service [%ld]", pService->Id());
         return false;
     }
@@ -27,16 +27,19 @@ bool xServiceMgr::Regist(xService* pService) {
     return true;
 }
 
-xService* xServiceMgr::Get(const ServiceID& u64ServiceID) {
+xService *xServiceMgr::Get(const ServiceID &u64ServiceID)
+{
     std::lock_guard l(m_stLock);
     auto it = m_mapService.find(u64ServiceID);
-    if (it == m_mapService.end()) {
+    if (it == m_mapService.end())
+    {
         XERR("not find service [%ld]", u64ServiceID);
         return nullptr;
     }
     return it->second;
 }
 
-bool xServiceMgr::UnRegist() {
+bool xServiceMgr::UnRegist()
+{
     return true;
 }

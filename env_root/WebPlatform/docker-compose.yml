@@ -1,0 +1,46 @@
+# =============================================================================
+# RealServer 测试环境 — WebPlatform 后台网站 (PHP)
+#
+# 登录 + 进程容器节点状态展示。自带 mysql(登录) 与 redis(节点状态),
+# 与 ../Mysql、../RedisCluster 逻辑对应, 但本工程自包含可独立 up。
+#
+# 启动:  docker compose up -d --build
+# 访问:  http://localhost:8080/index.php   (账号 admin / admin123)
+# 停止:  docker compose down
+# =============================================================================
+
+services:
+  web:
+    build: .
+    container_name: realserver-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./www:/var/www/html
+    environment:
+      REDIS_HOST: redis
+      DB_HOST: mysql
+    depends_on:
+      - redis
+      - mysql
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    container_name: realserver-web-redis
+    ports:
+      - "6380:6379"          # 与 RedisCluster 的 6379 错开, 避免端口冲突
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: realserver-web-mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: realserver
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+
+volumes: {}

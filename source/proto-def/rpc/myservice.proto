@@ -5,18 +5,15 @@ syntax = "proto3";
 package myservice;
 
 // 请求消息
-message HelloRequest {
+message PBRPCHelloRequest {
   string name = 1;
   int32 index = 2;
 }
 
 // 响应消息
-message HelloReply {
+message PBRPCHelloReply {
   string message = 1;
   int32 index = 2;
 }
 
-// 定义 MyService 服务
-service MyService {
-  rpc SayHello (HelloRequest) returns (HelloReply);
-}
+// (service 定义已退役 — RPC 传输走 asio-TCP)

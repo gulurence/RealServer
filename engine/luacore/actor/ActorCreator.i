@@ -10,10 +10,10 @@
     static bool RegistActor(CActor* actor) {
         return ActorCreator::RegistActor(actor);
     }
-    static CActor* CreateActor(ActorType type, ActorID id) {
+    static CActor* CreateActor(EActorType type, ActorID id) {
         return ActorCreator::Create(type, id);
     }
-    static void SetCreateEnableProxy(ActorType type, bool enable) {
+    static void SetCreateEnableProxy(EActorType type, bool enable) {
         ActorCreator::SetCreateEnable(type, enable);
     }
 }

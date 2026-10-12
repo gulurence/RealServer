@@ -6,9 +6,6 @@
 
 #include "xBase/xSingleton.h"
 
-
-
-
 class xServiceMgr : public xSingleton<xServiceMgr>
 {
 public:
@@ -17,11 +14,12 @@ public:
 
 public:
     bool Regist(xService *);
-    xService* Get(const ServiceID& u64ServiceID);
+    xService *Get(const ServiceID &u64ServiceID);
     bool UnRegist();
 
 public:
-    ServiceMap& GetServices() {
+    ServiceMap &GetServices()
+    {
         return m_mapService;
     }
 
@@ -29,9 +27,7 @@ public:
     virtual void Release();
 
     std::mutex m_stLock;
+
 private:
     ServiceMap m_mapService;
 };
-
-
-

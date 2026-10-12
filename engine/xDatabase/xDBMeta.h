@@ -16,7 +16,7 @@ enum
     DBDATA_TYPE_BIN2,
 };
 
-#define MAX_BIN2_SIZE 1024*10000
+#define MAX_BIN2_SIZE 1024 * 10000
 
 struct DBDataBin2
 {
@@ -27,10 +27,6 @@ struct DBDataBin2
 typedef struct
 {
     const char *name;
-    int type;
-    unsigned int size;
-}dbCol;
-
-
-
-
+    int32 type;
+    uint32 size;
+} dbCol;

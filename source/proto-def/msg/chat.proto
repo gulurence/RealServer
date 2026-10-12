@@ -1,0 +1,95 @@
+// =============================================================================
+// chat.proto — 聊天模块协议 (一级 Actor 类型 = AT_CHAT = 104)
+//
+// 结构规范: 消息ID枚举 => 子数据定义 => 协议定义
+// 协议定义每条消息前两个字段为 uint32 BigType / uint32 SmallType (消息路由):
+//   BigType   = 一级 actor 类型 (固定 104 = AT_CHAT)
+//   SmallType = 本模块内消息 ID (ChatMsgId 枚举)
+// =============================================================================
+syntax = "proto3";
+
+package PbChat;
+
+import "msg/msg_id.proto";
+
+// ---------------------------------------------------------------------------
+// 消息 ID 枚举 (SmallType 路由字段取值)
+// ---------------------------------------------------------------------------
+enum ChatMsgId {
+  CHAT_MSG_NONE       = 0;
+  CHAT_SEND_REQ       = 1;   // 客户端 -> Chat: 发送聊天
+  CHAT_SEND_RSP       = 2;   // Chat -> 客户端: 发送结果
+  CHAT_NTF            = 3;   // Chat -> 频道全员: 聊天广播
+  CHAT_HISTORY_REQ    = 4;   // 客户端 -> Chat: 拉历史消息
+  CHAT_HISTORY_RSP    = 5;   // Chat -> 客户端: 历史消息
+}
+
+// ---------------------------------------------------------------------------
+// 频道类型 (channel_type 取值)
+// ---------------------------------------------------------------------------
+enum ChatChannelType {
+  CHAT_CHANNEL_NONE   = 0;
+  CHAT_CHANNEL_ROOM   = 1;   // 房间频道 (channel_id = roomId)
+  CHAT_CHANNEL_BATTLE = 2;   // 战斗频道 (channel_id = battleId)
+}
+
+// ---------------------------------------------------------------------------
+// 子数据定义
+// ---------------------------------------------------------------------------
+
+// 单条聊天消息
+message PBChatMsg {
+  int64  sender_id   = 1;
+  string sender_name = 2;
+  string content     = 3;
+  int64  timestamp   = 4;   // unix 秒
+}
+
+// ---------------------------------------------------------------------------
+// 协议定义
+// ---------------------------------------------------------------------------
+
+// 发送聊天 (客户端 -> Chat)
+message PBChatSendReq {
+  uint32 big_type      = 1;
+  uint32 small_type    = 2;   // = CHAT_SEND_REQ (1)
+  ChatChannelType channel_type = 3;
+  int64  channel_id    = 4;
+  string content       = 5;
+}
+
+// 发送结果 (Chat -> 客户端)
+message PBChatSendRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = CHAT_SEND_RSP (2)
+  PbID.ErrorCode error_code = 3;
+}
+
+// 聊天广播 (Chat -> 频道全员)
+message PBChatNtf {
+  uint32 big_type      = 1;
+  uint32 small_type    = 2;   // = CHAT_NTF (3)
+  ChatChannelType channel_type = 4;
+  int64  channel_id    = 5;
+  int64  sender_id     = 6;
+  string sender_name   = 7;
+  string content       = 8;
+}
+
+// 拉历史消息 (客户端 -> Chat)
+message PBChatHistoryReq {
+  uint32 big_type      = 1;
+  uint32 small_type    = 2;   // = CHAT_HISTORY_REQ (4)
+  ChatChannelType channel_type = 3;
+  int64  channel_id    = 4;
+}
+
+// 历史消息 (Chat -> 客户端)
+message PBChatHistoryRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = CHAT_HISTORY_RSP (5)
+  PbID.ErrorCode error_code = 3;
+  ChatChannelType channel_type = 4;
+  int64  channel_id         = 5;
+  repeated PBChatMsg messages = 6;
+}

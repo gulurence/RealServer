@@ -2,7 +2,8 @@
 #include "UserCmd.h"
 #pragma pack(1)
 
-namespace Cmd {
+namespace Cmd
+{
 //    /************************* Б *****************************/
 //    struct LoginCmd : public UserCmd
 //    {
@@ -11,7 +12,7 @@ namespace Cmd {
 //    };
 //
 //    //client->regserver
-//#define ACCPASS_REG_USER_CMD 1
+// #define ACCPASS_REG_USER_CMD 1
 //    struct AccPassRegUserCmd : public LoginCmd
 //    {
 //        AccPassRegUserCmd() : LoginCmd(ACCPASS_REG_USER_CMD) {
@@ -24,7 +25,7 @@ namespace Cmd {
 //        uint32 zoneID;
 //    };
 //
-//#define SYS_INFO_USER_CMD 2
+// #define SYS_INFO_USER_CMD 2
 //    struct SysInfoUserCmd : public LoginCmd
 //    {
 //        SysInfoUserCmd() : LoginCmd(SYS_INFO_USER_CMD) {
@@ -34,7 +35,7 @@ namespace Cmd {
 //    };
 //
 //    // regServer -> Client
-//#define GATE_IP_USER_CMD 3
+// #define GATE_IP_USER_CMD 3
 //    struct GateIPUserCmd : public LoginCmd
 //    {
 //        GateIPUserCmd() : LoginCmd(GATE_IP_USER_CMD) {
@@ -43,7 +44,7 @@ namespace Cmd {
 //            len = 0;
 //        }
 //        uint32 ip;
-//        int port;
+//        int32 port;
 //        uint16 len;
 //        uint8 loginData[0];    //ウ: sha1|accid|loginTime ...
 //    };
@@ -66,20 +67,20 @@ namespace Cmd {
 //        }
 //    };
 //
-//#define REG_GATE_USER_CMD 4
+// #define REG_GATE_USER_CMD 4
 //    struct RegGateUserCmd : public LoginCmd
 //    {
 //        RegGateUserCmd() : LoginCmd(REG_GATE_USER_CMD) {
 //            loginType = 0;
 //            len = 0;
 //        }
-//        
+//
 //        //        char minloginType[MAX_BUFFER_LEN];//ｇ
 //        uint16 len;
 //        uint8 loginData[0];    //ウ: sha1|accid|loginTime ...
 //    };
 //
-//#define REG_ERR_USER_CMD 5
+// #define REG_ERR_USER_CMD 5
 //    struct RegErrUserCmd : public LoginCmd
 //    {
 //        RegErrUserCmd() : LoginCmd(REG_ERR_USER_CMD) {
@@ -91,7 +92,7 @@ namespace Cmd {
 //    };
 //
 //    //GateWay to Client
-//#define SNAPSHOT_USER_CMD 6
+// #define SNAPSHOT_USER_CMD 6
 //    struct SnapShotUserCmd : public LoginCmd
 //    {
 //        uint8 ret;
@@ -104,7 +105,7 @@ namespace Cmd {
 //    };
 //
 //    //client to //Session
-//#define LOGIN_USER_CMD 7 
+// #define LOGIN_USER_CMD 7
 //    struct LoginUserCmd : public LoginCmd
 //    {
 //        uint64 id;
@@ -114,21 +115,21 @@ namespace Cmd {
 //    };
 //
 //    //gate to client,login succeed
-//#define LOGIN_RESULT_USER_CMD 8
+// #define LOGIN_RESULT_USER_CMD 8
 //    struct LoginResultUserCmd : public LoginCmd
 //    {
 //        LoginResultUserCmd() : LoginCmd(LOGIN_RESULT_USER_CMD) {
 //            ret = 0;
 //        }
-//        
+//
 //    };
 //
-//    
-//#define CREATE_CHAR_USER_CMD 9
+//
+// #define CREATE_CHAR_USER_CMD 9
 //    struct CreateCharUserCmd : public LoginCmd
 //    {
 //        char name[MAX_ROLENAMESIZE]; // ⅷ
-//        uint8 role_career; // 
+//        uint8 role_career; //
 //        uint16 len;
 //        uint8 loginData[0];    //ウ: sha1|accid|loginTime ...
 //        CreateCharUserCmd() : LoginCmd(CREATE_CHAR_USER_CMD) {
@@ -138,8 +139,8 @@ namespace Cmd {
 //        }
 //    };
 //
-//    
-//#define DELETE_CHAR_USER_CMD 10
+//
+// #define DELETE_CHAR_USER_CMD 10
 //    struct DeleteCharUserCmd : public LoginCmd
 //    {
 //        uint64 id;
@@ -155,8 +156,8 @@ namespace Cmd {
 //        CREATE_ERROR_HAVE_SPACE = 2,//﹢
 //    };
 //
-//    
-//#define NAME_USED_CHAR_USER_CMD 11
+//
+// #define NAME_USED_CHAR_USER_CMD 11
 //    struct NameUsedCharUserCmd : public LoginCmd
 //    {
 //        uint16 type;
@@ -165,15 +166,15 @@ namespace Cmd {
 //        }
 //    };
 //
-//    
-//#define REQ_SNAP_CHAR_USER_CMD 12
+//
+// #define REQ_SNAP_CHAR_USER_CMD 12
 //    struct ReqSnapCharUserCmd : public LoginCmd
 //    {
 //        ReqSnapCharUserCmd() :LoginCmd(REQ_SNAP_CHAR_USER_CMD) {
 //        }
 //    };
 //
-//#define REQ_RANDOMNAME_USER_CMD 13
+// #define REQ_RANDOMNAME_USER_CMD 13
 //    struct ReqRandomNameUserCmd : public LoginCmd
 //    {
 //        uint8 sex;
@@ -184,7 +185,7 @@ namespace Cmd {
 //        }
 //    };
 //
-//#define RET_RANDOWNAME_USER_CMD 14
+// #define RET_RANDOWNAME_USER_CMD 14
 //    struct RetRandomNameUserCmd : public LoginCmd
 //    {
 //        uint8 ret;
@@ -197,7 +198,7 @@ namespace Cmd {
 //        }
 //    };
 //
-//#define LOADGAMEOK_USER_CMD 15
+// #define LOADGAMEOK_USER_CMD 15
 //    struct LoadGameOKCmd :public LoginCmd
 //    {
 //        char flagkey[MAX_NAMESIZE];
@@ -205,7 +206,7 @@ namespace Cmd {
 //            bzero(flagkey, MAX_NAMESIZE);
 //        }
 //    };
-//#define LOGIN_GATE_USER_CMD 104
+// #define LOGIN_GATE_USER_CMD 104
 //    struct LoginGateUserCmd : public LoginCmd
 //    {
 //        uint64 accid;
@@ -216,10 +217,3 @@ namespace Cmd {
 }
 
 #pragma pack()
-
-
-
-
-
-
-

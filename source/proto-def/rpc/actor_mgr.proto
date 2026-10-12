@@ -1,7 +1,7 @@
-// actor_mgr.proto — Cross-process actor management RPC service
+// actor_mgr.proto — Cross-process actor management RPC message schema
 //
 // Enables ActorMgr to create, find, and uninstall actors on remote processes.
-// Each process registers this service on its gRPC server at startup.
+// 仅保留 PBRPC* 消息结构; 传输走 asio-TCP (engine/xRpc/CRpcTcpClient), 无 gRPC service。
 
 syntax = "proto3";
 
@@ -10,12 +10,12 @@ package actormgr;
 // ---------------------------------------------------------------------------
 // CreateActor — request a remote process to create an actor instance
 // ---------------------------------------------------------------------------
-message CreateActorRequest {
+message PBRPCCreateActorRequest {
     int32 actor_type = 1;   // ActorType enum value
     int64 actor_id   = 2;   // Unique actor instance ID
 }
 
-message CreateActorReply {
+message PBRPCCreateActorReply {
     bool  success     = 1;
     int32 error_code  = 2;  // 0 = ok, nonzero = xErrorCode
 }
@@ -23,12 +23,12 @@ message CreateActorReply {
 // ---------------------------------------------------------------------------
 // FindActor — query whether a remote process has an actor instance
 // ---------------------------------------------------------------------------
-message FindActorRequest {
+message PBRPCFindActorRequest {
     int32 actor_type = 1;
     int64 actor_id   = 2;
 }
 
-message FindActorReply {
+message PBRPCFindActorReply {
     bool  found       = 1;
     int32 remote_type = 2;  // The type of the remote process hosting it (if found)
 }
@@ -36,21 +36,14 @@ message FindActorReply {
 // ---------------------------------------------------------------------------
 // UninstallActor — request a remote process to uninstall an actor
 // ---------------------------------------------------------------------------
-message UninstallActorRequest {
+message PBRPCUninstallActorRequest {
     int32 actor_type = 1;
     int64 actor_id   = 2;
 }
 
-message UninstallActorReply {
+message PBRPCUninstallActorReply {
     bool  success    = 1;
     int32 error_code = 2;
 }
 
-// ---------------------------------------------------------------------------
-// Service definition
-// ---------------------------------------------------------------------------
-service ActorMgrService {
-    rpc CreateActor     (CreateActorRequest)     returns (CreateActorReply);
-    rpc FindActor       (FindActorRequest)       returns (FindActorReply);
-    rpc UninstallActor  (UninstallActorRequest)  returns (UninstallActorReply);
-}
+// (service 定义已退役 — RPC 传输走 asio-TCP, 见 engine/xRpc/CRpcTcpClient)

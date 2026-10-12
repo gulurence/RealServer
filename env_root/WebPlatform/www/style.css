@@ -1,0 +1,207 @@
+/* =============================================================================
+ * RealServer 控制台 — Tabler 主题补充样式
+ *
+ * 基础 chrome (侧边栏/顶栏/卡片/表格/徽章/按钮/表单控件) 由 Tabler CDN 提供,
+ * 本文件只放: ① 供内联 var() 引用的主题变量; ② Tabler 没有的业务控件。
+ * ============================================================================= */
+
+/* ---- 主题变量 (trace.php / trace_topology.php 内联样式依赖 var(--*) 引用) ---- */
+:root {
+    color-scheme: dark;          /* 原生控件 (select 弹出层/滚动条) 走暗色, 避免白字白底 */
+    --bg:            #151f2c;   /* Tabler 暗色 body */
+    --panel:         #1b2434;   /* 卡片底色 */
+    --panel-2:       #202b3c;
+    --border:        #2b3a55;
+    --text:          #e2e8f0;
+    --dim:           #6c7a91;   /* 次级文字 */
+    --accent:        #206bc4;   /* Tabler 主蓝 */
+    --accent-hover:  #1a569d;
+    --online:        #2fb344;   /* 绿 */
+    --warn:          #f76707;   /* 橙 */
+    --danger:        #d63939;   /* 红 */
+    --offline:       #6c7a91;   /* 灰 */
+}
+
+body { font-family: "Segoe UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif; }
+
+/* 品牌标记 + 侧边栏分组标题 */
+.brand-dot {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); margin-right: 6px; vertical-align: -1px;
+}
+/* 侧边栏分组: 可折叠开关 (标题 + 右侧箭头, 按当前大类折叠) */
+.nav-group-toggle {
+    display: flex; align-items: center; gap: 6px;
+    width: 100%; padding: 12px 12px 4px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .6px; color: var(--dim);
+    cursor: pointer; background: transparent; border: 0;
+}
+.nav-group-toggle:hover { color: var(--text); }
+.nav-group-toggle .nav-group-title { flex: 1; }
+.nav-group-toggle .nav-group-chevron {
+    display: inline-flex; font-size: 12px; transition: transform .2s ease;
+}
+.nav-group-toggle.collapsed .nav-group-chevron { transform: rotate(-90deg); }
+.nav-group-items { padding-left: 4px; }
+
+/* ---- 次级文字 / 等宽 ---- */
+.dim { color: var(--dim); font-size: 13px; }
+.mono { font-family: Consolas, "SF Mono", "Courier New", monospace; font-size: 12px; color: var(--dim); }
+code { font-family: Consolas, monospace; color: #fbbf24; }
+
+/* ---- 空态 ---- */
+.empty {
+    color: var(--dim); padding: 28px;
+    border: 1px dashed var(--border); border-radius: 10px; text-align: center;
+}
+
+/* ---- 统计卡片网格 ---- */
+.stat-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px; margin-bottom: 20px;
+}
+.stat {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 18px;
+}
+.stat .k { color: var(--dim); font-size: 12px; }
+.stat .v { font-size: 24px; font-weight: 700; margin-top: 6px; }
+.stat .v small { font-size: 13px; font-weight: 400; color: var(--dim); }
+
+/* ---- 概要 / 章节 ---- */
+.summary { margin-bottom: 20px; font-size: 15px; }
+.section-title { font-size: 16px; margin: 4px 0 14px; }
+
+/* ---- 表格行状态 (在线绿边 / 离线降透明) ---- */
+tr.online td:first-child { box-shadow: inset 3px 0 0 var(--online); }
+tr.offline { opacity: 0.55; }
+
+/* ---- CPU/内存进度条 ---- */
+.bar { height: 8px; background: var(--panel-2); border-radius: 999px; overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.bar > span.high { background: var(--warn); }
+.bar > span.full { background: var(--danger); }
+.bar-cell { min-width: 120px; }
+.bar-cell .pct { font-size: 12px; color: var(--dim); margin-top: 3px; }
+
+/* ---- 事件流 (告警 / 恢复记录) ---- */
+.event-list { display: flex; flex-direction: column; }
+.event-item {
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    font-size: 13px; display: flex; gap: 12px;
+}
+.event-item:last-child { border-bottom: 0; }
+.event-item .t { color: var(--dim); font-family: Consolas, monospace; font-size: 12px; white-space: nowrap; }
+.event-item .msg { word-break: break-all; }
+
+/* ---- 表单 (设置页 / GM 用的轻量布局 wrapper) ---- */
+form.form { display: flex; flex-direction: column; gap: 16px; max-width: 760px; }
+.form-row { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.form-row label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--dim); min-width: 160px; }
+.form-row label span { color: var(--text); }
+.actions { display: flex; gap: 10px; margin-top: 6px; }
+
+/* ---- 勾选框 / 开关 可见性兜底 ----
+   Tabler 1.6 用 oklch()/color-mix()/light-dark() 定义颜色、用 mask-image 画对勾,
+   在不支持这些现代特性(旧内核 WebView / 强制深色)的环境下:
+   颜色 var() 解析失败回退透明 → 选中变黑; mask-image 失效 → 选中图标消失。
+   这里统一用纯 hex + background-image 内联 SVG 对勾, 不依赖 mask/现代颜色函数。 */
+.form-check-input {
+    background-color: #1b2434;   /* 未选中: 面板底色 */
+    border-color: #2b3a55;       /* 边框 */
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1em;
+}
+.form-check-input:checked {
+    background-color: #206bc4;   /* 选中: 主蓝 */
+    border-color: #206bc4;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8.5l2.5 2.5 5.5 -5.5'/%3e%3c/svg%3e");
+}
+/* 关闭 Tabler 的 mask 对勾 (::before), 改用上面的 background-image 对勾,
+   否则不支持 mask-image 时对勾不显示、甚至出现白块盖住蓝底 */
+.form-check-input::before {
+    content: none;
+}
+/* 开关: 不用对勾, ::before 作为旋钮保留 */
+.form-switch .form-check-input {
+    background-image: none;
+}
+.form-switch .form-check-input::before {
+    content: "";
+    background-color: #6c7a91;   /* 旋钮: 未选中灰 */
+}
+.form-switch .form-check-input:checked::before {
+    background-color: #fff;      /* 旋钮: 选中白 */
+}
+
+/* ---- 下拉列表 (form-select / dropdown-menu) 显式配色 ----
+   Tabler 1.6 用 oklch()/color-mix()/light-dark() 定义表单控件与下拉菜单颜色,
+   旧内核 WebView / 强制深色下这些现代函数解析失败 → 文字白、背景也白, 条目不可见。
+   这里用纯 hex 显式指定 (同 .form-check-input 的兜底思路), 让条目在暗色下可见。 */
+.form-select {
+    background-color: #1b2434;
+    border-color: #2b3a55;
+    color: #e2e8f0;
+}
+.form-select:focus {
+    background-color: #1b2434;
+    border-color: #206bc4;
+    color: #e2e8f0;
+    box-shadow: none;
+}
+.form-select option {
+    background-color: #1b2434;
+    color: #e2e8f0;
+}
+.dropdown-menu {
+    background-color: #1b2434;
+    border-color: #2b3a55;
+}
+.dropdown-item {
+    color: #e2e8f0;
+}
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: #202b3c;
+    color: #ffffff;
+}
+
+/* ---- GM / 阈值配置页的章节容器 ---- */
+.node-group { margin-bottom: 28px; }
+.node-group h2 { font-size: 17px; margin: 0 0 14px; }
+.gm-form { display: flex; flex-direction: column; gap: 12px; max-width: 820px; }
+.gm-form label { color: var(--dim); font-size: 13px; }
+.gm-form input[type=text] { width: 100%; }
+
+/* ---- 技术文档页 (docs_client / docs_server) ---- */
+.doc-h3 { font-size: 15px; font-weight: 700; margin: 20px 0 10px; }
+.doc-h3:first-child { margin-top: 0; }
+.doc-pre {
+    font-family: Consolas, "SF Mono", "Courier New", monospace;
+    font-size: 13px; line-height: 1.55;
+    background: var(--panel-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+    color: var(--text); white-space: pre; overflow-x: auto;
+    margin: 8px 0 16px;
+}
+.doc-pre .c { color: var(--dim); }        /* 注释/图例 */
+.doc-pre .k { color: #7fd1ff; }           /* 关键词/路径 */
+.doc-pre .m { color: #fbbf24; }           /* 模块/类名 */
+.doc-table td:first-child { white-space: nowrap; font-family: Consolas, monospace; color: #7fd1ff; }
+.doc-path { font-family: Consolas, monospace; color: var(--dim); font-size: 12px; }
+.doc-badge { font-size: 11px; }
+
+/* ---- 服务器进程日志实时查看 (server_logs.php) ---- */
+.log-view {
+    font-family: Consolas, "SF Mono", "Courier New", monospace;
+    font-size: 12px; line-height: 1.55;
+    background: #0f1720; border: 0; border-radius: 0;
+    color: var(--text); white-space: pre;
+    margin: 0; padding: 14px 16px;
+    max-height: calc(100vh - 260px); overflow: auto;
+}
+.log-view .ln { color: var(--dim); user-select: none; }          /* 行号 */
+.log-view .lvl-error { color: var(--danger); font-weight: 700; } /* error */
+.log-view .lvl-warn  { color: var(--warn); }                     /* warn */
+.log-view .lvl-info  { color: var(--accent); }                   /* info */

@@ -4,79 +4,214 @@
 #include "xLog/xLog.h"
 #include <ctime>
 
-bool CServiceDiscovery::Init(const std::string& redisPoolTitle) {
+namespace
+{
+// 心跳超时阈值: 超过该秒数未心跳即视为进程已死 (心跳间隔 5s, 允许丢失 3 拍)。
+// DiscoverPeers 与 IsProcessRunning 共用, 避免僵尸进程被当作存活节点反复连接。
+constexpr int64 kStaleHeartbeatSeconds = 15;
+
+// 进程注册 TTL (秒): 本进程注册 Hash 与类型索引 Set 的过期时间。进程每次心跳 (5s)
+// 用 Expire 续期; 一旦停止心跳, Redis 在 TTL 到期后自动删除僵尸数据, 无需其它进程
+// 主动扫描清理 (优雅注销 Deregister 在 while(true) 主循环下不可达, 全依赖此 TTL 兜底)。
+// 取值 30s = 6 拍, 大于心跳过滤阈值 (15s), 保证「短暂卡顿但尚未判定死亡」的进程其
+// Hash 不会先于发现过滤被提前删掉。
+constexpr int64 kProcessRegTtlSeconds = 30;
+} // namespace
+
+bool CServiceDiscovery::Init(const std::string &redisPoolTitle)
+{
     m_strRedisPoolTitle = redisPoolTitle;
 
-    // 测试 Redis 是否可用
-    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli(m_strRedisPoolTitle);
-    if (!pCli) {
+    // 从池中 checkout 一条专用连接并长期持有 (进程生命周期内复用)。
+    // 注意: GetRedisCli 是「取出」语义, 本模块持有此连接、不再归还,
+    // 因此只有这一条连接被占用, 不会随每次心跳/发现反复新建。
+    m_pCli = CRedisPoolMgr::getMe().GetRedisCli(m_strRedisPoolTitle);
+    if (!m_pCli)
+    {
         XWRN("[ServiceDiscovery] Redis pool '%s' not available — running in standalone mode",
              m_strRedisPoolTitle.c_str());
         m_bRedisAvailable = false;
         return false;
     }
-    CRedisPoolMgr::getMe().GetRedisCli(m_strRedisPoolTitle); // release? 由池管理
     m_bRedisAvailable = true;
-    XLOG("[ServiceDiscovery] Initialized with Redis pool '%s'", m_strRedisPoolTitle.c_str());
+    XLOG("[ServiceDiscovery] Initialized with Redis pool '%s' (dedicated connection)",
+         m_strRedisPoolTitle.c_str());
     return true;
 }
 
 // =============================================================================
 // 注册
 // =============================================================================
-bool CServiceDiscovery::Register(const ProcessInfo& info) {
+bool CServiceDiscovery::Register(const ProcessInfo &info)
+{
     m_stSelfInfo = info;
-    if (!m_bRedisAvailable) {
+    if (!m_bRedisAvailable)
+    {
         XLOG("[ServiceDiscovery] Register skipped — Redis unavailable (using local fallback)");
-        return true;  // 非致命: standalone 模式
+        return true; // 非致命: standalone 模式
     }
-    if (!WriteProcessInfo(info)) {
+    if (!WriteProcessInfo(info))
+    {
         XERR("[ServiceDiscovery] Failed to register process %s", info.RedisKey().c_str());
         return false;
     }
     // 加入类型索引集合
     RedisSAdd("cluster:process:by_type:" + std::to_string((int32)info.type),
               std::to_string(info.processId));
-    XCLOG("Registered: %s type=%d name=%s host=%s:%u",
-         info.RedisKey().c_str(), (int32)info.type, info.processName.c_str(),
-         info.host.c_str(), info.grpcPort);
+    // 注册即设 TTL: 本进程注册 Hash 与类型索引 Set 各续期一次, 后续由心跳持续续期。
+    // 进程停止心跳后由 Redis 按 TTL 自动删除僵尸数据, 不主动扫描清理。
+    RedisExpire(info.RedisKey(), kProcessRegTtlSeconds);
+    RedisExpire("cluster:process:by_type:" + std::to_string((int32)info.type),
+                kProcessRegTtlSeconds);
+    XCLOG("Registered: %s type=%d name=%s host=%s:%u", info.RedisKey().c_str(), (int32)info.type,
+          info.processName.c_str(), info.host.c_str(), info.rpcPort);
+    return true;
+}
+
+// =============================================================================
+// ConfirmNodeDetail — 写入完整节点详情并读回比对
+//
+// 容器节点初始化完成的标志: Redis 中的 ip/port/authkey 与本进程一致。
+// 读回比对用于发现 Redis 侧的写入偏差 (如多实例竞争同一 key)。
+// =============================================================================
+bool CServiceDiscovery::ConfirmNodeDetail(const ProcessInfo &info)
+{
+    if (!m_bRedisAvailable)
+    {
+        XLOG("[ServiceDiscovery] ConfirmNodeDetail skipped — Redis unavailable");
+        return false;
+    }
+
+    // 先全量写入 (含 ip/authkey), 再读回关键字段比对
+    if (!WriteProcessInfo(info))
+    {
+        XERR("[ServiceDiscovery] ConfirmNodeDetail: write failed for %s", info.RedisKey().c_str());
+        return false;
+    }
+
+    std::string key = info.RedisKey();
+    std::string gotIp = RedisHGet(key, "ip");
+    std::string gotPort = RedisHGet(key, "port");
+    std::string gotKey = RedisHGet(key, "authkey");
+
+    bool ok = (gotIp == info.ip) && (gotPort == std::to_string(info.rpcPort))
+              && (gotKey == info.authKey);
+    if (!ok)
+    {
+        XERR("[ServiceDiscovery] ConfirmNodeDetail mismatch: ip=%s/%s port=%s/%u auth=%s/%s",
+             gotIp.c_str(), info.ip.c_str(), gotPort.c_str(), info.rpcPort, gotKey.c_str(),
+             info.authKey.c_str());
+        return false;
+    }
+
+    XCLOG("Node detail confirmed: %s ip=%s port=%u auth=%s", key.c_str(), info.ip.c_str(),
+          info.rpcPort, info.authKey.c_str());
     return true;
 }
 
 // =============================================================================
 // 心跳
 // =============================================================================
-bool CServiceDiscovery::Heartbeat() {
-    if (!m_bRedisAvailable) return true;
+bool CServiceDiscovery::Heartbeat()
+{
+    if (!m_bRedisAvailable)
+    {
+        return true;
+    }
     int64 now = (int64)time(nullptr);
     m_stSelfInfo.lastHeartbeat = now;
-    return RedisHSet(m_stSelfInfo.RedisKey(), "heartbeat", std::to_string(now))
-        && RedisHSet(m_stSelfInfo.RedisKey(), "state", std::to_string(m_stSelfInfo.state));
+    const std::string &key = m_stSelfInfo.RedisKey();
+    bool ok = RedisHSet(key, "heartbeat", std::to_string(now))
+              && RedisHSet(key, "state", std::to_string(m_stSelfInfo.state));
+    // 自愈索引: 每拍重新 SAdd 本进程 ID 到类型集合 (SAdd 幂等, 开销可忽略), 防止索引
+    // 成员在边缘场景下丢失。
+    RedisSAdd("cluster:process:by_type:" + std::to_string((int32)m_stSelfInfo.type),
+              std::to_string(m_stSelfInfo.processId));
+    // TTL 续期: 每拍刷新本进程注册 Hash 与类型索引 Set 的过期时间。进程停止心跳后,
+    // 由 Redis 按 TTL 自动删除僵尸数据, 不主动扫描清理。
+    RedisExpire(key, kProcessRegTtlSeconds);
+    RedisExpire("cluster:process:by_type:" + std::to_string((int32)m_stSelfInfo.type),
+                kProcessRegTtlSeconds);
+    return ok;
 }
 
 // =============================================================================
 // 更新负载
 // =============================================================================
-bool CServiceDiscovery::UpdateLoad(int32 loadScore) {
+bool CServiceDiscovery::UpdateLoad(int32 loadScore)
+{
     m_stSelfInfo.loadScore = loadScore;
-    if (!m_bRedisAvailable) return true;
+    if (!m_bRedisAvailable)
+    {
+        return true;
+    }
     return RedisHSet(m_stSelfInfo.RedisKey(), "load", std::to_string(loadScore));
+}
+
+// =============================================================================
+// 更新资源占用 — 心跳时采样本进程 CPU/内存, 写入 Redis 供负载均衡与 WebPlatform 读取
+// =============================================================================
+bool CServiceDiscovery::UpdateResource(int32 cpuPercent, int64 memRssMb, int32 memPercent)
+{
+    m_stSelfInfo.cpuPercent = cpuPercent;
+    m_stSelfInfo.memRssMb = memRssMb;
+    m_stSelfInfo.memPercent = memPercent;
+    if (!m_bRedisAvailable)
+    {
+        return true;
+    }
+    const std::string &key = m_stSelfInfo.RedisKey();
+    return RedisHSet(key, "cpu_percent", std::to_string(cpuPercent))
+           && RedisHSet(key, "mem_rss_mb", std::to_string(memRssMb))
+           && RedisHSet(key, "mem_percent", std::to_string(memPercent));
 }
 
 // =============================================================================
 // 更新状态
 // =============================================================================
-bool CServiceDiscovery::UpdateState(EProcessState newState) {
+bool CServiceDiscovery::UpdateState(EProcessState newState)
+{
     m_stSelfInfo.state = newState;
-    if (!m_bRedisAvailable) return true;
+    if (!m_bRedisAvailable)
+    {
+        return true;
+    }
     return RedisHSet(m_stSelfInfo.RedisKey(), "state", std::to_string((int32)newState));
+}
+
+// =============================================================================
+// 版本 / 内容版本上报 (P9 灰度更新)
+// =============================================================================
+bool CServiceDiscovery::UpdateVersion(const std::string &version, const std::string &contentVersion)
+{
+    m_stSelfInfo.version = version;
+    m_stSelfInfo.contentVersion = contentVersion;
+    if (!m_bRedisAvailable)
+    {
+        return true;
+    }
+    const std::string &key = m_stSelfInfo.RedisKey();
+    return RedisHSet(key, "version", version) && RedisHSet(key, "content_version", contentVersion);
+}
+
+std::string CServiceDiscovery::GetContentUpdateConfig(const std::string &field)
+{
+    if (!m_bRedisAvailable)
+    {
+        return "";
+    }
+    return RedisHGet("cluster:update:content:config", field);
 }
 
 // =============================================================================
 // 注销
 // =============================================================================
-bool CServiceDiscovery::Deregister() {
-    if (!m_bRedisAvailable) return true;
+bool CServiceDiscovery::Deregister()
+{
+    if (!m_bRedisAvailable)
+    {
+        return true;
+    }
     UpdateState(EProcessState_Shutdown);
     RedisSRem("cluster:process:by_type:" + std::to_string((int32)m_stSelfInfo.type),
               std::to_string(m_stSelfInfo.processId));
@@ -87,30 +222,55 @@ bool CServiceDiscovery::Deregister() {
 // =============================================================================
 // 发现对等进程
 // =============================================================================
-std::vector<ProcessInfo> CServiceDiscovery::DiscoverPeers(EProcessType targetType) {
+std::vector<ProcessInfo> CServiceDiscovery::DiscoverPeers(EProcessType targetType)
+{
     std::vector<ProcessInfo> result;
-    if (!m_bRedisAvailable) return result;
+    if (!m_bRedisAvailable)
+    {
+        return result;
+    }
 
+    int64 now = (int64)time(nullptr);
     auto members = RedisSMembers("cluster:process:by_type:" + std::to_string((int32)targetType));
-    for (auto& idStr : members) {
+    for (auto &idStr : members)
+    {
         std::string key = "cluster:process:" + std::to_string((int32)targetType) + ":" + idStr;
         ProcessInfo info = ReadProcessInfo(key);
-        if (info.processId != 0) {
-            result.push_back(info);
+        if (info.processId == 0)
+        {
+            continue;
         }
+
+        // 心跳过滤: 跳过已死但未注销的僵尸进程 (state 停留在 Running, 但心跳已停)。
+        // 否则 DiscoverAndConnect 会反复尝试连接死节点, 阻塞 RPC io 线程导致链路延迟。
+        if (now - info.lastHeartbeat > kStaleHeartbeatSeconds)
+        {
+            XCWRN("Skip stale node: %s:%lld (heartbeat %llds ago)", ProcessTypeName(info.type),
+                  (int64)info.processId, (int64)(now - info.lastHeartbeat));
+            continue;
+        }
+        result.push_back(info);
     }
     return result;
 }
 
-std::vector<ProcessInfo> CServiceDiscovery::GetAllRunningPeers() {
+std::vector<ProcessInfo> CServiceDiscovery::GetAllRunningPeers()
+{
     std::vector<ProcessInfo> result;
-    if (!m_bRedisAvailable) return result;
+    if (!m_bRedisAvailable)
+    {
+        return result;
+    }
 
-    for (int32 t = EProcessType_Gate; t <= EProcessType_World; t += 100) {
-        if (t != 100 && t != 101 && t != 201 && t != 202) continue;
-        auto peers = DiscoverPeers((EProcessType)t);
-        for (auto& p : peers) {
-            if (IsProcessRunning(p.type, p.processId)) {
+    static const EProcessType kProcessTypes[]
+        = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame};
+    for (EProcessType t : kProcessTypes)
+    {
+        auto peers = DiscoverPeers(t);
+        for (auto &p : peers)
+        {
+            if (IsProcessRunning(p.type, p.processId))
+            {
                 result.push_back(p);
             }
         }
@@ -118,22 +278,31 @@ std::vector<ProcessInfo> CServiceDiscovery::GetAllRunningPeers() {
     return result;
 }
 
-ProcessInfo CServiceDiscovery::GetProcessInfo(EProcessType type, int64 processId) {
-    std::string key = "cluster:process:" + std::to_string((int32)type) + ":" + std::to_string(processId);
+ProcessInfo CServiceDiscovery::GetProcessInfo(EProcessType type, int64 processId)
+{
+    std::string key
+        = "cluster:process:" + std::to_string((int32)type) + ":" + std::to_string(processId);
     return ReadProcessInfo(key);
 }
 
-bool CServiceDiscovery::IsProcessRunning(EProcessType type, int64 processId) const {
-    std::string key = "cluster:process:" + std::to_string((int32)type) + ":" + std::to_string(processId);
-    auto* pCli = const_cast<CServiceDiscovery*>(this)->GetRedisCli();
-    if (!pCli) return false;
-    // 检查心跳是否在 15 秒内
+bool CServiceDiscovery::IsProcessRunning(EProcessType type, int64 processId) const
+{
+    std::string key
+        = "cluster:process:" + std::to_string((int32)type) + ":" + std::to_string(processId);
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = m_pCli;
+    if (!pCli)
+    {
+        return false;
+    }
+    // 检查心跳是否在阈值内 (kStaleHeartbeatSeconds)
     RecordDataST data;
     std::string hbKey = key;
-    if (pCli->HGet(key, "heartbeat", &data) == REDIS_OK) {
+    if (pCli->HGet(key, "heartbeat", &data) == REDIS_OK)
+    {
         int64 hb = strtoll(std::string(data.Data(), data.Size()).c_str(), nullptr, 10);
         int64 now = (int64)time(nullptr);
-        return (now - hb) <= 15;
+        return (now - hb) <= kStaleHeartbeatSeconds;
     }
     return false;
 }
@@ -141,44 +310,65 @@ bool CServiceDiscovery::IsProcessRunning(EProcessType type, int64 processId) con
 // =============================================================================
 // 链接规则
 // =============================================================================
-std::map<EProcessType, std::vector<EProcessType>> CServiceDiscovery::GetLinkRules() {
+std::map<EProcessType, std::vector<EProcessType>> CServiceDiscovery::GetLinkRules()
+{
     std::map<EProcessType, std::vector<EProcessType>> rules;
-    if (!m_bRedisAvailable) {
+    if (!m_bRedisAvailable)
+    {
         // 默认规则: 所有类型互联
-        std::vector<EProcessType> all = {
-            EProcessType_Gate, EProcessType_Login,
-            EProcessType_Player, EProcessType_World
-        };
-        for (auto& t : all) rules[t] = all;
+        std::vector<EProcessType> all
+            = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame};
+        for (auto &t : all)
+        {
+            rules[t] = all;
+        }
         return rules;
     }
     // 从 Redis Hash 读取
-    for (int32 t = EProcessType_Gate; t <= EProcessType_World; t += 100) {
-        if (t != 100 && t != 101 && t != 201 && t != 202) continue;
-        std::string val = RedisHGet("cluster:link:rules", std::to_string(t));
-        if (!val.empty()) {
+    static const EProcessType kProcessTypes[]
+        = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame};
+    for (EProcessType t : kProcessTypes)
+    {
+        std::string val = RedisHGet("cluster:link:rules", std::to_string((int32)t));
+        if (!val.empty())
+        {
             std::vector<EProcessType> targets;
             // 逗号分隔
             size_t pos = 0;
-            while (pos < val.size()) {
+            while (pos < val.size())
+            {
                 size_t comma = val.find(',', pos);
                 std::string tok = val.substr(pos, comma - pos);
                 int32 tt = atoi(tok.c_str());
-                if (tt >= 100) targets.push_back((EProcessType)tt);
-                if (comma == std::string::npos) break;
+                if (tt >= 100)
+                {
+                    targets.push_back((EProcessType)tt);
+                }
+                if (comma == std::string::npos)
+                {
+                    break;
+                }
                 pos = comma + 1;
             }
-            rules[(EProcessType)t] = targets;
+            rules[t] = targets;
         }
     }
     return rules;
 }
 
-bool CServiceDiscovery::SetLinkRule(EProcessType fromType, const std::vector<EProcessType>& toTypes) {
-    if (!m_bRedisAvailable) return false;
+bool CServiceDiscovery::SetLinkRule(EProcessType fromType, const std::vector<EProcessType> &toTypes)
+{
+    if (!m_bRedisAvailable)
+    {
+        return false;
+    }
     std::string val;
-    for (size_t i = 0; i < toTypes.size(); ++i) {
-        if (i > 0) val += ",";
+    for (size_t i = 0; i < toTypes.size(); ++i)
+    {
+        if (i > 0)
+        {
+            val += ",";
+        }
         val += std::to_string((int32)toTypes[i]);
     }
     return RedisHSet("cluster:link:rules", std::to_string((int32)fromType), val);
@@ -187,67 +377,115 @@ bool CServiceDiscovery::SetLinkRule(EProcessType fromType, const std::vector<EPr
 // =============================================================================
 // ID 生成
 // =============================================================================
-int64 CServiceDiscovery::GenerateProcessId(EProcessType type) {
-    if (!m_bRedisAvailable) return -1;
-    return RedisIncr("cluster:process:id_seq:" + std::to_string((int32)type));
+int64 CServiceDiscovery::GenerateProcessId(EProcessType type)
+{
+    if (!m_bRedisAvailable)
+    {
+        return -1;
+    }
+    // 全局唯一序列: 对等连接表/RPC 客户端以 processId 为主键, 必须跨类型唯一
+    return RedisIncr("cluster:process:id_seq");
 }
 
 // =============================================================================
 // Redis 辅助方法
 // =============================================================================
-CRedisCli* CServiceDiscovery::GetRedisCli() {
-    return CRedisPoolMgr::getMe().GetRedisCli(m_strRedisPoolTitle);
+CRedisCli *CServiceDiscovery::GetRedisCli()
+{
+    return m_pCli;
 }
 
-bool CServiceDiscovery::WriteProcessInfo(const ProcessInfo& info) {
-    auto* pCli = GetRedisCli();
-    if (!pCli) return false;
+bool CServiceDiscovery::WriteProcessInfo(const ProcessInfo &info)
+{
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return false;
+    }
 
     bool ok = true;
-    auto hset = [&](const char* field, const std::string& val) {
-        if (!ok) return;
+    auto hset = [&](const char *field, const std::string &val)
+    {
+        if (!ok)
+        {
+            return;
+        }
         RecordDataST d;
         d.Resize((int32)val.size());
         memcpy(d.MutableData(), val.data(), val.size());
         d.SetSize((int32)val.size());
-        if (pCli->HSet(info.RedisKey(), field, &d) != REDIS_OK) ok = false;
+        if (pCli->HSet(info.RedisKey(), field, &d) != REDIS_OK)
+        {
+            ok = false;
+        }
     };
-    hset("type",   std::to_string((int32)info.type));
-    hset("id",     std::to_string(info.processId));
-    hset("name",   info.processName);
-    hset("host",   info.host);
-    hset("port",   std::to_string(info.grpcPort));
-    hset("load",   std::to_string(info.loadScore));
-    hset("state",  std::to_string((int32)info.state));
+    hset("type", std::to_string((int32)info.type));
+    hset("id", std::to_string(info.processId));
+    hset("name", info.processName);
+    hset("host", info.host);
+    hset("ip", info.ip);
+    hset("port", std::to_string(info.rpcPort));
+    hset("load", std::to_string(info.loadScore));
+    hset("machine_id", std::to_string(info.machineId));
+    hset("cpu_percent", std::to_string(info.cpuPercent));
+    hset("mem_rss_mb", std::to_string(info.memRssMb));
+    hset("mem_percent", std::to_string(info.memPercent));
+    hset("version", info.version);
+    hset("content_version", info.contentVersion);
+    hset("state", std::to_string((int32)info.state));
     hset("heartbeat", std::to_string(info.lastHeartbeat));
+    hset("authkey", info.authKey);
     return ok;
 }
 
-ProcessInfo CServiceDiscovery::ReadProcessInfo(const std::string& redisKey) {
+ProcessInfo CServiceDiscovery::ReadProcessInfo(const std::string &redisKey)
+{
     ProcessInfo info;
-    auto* pCli = GetRedisCli();
-    if (!pCli) return info;
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return info;
+    }
 
-    auto hget = [&](const char* field) -> std::string {
+    auto hget = [&](const char *field) -> std::string
+    {
         RecordDataST d;
         if (pCli->HGet(redisKey, field, &d) == REDIS_OK && d.Size() > 0)
+        {
             return std::string(d.Data(), d.Size());
+        }
         return "";
     };
-    info.type          = (EProcessType)atoi(hget("type").c_str());
-    info.processId     = atoll(hget("id").c_str());
-    info.processName   = hget("name");
-    info.host          = hget("host");
-    info.grpcPort      = (uint16)atoi(hget("port").c_str());
-    info.loadScore     = atoi(hget("load").c_str());
-    info.state         = (EProcessState)atoi(hget("state").c_str());
+    info.type = (EProcessType)atoi(hget("type").c_str());
+    info.processId = atoll(hget("id").c_str());
+    info.processName = hget("name");
+    info.host = hget("host");
+    info.ip = hget("ip");
+    info.rpcPort = (uint16)atoi(hget("port").c_str());
+    info.loadScore = atoi(hget("load").c_str());
+    info.machineId = (uint32)atoi(hget("machine_id").c_str());
+    info.cpuPercent = atoi(hget("cpu_percent").c_str());
+    info.memRssMb = atoll(hget("mem_rss_mb").c_str());
+    info.memPercent = atoi(hget("mem_percent").c_str());
+    info.version = hget("version");
+    info.contentVersion = hget("content_version");
+    info.state = (EProcessState)atoi(hget("state").c_str());
     info.lastHeartbeat = atoll(hget("heartbeat").c_str());
+    info.authKey = hget("authkey");
     return info;
 }
 
-bool CServiceDiscovery::RedisHSet(const std::string& key, const std::string& field, const std::string& value) {
-    auto* pCli = GetRedisCli();
-    if (!pCli) return false;
+bool CServiceDiscovery::RedisHSet(const std::string &key, const std::string &field,
+                                  const std::string &value)
+{
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return false;
+    }
     RecordDataST d;
     d.Resize((int32)value.size());
     memcpy(d.MutableData(), value.data(), value.size());
@@ -255,74 +493,76 @@ bool CServiceDiscovery::RedisHSet(const std::string& key, const std::string& fie
     return pCli->HSet(key, field, &d) == REDIS_OK;
 }
 
-std::string CServiceDiscovery::RedisHGet(const std::string& key, const std::string& field) {
-    auto* pCli = GetRedisCli();
-    if (!pCli) return "";
+std::string CServiceDiscovery::RedisHGet(const std::string &key, const std::string &field)
+{
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return "";
+    }
     RecordDataST d;
     if (pCli->HGet(key, field, &d) == REDIS_OK && d.Size() > 0)
+    {
         return std::string(d.Data(), d.Size());
+    }
     return "";
 }
 
-bool CServiceDiscovery::RedisSAdd(const std::string& key, const std::string& member) {
-    auto* pCli = GetRedisCli();
-    if (!pCli) return false;
-    RecordDataST d;
-    d.Resize((int32)member.size());
-    memcpy(d.MutableData(), member.data(), member.size());
-    d.SetSize((int32)member.size());
-    // 使用通用 SET 命令的变体 — hiredis 没有直接 SADD, 用 redisCommand
-    // 简化: 通过 redisCommand 执行
-    redisContext* ctx = pCli->GetRedisContext();
-    if (!ctx) return false;
-    redisReply* reply = (redisReply*)redisCommand(ctx, "SADD %s %s", key.c_str(), member.c_str());
-    bool ok = (reply && reply->type == REDIS_REPLY_INTEGER);
-    if (reply) freeReplyObject(reply);
-    return ok;
-}
-
-bool CServiceDiscovery::RedisSRem(const std::string& key, const std::string& member) {
-    auto* pCli = GetRedisCli();
-    if (!pCli) return false;
-    redisContext* ctx = pCli->GetRedisContext();
-    if (!ctx) return false;
-    redisReply* reply = (redisReply*)redisCommand(ctx, "SREM %s %s", key.c_str(), member.c_str());
-    bool ok = (reply && reply->type == REDIS_REPLY_INTEGER);
-    if (reply) freeReplyObject(reply);
-    return ok;
-}
-
-std::vector<std::string> CServiceDiscovery::RedisSMembers(const std::string& key) {
-    std::vector<std::string> result;
-    auto* pCli = GetRedisCli();
-    if (!pCli) return result;
-    redisContext* ctx = pCli->GetRedisContext();
-    if (!ctx) return result;
-    redisReply* reply = (redisReply*)redisCommand(ctx, "SMEMBERS %s", key.c_str());
-    if (reply && reply->type == REDIS_REPLY_ARRAY) {
-        for (size_t i = 0; i < reply->elements; ++i) {
-            if (reply->element[i]->type == REDIS_REPLY_STRING)
-                result.push_back(std::string(reply->element[i]->str, reply->element[i]->len));
-        }
+bool CServiceDiscovery::RedisSAdd(const std::string &key, const std::string &member)
+{
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return false;
     }
-    if (reply) freeReplyObject(reply);
+    return pCli->SAdd(key, member) == REDIS_OK;
+}
+
+bool CServiceDiscovery::RedisSRem(const std::string &key, const std::string &member)
+{
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return false;
+    }
+    return pCli->SRem(key, member) == REDIS_OK;
+}
+
+std::vector<std::string> CServiceDiscovery::RedisSMembers(const std::string &key)
+{
+    std::vector<std::string> result;
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return result;
+    }
+    pCli->SMembers(key, result);
     return result;
 }
 
-int64 CServiceDiscovery::RedisIncr(const std::string& key) {
-    auto* pCli = GetRedisCli();
-    if (!pCli) return -1;
-    redisContext* ctx = pCli->GetRedisContext();
-    if (!ctx) return -1;
-    redisReply* reply = (redisReply*)redisCommand(ctx, "INCR %s", key.c_str());
-    int64 val = (reply && reply->type == REDIS_REPLY_INTEGER) ? reply->integer : -1;
-    if (reply) freeReplyObject(reply);
-    return val;
+int64 CServiceDiscovery::RedisIncr(const std::string &key)
+{
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return -1;
+    }
+    return pCli->Incr(key);
 }
 
-bool CServiceDiscovery::RedisSet(const std::string& key, const std::string& value) {
-    auto* pCli = GetRedisCli();
-    if (!pCli) return false;
+bool CServiceDiscovery::RedisSet(const std::string &key, const std::string &value)
+{
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return false;
+    }
     RecordDataST d;
     d.Resize((int32)value.size());
     memcpy(d.MutableData(), value.data(), value.size());
@@ -330,11 +570,29 @@ bool CServiceDiscovery::RedisSet(const std::string& key, const std::string& valu
     return pCli->Set(key, &d) == REDIS_OK;
 }
 
-std::string CServiceDiscovery::RedisGet(const std::string& key) {
-    auto* pCli = GetRedisCli();
-    if (!pCli) return "";
+std::string CServiceDiscovery::RedisGet(const std::string &key)
+{
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return "";
+    }
     RecordDataST d;
     if (pCli->Get(key, &d) == REDIS_OK && d.Size() > 0)
+    {
         return std::string(d.Data(), d.Size());
+    }
     return "";
+}
+
+bool CServiceDiscovery::RedisExpire(const std::string &key, int64 ttlSec)
+{
+    std::lock_guard<std::mutex> lock(m_redisMutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return false;
+    }
+    return pCli->Expire(key, ttlSec) == REDIS_OK;
 }

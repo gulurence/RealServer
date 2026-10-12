@@ -2,63 +2,77 @@
 
 #include "xState.h"
 
-template<typename entity_type>
-class xStateMachine
+template <typename entity_type> class xStateMachine
 {
-    public:
-        xStateMachine(entity_type *_owner, xState<entity_type> *_curState, 
-                xState<entity_type> *_globalState = NULL) : owner(_owner) 
+public:
+    xStateMachine(entity_type *_owner, xState<entity_type> *_curState,
+                  xState<entity_type> *_globalState = NULL)
+        : owner(_owner)
+    {
+        prevState = NULL;
+        curState = _curState;
+        globalState = _globalState;
+    }
+    virtual ~xStateMachine()
+    {
+    }
+
+    void update() const
+    {
+        if (globalState)
         {
-            prevState = NULL;
-            curState = _curState;
-            globalState = _globalState;
+            globalState->execute(owner);
         }
-        virtual ~xStateMachine(){}
-
-        void update() const
+        if (curState)
         {
-            if (globalState) globalState->execute(owner);
-            if (curState) curState->execute(owner);
+            curState->execute(owner);
         }
+    }
 
-        void changeState(xState<entity_type> *newState)
+    void changeState(xState<entity_type> *newState)
+    {
+        if (!newState || curState == newState)
         {
-            if (!newState || curState == newState) return;
-            prevState = curState;
-            curState = newState;
-
-            if (prevState)
-                prevState->exit(owner);
-            curState->enter(owner);
+            return;
         }
+        prevState = curState;
+        curState = newState;
 
-        void changeGlobalState(xState<entity_type> *newState)
+        if (prevState)
         {
-            if (!newState) return;
-            if (globalState)
-                globalState->exit(owner);
-            globalState = newState;
-            globalState->enter(owner);
+            prevState->exit(owner);
         }
+        curState->enter(owner);
+    }
 
-        void revertToPreviousState()
+    void changeGlobalState(xState<entity_type> *newState)
+    {
+        if (!newState)
         {
-            changeState(prevState);
+            return;
         }
-
-        xState<entity_type> *getCurState()
+        if (globalState)
         {
-            return curState;
+            globalState->exit(owner);
         }
+        globalState = newState;
+        globalState->enter(owner);
+    }
 
-    private:
-        entity_type * const owner; //
+    void revertToPreviousState()
+    {
+        changeState(prevState);
+    }
 
-        xState<entity_type> *prevState;        //
-        xState<entity_type> *curState;        //
-        xState<entity_type> *globalState;    //
+    xState<entity_type> *getCurState()
+    {
+        return curState;
+    }
 
+private:
+    entity_type *const owner; //
+
+    xState<entity_type> *prevState;   //
+    xState<entity_type> *curState;    //
+    xState<entity_type> *globalState; //
 };
-
-
-

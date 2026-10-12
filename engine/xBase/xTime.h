@@ -3,17 +3,19 @@
 #include "xDefine.h"
 
 #ifdef _WINDOWS
-#define clock_gettime(CLOCK_REALTIME, _tv) {\
-(_tv)->tv_sec = clock()/1000;\
-(_tv)->tv_nsec = clock()%1000*1000000L;}
+#define clock_gettime(CLOCK_REALTIME, _tv)                                                         \
+    {                                                                                              \
+        (_tv)->tv_sec = clock() / 1000;                                                            \
+        (_tv)->tv_nsec = clock() % 1000 * 1000000L;                                                \
+    }
 
 // struct timespec
 // {
-//     time_t tv_sec; /*second*/ 
-//     long tv_nsec;/*nanosecond*/ 
+//     time_t tv_sec; /*second*/
+//     long tv_nsec;/*nanosecond*/
 // };
 
-int gettimeofday(struct timeval* tp, void* tzp);
+int32 gettimeofday(struct timeval *tp, void *tzp);
 #endif
 
 class xTime
@@ -24,21 +26,21 @@ public:
 
     static uint64 getCurUSec();
     static uint32 getCurSec();
-    static time_t    getDayStart(time_t time);
-    static time_t    getDayStart(uint32 year, uint32 month, uint32 day);
-    static time_t    getWeekStart(time_t time);
-    static time_t    getMonthStart(time_t time);
-    static bool        isSameDay(time_t t1, time_t t2);
-    static bool        isSameWeek(time_t t1, time_t t2);
-    static bool        isSameMonth(time_t t1, time_t t2);
-    static bool        isValidDate(uint32 year, uint32 month, uint32 day);    //
-    static bool        isLeapYear(uint32 year);
-    static int        getDay(time_t time);
-    static int        getMonth(time_t time);
-    static int        getYear(time_t time);
-    static int        getWeek(time_t time);
-    static int        getHour(time_t time);
-    static int        getMin(time_t time);
+    static time_t getDayStart(time_t time);
+    static time_t getDayStart(uint32 year, uint32 month, uint32 day);
+    static time_t getWeekStart(time_t time);
+    static time_t getMonthStart(time_t time);
+    static bool isSameDay(time_t t1, time_t t2);
+    static bool isSameWeek(time_t t1, time_t t2);
+    static bool isSameMonth(time_t t1, time_t t2);
+    static bool isValidDate(uint32 year, uint32 month, uint32 day); //
+    static bool isLeapYear(uint32 year);
+    static int32 getDay(time_t time);
+    static int32 getMonth(time_t time);
+    static int32 getYear(time_t time);
+    static int32 getWeek(time_t time);
+    static int32 getHour(time_t time);
+    static int32 getMin(time_t time);
 
     void now();
 
@@ -58,18 +60,29 @@ public:
 class xTimer
 {
 public:
-    xTimer() : elapse(0) {}
-    xTimer(uint32 t) {
+    xTimer() : elapse(0)
+    {
+    }
+    xTimer(uint32 t)
+    {
         elapse = t;
     }
-    ~xTimer() {}
-    inline bool timeUp() {
+    ~xTimer()
+    {
+    }
+    inline bool timeUp()
+    {
         return time.elapse(elapse);
     }
-    void reset() {
+    void reset()
+    {
         time.elapseStart();
     }
-    inline uint32 getElapse() const { return elapse; }
+    inline uint32 getElapse() const
+    {
+        return elapse;
+    }
+
 private:
     xTime time;
     uint32 elapse;
@@ -78,17 +91,25 @@ private:
 class xMilliTimer
 {
 public:
-    xMilliTimer() : elapse(0) {}
-    xMilliTimer(uint32 t) {
+    xMilliTimer() : elapse(0)
+    {
+    }
+    xMilliTimer(uint32 t)
+    {
         elapse = t;
     }
-    ~xMilliTimer() {}
-    bool timeUp() {
+    ~xMilliTimer()
+    {
+    }
+    bool timeUp()
+    {
         return time.milliElapse(elapse);
     }
-    void reset() {
+    void reset()
+    {
         time.elapseStart();
     }
+
 private:
     xTime time;
     uint32 elapse;
@@ -97,19 +118,25 @@ private:
 class xDayTimer
 {
 public:
-    xDayTimer(uint8 h, uint8 d = 5) {
+    xDayTimer(uint8 h, uint8 d = 5)
+    {
         _hour = h;
 
         _last_done = 0;
 
         _delay = d;
     }
-    ~xDayTimer() {
+    ~xDayTimer()
+    {
     }
-    bool timeUp(struct tm& tm_cur) {
-        if (_last_done != tm_cur.tm_mday) {
-            if (tm_cur.tm_hour == _hour) {
-                if (tm_cur.tm_min <= _delay) {
+    bool timeUp(struct tm &tm_cur)
+    {
+        if (_last_done != tm_cur.tm_mday)
+        {
+            if (tm_cur.tm_hour == _hour)
+            {
+                if (tm_cur.tm_min <= _delay)
+                {
                     _last_done = tm_cur.tm_mday;
                     return true;
                 }
@@ -126,8 +153,4 @@ private:
     uint8 _delay;
 };
 
-std::string getAscTime(const uint32& dwTime);
-
-
-
-
+std::string getAscTime(const uint32 &dwTime);

@@ -7,9 +7,10 @@
 class tServiceLog : public ThridService
 {
 public:
-    tServiceLog(int32 id, const std::string& name)
-        : ThridService(EST_Log, id, name) {}
+    tServiceLog(int32 id, const std::string &name) : ThridService(EST_Log, id, name)
+    {
+    }
 
-    virtual bool Init(const ThridServiceConfig& cfg) override;
+    virtual bool Init(const ThridServiceConfig &cfg) override;
     virtual void Release() override;
 };

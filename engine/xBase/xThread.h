@@ -7,10 +7,10 @@ class xThread
 public:
     enum ThreadState
     {
-        THREAD_INIT = 0,//after new, before start()
-        THREAD_RUN,//in while()
-        THREAD_STOP,//stopping
-        THREAD_FINISH,//can delete
+        THREAD_INIT = 0, // after new, before start()
+        THREAD_RUN,      // in while()
+        THREAD_STOP,     // stopping
+        THREAD_FINISH,   // can delete
     };
 
 public:
@@ -20,16 +20,19 @@ public:
 public:
     bool thread_start();
 
-    virtual bool thread_init() {
+    virtual bool thread_init()
+    {
         return true;
     }
 
     virtual void thread_stop();
 
-    void thread_setState(ThreadState s) {
+    void thread_setState(ThreadState s)
+    {
         thread_state = s;
     }
-    ThreadState thread_getState() {
+    ThreadState thread_getState()
+    {
         return thread_state;
     }
 
@@ -40,7 +43,3 @@ protected:
     ThreadState thread_state;
     virtual void thread_proc() = 0;
 };
-
-
-
-

@@ -9,7 +9,9 @@ xEngine = xEngine or {}
 package.loaded["common.util.log"] = nil
 package.loaded["common.util.timer"] = nil
 package.loaded["common.util.string_ext"] = nil
+package.loaded["common.util.number"] = nil
 
 require("common.util.log")
 require("common.util.timer")
 require("common.util.string_ext")
+require("common.util.number")

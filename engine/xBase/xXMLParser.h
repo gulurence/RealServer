@@ -5,12 +5,12 @@
 #include <libxml/parser.h>
 // iconv_t is used privately; real <iconv.h> included in .cpp
 #ifndef _ICONV_H
-typedef void* iconv_t;
+typedef void *iconv_t;
 #endif
 
-
-//XML婢跺嫮鎮?
-class xXMLParser {
+// XML婢跺嫮鎮?
+class xXMLParser
+{
 public:
     xXMLParser();
     ~xXMLParser();
@@ -30,12 +30,16 @@ public:
 
     bool getPropStr(xmlNodePtr node, const char *name, std::string &out) const;
     bool InnerXml(xmlNodePtr node, std::string &out) const;
-    template<typename T>
-    bool getPropValue(xmlNodePtr node, const char *name, T* out) const {
+    template <typename T> bool getPropValue(xmlNodePtr node, const char *name, T *out) const
+    {
         if (!node)
+        {
             return false;
+        }
         if (!xmlHasProp(node, BAD_CAST name))
+        {
             return false;
+        }
 
         *out = T();
 
@@ -55,27 +59,21 @@ public:
         std::stringstream ss((char *)conv);
 
 #endif
-        std::stringstream ss((char *) utf);
+        std::stringstream ss((char *)utf);
         ss >> *out;
-        xmlFree (utf);
+        xmlFree(utf);
         return true;
     }
 
 private:
-    //bool toUTF8();
-    static int code_convert(const char *from_charset, const char *to_charset,
-            char *inbuf, size_t inlen, char *outbuf, size_t outlen);
+    // bool toUTF8();
+    static int32 code_convert(const char *from_charset, const char *to_charset, char *inbuf,
+                              size_t inlen, char *outbuf, size_t outlen);
     xmlDocPtr doc;
     char *docBuffer;
 
     static iconv_t iconv_utf8_gbk;
     static iconv_t iconv_gbk_utf8;
-    static int gbk_input(unsigned char *out, int *outlen,
-            const unsigned char *in, int *inlen);
-    static int gbk_output(unsigned char *out, int *outlen,
-            const unsigned char *in, int *inlen);
-
+    static int32 gbk_input(uint8 *out, int32 *outlen, const uint8 *in, int32 *inlen);
+    static int32 gbk_output(uint8 *out, int32 *outlen, const uint8 *in, int32 *inlen);
 };
-
-
-

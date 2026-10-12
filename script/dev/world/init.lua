@@ -1,6 +1,0 @@
--- init.lua — World actor config (dev)
-require("common.include")
-require("actors.world.world")
-require("actors.world.on_event.include")
-require("actors.world.on_rpc.include")
-xEngine.Log.info("[World:dev] ready")

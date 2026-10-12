@@ -4,6 +4,9 @@ build2/
 build_vcpkg/
 third_part/
 
+# CI/CD tooling (downloaded JDK/git binaries + local configs with dev credentials)
+env_root/tools/
+
 # CMake generated files (root in-tree build)
 CMakeCache.txt
 CMakeFiles/
@@ -28,3 +31,39 @@ engine/RealServer
 
 # Runtime config with credentials — copy server.xml.example → server.xml
 config/server.xml
+
+# Runtime logs
+logs/
+
+# Runtime node registry (引擎自动维护, 每个运行根目录一份)
+local.info
+node_manager.machine
+
+# cocos2d-x client (独立工程, 不属于 RealServer 服务端仓库)
+client/
+
+# MSVC 构建目录
+build_msvc/
+
+# config 备份可能含明文凭证
+config/*.bak
+
+# env_root: 下载的二进制依赖 (MySQL/PHP/Redis)、崩溃转储、运行时 txt 输出、测试客户端
+env_root/.downloads/
+env_root/Mysql/
+env_root/php/
+env_root/RedisCluster/
+env_root/dumps/
+env_root/TestClient/
+env_root/*.txt
+
+# WebPlatform 运行时日志
+env_root/WebPlatform/*.log
+
+# Claude 本地个人设置 (项目级 settings.json 仍提交)
+.claude/settings.local.json
+
+# 编译产物: shared 测试二进制/目标文件 + Go 工具可执行
+shared/**/test/*.exe
+shared/**/*.obj
+tools/**/*.exe

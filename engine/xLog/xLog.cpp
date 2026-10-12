@@ -3,52 +3,60 @@
 #include <spdlog/spdlog.h>
 #include "spdlog/sinks/stdout_color_sinks.h"
 
-xLog::xLog(void) {
+xLog::xLog(void)
+{
 }
 
-xLog::~xLog(void) {
+xLog::~xLog(void)
+{
 }
 
-void xLog::Init(const char* prop) {
+void xLog::Init(const char *prop)
+{
     service_name = "normal";
     std::string logFileName = "logs/" + service_name + ".log";
     // 文件日志
-    auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5, 400);
-    //sink->set_pattern("[%Y-%m-%d %H:%M:%S] [%^%L%$] %v");
-    // 前台日志
+    auto sink
+        = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5, 400);
+    // sink->set_pattern("[%Y-%m-%d %H:%M:%S] [%^%L%$] %v");
+    //  前台日志
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    //console_sink->set_pattern("[%Y-%m-%d %H:%M:%S] [%^%L%$] %v");
+    // console_sink->set_pattern("[%Y-%m-%d %H:%M:%S] [%^%L%$] %v");
     //
     spdlog::set_pattern("[%H:%M:%S %z] %v");
     // 设置日志
-    std::vector<spdlog::sink_ptr> sinks = { sink, console_sink };
+    std::vector<spdlog::sink_ptr> sinks = {sink, console_sink};
     _logger = std::make_shared<spdlog::logger>(service_name, sinks.begin(), sinks.end());
     spdlog::set_default_logger(_logger);
 
     XLOG("[INIT] xLog initialized — console + rotating file: %s", logFileName.c_str());
 
     // 文件日志
-    //auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5, 400);
-    //auto logger = std::make_shared<spdlog::logger>("logger", sink);
-    //spdlog::set_default_logger(logger);
+    // auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5,
+    // 400); auto logger = std::make_shared<spdlog::logger>("logger", sink);
+    // spdlog::set_default_logger(logger);
 }
 
-std::shared_ptr<spdlog::logger> xLog::CreateServiceLog(const std::string& strServiceName) {
+std::shared_ptr<spdlog::logger> xLog::CreateServiceLog(const std::string &strServiceName)
+{
     std::string logFileName = "logs/" + strServiceName + "/" + strServiceName + ".log";
     // 文件日志
-    auto sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5, 400);
+    auto sink
+        = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(logFileName, 1048576 * 5, 400);
     auto logger = std::make_shared<spdlog::logger>(strServiceName, sink);
     return logger;
 }
 
-bool xLog::RemoveServiceLog(const std::string& strServiceName) {
+bool xLog::RemoveServiceLog(const std::string &strServiceName)
+{
 
     return true;
 }
 
-
-void xLog::Print(const char* file, long line, const char* funtion, Level level, const char* format, ...) {
-    char buff[4096] = { 0 };
+void xLog::Print(const char *file, int32 line, const char *funtion, Level level, const char *format,
+                 ...)
+{
+    char buff[4096] = {0};
     va_list ap;
     va_start(ap, format);
     vsnprintf(buff, 4096, format, ap);
@@ -58,15 +66,20 @@ void xLog::Print(const char* file, long line, const char* funtion, Level level, 
     std::string::size_type pos = filePatch.rfind('\\');
     std::string::size_type pos2 = filePatch.rfind('/');
     if (pos2 != std::string::npos && (pos == std::string::npos || pos2 > pos))
+    {
         pos = pos2;
+    }
     if (pos != std::string::npos)
+    {
         filePatch = filePatch.substr(pos + 1);
+    }
 
-    char fmtBuf[4352] = { 0 };
+    char fmtBuf[4352] = {0};
     snprintf(fmtBuf, sizeof(fmtBuf), " %s:%ld - %s", filePatch.c_str(), line, buff);
     std::string strlog = fmtBuf;
 
-    switch (level) {
+    switch (level)
+    {
     case Level::ERR:
         _logger->error(strlog);
         break;
@@ -89,4 +102,3 @@ void xLog::Print(const char* file, long line, const char* funtion, Level level, 
     }
     _logger->flush();
 }
-

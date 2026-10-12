@@ -1,0 +1,49 @@
+// =============================================================================
+// account.proto — 账号/角色/游戏/玩家/物品 共享数据结构 (子数据定义)
+// 供 login.proto / player.proto / player_item.proto import 复用
+// =============================================================================
+syntax = "proto3";
+
+package PbAccount;
+
+import "msg/msg_id.proto";
+
+// 游戏服信息
+message GameInfo {
+  string server_name = 1;   // 服务器名
+  int64  server_time = 2;   // 服务器时间 (unix 秒)
+  string version     = 3;   // 版本号
+}
+
+// 角色列表条目 (选角前的角色摘要)
+message RoleInfo {
+  int64  role_id   = 1;
+  string role_name = 2;
+  int32  level     = 3;
+  int32  job       = 4;     // 职业
+}
+
+// 账号信息 (热数据 account:{id})
+message AccountInfo {
+  int64    account_id = 1;
+  string   username   = 2;
+  PbID.AccountState state = 3;
+  GameInfo game_info  = 4;
+}
+
+// 玩家信息 (Player actor 创建完成后下发)
+message PlayerInfo {
+  int64  player_id  = 1;
+  int64  account_id = 2;
+  int64  role_id    = 3;
+  string role_name  = 4;
+  int32  level      = 5;
+  int32  job        = 6;
+}
+
+// 物品条目
+message ItemInfo {
+  int64 item_id  = 1;
+  int32 item_tid = 2;   // 物品模板 id
+  int32 count    = 3;
+}

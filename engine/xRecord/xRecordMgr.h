@@ -6,7 +6,6 @@
 #include "xRedisRecord.h"
 #include "xDatabaseRecord.h"
 
-
 // CRecordMgr — unifying data persistence manager.
 //
 // Flow for each operation:
@@ -19,32 +18,33 @@
 class CRecordMgr : public xSingleton<CRecordMgr>
 {
 public:
-    CRecordMgr()
-        : m_xRedisRecord("actor_cache")
-        , m_xDatabaseRecord("actor_db") {
+    CRecordMgr() : m_xRedisRecord("actor_cache"), m_xDatabaseRecord("actor_db")
+    {
     }
-    virtual ~CRecordMgr() {
+    virtual ~CRecordMgr()
+    {
     }
 
 public:
     // Load actor data: Redis first, DB fallback, cache on DB hit.
     // pData->m_i32Type and m_i64Id must be set before calling.
     // On return, pData contains the binary record (or empty for new actors).
-    bool LoadActor(RecordDataST* pData);
+    bool LoadActor(RecordDataST *pData);
 
     // Update actor data: Redis sync write + enqueue DB async write.
-    bool UpdateActor(const RecordDataST* pData);
+    bool UpdateActor(const RecordDataST *pData);
 
     // Remove actor data: Redis sync delete + enqueue DB async delete.
-    bool RemoveActor(const RecordDataST* pData);
+    bool RemoveActor(const RecordDataST *pData);
 
 public:
-    void PushBackRecordData(RecordDataST* pData) {
+    void PushBackRecordData(RecordDataST *pData)
+    {
         m_xPool.DeleteObj(pData);
     }
 
 private:
     xObjPool<RecordDataST> m_xPool;
-    CRedisRecord    m_xRedisRecord;
+    CRedisRecord m_xRedisRecord;
     CDatabaseRecord m_xDatabaseRecord;
-}; 
+};

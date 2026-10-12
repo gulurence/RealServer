@@ -4,80 +4,36 @@
 #include "xBase/xSingleton.h"
 #include "tService/tThridServiceConfig.h"
 
-#include <queue>
-#include <mutex>
-#include <condition_variable>
-#include <hiredis/hiredis.h>
+#include <map>
+#include <string>
 
-// Forward declare redis++ types (async types temporarily disabled — needs libuv)
-// namespace sw { namespace redis { class AsyncRedis; class RedisCluster; } }
-
-
-class CRedisPool
-{
-public:
-    CRedisPool(const ThridRedisConfig& cfg);
-    ~CRedisPool();
-
-    CRedisCli* GetConnection();
-    void ReleaseConnection(CRedisCli* pConn);
-
-private:
-    CRedisCli* CreateConnection();
-    bool Validate(CRedisCli* pConn);
-
-private:
-    std::queue<CRedisCli*> m_qPool_;
-    std::mutex m_mLock_;
-    std::condition_variable m_condCv_;
-    ThridRedisConfig m_stConfig_;
-};
-typedef std::map<std::string, CRedisPool*> RedisPoolMap;
-
-// 链接池管理
+// CRedisPoolMgr — Redis 连接管理 (每 title 一个共享 CRedisCli)
+//
+// RedisCluster 自带连接池且线程安全, 无需再维护 queue<CRedisCli*> + mutex/cv
+// 的「取出/归还」连接池 (旧实现存在取出不归还致池耗尽的隐患)。改为:
+//   ConnectToRedis(title) → 构造一个共享 CRedisCli (内部持 RedisCluster)
+//   GetRedisCli(title)    → 返回持久化、线程安全的同一句柄
+// 与现有用法契合: CTraceManager/CPlayerActorIndex/CServiceDiscovery 长期持有
+// m_pCli, xRedisRecord/luacore 按次取也拿到同一句柄即可。
 class CRedisPoolMgr : public xSingleton<CRedisPoolMgr>
 {
 public:
-    CRedisPoolMgr(){}
-    ~CRedisPoolMgr(){}
+    CRedisPoolMgr()
+    {
+    }
+    ~CRedisPoolMgr()
+    {
+        for (auto &kv : m_mapCli)
+        {
+            delete kv.second;
+        }
+        m_mapCli.clear();
+    }
 
 private:
-    RedisPoolMap m_mapPool;
+    std::map<std::string, CRedisCli *> m_mapCli;
 
 public:
-    bool ConnectToRedis(const ThridRedisConfig& stConfig);
-    CRedisCli* GetRedisCli(const std::string& strTitle);
+    bool ConnectToRedis(const ThridRedisConfig &stConfig);
+    CRedisCli *GetRedisCli(const std::string &strTitle);
 };
-
-#if 0 // Temporarily disabled: async redis requires libuv
-typedef std::map<std::string, sw::redis::AsyncRedis*> AsyncRedisMap;
-typedef std::map<std::string, sw::redis::RedisCluster*> RedisClusterMap;
-
-class CRedisClusterMgr : public xSingleton<CRedisClusterMgr>
-{
-public:
-    CRedisClusterMgr(){}
-    ~CRedisClusterMgr(){}
-
-private:
-    RedisClusterMap m_mapRedis;
-
-public:
-    bool ConnectToCluster(const std::string &key, const std::string &url);
-    sw::redis::RedisCluster* GetConnect(const std::string& key);
-};
-
-class CRedisAsyncMgr : public xSingleton<CRedisAsyncMgr>
-{
-public:
-    CRedisAsyncMgr() {}
-    ~CRedisAsyncMgr() {}
-
-private:
-    AsyncRedisMap m_mapAsyncRedisCluster;
-
-public:
-    bool ConnectToAsyncRedis(const std::string& key, const std::string& url);
-    sw::redis::AsyncRedis* GetConnect(const std::string& key);
-};
-#endif // Temporarily disabled: async redis requires libuv

@@ -5,58 +5,69 @@
 class xObjPoolBase
 {
 public:
-    xObjPoolBase() {}
-    virtual ~xObjPoolBase() {}
+    xObjPoolBase()
+    {
+    }
+    virtual ~xObjPoolBase()
+    {
+    }
 
 private:
     uint32 m_u32PoolIndex____ = 0;
 
 public:
-    virtual void cleanUp(){}
+    virtual void cleanUp()
+    {
+    }
 
 public:
-    uint32 GetPoolID___() {
+    uint32 GetPoolID___()
+    {
         return m_u32PoolIndex____;
     }
-    void SetPoolID___(uint32 poolIndex) {
+    void SetPoolID___(uint32 poolIndex)
+    {
         m_u32PoolIndex____ = poolIndex;
     }
 };
 
-template<class T>
-class xObjPool
+template <class T> class xObjPool
 {
 public:
-    xObjPool(void) {
+    xObjPool(void)
+    {
     }
 
-    ~xObjPool(void) {
+    ~xObjPool(void)
+    {
         Term();
-        //Assert(m_papObj == nullptr);
+        // Assert(m_papObj == nullptr);
     }
 
 public:
     bool bInit = false;
-    // 
-    std::map<T*, int> mFreeMap;
+    //
+    std::map<T *, int32> mFreeMap;
 
 public:
-    bool Init(int32 nMaxCount) {
-        //Assert(nMaxCount > 0);
-        if (nMaxCount <= 0) {
+    bool Init(int32 nMaxCount)
+    {
+        // Assert(nMaxCount > 0);
+        if (nMaxCount <= 0)
+        {
             return false;
         }
 
         m_nMaxCount = nMaxCount;
         m_nPosition = 0;
-        m_papObj = new T*[m_nMaxCount];
+        m_papObj = new T *[m_nMaxCount];
 
         for (int32 i = 0; i < m_nMaxCount; i++)
         {
             m_papObj[i] = new T;
             if (!m_papObj[i])
             {
-                //Assert(m_papObj[i] != nullptr);
+                // Assert(m_papObj[i] != nullptr);
                 return false;
             }
 
@@ -67,12 +78,14 @@ public:
         return true;
     }
 
-    void Term(void) {
+    void Term(void)
+    {
         if (m_papObj != nullptr)
         {
             for (int32 i = 0; i < m_nMaxCount; i++)
             {
-                if (m_papObj[i]) {
+                if (m_papObj[i])
+                {
                     delete m_papObj[i];
                     m_papObj[i] = nullptr;
                 }
@@ -88,14 +101,15 @@ public:
         mFreeMap.clear();
     }
 
-    T* NewObj(void) {
+    T *NewObj(void)
+    {
         std::lock_guard<std::mutex> guard(m_Lock);
-        //Assert(m_nPosition < m_nMaxCount);
+        // Assert(m_nPosition < m_nMaxCount);
         if (m_nPosition >= m_nMaxCount)
         {
             Resize(m_nMaxCount + 1024);
-            //m_Lock.unlock();
-            //return nullptr;
+            // m_Lock.unlock();
+            // return nullptr;
         }
 
         T *pObj = m_papObj[m_nPosition];
@@ -106,58 +120,69 @@ public:
         return pObj;
     }
 
-    bool Resize(int32 nMaxCount) {
-        //Assert(nMaxCount > 0);
-        if (nMaxCount <= m_nMaxCount) {
+    bool Resize(int32 nMaxCount)
+    {
+        // Assert(nMaxCount > 0);
+        if (nMaxCount <= m_nMaxCount)
+        {
             return false;
         }
 
         int32 i32PreMaxCount = m_nMaxCount;
         m_nMaxCount = nMaxCount;
-        T **m_papObjT = new T*[m_nMaxCount];
+        T **m_papObjT = new T *[m_nMaxCount];
 
-        // 
-        for (int32 i = 0; i < i32PreMaxCount; i++) {
+        //
+        for (int32 i = 0; i < i32PreMaxCount; i++)
+        {
             m_papObjT[i] = m_papObj[i];
         }
-        // 
-        for (int32 i = i32PreMaxCount; i < m_nMaxCount; i++) {
+        //
+        for (int32 i = i32PreMaxCount; i < m_nMaxCount; i++)
+        {
             m_papObjT[i] = new T;
-            if (m_papObjT[i] == nullptr) {
-                //Assert(m_papObj[i] != nullptr);
+            if (m_papObjT[i] == nullptr)
+            {
+                // Assert(m_papObj[i] != nullptr);
                 return false;
             }
             mFreeMap[m_papObjT[i]] = 1;
         }
-        delete[]m_papObj;
+        delete[] m_papObj;
         m_papObj = m_papObjT;
         return true;
     }
 
-    void DeleteObj(T *pObj) {
+    void DeleteObj(T *pObj)
+    {
 
         std::lock_guard<std::mutex> guard(m_Lock);
-        //Assert(pObj != nullptr);
-        if (pObj == nullptr) {
+        // Assert(pObj != nullptr);
+        if (pObj == nullptr)
+        {
             return;
         }
-        // 
-        if (mFreeMap.find(pObj)!= mFreeMap.end()) {
+        //
+        if (mFreeMap.find(pObj) != mFreeMap.end())
+        {
             return;
         }
-        //Assert(m_nPosition > 0);
-        if (m_nPosition <= 0) {
+        // Assert(m_nPosition > 0);
+        if (m_nPosition <= 0)
+        {
             return;
         }
 
         uint32 uDelIndex = pObj->GetPoolID___();
-        //Assert(uDelIndex < (uint32)m_nPosition);
-        if (uDelIndex >= (uint32)m_nPosition) {
+        // Assert(uDelIndex < (uint32)m_nPosition);
+        if (uDelIndex >= (uint32)m_nPosition)
+        {
             return;
         }
 
         //------------------------------------------------------------//
-        //|   ...   |  ...      |        uDelIndex     |     ...       |      m_nPosition-1  |     m_nPosition ( ) |
+        //|   ...   |  ...      |        uDelIndex     |     ...       |      m_nPosition-1  |
+        // m_nPosition ( ) |
 
         //|   ...   |  ...      |      m_nPosition -1 | ...            |   m_nPosition(ｉ) |
 
@@ -175,16 +200,14 @@ public:
         return;
     }
 
-    int32 GetCount(void)const {
+    int32 GetCount(void) const
+    {
         return m_nPosition;
     }
 
 private:
-    T                **m_papObj = nullptr;
-    int32            m_nMaxCount = 0;
-    int32            m_nPosition = 0;
-    std::mutex        m_Lock;
+    T **m_papObj = nullptr;
+    int32 m_nMaxCount = 0;
+    int32 m_nPosition = 0;
+    std::mutex m_Lock;
 };
-
-
-

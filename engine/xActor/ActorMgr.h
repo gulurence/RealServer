@@ -14,7 +14,7 @@
 // is delegated to tServiceMgr for reference-counted sharing across actors.
 //
 // Lifecycle:
-//   1. RegisterActorDeps: declare which services each ActorType needs
+//   1. RegisterActorDeps: declare which services each EActorType needs
 //   2. Install(type, id): tServiceMgr::AcquireServices → create/reuse services
 //      → call actor->Install()
 //   3. UnInstall(type, id): actor->UnInstall() → tServiceMgr::ReleaseServices
@@ -27,38 +27,43 @@ public:
     ~CActorMgr();
 
     // --- Hosted Type Management ---
-    void AddHostedType(ActorType i32Type);
-    bool CanHostType(ActorType i32Type) const;
-    const std::set<ActorType>& GetHostedTypes() const { return m_setHostedTypes; }
+    void AddHostedType(EActorType i32Type);
+    bool CanHostType(EActorType i32Type) const;
+    const std::set<EActorType> &GetHostedTypes() const
+    {
+        return m_setHostedTypes;
+    }
 
     // --- Instance Management ---
-    bool AddInstance(CActor* pActor);
-    CActor* RemoveInstance(ActorType i32Type, ActorID i64ID);
+    bool AddInstance(CActor *pActor);
+    CActor *RemoveInstance(EActorType i32Type, ActorID i64ID);
 
     // --- Lifecycle Operations ---
     // Install actor environment: delegates to tServiceMgr for shared services,
     // then calls actor->Install()
-    bool Install(ActorType i32Type, ActorID i64ID);
+    bool Install(EActorType i32Type, ActorID i64ID);
 
     // Uninstall actor: calls actor->UnInstall(), removes from instances,
     // delegates service release to tServiceMgr
-    bool UnInstall(ActorType i32Type, ActorID i64ID);
+    bool UnInstall(EActorType i32Type, ActorID i64ID);
 
     // Install / UnInstall all actors of a type
-    int32 InstallAll(ActorType i32Type);
-    int32 UnInstallAll(ActorType i32Type);
+    int32 InstallAll(EActorType i32Type);
+    int32 UnInstallAll(EActorType i32Type);
 
     // --- Query Operations ---
-    CActor* Find(ActorType i32Type, ActorID i64ID);
-    std::vector<CActor*> GetByType(ActorType i32Type);
+    CActor *Find(EActorType i32Type, ActorID i64ID);
+    // 按 ActorID 在所有托管类型中查找 (网络路由用: 包头只带 targetActorId 不带类型)
+    CActor *FindByActorID(ActorID i64ID);
+    std::vector<CActor *> GetByType(EActorType i32Type);
     size_t GetInstanceCount() const;
 
 private:
     // type → (id → actor) two-level map
-    std::unordered_map<ActorType, CActorMap> m_mapInstances;
+    std::unordered_map<EActorType, CActorMap> m_mapInstances;
 
     // Actor types this process is configured to host
-    std::set<ActorType> m_setHostedTypes;
+    std::set<EActorType> m_setHostedTypes;
 
     mutable std::mutex m_stLock;
 };

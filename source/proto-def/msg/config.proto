@@ -1,0 +1,63 @@
+// =============================================================================
+// config.proto — 配置热更模块协议 (一级 Actor 类型 = AT_CONFIG = 105)
+//
+// 结构规范: 消息ID枚举 => 子数据定义 => 协议定义
+// 协议定义每条消息前两个字段为 uint32 BigType / uint32 SmallType (消息路由):
+//   BigType   = 一级 actor 类型 (固定 105 = AT_CONFIG)
+//   SmallType = 本模块内消息 ID (ConfigMsgId 枚举)
+//
+// 流程 (docs/config-system-design.md §C4):
+//   客户端进大厅 → CONFIG_GET_REQ 拉取完整 bundle (version + contentHash + bin 字节)
+//   → 校验 contentHash → 原子替换; 服务器配置版本变更时广播 CONFIG_CHANGED_NTF,
+//   客户端据版本比对决定是否重新拉取 (下一局生效)。
+// =============================================================================
+syntax = "proto3";
+
+package PbConfig;
+
+// ---------------------------------------------------------------------------
+// 消息 ID 枚举 (SmallType 路由字段取值)
+// ---------------------------------------------------------------------------
+enum ConfigMsgId {
+  CONFIG_MSG_NONE     = 0;
+  CONFIG_GET_REQ      = 1;   // 客户端 -> Config: 拉取完整配置 bundle
+  CONFIG_GET_RSP      = 2;   // Config -> 客户端: version + contentHash + bin 文件字节
+  CONFIG_CHANGED_NTF  = 3;   // Config -> 全员: 版本变更通知 (触发客户端重新拉取)
+}
+
+// ---------------------------------------------------------------------------
+// 子数据定义
+// ---------------------------------------------------------------------------
+
+// 一份 bin 文件 (RSCF 格式原始字节)
+message PBConfigFile {
+  string name = 1;   // 逻辑名 ("wave.bin" / "map_collision.bin" / "sp01.bin")
+  bytes  data = 2;   // RSCF bin 原始字节
+}
+
+// ---------------------------------------------------------------------------
+// 协议定义
+// ---------------------------------------------------------------------------
+
+// 拉取配置 (客户端 -> Config)
+message PBConfigGetReq {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = CONFIG_GET_REQ (1)
+}
+
+// 配置 bundle (Config -> 客户端)
+message PBConfigGetRsp {
+  uint32 big_type     = 1;
+  uint32 small_type   = 2;   // = CONFIG_GET_RSP (2)
+  uint32 version      = 3;   // 单调递增内容版本
+  uint64 content_hash = 4;   // 聚合内容哈希 (客户端下载后校验)
+  repeated PBConfigFile files = 5;   // bin 文件列表
+}
+
+// 配置版本变更通知 (Config -> 全员)
+message PBConfigChangedNtf {
+  uint32 big_type     = 1;
+  uint32 small_type   = 2;   // = CONFIG_CHANGED_NTF (3)
+  uint32 version      = 3;
+  uint64 content_hash = 4;
+}

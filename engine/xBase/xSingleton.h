@@ -2,19 +2,21 @@
 
 #include "xDefine.h"
 
-template <typename T>
-class xSingleton
+template <typename T> class xSingleton
 {
 private:
-    xSingleton(const xSingleton&);
-    const xSingleton& operator=(const xSingleton&);
+    xSingleton(const xSingleton &);
+    const xSingleton &operator=(const xSingleton &);
 
 protected:
-    static T* _instance;
-    xSingleton() {
+    static T *_instance;
+    xSingleton()
+    {
         static CGarbo garbo;
     }
-    virtual ~xSingleton() {}
+    virtual ~xSingleton()
+    {
+    }
 
 public:
     /*        static void delMe()
@@ -22,34 +24,38 @@ public:
                 SAFE_DELETE(_instance);
             }
             */
-    static T* instance() {
+    static T *instance()
+    {
         if (!_instance)
+        {
             _instance = new T;
+        }
         return _instance;
     }
-    static T& getMe() {
-        if (!_instance) {
+    static T &getMe()
+    {
+        if (!_instance)
+        {
             _instance = new T;
         }
         return *_instance;
     }
     // Alias for compatibility with boost::serialization::singleton pattern
-    static T& get_mutable_instance() {
+    static T &get_mutable_instance()
+    {
         return getMe();
     }
     class CGarbo
     {
     public:
-        ~CGarbo() {
+        ~CGarbo()
+        {
             SAFE_DELETE(xSingleton::_instance);
         }
-        CGarbo() {
+        CGarbo()
+        {
         }
     };
 };
 
-template <typename T>
-T* xSingleton<T>::_instance = 0;
-
-
-
+template <typename T> T *xSingleton<T>::_instance = 0;

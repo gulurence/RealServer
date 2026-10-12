@@ -2,8 +2,6 @@
 
 #include "xBase/xDefine.h"
 
-
-
 // 事件类型
 enum EventType
 {
@@ -11,24 +9,4 @@ enum EventType
     EventTypeService,
     EventTypeActor,
 
-
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

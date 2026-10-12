@@ -5,7 +5,7 @@
 --   1. Template management — registerPrototype(type, classTable)
 --   2. Local instance lifecycle — createLocal / findLocal / deleteLocal
 --   3. Environment management — install / uninstall (with connection ref counting)
---   4. Process hosting — hostType / canHostType
+--   4. Process hosting — canHostType (托管类型由 C++ CActorLoadManager 注册)
 --
 -- For cross-process operations, use xEngine.ActorCreator.
 --
@@ -13,7 +13,6 @@
 --   require("common.actor.actor_mgr")
 --
 --   -- Process startup
---   xEngine.ActorMgr.hostType(100)
 --   local MyClass = xEngine.Class.define("MyActor", xEngine.ActorBase)
 --   xEngine.ActorMgr.registerPrototype(100, MyClass)
 --   xEngine.ActorMgr.install(100, 0)
@@ -36,27 +35,14 @@ local i64 = luacore.toint64
 --------------------------------------------------------------------------------
 local protoRegistry = {}       -- type → { classTable, instance, cppActor, className }
 local localInstances = {}      -- type → { id → Lua instance }
-local hostedTypes = {}         -- { [type] = true }
+local protoInstalled = {}      -- type → true (原型 id=0 已 Install, 热更幂等短路)
 
 --------------------------------------------------------------------------------
--- Process hosting
+-- Process hosting (托管类型由 C++ CActorLoadManager 在启动时从进程类型注册)
 --------------------------------------------------------------------------------
-
-function xEngine.ActorMgr.hostType(actorType)
-    if hostedTypes[actorType] then return end
-    hostedTypes[actorType] = true
-    luacore.si_actor_mgr_add_hosted_type(i32(actorType))
-    xEngine.Log.info("[ActorMgr] Host type declared: %d", actorType)
-end
 
 function xEngine.ActorMgr.canHostType(actorType)
-    return hostedTypes[actorType] == true
-end
-
-function xEngine.ActorMgr.getHostedTypes()
-    local result = {}
-    for t, _ in pairs(hostedTypes) do result[t] = true end
-    return result
+    return luacore.si_actor_mgr_can_host_type(i32(actorType))
 end
 
 --------------------------------------------------------------------------------
@@ -70,16 +56,25 @@ function xEngine.ActorMgr.registerPrototype(actorType, classTable)
     end
 
     if protoRegistry[actorType] then
-        xEngine.Log.warn("[ActorMgr] registerPrototype: type=%d updating", actorType)
+        -- 热更: class.lua 已把 classTable 原地更新 (同一张表), 既有 protoInstance 经
+        -- metatable.__index 指向该表自动获得新方法; C++ 侧 CLuaActor/delegate 无需重建
+        -- (重建会泄漏原型对象并重复 si_actor_regist)。仅刷新 classTable/className 引用。
+        local proto = protoRegistry[actorType]
+        proto.classTable = classTable
+        proto.className = classTable._className or proto.className
+        xEngine.Log.info("[ActorMgr] Prototype hot-updated (in-place): type=%d class=%s",
+            actorType, proto.className)
+        return true
     end
 
-    if not hostedTypes[actorType] then
-        xEngine.ActorMgr.hostType(actorType)
-    end
-
-    local className = classTable._className or ("ActorType_" .. tostring(actorType))
+    local className = classTable._className or ("ActorType_" .. xEngine.Number.intKey(actorType))
     local protoInstance = classTable:new(actorType, 0, className)
+
+    -- 绑定 Lua 业务委托: si_lua_actor_create 会读取 _G.__actor_delegate,
+    -- luaL_ref 后 SetLuaDelegate, 使 CLuaActor::OnMessage → on_msg 可达。
+    _G.__actor_delegate = protoInstance
     local cppProto = luacore.si_lua_actor_create(i32(actorType), 0, className)
+    _G.__actor_delegate = nil
 
     if not cppProto then
         xEngine.Log.error("[ActorMgr] C++ CLuaActor create failed type=%d", actorType)
@@ -123,6 +118,15 @@ function xEngine.ActorMgr.install(actorType, actorID)
         return false
     end
 
+    -- 幂等 (仅原型 id=0): 热更时各 actor init.lua 会再次 install(type, 0), 此处短路,
+    -- 避免 C++ Install 重复执行 (AcquireServices 引用计数 +1 / actor->Install 二次回调 /
+    -- RegisterActor 重复写), 也不重跑 onInstall。实例 (id≠0) 走 createLocal 每次新建,
+    -- 不在热更路径, 保持原样 (deleteLocal 后同名重建需重新 Install)。
+    if actorID == 0 and protoInstalled[actorType] then
+        xEngine.Log.info("[ActorMgr] install: skip (proto already installed) type=%d id=%d", actorType, actorID)
+        return true
+    end
+
     local ok = luacore.si_actor_mgr_install(i32(actorType), i64(actorID))
     if not ok then
         xEngine.Log.error("[ActorMgr] install: C++ failed type=%d id=%d", actorType, actorID)
@@ -135,6 +139,10 @@ function xEngine.ActorMgr.install(actorType, actorID)
     end
     if instance and type(instance.onInstall) == "function" then
         instance:onInstall()
+    end
+
+    if actorID == 0 then
+        protoInstalled[actorType] = true
     end
 
     xEngine.Log.info("[ActorMgr] Installed type=%d id=%d", actorType, actorID)
@@ -179,7 +187,7 @@ end
 --------------------------------------------------------------------------------
 
 function xEngine.ActorMgr.createLocal(actorType, actorID)
-    if not hostedTypes[actorType] then
+    if not xEngine.ActorMgr.canHostType(actorType) then
         xEngine.Log.error("[ActorMgr] createLocal: type=%d not hosted locally", actorType)
         return nil
     end
@@ -193,7 +201,7 @@ function xEngine.ActorMgr.createLocal(actorType, actorID)
         return nil
     end
 
-    local instanceName = proto.className .. "_" .. tostring(actorID)
+    local instanceName = proto.className .. "_" .. xEngine.Number.intKey(actorID)
     local luaInstance = proto.classTable:new(actorType, actorID, instanceName)
     if not luaInstance then return nil end
 
@@ -248,14 +256,25 @@ function xEngine.ActorMgr.deleteLocal(actorType, actorID)
         instance:data_save(3)  -- save_type=3 (delete)
     end
 
-    -- Uninstall
-    xEngine.ActorMgr.uninstall(actorType, actorID)
+    -- Lua 业务卸载 (表实例 onUnInstall)
+    if type(instance.onUnInstall) == "function" then
+        instance:onUnInstall()
+    end
 
-    -- Remove C++ actor
-    luacore.si_actor_creator_delete(i32(actorType), i64(actorID))
+    -- 清理本地 Lua 索引
+    if localInstances[actorType] then
+        localInstances[actorType][actorID] = nil
+        if next(localInstances[actorType]) == nil then
+            localInstances[actorType] = nil
+        end
+    end
 
-    xEngine.Log.info("[ActorMgr] Local delete: type=%d id=%d", actorType, actorID)
-    return true
+    -- C++ 卸载环境 + 释放内存 (DeleteActor: Find → UnInstall → delete)
+    -- 不再额外调用 uninstall(), 避免二次 UnInstall (原路径会重复触发 si_actor_mgr_uninstall)
+    local ok = luacore.si_actor_creator_delete(i32(actorType), i64(actorID))
+
+    xEngine.Log.info("[ActorMgr] Local delete: type=%d id=%d ok=%s", actorType, actorID, tostring(ok))
+    return ok
 end
 
 function xEngine.ActorMgr.getByType(actorType)

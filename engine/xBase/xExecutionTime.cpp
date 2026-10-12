@@ -1,62 +1,78 @@
 #include <time.h>
 #include "xExecutionTime.h"
 
-
-
 xExecutionTime ExecutionTimeWrap::_et(1000);
-xTimeTest::xTimeTest(const std::string& logName) : _logName(logName) {
+xTimeTest::xTimeTest(const std::string &logName) : _logName(logName)
+{
     clock_gettime(CLOCK_REALTIME, &_tv);
 }
 
-xTimeTest::~xTimeTest() {
-    //uint64 begin = (uint64)_tv.tv_sec * 1000000000L + _tv.tv_nsec;
-    //clock_gettime(CLOCK_REALTIME, &_tv);
-    //uint64 end = (uint64)_tv.tv_sec * 1000000000L + _tv.tv_nsec;
-    //XDBG("[%s],%llu～?, _logName.c_str(), (end - begin) / 1000);
+xTimeTest::~xTimeTest()
+{
+    // uint64 begin = (uint64)_tv.tv_sec * 1000000000L + _tv.tv_nsec;
+    // clock_gettime(CLOCK_REALTIME, &_tv);
+    // uint64 end = (uint64)_tv.tv_sec * 1000000000L + _tv.tv_nsec;
+    // XDBG("[%s],%llu～?, _logName.c_str(), (end - begin) / 1000);
 }
 
-void xExecutionTime::inc(const std::string& func, const uint64 total, const bool& addFlag) {
-    _stTimes& st = _times[func];
+void xExecutionTime::inc(const std::string &func, const uint64 total, const bool &addFlag)
+{
+    _stTimes &st = _times[func];
     ++st.__times;
     st.__total_time += total;
     st.__addFlag = addFlag;
 }
 
-void xExecutionTime::reset(const bool bForcePrint) {
-    if (bForcePrint || _log_timer.timeUp()) {
+void xExecutionTime::reset(const bool bForcePrint)
+{
+    if (bForcePrint || _log_timer.timeUp())
+    {
         uint64 totalTime = 0;
-        for (_Times_iter it = _times.begin(); it != _times.end(); ++it) {
+        for (_Times_iter it = _times.begin(); it != _times.end(); ++it)
+        {
             if (it->second.__times && it->second.__addFlag)
+            {
                 totalTime += it->second.__total_time;
+            }
         }
 
-        for (_Times_iter it = _times.begin(); it != _times.end(); ++it) {
-            if (it->second.__times && !it->second.__addFlag) {
-                //                 XDBG("[╂Λ璺ㄧ€]%05.2f%%, %s, %llu～? %u %llu～, 
-                //                     it->second.__total_time * 100.0f / totalTime, it->first.c_str(), 
-                //                     it->second.__total_time / 1000L, it->second.__times, 
-                //                     it->second.__total_time / 1000L / it->second.__times);
+        for (_Times_iter it = _times.begin(); it != _times.end(); ++it)
+        {
+            if (it->second.__times && !it->second.__addFlag)
+            {
+                //                 XDBG("[╂Λ璺ㄧ€]%05.2f%%, %s, %llu～? %u %llu～,
+                //                     it->second.__total_time * 100.0f / totalTime,
+                //                     it->first.c_str(), it->second.__total_time / 1000L,
+                //                     it->second.__times, it->second.__total_time / 1000L /
+                //                     it->second.__times);
             }
         }
-        //XDBG("[╂Λ璺ㄧ€]-------------------------------"); 
-        for (_Times_iter it = _times.begin(); it != _times.end(); ++it) {
-            if (it->second.__times && it->second.__addFlag) {
-                //                 XDBG("[╂Λ璺ㄧ€]%05.2f%%, %s, %llu～? %u %llu～, 
-                //                         it->second.__total_time * 100.0f / totalTime, it->first.c_str(), 
-                //                         it->second.__total_time / 1000L, it->second.__times, 
-                //                         it->second.__total_time / 1000L / it->second.__times);
+        // XDBG("[╂Λ璺ㄧ€]-------------------------------");
+        for (_Times_iter it = _times.begin(); it != _times.end(); ++it)
+        {
+            if (it->second.__times && it->second.__addFlag)
+            {
+                //                 XDBG("[╂Λ璺ㄧ€]%05.2f%%, %s, %llu～? %u %llu～,
+                //                         it->second.__total_time * 100.0f / totalTime,
+                //                         it->first.c_str(), it->second.__total_time / 1000L,
+                //                         it->second.__times, it->second.__total_time / 1000L /
+                //                         it->second.__times);
             }
         }
-        //XDBG("[╂Λ璺ㄧ€]⒒?%llu～▓?%u", totalTime / 1000L, _log_timer.getElapse());
+        // XDBG("[╂Λ璺ㄧ€]⒒?%llu～▓?%u", totalTime / 1000L,
+        // _log_timer.getElapse());
         _times.clear();
     }
 }
 
-ExecutionTimeWrap::ExecutionTimeWrap(const std::string& func, bool addFlag) : _func(func), _addFlag(addFlag) {
+ExecutionTimeWrap::ExecutionTimeWrap(const std::string &func, bool addFlag)
+    : _func(func), _addFlag(addFlag)
+{
     clock_gettime(CLOCK_REALTIME, &_tv);
 }
 
-ExecutionTimeWrap::~ExecutionTimeWrap() {
+ExecutionTimeWrap::~ExecutionTimeWrap()
+{
     uint64 begin = (uint64)_tv.tv_sec * 1000000000L + _tv.tv_nsec;
 
     clock_gettime(CLOCK_REALTIME, &_tv);
@@ -65,11 +81,3 @@ ExecutionTimeWrap::~ExecutionTimeWrap() {
 
     _et.inc(_func, end - begin, _addFlag);
 }
-
-
-
-
-
-
-
-

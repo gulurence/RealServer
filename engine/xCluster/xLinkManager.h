@@ -7,7 +7,7 @@
 #include <mutex>
 
 // =============================================================================
-// CLinkManager — 进程间 gRPC 链接管理器
+// CLinkManager — 进程间 asio-TCP RPC 链接管理器
 //
 // 职责:
 //   1. 从 Redis 加载链接规则 (哪些类型需要互连)
@@ -15,6 +15,8 @@
 //   3. 仅链接到 Running 状态的节点
 //   4. 已链接但变为非 Running 的节点停止 Actor 分配
 //   5. 定期刷新: 发现新节点, 移除失活节点
+//
+// 连接由 CRpcTcpClient::Connect 建立 (gRPC 已退役)。
 // =============================================================================
 class CLinkManager : public xSingleton<CLinkManager>
 {
@@ -22,12 +24,12 @@ public:
     // 初始化 — 加载链接规则
     bool Init();
 
-    // 发现并连接 — 依据链接规则发现对等进程并建立 gRPC 连接
+    // 发现并连接 — 依据链接规则发现对等进程并建立 asio-TCP RPC 连接
     // 跳过非 Running 状态的节点
     bool DiscoverAndConnect();
 
     // 连接到指定对等进程
-    bool ConnectToPeer(const ProcessInfo& peer);
+    bool ConnectToPeer(const ProcessInfo &peer);
 
     // 断开与指定进程的连接
     bool DisconnectFromPeer(int64 processId);
@@ -41,6 +43,9 @@ public:
     // 获取指定类型的所有可用对等进程
     std::vector<ProcessInfo> GetAvailablePeers(EProcessType targetType) const;
 
+    // 获取指定 processId 的对等进程信息 (未连接则返回空 ProcessInfo)
+    ProcessInfo GetPeerInfo(int64 processId) const;
+
     // 定期刷新 — 检测新节点 / 移除失活节点
     void RefreshLoop();
 
@@ -51,6 +56,9 @@ private:
     // 判断是否应该连接 (依据链接规则)
     bool ShouldConnectTo(EProcessType selfType, EProcessType peerType) const;
 
+    // 断开并移除对端 (调用方需已持有 m_mutex), 同时关闭底层 TCP 连接
+    void DisconnectFromPeerNoLock(int64 processId);
+
 private:
     // 链接规则: 本进程类型 → 需要连接的目标类型列表
     std::map<EProcessType, std::vector<EProcessType>> m_linkRules;
@@ -60,6 +68,9 @@ private:
 
     // 本进程类型
     EProcessType m_selfType = EProcessType_None;
+
+    // 首次发现是否已打日志 (周期轮询不再重复打印 Discovering/Discovery complete)
+    bool m_discoveryLogged = false;
 
     mutable std::mutex m_mutex;
 };

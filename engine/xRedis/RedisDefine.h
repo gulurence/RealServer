@@ -1,10 +1,14 @@
 #pragma once
 
-#include "hiredis/hiredis.h"
 #include "xBase/xDefine.h"
 #include "xLog/xLog.h"
 
-// RedisConfigST / RedisConfigMap 已废弃 — 统一使用 tService/tThridServiceConfig.h 中的 ThridRedisConfig
+#include <list>
+#include <map>
+#include <string>
+
+// RedisConfigST / RedisConfigMap 已废弃 — 统一使用 tService/tThridServiceConfig.h 中的
+// ThridRedisConfig
 
 typedef std::list<std::string> ListData;
 typedef std::map<std::string, ListData> ListDataMap;

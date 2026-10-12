@@ -1,12 +1,2 @@
 
 #include "xServiceLancher.h"
-
-
-
-
-
-
-
-
-
-

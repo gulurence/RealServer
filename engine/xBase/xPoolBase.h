@@ -20,10 +20,10 @@
             }
 
             ...
-            // 
+            //
             SubClass *pSubClass = new SubClass();
             ...
-            // 
+            //
             delete pSubClass;
 
         注意: PoolBase 不支持数组分配（如 new T[12]），
@@ -39,51 +39,53 @@
 #include "xSimpleAllocator.h"
 
 #ifndef AllowPoolBase
-template <
-    typename T,             // 池中存储的对象类型
-    size_t BatchSize        // 每次分配的对象数量（块大小）
->
+template <typename T,      // 池中存储的对象类型
+          size_t BatchSize // 每次分配的对象数量（块大小）
+          >
 struct PoolBase
 {
 };
 
 // 默认实现为空（需要定义 AllowPoolBase 宏启用）
-template <typename T>
-struct MTPoolBase
+template <typename T> struct MTPoolBase
 {
 };
 
 #else
 
-template <
-    typename T,                                               // 池中存储的对象类型
-    size_t BatchSize,                                         // 每次分配的对象数量（块大小）
-    template <typename, size_t> class Alloc = SimpleAllocator // 分配器策略（默认 SimpleAllocator）
->
+template <typename T,       // 池中存储的对象类型
+          size_t BatchSize, // 每次分配的对象数量（块大小）
+          template <typename, size_t> class Alloc
+          = SimpleAllocator // 分配器策略（默认 SimpleAllocator）
+          >
 class PoolBase
 {
     typedef Alloc<T, BatchSize> MyAlloc;
+
 public:
-    virtual ~PoolBase() {
+    virtual ~PoolBase()
+    {
     }
 
     // 重载 new 操作符（从池中分配）
-    void * operator new(size_t s) {
+    void *operator new(size_t s)
+    {
         return myAlloc.allocateBlock();
     }
 
-    void operator delete(void *p) {
+    void operator delete(void *p)
+    {
         myAlloc.releaseBlock((T *)p);
     }
 
 private:
     // 禁用数组分配（数组不使用池分配器）
-    void* operator new[](size_t s) {
+    void *operator new[](size_t s)
+    {
         return nullptr;
     }
 
-        void operator delete[](void* p) {
-    };
+    void operator delete[](void *p){};
 
 private:
     // 静态分配器实例（所有对象共享）
@@ -93,36 +95,39 @@ private:
 template <typename T, size_t BatchSize, template <typename, size_t> class Alloc>
 typename PoolBase<T, BatchSize, Alloc>::MyAlloc PoolBase<T, BatchSize, Alloc>::myAlloc;
 
-
-template <
-    typename T,                                               // 池中存储的对象类型
-    size_t BatchSize,                                         // 每次分配的对象数量（块大小）
-    template <typename, size_t> class Alloc = MTSimpleAllocator // 分配器策略（默认 MTSimpleAllocator，线程安全）
->
+template <typename T,       // 池中存储的对象类型
+          size_t BatchSize, // 每次分配的对象数量（块大小）
+          template <typename, size_t> class Alloc
+          = MTSimpleAllocator // 分配器策略（默认 MTSimpleAllocator，线程安全）
+          >
 class MTPoolBase
 {
     typedef Alloc<T, BatchSize> MTMyAlloc;
+
 public:
-    virtual ~MTPoolBase() {
+    virtual ~MTPoolBase()
+    {
     }
 
     // 重载 new 操作符（从池中分配，线程安全）
-    void* operator new(size_t s) {
+    void *operator new(size_t s)
+    {
         return myAlloc.allocateBlock();
     }
 
-    void operator delete(void* p) {
-        myAlloc.releaseBlock((T*)p);
+    void operator delete(void *p)
+    {
+        myAlloc.releaseBlock((T *)p);
     }
 
 private:
     // 禁用数组分配
-    void* operator new[](size_t s) {
+    void *operator new[](size_t s)
+    {
         return nullptr;
     }
 
-        void operator delete[](void* p) {
-    };
+    void operator delete[](void *p){};
 
 private:
     // 静态分配器实例（所有对象共享，线程安全）
@@ -133,10 +138,3 @@ template <typename T, size_t BatchSize, template <typename, size_t> class Alloc>
 typename MTPoolBase<T, BatchSize, Alloc>::MTMyAlloc MTPoolBase<T, BatchSize, Alloc>::myAlloc;
 
 #endif // AllowPoolBase
-
-
-
-
-
-
-

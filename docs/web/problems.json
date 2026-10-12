@@ -1,0 +1,356 @@
+{
+  "modules": {
+    "框架/01-类型系统与进程划分.md": "类型系统与进程划分",
+    "框架/02-全局ID编码与Actor寻址.md": "全局 ID 编码与 Actor 寻址",
+    "框架/03-RPC层与asio迁移.md": "RPC 层与 asio 迁移",
+    "框架/04-进程配置与hosted-actors.md": "进程配置与 hosted-actors",
+    "框架/07-编码命名风格.md": "编码命名风格",
+    "交互/系统间交互.md": "系统间交互总览",
+    "模块/01-登录.md": "登录模块",
+    "模块/02-好友FriendActor.md": "好友模块",
+    "模块/03-房间RoomActor.md": "房间模块",
+    "模块/04-聊天ChatActor.md": "聊天模块",
+    "模块/05-战斗BattleActor.md": "战斗模块",
+    "模块/06-观战SpectatorActor.md": "观战模块"
+  },
+  "groups": [
+    "A-RPC 层",
+    "B-类型系统",
+    "C-全局 ID 与寻址",
+    "D-进程配置",
+    "E-交互与编码风格",
+    "F-文档缺口"
+  ],
+  "problems": [
+    {
+      "id": "A1",
+      "group": "A-RPC 层",
+      "module": "框架/03-RPC层与asio迁移.md",
+      "status": "done",
+      "priority": "high",
+      "milestone": "M0",
+      "title": "CallSync 超时未清理 m_pending",
+      "note": "Submit/Call 改返 uint32 requestId（无连接返 0），CallSync/CallSyncRaw 超时后 m_pending.erase(requestId)，消除迟到响应触发 future_error 与 pending 泄漏。"
+    },
+    {
+      "id": "A2",
+      "group": "A-RPC 层",
+      "module": "框架/03-RPC层与asio迁移.md",
+      "status": "done",
+      "priority": "low",
+      "milestone": "M0",
+      "title": "proto 的 service 定义未清理",
+      "note": "actor_mgr/myservice 两个 proto 已删 service 块、保留 PBRPC* 消息，protoc 重跑验证通过。"
+    },
+    {
+      "id": "A3",
+      "group": "A-RPC 层",
+      "module": "框架/03-RPC层与asio迁移.md",
+      "status": "done",
+      "priority": "low",
+      "milestone": "M0",
+      "title": "stale *.grpc.pb.cc/.h 生成物未删",
+      "note": "已删 4 个 .grpc.pb.cc/.h，rpc 目录现只剩 *.pb.cc/.h。"
+    },
+    {
+      "id": "A4",
+      "group": "A-RPC 层",
+      "module": "框架/03-RPC层与asio迁移.md",
+      "status": "done",
+      "priority": "low",
+      "milestone": "M0",
+      "title": "luacore_wrap.cxx 过时生成物",
+      "note": "仓库旧文件已删，构建时由 SWIG 从 engine/luacore/luacore.i 重新生成。"
+    },
+    {
+      "id": "A5",
+      "group": "A-RPC 层",
+      "module": "框架/03-RPC层与asio迁移.md",
+      "status": "done",
+      "priority": "low",
+      "milestone": "M1",
+      "title": "grpcPort 字段名未 rename rpcPort",
+      "note": "已统一 rename 为 rpcPort，波及 xServerConfig/xLocalInfo/xProcessDefine/xProcessManager/xLinkManager/xServiceDiscovery/ProcessEnv 等文件；源码已无 grpcPort 残留。"
+    },
+    {
+      "id": "A6",
+      "group": "A-RPC 层",
+      "module": "框架/03-RPC层与asio迁移.md",
+      "status": "open",
+      "priority": "low",
+      "milestone": "",
+      "title": "RpcCallMgr/xNatsCall.h 遗留宏混 std::cout",
+      "note": "为兼容 xService/xNats 旧骨架保留，其宏内混 std::cout 违反日志规范；待旧骨架清理时一并移除。"
+    },
+    {
+      "id": "A7",
+      "group": "A-RPC 层",
+      "module": "框架/03-RPC层与asio迁移.md",
+      "status": "open",
+      "priority": "med",
+      "milestone": "",
+      "title": "CallSync 阻塞调用方线程",
+      "note": "同步 CallSync 在 Actor 协程内直接调用会阻塞调度线程最多 timeoutMs；协程场景应改 co_await AsyncRpcCall（原语已就绪），后续按需替换调用点。"
+    },
+    {
+      "id": "B1",
+      "group": "B-类型系统",
+      "module": "框架/01-类型系统与进程划分.md",
+      "status": "done",
+      "priority": "med",
+      "milestone": "M1-M6",
+      "title": "进程/Actor 值域重叠、裸 int32 无类型安全",
+      "note": "已收敛为 EProcessType / EActorType / PbID::ActorType 三个严格区分的枚举（统一 E 前缀），进程/Actor/proto 路由枚举彼此独立；代码内部改用枚举类型名、消除裸 int32 传值（enum E : int32 不隐式从 int 转换，编译期强制显式转换）。"
+    },
+    {
+      "id": "B2",
+      "group": "B-类型系统",
+      "module": "框架/01-类型系统与进程划分.md",
+      "status": "done",
+      "priority": "med",
+      "milestone": "M1-M6",
+      "title": "ActorType typedef 与 EActorType 枚举并存",
+      "note": "已删除 `typedef int32 ActorType`（xDefine.h 与 ActorDefine.h 重复定义），GetHostedActorTypes 等入参/出参统一为 EActorType / std::vector<EActorType>，消除隐式互转缺口。"
+    },
+    {
+      "id": "B3",
+      "group": "B-类型系统",
+      "module": "框架/01-类型系统与进程划分.md",
+      "status": "done",
+      "priority": "low",
+      "milestone": "M1-M6",
+      "title": "AWorld→PGame 历史映射（值撞 PWorld）",
+      "note": "World 模块（EProcessType_PWorld=202 / EActorType_AWorld=202 / 映射表 AWorld→PGame）已整体移除，进程与 Actor 枚举不再含 World 值。"
+    },
+    {
+      "id": "B4",
+      "group": "B-类型系统",
+      "module": "框架/01-类型系统与进程划分.md",
+      "status": "done",
+      "priority": "high",
+      "milestone": "M0",
+      "title": "GetBasePortForType default 返回 50551",
+      "note": "default 改返回 0（无效端口），AllocatePort 对 base==0 打 XERR 返回 0，杜绝未知类型静默落到 Gate 端口段。"
+    },
+    {
+      "id": "B5",
+      "group": "B-类型系统",
+      "module": "框架/01-类型系统与进程划分.md",
+      "status": "open",
+      "priority": "high",
+      "milestone": "M2",
+      "title": "Battle/Spectator 多实例需定位到 ActorIndex 层",
+      "note": "ABattle=203 与 APlayer 同驻 Game、ASpectator=204 同驻 Global，均多实例，若 ActorID 寻址只覆盖到进程层会误投；需依赖自描述路由定位到 ActorIndex。"
+    },
+    {
+      "id": "C1",
+      "group": "C-全局 ID 与寻址",
+      "module": "框架/02-全局ID编码与Actor寻址.md",
+      "status": "open",
+      "priority": "high",
+      "milestone": "M2",
+      "title": "MachineID 唯一性派生未落地",
+      "note": "编解码与索引已就位，但 Redis 按物理机唯一 ID 派生 MachineID 的逻辑未实现；若多实例同时注册同机存在竞态，可能拿重复 MachineID 导致跨机 ActorID 碰撞。"
+    },
+    {
+      "id": "C2",
+      "group": "C-全局 ID 与寻址",
+      "module": "框架/02-全局ID编码与Actor寻址.md",
+      "status": "open",
+      "priority": "high",
+      "milestone": "M2",
+      "title": "PID 复用碰撞",
+      "note": "PID 仅 16 位且 OS 回收复用；同机先后两进程拿到同 PID 时，旧进程残留 player:*/cluster:actor:* 索引指向错误进程；需进程心跳存活校验 + 启动清理本 PID 残留。"
+    },
+    {
+      "id": "C3",
+      "group": "C-全局 ID 与寻址",
+      "module": "框架/02-全局ID编码与Actor寻址.md",
+      "status": "open",
+      "priority": "med",
+      "milestone": "M2",
+      "title": "ActorIndex 24 位溢出回绕",
+      "note": "约 1677 万上限；不重启累计创建超限时自增回绕会撞现存实例；分配时需检测回绕并拒绝或复用已释放索引。"
+    },
+    {
+      "id": "C4",
+      "group": "C-全局 ID 与寻址",
+      "module": "框架/02-全局ID编码与Actor寻址.md",
+      "status": "open",
+      "priority": "med",
+      "milestone": "M2",
+      "title": "PID 位宽不足（OS PID 可超 65535）",
+      "note": "Linux 默认 PID 上限 4M，打包进 16 位会截断、低位相同而碰撞；需限制 PID 上限或改用 24 位 PID 段（会挤占 ActorIndex/保留位）。"
+    },
+    {
+      "id": "C5",
+      "group": "C-全局 ID 与寻址",
+      "module": "框架/02-全局ID编码与Actor寻址.md",
+      "status": "open",
+      "priority": "high",
+      "milestone": "M2",
+      "title": "跨进程缓存一致性",
+      "note": "本地缓存为纯内存快照、无主动失效推送；A 改 B 缓时 B 读到过期 ActorID，需依赖 Invalidate+失败回查，或改 Redis Pub/Sub 广播失效。"
+    },
+    {
+      "id": "C6",
+      "group": "C-全局 ID 与寻址",
+      "module": "框架/02-全局ID编码与Actor寻址.md",
+      "status": "open",
+      "priority": "high",
+      "milestone": "M2",
+      "title": "进程崩溃脏缓存/脏键（player:* 无 TTL）",
+      "note": "崩溃不清 Redis 残留 player:{id} 脏键；他进程缓存可能仍指向死进程；兜底=目标进程存活校验+路由失败回查+player:* 加 TTL 定期清理。"
+    },
+    {
+      "id": "C7",
+      "group": "C-全局 ID 与寻址",
+      "module": "框架/02-全局ID编码与Actor寻址.md",
+      "status": "open",
+      "priority": "med",
+      "milestone": "M2",
+      "title": "过渡态 id→id 恒等映射",
+      "note": "ActorID 尚未切换全局自描述（实例 ID 沿用业务 roleId），Register(id,id) 暂存恒等映射；全局 ID 接入创建链路前，本索引无跨进程定位实际收益。"
+    },
+    {
+      "id": "D1",
+      "group": "D-进程配置",
+      "module": "框架/04-进程配置与hosted-actors.md",
+      "status": "mitigated",
+      "priority": "med",
+      "milestone": "M0",
+      "title": "XML 解析失败静默回落 Gate",
+      "note": "已缓解：Load 失败 XERR 带「将以 DEFAULT identity (type=%d) 启动」提示；根治方向=fail-fast 或回落非 Gate，仍需人工核对 Loaded 日志。"
+    },
+    {
+      "id": "D2",
+      "group": "D-进程配置",
+      "module": "框架/04-进程配置与hosted-actors.md",
+      "status": "mitigated",
+      "priority": "med",
+      "milestone": "M0",
+      "title": "配置与硬编码不一致",
+      "note": "已缓解：GetHostedActorTypes 回退硬编码打 XWRN（含 type）；更进一步「启动期打印 config 命中 vs fallback 各自类型」校验日志仍可选。"
+    },
+    {
+      "id": "D3",
+      "group": "D-进程配置",
+      "module": "框架/04-进程配置与hosted-actors.md",
+      "status": "mitigated",
+      "priority": "med",
+      "milestone": "M0",
+      "title": "type 值域合法性",
+      "note": "部分处理：<actor type> 已加 ActorTypeToProcessType != EProcessType_None 校验（嵌套+顶层），非法值告警忽略；<process type>（entry.processType/process.type）仍只判非 0。"
+    },
+    {
+      "id": "D4",
+      "group": "D-进程配置",
+      "module": "框架/04-进程配置与hosted-actors.md",
+      "status": "open",
+      "priority": "low",
+      "milestone": "",
+      "title": "启动顺序依赖（查询须在 Load 之后）",
+      "note": "GetHostedActorTypes 依赖 Load 完成，消费方在 OnActorInit（更后）调用，顺序成立；若提前到 Load 前会静默拿空配置→全量回退硬编码且无告警。"
+    },
+    {
+      "id": "D5",
+      "group": "D-进程配置",
+      "module": "框架/04-进程配置与hosted-actors.md",
+      "status": "open",
+      "priority": "low",
+      "milestone": "",
+      "title": "空列表语义（无法表达显式不承载）",
+      "note": "空 <actor> 列表被当「未配置」回退硬编码而非「显式不承载」；若确实需要某进程什么都不负载，需引入显式占位（如 none）。"
+    },
+    {
+      "id": "D6",
+      "group": "D-进程配置",
+      "module": "框架/04-进程配置与hosted-actors.md",
+      "status": "open",
+      "priority": "low",
+      "milestone": "",
+      "title": "顶层表 vs 嵌套声明冲突无告警",
+      "note": "同进程类型在顶层表和 <process> 嵌套都声明且不一致时，嵌套优先且无冲突告警；示例模板只用顶层表避免歧义。"
+    },
+    {
+      "id": "D7",
+      "group": "D-进程配置",
+      "module": "框架/04-进程配置与hosted-actors.md",
+      "status": "open",
+      "priority": "med",
+      "milestone": "",
+      "title": "同类型多实例进程不支持",
+      "note": "hosted-actors 按「进程类型」声明，天然不支持同类型不同承载（如两个 Game 一个只跑 Battle 一个只跑 Player）；若需按进程细分承载得把粒度下沉到进程实例。"
+    },
+    {
+      "id": "E1",
+      "group": "E-交互与编码风格",
+      "module": "交互/系统间交互.md",
+      "status": "open",
+      "priority": "high",
+      "milestone": "M1",
+      "title": "Gate 链接失败/重启后重连与路由刷新",
+      "note": "Gate 到各进程建链失败或对端重启后，需要重连 + 刷新路由缓存，否则消息投递失败。"
+    },
+    {
+      "id": "E2",
+      "group": "E-交互与编码风格",
+      "module": "交互/系统间交互.md",
+      "status": "open",
+      "priority": "high",
+      "milestone": "M2",
+      "title": "20Hz 帧命令背压与丢包策略",
+      "note": "高频战斗帧命令（20Hz 全员广播）经 Gate 转发时的背压与丢包策略未定。"
+    },
+    {
+      "id": "E3",
+      "group": "E-交互与编码风格",
+      "module": "交互/系统间交互.md",
+      "status": "open",
+      "priority": "med",
+      "milestone": "M2",
+      "title": "观战/战斗帧流共享带宽拥塞控制",
+      "note": "观战帧流与战斗帧流共享带宽时的拥塞控制未定。"
+    },
+    {
+      "id": "E4",
+      "group": "E-交互与编码风格",
+      "module": "框架/07-编码命名风格.md",
+      "status": "open",
+      "priority": "low",
+      "milestone": "",
+      "title": "Lua camelCase→snake_case 渐进迁移",
+      "note": "现有 Lua 混用 onInstall（camel）与 data_load（snake），统一需逐文件迁移，属渐进重构勿一次性改。"
+    },
+    {
+      "id": "E5",
+      "group": "E-交互与编码风格",
+      "module": "框架/07-编码命名风格.md",
+      "status": "open",
+      "priority": "low",
+      "milestone": "",
+      "title": "C++ m_ 类型提示混用收敛",
+      "note": "现有 C++ 存在 m_+类型提示（m_map/m_i32）与纯 m_ 混用，新代码统一为 m_+类型提示，渐进收敛。"
+    },
+    {
+      "id": "F1",
+      "group": "F-文档缺口",
+      "module": "",
+      "status": "open",
+      "priority": "low",
+      "milestone": "",
+      "title": "框架/05 通信拓扑、06 日志Nats 文档未写",
+      "note": "总纲与 sidebar 已列出但正文未写，随 M1-M6 补。"
+    },
+    {
+      "id": "F2",
+      "group": "F-文档缺口",
+      "module": "",
+      "status": "done",
+      "priority": "med",
+      "milestone": "M1-M6",
+      "title": "模块/ 六篇（登录/好友/房间/聊天/战斗/观战）未写",
+      "note": "已补六篇模块设计文档（docs/web/模块/01-登录.md ~ 06-观战SpectatorActor.md），含消息 ID / 错误码 / 状态 / 关键流程 / 潜在问题章节；对应 Lua Actor 与 proto 均已落地。"
+    }
+  ]
+}

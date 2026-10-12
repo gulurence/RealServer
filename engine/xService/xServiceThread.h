@@ -3,7 +3,6 @@
 #include "xEvent/xEvent.h"
 #include "xBase/xCircularPool.h"
 
-
 class xServiceThread : public xThread
 {
 public:
@@ -11,8 +10,6 @@ public:
     virtual ~xServiceThread();
 
 public:
-
-
 public:
     virtual void thread_proc();
 
@@ -20,9 +17,7 @@ private:
     uint16 m_u16ThreadIndex;
 };
 
-typedef std::list<xServiceThread*> ServiceThreadList;
-
-
+typedef std::list<xServiceThread *> ServiceThreadList;
 
 class xServiceThreadMgr
 {
@@ -39,5 +34,3 @@ private:
     uint16 m_u16ThreadCount;
     ServiceThreadList m_listServiceThread;
 };
-
-

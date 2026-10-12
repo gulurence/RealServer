@@ -1,0 +1,152 @@
+// =============================================================================
+// battle.proto — 战斗模块协议 (一级 Actor 类型 = AT_BATTLE = 203)
+//
+// 结构规范: 消息ID枚举 => 子数据定义 => 协议定义
+// 协议定义每条消息前两个字段为 uint32 BigType / uint32 SmallType (消息路由):
+//   BigType   = 一级 actor 类型 (固定 203 = AT_BATTLE)
+//   SmallType = 本模块内消息 ID (BattleMsgId 枚举)
+// =============================================================================
+syntax = "proto3";
+
+package PbBattle;
+
+import "msg/msg_id.proto";
+
+// ---------------------------------------------------------------------------
+// 消息 ID 枚举 (SmallType 路由字段取值)
+// ---------------------------------------------------------------------------
+enum BattleMsgId {
+  BATTLE_MSG_NONE       = 0;
+  BATTLE_ENTER_REQ      = 1;   // 客户端 -> Battle: 进入战斗 (校验 auth_key)
+  BATTLE_ENTER_RSP      = 2;   // Battle -> 客户端: 进入结果 (种子/玩家列表)
+  BATTLE_START_NTF      = 3;   // Battle -> 全员: 战斗开始 (进入帧同步)
+  BATTLE_INPUT_REQ      = 4;   // 客户端 -> Battle: 逐帧上报输入
+  BATTLE_FRAME_NTF      = 5;   // Battle -> 全员: 权威帧命令
+  BATTLE_SNAPSHOT_NTF   = 6;   // Battle -> 客户端: 全量快照 (重连/校准)
+  BATTLE_END_NTF        = 7;   // Battle -> 全员: 战斗结束 (胜负)
+  BATTLE_LEAVE_REQ      = 8;   // 客户端 -> Battle: 中途退出
+  BATTLE_LEAVE_RSP      = 9;   // Battle -> 客户端: 退出结果
+  BATTLE_HASH_NTF       = 10;  // 客户端 -> Battle: 一致性校验哈希上报
+}
+
+// ---------------------------------------------------------------------------
+// 子数据定义
+// ---------------------------------------------------------------------------
+
+// 玩家单帧输入 (move_dir 为 8 方向枚举; shoot_dx/shoot_dy 为 Q16.16 定点方向向量, 数学坐标 Y 向上)
+message PBBattlePlayerInput {
+  int64  player_id = 1;
+  uint32 move_dir  = 2;   // 移动方向 (0-8)
+  uint32 skill_id  = 4;   // 释放技能 ID (0=无)
+  bool   fire      = 5;   // 是否开火
+  uint32 gun_type  = 6;   // 当前枪械类别 (内核 kGun* 枚举: 手枪0/机枪1/散弹2/狙击3/加特林16/火箭筒17)
+  sint32 shoot_dx  = 7;   // 射击方向向量 X (Q16.16 定点; 数学坐标 Y 向上)
+  sint32 shoot_dy  = 8;   // 射击方向向量 Y (Q16.16 定点)
+}
+
+// 战斗玩家信息 (进入战斗时下发)
+message PBBattlePlayer {
+  int64  player_id   = 1;
+  string name        = 2;
+  uint32 spawn_index = 3;   // 出生点索引
+  uint32 primary_gun = 4;   // 初始主枪 (内核 kGun* 类: 手枪0/机枪1/散弹2/狙击3/加特林16/火箭筒17)
+  string equip       = 5;   // 6 槽枪械载具 (客户端 GunType 原始值, 逗号分隔, NONE=22)
+  uint32 level       = 6;   // 角色等级 (服务端透传真实值, 客户端展示用)
+  uint32 exp         = 7;   // 当前经验 (带入战斗房间展示)
+  uint32 gold        = 8;   // 金币 (入场费消耗 / 排名奖励)
+  uint32 attack      = 9;   // 攻击 (战斗属性展示)
+  uint32 defense     = 10;  // 防御 (战斗属性展示)
+  uint32 hp          = 11;  // 血量 (战斗属性展示; 战斗内实时值由核心 HeroState 覆盖)
+}
+
+// ---------------------------------------------------------------------------
+// 协议定义
+// ---------------------------------------------------------------------------
+
+// 进入战斗 (客户端 -> Battle)
+message PBBattleEnterReq {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = BATTLE_ENTER_REQ (1)
+  int64  battle_id  = 3;
+  string auth_key   = 4;
+  int64  player_id  = 5;
+}
+
+// 进入结果 (Battle -> 客户端)
+message PBBattleEnterRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = BATTLE_ENTER_RSP (2)
+  PbID.ErrorCode error_code = 3;
+  int64  battle_id          = 4;
+  uint32 seed               = 5;   // 确定性 PRNG 种子
+  repeated PBBattlePlayer players = 6;
+  uint32 max_frame          = 7;   // 当前推进到的帧号 (重连对齐用)
+  uint32 level_id           = 8;   // 本场关卡 ID (11..68, 客户端据此注入 bin)
+  uint32 difficulty         = 9;   // 本场难度 (0/1/2)
+}
+
+// 战斗开始 (Battle -> 全员)
+message PBBattleStartNtf {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = BATTLE_START_NTF (3)
+  int64  battle_id  = 3;
+  uint32 seed       = 4;
+}
+
+// 逐帧输入上报 (客户端 -> Battle)
+message PBBattleInputReq {
+  uint32 big_type      = 1;
+  uint32 small_type    = 2;   // = BATTLE_INPUT_REQ (4)
+  int64  battle_id     = 3;
+  uint32 client_frame  = 4;   // 客户端逻辑帧号
+  PBBattlePlayerInput input = 5;
+}
+
+// 权威帧命令 (Battle -> 全员)
+message PBBattleFrameNtf {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = BATTLE_FRAME_NTF (5)
+  uint32 frame_id   = 3;   // 服务器逻辑帧号
+  repeated PBBattlePlayerInput inputs = 4;   // 本帧收集到的所有输入
+}
+
+// 全量快照 (Battle -> 客户端)
+message PBBattleSnapshotNtf {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = BATTLE_SNAPSHOT_NTF (6)
+  uint32 frame_id   = 3;
+  bytes  state      = 4;   // BattleCore 全量序列化状态
+}
+
+// 战斗结束 (Battle -> 全员)
+message PBBattleEndNtf {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = BATTLE_END_NTF (7)
+  int64  battle_id  = 3;
+  int32  win_side   = 4;   // 胜方阵营 (0=平局, 1/2=阵营)
+  string stats      = 5;   // 结算统计 (json 字符串)
+}
+
+// 中途退出 (客户端 -> Battle)
+message PBBattleLeaveReq {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = BATTLE_LEAVE_REQ (8)
+  int64  battle_id  = 3;
+  int64  player_id  = 4;
+}
+
+// 退出结果 (Battle -> 客户端)
+message PBBattleLeaveRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = BATTLE_LEAVE_RSP (9)
+  PbID.ErrorCode error_code = 3;
+}
+
+// 一致性校验哈希上报 (客户端 -> Battle)
+message PBBattleHashNtf {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = BATTLE_HASH_NTF (10)
+  int64  battle_id  = 3;   // 目标战斗房 (Gate 路由到对应 BattleActor 实例)
+  uint32 frame_id   = 4;
+  uint64 state_hash = 5;
+}

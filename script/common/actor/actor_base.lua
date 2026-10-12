@@ -84,7 +84,7 @@ end
 -- @param actor_data  string  Protobuf binary data (may be empty for first load)
 -- @return true on success
 function ActorBase:data_load(actor_data)
-    local key = self._actor_type_name .. ":" .. tostring(self._actor_id)
+    local key = self._actor_type_name .. ":" .. xEngine.Number.intKey(self._actor_id)
 
     -- Try Redis cache first
     local cached = xEngine.Redis.Get(key)
@@ -97,7 +97,7 @@ function ActorBase:data_load(actor_data)
     end
 
     -- Fallback to DB (async query — returns immediately)
-    local dbData = xEngine.DB.Select(self._actor_type_name, "id=" .. tostring(self._actor_id))
+    local dbData = xEngine.DB.Select(self._actor_type_name, "id=" .. xEngine.Number.intKey(self._actor_id))
     if dbData and dbData ~= "" then
         -- Cache the DB result to Redis for subsequent reads
         xEngine.Redis.Set(key, dbData)
@@ -122,7 +122,7 @@ end
 -- @param save_type  int32  1=insert(新建), 2=update(更新), 3=delete(删除)
 -- @return true on success
 function ActorBase:data_save(save_type)
-    local key = self._actor_type_name .. ":" .. tostring(self._actor_id)
+    local key = self._actor_type_name .. ":" .. xEngine.Number.intKey(self._actor_id)
 
     if save_type == 3 then  -- delete
         xEngine.Redis.Del(key)
@@ -153,7 +153,6 @@ local EVENT_NAMES = {
     [2] = "connection",   -- client connection state change
     [3] = "session",      -- session lifecycle event
     [4] = "entity",       -- entity state change
-    [5] = "world_tick",   -- world simulation tick
 }
 
 --- on_event — handle an event by enum, dispatched by name.
@@ -172,28 +171,40 @@ function ActorBase:on_event(event_enum)
     end
 end
 
---- on_msg — handle an incoming proto message, dispatched by msg type.
--- Inspects the proto_msg table for a _msg_type_ field (set by the C++/SWIG
--- deserialization layer), then calls self["on_" .. msg_type .. "_msg"](self, msg).
--- If no _msg_type_ field is found, a warning is logged.
--- @param proto_msg  table  Deserialized protobuf message with optional _msg_type_
-function ActorBase:on_msg(proto_msg)
-    local msg_type = nil
-    if type(proto_msg) == "table" then
-        msg_type = proto_msg._msg_type_ or proto_msg.msg_type
+--- on_msg — handle an incoming message dispatched by C++ CLuaActor::OnMessage.
+-- C++ 侧 (CLuaActor::OnMessage) 以 (self, msg_id, raw_body) 调用本方法。
+-- 按 msg_id 查 xEngine.MsgId.NAMES → 调用 self["on_" .. name .. "_msg"](self, raw_body)。
+-- 处理器定义在 script/actors/<actor>/net_msg/<name>_msg.lua。
+-- @param msg_id   int32   协议号 (见 xEngine.MsgId)
+-- @param raw_body string  二进制负载 (后续解析为 protobuf)
+function ActorBase:on_msg(msg_id, raw_body)
+    local name = xEngine.MsgId.NAMES[msg_id]
+    if not name then
+        xEngine.Log.warn("[%s] Unknown msg_id=%d (body_len=%d)",
+            self._actor_type_name, msg_id or 0, raw_body and #raw_body or 0)
+        return
     end
 
-    if msg_type then
-        local handler = self["on_" .. msg_type .. "_msg"]
-        if handler then
-            return handler(self, proto_msg)
-        end
-        xEngine.Log.warn("[%s] No on_msg handler for type '%s'",
-            self._actor_type_name, msg_type)
-    else
-        xEngine.Log.warn("[%s] on_msg called without _msg_type_",
-            self._actor_type_name)
+    local handler = self["on_" .. name .. "_msg"]
+    if not handler then
+        xEngine.Log.warn("[%s] No handler on_%s_msg for msg_id=%d",
+            self._actor_type_name, name, msg_id)
+        return
     end
+
+    handler(self, raw_body)
+end
+
+--- on_gm_cmd — GM 命令分发 (由 C++ SYS_GM_CMD 投递, 调度线程串行调用)。
+-- 命令格式: `actor <type> <id> <cmd...>`, 此处拿到的是 <cmd...> 拼接串。
+-- 返回字符串作为应答 (C++ 侧经 CGmCommandMgr::LogReply 写回 Redis 控制台)。
+-- 子类可覆写以提供具体业务 GM 命令 (如 battle 的 status)。
+-- @param cmdline  string  命令剩余部分
+-- @return string  应答文本
+function ActorBase:on_gm_cmd(cmdline)
+    return string.format("type=%d id=%d name=%s: received GM cmd '%s' (no specific handler)",
+        self._actor_type or 0, self._actor_id or 0,
+        self._actor_type_name or "?", tostring(cmdline))
 end
 
 --- on_rpc_call — RPC dispatch from C++ gRPC layer.

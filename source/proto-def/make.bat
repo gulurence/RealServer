@@ -1,6 +1,24 @@
-:: RPC 协议编译
-./protoc.exe --cpp_out=../proto-cpp/protocol --grpc_out=../proto-cpp/protocol --plugin=protoc-gen-grpc=D:/vcpkg-master/packages/grpc_x64-windows/tools/grpc/grpc_cpp_plugin.exe rpc/myservice.proto
+@echo off
+REM ============================================================
+REM  Regenerate protobuf C++ sources (protoc -> source/proto-cpp)
+REM  Run from source/proto-def directory.
+REM    protoc.exe      : libprotoc 29.3 (bundled in this dir)
+REM ============================================================
 
-:: MSG 协议编译
-./protoc.exe --cpp_out=../proto-cpp/protocol msg/login.proto
+set PROTOC=.\protoc.exe
+set OUT=../proto-cpp/protocol
 
+REM --- MSG protocols (--cpp_out only) ---
+%PROTOC% --cpp_out=%OUT% --proto_path=. msg/msg_id.proto msg/account.proto msg/login.proto msg/player.proto msg/player_item.proto msg/friend.proto msg/room.proto msg/chat.proto msg/battle.proto msg/spectator.proto msg/config.proto
+if errorlevel 1 goto :err
+
+REM --- RPC protocols (--cpp_out only; service 鍧椾笉鐢熸垚 C++锛屽凡寮冪敤 gRPC) ---
+%PROTOC% --cpp_out=%OUT% --proto_path=. rpc/actor_mgr.proto rpc/myservice.proto
+if errorlevel 1 goto :err
+
+echo Done. Generated C++ sources under %OUT%
+goto :eof
+
+:err
+echo protoc failed with errorlevel %errorlevel%
+exit /b 1

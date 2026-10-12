@@ -25,16 +25,14 @@
 *********************************************************************/
 #pragma once
 
-
-template <typename T>
-class CiaSingleton : public T
+template <typename T> class CiaSingleton : public T
 {
 public:
     typedef T SingletonType;
 
 public:
     // Get singleton instance
-    static SingletonType * singleton();
+    static SingletonType *singleton();
     // Release singleton instance
     static void release();
 
@@ -44,24 +42,27 @@ private:
 
 private:
     CiaSingleton(const CiaSingleton &) = delete;
-    const CiaSingleton & operator=(const CiaSingleton &) = delete;
+    const CiaSingleton &operator=(const CiaSingleton &) = delete;
 
     // Protected: allow subclass construction, prevent direct instantiation
-    CiaSingleton() {};
-    ~CiaSingleton() override {};
+    CiaSingleton(){};
+    ~CiaSingleton() override{};
 
 private:
     struct Init
     {
-        Init() {
+        Init()
+        {
             CiaSingleton<T>::singleton();
         }
     };
 
     struct destroy
     {
-        ~destroy() {
-            if (nullptr == sm_pSingleInstance) {
+        ~destroy()
+        {
+            if (nullptr == sm_pSingleInstance)
+            {
                 return;
             }
 
@@ -74,42 +75,43 @@ private:
     static Init sm_Init;
 };
 
-
-template <typename T>
-class ChaSingleton final
+template <typename T> class ChaSingleton final
 {
 public:
     typedef T SingleInstanceType;
 
-    // 
-    static SingleInstanceType * singleton();
-    // 
+    //
+    static SingleInstanceType *singleton();
+    //
     static void release();
 
 private:
-    // 
+    //
     static SingleInstanceType *sm_pSingleInstance;
 
 private:
     ChaSingleton(const ChaSingleton &) = delete;
-    const ChaSingleton & operator=(const ChaSingleton &) = delete;
+    const ChaSingleton &operator=(const ChaSingleton &) = delete;
 
-    // 
+    //
     ChaSingleton() = delete;
     ~ChaSingleton() = delete;
 
 private:
     struct Init
     {
-        Init() {
+        Init()
+        {
             ChaSingleton<T>::singleton();
         }
     };
 
     struct Destroy
     {
-        ~Destroy() {
-            if (nullptr == sm_pSingleInstance) {
+        ~Destroy()
+        {
+            if (nullptr == sm_pSingleInstance)
+            {
                 return;
             }
 
@@ -122,14 +124,14 @@ private:
     static Init sm_Init;
 };
 
-
 // 缁眴iaSingleInstance閻ㄥ
 template <typename T>
-typename CiaSingleton<T>::SingletonType * CiaSingleton<T>::sm_pSingleInstance = nullptr;
+typename CiaSingleton<T>::SingletonType *CiaSingleton<T>::sm_pSingleInstance = nullptr;
 
-template <typename T>
-typename CiaSingleton<T>::SingletonType * CiaSingleton<T>::singleton() {
-    if (nullptr == sm_pSingleInstance) {
+template <typename T> typename CiaSingleton<T>::SingletonType *CiaSingleton<T>::singleton()
+{
+    if (nullptr == sm_pSingleInstance)
+    {
         sm_pSingleInstance = new CiaSingleton<T>();
         static destroy s_Des;
     }
@@ -137,25 +139,25 @@ typename CiaSingleton<T>::SingletonType * CiaSingleton<T>::singleton() {
     return sm_pSingleInstance;
 }
 
-template <typename T>
-void CiaSingleton<T>::release() {
-    if (nullptr != sm_pSingleInstance) {
+template <typename T> void CiaSingleton<T>::release()
+{
+    if (nullptr != sm_pSingleInstance)
+    {
         delete sm_pSingleInstance;
         sm_pSingleInstance = nullptr;
     }
 }
 
-template <typename T>
-typename CiaSingleton<T>::Init CiaSingleton<T>::sm_Init;
-
+template <typename T> typename CiaSingleton<T>::Init CiaSingleton<T>::sm_Init;
 
 // 缁眴haSingleInstance閻ㄥ
 template <typename T>
-typename ChaSingleton<T>::SingleInstanceType * ChaSingleton<T>::sm_pSingleInstance = nullptr;
+typename ChaSingleton<T>::SingleInstanceType *ChaSingleton<T>::sm_pSingleInstance = nullptr;
 
-template <typename T>
-typename ChaSingleton<T>::SingleInstanceType * ChaSingleton<T>::singleton() {
-    if (nullptr == sm_pSingleInstance) {
+template <typename T> typename ChaSingleton<T>::SingleInstanceType *ChaSingleton<T>::singleton()
+{
+    if (nullptr == sm_pSingleInstance)
+    {
         sm_pSingleInstance = new SingleInstanceType();
         static Destroy s_Des;
     }
@@ -163,20 +165,13 @@ typename ChaSingleton<T>::SingleInstanceType * ChaSingleton<T>::singleton() {
     return sm_pSingleInstance;
 }
 
-template <typename T>
-void ChaSingleton<T>::release() {
-    if (nullptr != sm_pSingleInstance) {
+template <typename T> void ChaSingleton<T>::release()
+{
+    if (nullptr != sm_pSingleInstance)
+    {
         delete sm_pSingleInstance;
         sm_pSingleInstance = nullptr;
     }
 }
 
-template <typename T>
-typename ChaSingleton<T>::Init ChaSingleton<T>::sm_Init;
-
-
-
-
-
-
-
+template <typename T> typename ChaSingleton<T>::Init ChaSingleton<T>::sm_Init;

@@ -21,12 +21,13 @@ public:
     class Imp;
 
 public:
-    void Init(const char* prop = "log4cxx.properties");
-    void Print(const char* file, long line, const char* funtion, Level level, const char* format, ...);
+    void Init(const char *prop = "log4cxx.properties");
+    void Print(const char *file, int32 line, const char *funtion, Level level, const char *format,
+               ...);
 
 public:
     std::shared_ptr<spdlog::logger> CreateServiceLog(const std::string &strServiceName);
-    bool RemoveServiceLog(const std::string& strServiceName);
+    bool RemoveServiceLog(const std::string &strServiceName);
 
 public:
     xLog(void);
@@ -37,14 +38,19 @@ private:
     std::shared_ptr<spdlog::logger> _logger;
 };
 
-#define  XTRC(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::TRACE, __VA_ARGS__)
+#define XTRC(...)                                                                                  \
+    xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::TRACE, __VA_ARGS__)
 // 调试日志
-#define  XDBG(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::DEBUG, __VA_ARGS__)
+#define XDBG(...)                                                                                  \
+    xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::DEBUG, __VA_ARGS__)
 // 运行日志
-#define  XLOG(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::INFO, __VA_ARGS__)
-#define  XINF(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::INFO, __VA_ARGS__)
+#define XLOG(...)                                                                                  \
+    xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::INFO, __VA_ARGS__)
+#define XINF(...)                                                                                  \
+    xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::INFO, __VA_ARGS__)
 // 警告
-#define  XWRN(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::WARN, __VA_ARGS__)
+#define XWRN(...)                                                                                  \
+    xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::WARN, __VA_ARGS__)
 // 错误
-#define  XERR(...) xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::ERR, __VA_ARGS__)
-
+#define XERR(...)                                                                                  \
+    xLog::get_mutable_instance().Print(__FILE__, __LINE__, __FUNCTION__, xLog::ERR, __VA_ARGS__)

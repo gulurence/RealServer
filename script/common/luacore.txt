@@ -268,10 +268,10 @@ Version: Lua 5.4.7  |  SWIG 4.3  |  RealServer Engine
     luacore.si_actor_creator_get_process_load()         → int32
     luacore.si_actor_creator_get_local_count(type)      → int32
 
-  -- gRPC forwarding (cross-process)
-    luacore.si_actor_creator_grpc_create(svr, type, id)             → bool
-    luacore.si_actor_creator_grpc_find(svr, type, id, &found, &rt)  → bool
-    luacore.si_actor_creator_grpc_uninstall(svr, type, id)          → bool
+  -- 自建 asio-TCP RPC forwarding (cross-process, 负载均衡)
+    luacore.si_actor_creator_rpc_create(type, id)             → bool
+    luacore.si_actor_creator_rpc_find(type, id, &found, &rt)  → bool
+    luacore.si_actor_creator_rpc_uninstall(type, id)          → bool
 
 
 11. REDIS (Synchronous)

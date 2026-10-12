@@ -5,40 +5,68 @@
     <!-- Deployment environment: dev / test / prod -->
     <platform>dev</platform>
 
-    <!-- gRPC server port for inter-process actor management -->
-    <grpc port="50051"/>
+    <!-- RPC server port for inter-process actor management -->
+    <rpc port="50051"/>
 
     <!-- ================================================================= -->
     <!-- Process Identity                                                   -->
-    <!--   type: 100=Gate 101=Login 201=Player 202=World                   -->
+    <!--   type: 100=Gate 101=Login 102=Global 201=Game                    -->
     <!--   name: unique process name within the cluster                    -->
     <!--   host: IP to bind gRPC server (0.0.0.0 = all interfaces)         -->
+    <!--   machine: physical machine id (NodeManager 分配; 单机=0)          -->
     <!-- ================================================================= -->
-    <process type="100" name="gate-01" host="0.0.0.0"/>
+    <process type="100" name="gate-01" host="0.0.0.0" machine="0"/>
+
+    <!-- ================================================================= -->
+    <!-- Hosted Actors — 进程类型 → 可承载 Actor 类型列表                  -->
+    <!-- 缺失或某类型未声明时, 回退到 xProcessDefine.h 硬编码 switch        -->
+    <!-- Actor type: 100=Gate 101=Login 102=Friend 103=Room 104=Chat       -->
+    <!--             201=Player 203=Battle 204=Spectator                   -->
+    <!-- ================================================================= -->
+    <hosted-actors>
+        <process type="100">
+            <actor type="100"/>   <!-- Gate -->
+        </process>
+        <process type="101">
+            <actor type="101"/>   <!-- Login -->
+        </process>
+        <process type="102">
+            <actor type="102"/>   <!-- Friend -->
+            <actor type="103"/>   <!-- Room -->
+            <actor type="104"/>   <!-- Chat -->
+            <actor type="204"/>   <!-- Spectator -->
+        </process>
+        <process type="201">
+            <actor type="201"/>   <!-- Player -->
+            <actor type="203"/>   <!-- Battle -->
+        </process>
+    </hosted-actors>
 
     <!-- ================================================================= -->
     <!-- Cluster Fallback (when Redis is unavailable)                       -->
     <!-- Used for local dev/test without Redis                              -->
     <!-- ================================================================= -->
     <cluster>
+        <!-- Verification key secret — derives node AuthKey (optional, defaults in code) -->
+        <auth secret="RealServerAuthSecret"/>
+
         <!-- Local process identity (used when Redis ID gen fails) -->
         <local type="100" id="1" name="gate-dev-01"/>
 
         <!-- Peers to connect to (static config, no service discovery) -->
         <peer type="101" host="127.0.0.1" port="50052"/>
         <peer type="201" host="127.0.0.1" port="50053"/>
-        <peer type="202" host="127.0.0.1" port="50054"/>
     </cluster>
 
     <!-- ================================================================= -->
-    <!-- Redis Connection Pools                                             -->
+    <!-- Redis Connection Pools (Redis Cluster: host/port 为集群 seed 节点)  -->
     <!-- ================================================================= -->
     <redis>
         <!-- Actor cache (runtime data) -->
         <pool
             title="actor_cache"
             host="127.0.0.1"
-            port="6379"
+            port="7000"
             max_conn="20"
             conn_timeout="3"
             retry_interval="1"
@@ -50,7 +78,7 @@
         <pool
             title="cluster_discovery"
             host="127.0.0.1"
-            port="6379"
+            port="7000"
             max_conn="5"
             conn_timeout="3"
             retry_interval="1"

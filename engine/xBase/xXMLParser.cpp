@@ -5,20 +5,29 @@
 iconv_t xXMLParser::iconv_utf8_gbk;
 iconv_t xXMLParser::iconv_gbk_utf8;
 
-xXMLParser::xXMLParser() {
+xXMLParser::xXMLParser()
+{
     doc = 0;
     docBuffer = NULL;
 }
 
-xXMLParser::~xXMLParser() {
-    if (doc) xmlFreeDoc(doc);
-    if (docBuffer) free(docBuffer);
+xXMLParser::~xXMLParser()
+{
+    if (doc)
+    {
+        xmlFreeDoc(doc);
+    }
+    if (docBuffer)
+    {
+        free(docBuffer);
+    }
 #ifdef _LX_DEBUG
     XLOG("[xXMLParser] destroyed");
 #endif
 }
 
-void xXMLParser::initSystem() {
+void xXMLParser::initSystem()
+{
     xmlInitParser();
     XLOG("[xXMLParser] initialized");
     /*
@@ -27,17 +36,16 @@ void xXMLParser::initSystem() {
     iconv_gbk_utf8 = iconv_open("GBK", "UTF-8");
 
     xmlCharEncodingHandlerPtr h = 0;
-    h = xmlNewCharEncodingHandler("GB2312", gbk_input, gbk_output);// register GB2312 encoding handler
-    if (!h)
-        XERR("Failed to create GB2312 encoding handler");
-    h = xmlNewCharEncodingHandler("GBK", gbk_input, gbk_output);// register GBK encoding handler
-    if (!h)
+    h = xmlNewCharEncodingHandler("GB2312", gbk_input, gbk_output);// register GB2312 encoding
+    handler if (!h) XERR("Failed to create GB2312 encoding handler"); h =
+    xmlNewCharEncodingHandler("GBK", gbk_input, gbk_output);// register GBK encoding handler if (!h)
         XERR("Failed to create GBK encoding handler");
     XLOG("[XML] Registered custom encoding handlers: GB2312 GBK");
     */
 }
 
-void xXMLParser::clearSystem() {
+void xXMLParser::clearSystem()
+{
     /*
     iconv_close(iconv_gbk_utf8);
     iconv_close(iconv_utf8_gbk);
@@ -46,94 +54,105 @@ void xXMLParser::clearSystem() {
     xmlMemoryDump();
 }
 
-int xXMLParser::gbk_input(unsigned char* out, int* outlen, const unsigned char* in, int* inlen) {
-    char* outbuf = (char*)out;
-    char* inbuf = (char*)in;
-    size_t          rslt;
+int32 xXMLParser::gbk_input(uint8 *out, int32 *outlen, const uint8 *in, int32 *inlen)
+{
+    char *outbuf = (char *)out;
+    char *inbuf = (char *)in;
+    size_t rslt;
     XDBG("[XML] gbk_input before: inlen=%d in=%s", *inlen, in);
 
     rslt =
 #ifndef _WINDOWS
-        iconv(iconv_utf8_gbk, &inbuf, (size_t*)inlen,
-            &outbuf, (size_t*)outlen);
+        iconv(iconv_utf8_gbk, &inbuf, (size_t *)inlen, &outbuf, (size_t *)outlen);
 #else
-        iconv(iconv_utf8_gbk, (char**)&inbuf, (size_t*)inlen,
-            &outbuf, (size_t*)outlen);
+        iconv(iconv_utf8_gbk, (char **)&inbuf, (size_t *)inlen, &outbuf, (size_t *)outlen);
 #endif
-    if (rslt < 0) {
+    if (rslt < 0)
+    {
         XERR("[XML] gbk_input iconv failed: %d", rslt);
         return rslt;
     }
     XDBG("[XML] gbk_input after: outlen=%d out=%s", *outlen, out);
-    *outlen = ((unsigned char*)outbuf - out);
-    *inlen = ((unsigned char*)inbuf - in);
+    *outlen = ((uint8 *)outbuf - out);
+    *inlen = ((uint8 *)inbuf - in);
     XDBG("[XML] gbk_input result: ret=%d inlen=%d outlen=%d", rslt, *inlen, *outlen);
     return *outlen;
 }
 
-int xXMLParser::gbk_output(unsigned char* out, int* outlen, const unsigned char* in, int* inlen) {
-    char* outbuf = (char*)out;
-    char* inbuf = (char*)in;
-    size_t          rslt;
+int32 xXMLParser::gbk_output(uint8 *out, int32 *outlen, const uint8 *in, int32 *inlen)
+{
+    char *outbuf = (char *)out;
+    char *inbuf = (char *)in;
+    size_t rslt;
 
     rslt =
 #ifndef _WINDOWS
-        iconv(iconv_gbk_utf8, &inbuf, (size_t*)inlen,
-            &outbuf, (size_t*)outlen);
+        iconv(iconv_gbk_utf8, &inbuf, (size_t *)inlen, &outbuf, (size_t *)outlen);
 #else
-        iconv(iconv_gbk_utf8, (char**)&inbuf, (size_t*)inlen,
-            &outbuf, (size_t*)outlen);
+        iconv(iconv_gbk_utf8, (char **)&inbuf, (size_t *)inlen, &outbuf, (size_t *)outlen);
 #endif
 
-    if (rslt < 0) {
+    if (rslt < 0)
+    {
         XERR("[XML] gbk_output iconv failed: %d", rslt);
         return rslt;
     }
-    *outlen = ((unsigned char*)outbuf - out);
-    *inlen = ((unsigned char*)inbuf - in);
+    *outlen = ((uint8 *)outbuf - out);
+    *inlen = ((uint8 *)inbuf - in);
     XDBG("[XML] gbk_output result: ret=%d inlen=%d outlen=%d", rslt, *inlen, *outlen);
     return *outlen;
 }
 
-
-bool xXMLParser::parseDoc(const char* file) {
+bool xXMLParser::parseDoc(const char *file)
+{
     xmlKeepBlanksDefault(1);
-    //doc = xmlReadFile(file, "GBK", 0);
+    // doc = xmlReadFile(file, "GBK", 0);
 
-    FILE* in = fopen(file, "r");
-    if (in == NULL) return false;
+    FILE *in = fopen(file, "r");
+    if (in == NULL)
+    {
+        return false;
+    }
 
     fseek(in, 0L, SEEK_END);
     uint32 numBytes = ftell(in);
     fseek(in, 0L, SEEK_SET);
 
-    docBuffer = (char*)calloc(numBytes, sizeof(char));
+    docBuffer = (char *)calloc(numBytes, sizeof(char));
     if (docBuffer == NULL)
+    {
         return 1;
+    }
 
     fread(docBuffer, sizeof(char), numBytes, in);
     fclose(in);
     doc = xmlParseMemory(docBuffer, numBytes);
 
-    if (!doc) {
+    if (!doc)
+    {
         XERR("can not parse xml file %s", file);
         return false;
     }
     return true;
 }
 
-int xXMLParser::code_convert(const char* from_charset, const char* to_charset, char* inbuf, size_t inlen, char* outbuf, size_t outlen) {
+int32 xXMLParser::code_convert(const char *from_charset, const char *to_charset, char *inbuf,
+                               size_t inlen, char *outbuf, size_t outlen)
+{
     iconv_t cd;
-    char** pin = &inbuf;
-    char** pout = &outbuf;
+    char **pin = &inbuf;
+    char **pout = &outbuf;
 
     cd = iconv_open(to_charset, from_charset);
-    if (cd == 0) return -1;
+    if (cd == 0)
+    {
+        return -1;
+    }
     memset(outbuf, 0, outlen);
 #ifndef _WINDOWS
-    if (iconv(cd, pin, (size_t*)&inlen, pout, (size_t*)&outlen) == (uint32)-1)
+    if (iconv(cd, pin, (size_t *)&inlen, pout, (size_t *)&outlen) == (uint32)-1)
 #else
-    if (iconv(cd, (char**)pin, (size_t*)&inlen, pout, (size_t*)&outlen) == (uint32)-1)
+    if (iconv(cd, (char **)pin, (size_t *)&inlen, pout, (size_t *)&outlen) == (uint32)-1)
 #endif
         return -1;
     iconv_close(cd);
@@ -164,23 +183,38 @@ bool xXMLParser::toUTF8()
 }
 */
 
-xmlNodePtr xXMLParser::getRoot() {
-    if (!doc) { return 0; }
+xmlNodePtr xXMLParser::getRoot()
+{
+    if (!doc)
+    {
+        return 0;
+    }
     return xmlDocGetRootElement(doc);
 }
 
-xmlNodePtr xXMLParser::getChild(xmlNodePtr node) {
-    if (!node) { return 0; }
+xmlNodePtr xXMLParser::getChild(xmlNodePtr node)
+{
+    if (!node)
+    {
+        return 0;
+    }
     return node->xmlChildrenNode;
 }
 
-xmlNodePtr xXMLParser::getChild(xmlNodePtr node, const char* name) {
-    if (!node) { return 0; }
+xmlNodePtr xXMLParser::getChild(xmlNodePtr node, const char *name)
+{
+    if (!node)
+    {
+        return 0;
+    }
 
     xmlNodePtr tmp = node->xmlChildrenNode;
-    while (tmp) {
-        if (tmp->type == XML_ELEMENT_NODE) {
-            if (!xmlStrcmp(tmp->name, (const xmlChar*)name)) {
+    while (tmp)
+    {
+        if (tmp->type == XML_ELEMENT_NODE)
+        {
+            if (!xmlStrcmp(tmp->name, (const xmlChar *)name))
+            {
                 return tmp;
             }
         }
@@ -189,14 +223,21 @@ xmlNodePtr xXMLParser::getChild(xmlNodePtr node, const char* name) {
     return 0;
 }
 
-uint32 xXMLParser::getChildNum(xmlNodePtr node, const char* name) {
-    if (!node) { return 0; }
+uint32 xXMLParser::getChildNum(xmlNodePtr node, const char *name)
+{
+    if (!node)
+    {
+        return 0;
+    }
 
     uint32 num = 0;
     xmlNodePtr tmp = node->xmlChildrenNode;
-    while (tmp) {
-        if (tmp->type == XML_ELEMENT_NODE) {
-            if (!xmlStrcmp(tmp->name, (const xmlChar*)name)) {
+    while (tmp)
+    {
+        if (tmp->type == XML_ELEMENT_NODE)
+        {
+            if (!xmlStrcmp(tmp->name, (const xmlChar *)name))
+            {
                 ++num;
             }
         }
@@ -205,12 +246,18 @@ uint32 xXMLParser::getChildNum(xmlNodePtr node, const char* name) {
     return num;
 }
 
-xmlNodePtr xXMLParser::getNext(xmlNodePtr node) {
-    if (!node) { return 0; }
+xmlNodePtr xXMLParser::getNext(xmlNodePtr node)
+{
+    if (!node)
+    {
+        return 0;
+    }
 
     xmlNodePtr tmp = node->next;
-    while (tmp) {
-        if (tmp->type == XML_ELEMENT_NODE) {
+    while (tmp)
+    {
+        if (tmp->type == XML_ELEMENT_NODE)
+        {
             return tmp;
         }
         tmp = tmp->next;
@@ -218,13 +265,20 @@ xmlNodePtr xXMLParser::getNext(xmlNodePtr node) {
     return 0;
 }
 
-xmlNodePtr xXMLParser::getNext(xmlNodePtr node, const char* name) {
-    if (!node) { return 0; }
+xmlNodePtr xXMLParser::getNext(xmlNodePtr node, const char *name)
+{
+    if (!node)
+    {
+        return 0;
+    }
 
     xmlNodePtr tmp = node->next;
-    while (tmp) {
-        if (tmp->type == XML_ELEMENT_NODE) {
-            if (!xmlStrcmp(tmp->name, (const xmlChar*)name)) {
+    while (tmp)
+    {
+        if (tmp->type == XML_ELEMENT_NODE)
+        {
+            if (!xmlStrcmp(tmp->name, (const xmlChar *)name))
+            {
                 return tmp;
             }
         }
@@ -233,39 +287,55 @@ xmlNodePtr xXMLParser::getNext(xmlNodePtr node, const char* name) {
     return 0;
 }
 
-xmlNodePtr xXMLParser::getNodeByPath(const char* path) {
+xmlNodePtr xXMLParser::getNodeByPath(const char *path)
+{
     std::vector<std::string> v;
     stringTok(path, "/", v);
-    if (v.size() <= 1) { return 0; }
+    if (v.size() <= 1)
+    {
+        return 0;
+    }
 
     uint32 i = 0;
     xmlNodePtr tmp = getRoot();
-    while (tmp) {
+    while (tmp)
+    {
         i++;
-        tmp = getChild(tmp, (char*)v[i].c_str());
-        if (i == v.size() - 1) { return tmp; }
+        tmp = getChild(tmp, (char *)v[i].c_str());
+        if (i == v.size() - 1)
+        {
+            return tmp;
+        }
     }
 
     return 0;
 }
 
-bool xXMLParser::getPropStr(xmlNodePtr node, const char* name, std::string& out) const {
+bool xXMLParser::getPropStr(xmlNodePtr node, const char *name, std::string &out) const
+{
     //
-    if (!node) { return false; }
-    if (!xmlHasProp(node, BAD_CAST name)) { return false; }
-    xmlChar* utf = xmlGetProp(node, BAD_CAST name);
-    out += (char*)utf;
+    if (!node)
+    {
+        return false;
+    }
+    if (!xmlHasProp(node, BAD_CAST name))
+    {
+        return false;
+    }
+    xmlChar *utf = xmlGetProp(node, BAD_CAST name);
+    out = (char *)utf;
     xmlFree(utf);
     return true;
 }
 
-bool xXMLParser::InnerXml(xmlNodePtr node, std::string& out) const {
-    if (!node) { return false; }
-    xmlChar* utf = xmlNodeGetContent(node);
-    out += (char*)utf;
+bool xXMLParser::InnerXml(xmlNodePtr node, std::string &out) const
+{
+    if (!node)
+    {
+        return false;
+    }
+    xmlChar *utf = xmlNodeGetContent(node);
+    out = (char *)utf;
     xmlFree(utf);
     return true;
 }
-
-
-

@@ -7,9 +7,10 @@
 class tServiceXml : public ThridService
 {
 public:
-    tServiceXml(int32 id, const std::string& name)
-        : ThridService(EST_Xml, id, name) {}
+    tServiceXml(int32 id, const std::string &name) : ThridService(EST_Xml, id, name)
+    {
+    }
 
-    virtual bool Init(const ThridServiceConfig& cfg) override;
+    virtual bool Init(const ThridServiceConfig &cfg) override;
     virtual void Release() override;
 };

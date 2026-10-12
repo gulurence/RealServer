@@ -1,108 +1,149 @@
 
 #include "xCircularBuffer.h"
 
-
-xCircularBuffer::xCircularBuffer(const std::size_t& size)
-    : head_(0), tail_(0), size_(0), max_size_(size) {
+xCircularBuffer::xCircularBuffer(const std::size_t &size)
+    : head_(0), tail_(0), size_(0), max_size_(size)
+{
     buffer_ = new char[max_size_];
     std::memset(buffer_, 0, max_size_);
 }
 
-xCircularBuffer::~xCircularBuffer() {
-    if (buffer_) {
+xCircularBuffer::~xCircularBuffer()
+{
+    if (buffer_)
+    {
         delete[] buffer_;
         buffer_ = nullptr;
     }
 }
 
-boost::asio::mutable_buffer xCircularBuffer::GetWriteBuffer() {
-    if (IsFull()) {
+asio::mutable_buffer xCircularBuffer::GetWriteBuffer()
+{
+    if (IsFull())
+    {
         XINF("GetWriteBuffer IsFull");
         Resize(max_size_ * 2);
     }
     std::size_t tail = tail_.load(std::memory_order_relaxed);
     std::size_t head = head_.load(std::memory_order_relaxed);
 
-    if (head <= tail) {
+    if (head <= tail)
+    {
         std::size_t available = max_size_ - tail;
-        return boost::asio::mutable_buffer(&buffer_[tail], available);
-    } else {
-        return boost::asio::mutable_buffer(&buffer_[tail], head - tail);
+        return asio::mutable_buffer(&buffer_[tail], available);
+    }
+    else
+    {
+        return asio::mutable_buffer(&buffer_[tail], head - tail);
     }
 }
 
-void xCircularBuffer::Write(const std::size_t& size) {
+void xCircularBuffer::Write(const std::size_t &size)
+{
     std::size_t new_tail = (tail_.load(std::memory_order_relaxed) + size) % max_size_;
     std::size_t new_size = size_.load(std::memory_order_relaxed) + size;
 
     size_.store(new_size, std::memory_order_release);
     tail_.store(new_tail, std::memory_order_release);
 
-    if (new_size >= max_size_) {
+    if (new_size >= max_size_)
+    {
         Resize(new_size * 2);
     }
 }
 
-int xCircularBuffer::Read(uint8* out, const std::size_t& size) {
+int32 xCircularBuffer::Read(uint8 *out, const std::size_t &size)
+{
     std::size_t head = head_.load(std::memory_order_acquire);
     std::size_t tail = tail_.load(std::memory_order_acquire);
 
-    if (Size() < size) {
+    if (Size() < size)
+    {
         return 0;
     }
 
-    if (tail < head) {
-        if (size <= max_size_ - head) {
+    if (tail < head)
+    {
+        if (size <= max_size_ - head)
+        {
             std::memcpy(&(out[0]), &(buffer_[head]), size);
-        } else {
+        }
+        else
+        {
             std::memcpy(&(out[0]), &(buffer_[head]), max_size_ - head);
             std::memcpy(&(out[max_size_ - head]), &(buffer_[0]), size - (max_size_ - head));
         }
-    } else if (tail > head) {
+    }
+    else if (tail > head)
+    {
         std::memcpy(&(out[0]), &(buffer_[head]), size);
-    } else {
-        if (tail == 0) {
+    }
+    else
+    {
+        if (tail == 0)
+        {
             std::memcpy(&(out[0]), &(buffer_[head]), size);
-        } else {
-            if (size <= max_size_ - head) {
+        }
+        else
+        {
+            if (size <= max_size_ - head)
+            {
                 std::memcpy(&(out[0]), &(buffer_[head]), size);
-            } else {
+            }
+            else
+            {
                 std::memcpy(&(out[0]), &(buffer_[head]), max_size_ - head);
                 std::memcpy(&(out[max_size_ - head]), &(buffer_[0]), size - (max_size_ - head));
             }
         }
     }
 
-    //head_.store((head + size) % max_size_, std::memory_order_release);
-    //size_.store(Size() - size, std::memory_order_release);
+    // head_.store((head + size) % max_size_, std::memory_order_release);
+    // size_.store(Size() - size, std::memory_order_release);
 
     return size;
 }
 
-bool xCircularBuffer::Put(const std::size_t& size) {
+bool xCircularBuffer::Put(const std::size_t &size)
+{
     std::size_t current_size = size_.load(std::memory_order_acquire);
-    if (current_size < size) {
+    if (current_size < size)
+    {
         return false;
     }
 
     std::size_t head = head_.load(std::memory_order_acquire);
     std::size_t new_head;
 
-    if (tail_ < head) {
-        if (size <= max_size_ - head) {
+    if (tail_ < head)
+    {
+        if (size <= max_size_ - head)
+        {
             new_head = head + size;
-        } else {
+        }
+        else
+        {
             new_head = size - (max_size_ - head);
         }
-    } else if (tail_ > head) {
+    }
+    else if (tail_ > head)
+    {
         new_head = head + size;
-    } else {
-        if (tail_ == 0) {
+    }
+    else
+    {
+        if (tail_ == 0)
+        {
             new_head = head + size;
-        } else {
-            if (size <= max_size_ - head) {
+        }
+        else
+        {
+            if (size <= max_size_ - head)
+            {
                 new_head = head + size;
-            } else {
+            }
+            else
+            {
                 new_head = size - (max_size_ - head);
             }
         }
@@ -114,29 +155,39 @@ bool xCircularBuffer::Put(const std::size_t& size) {
     return true;
 }
 
-void xCircularBuffer::Resize(const std::size_t& size) {
+void xCircularBuffer::Resize(const std::size_t &size)
+{
 
     XINF("xCircularBuffer::Resize size:%d", size);
 
-    if (size < max_size_) {
+    if (size < max_size_)
+    {
         return;
     }
 
-    char* tbuffer_ = new char[size];
+    char *tbuffer_ = new char[size];
     std::memset(tbuffer_, 0, size);
 
     std::size_t head = head_.load(std::memory_order_acquire);
     std::size_t tail = tail_.load(std::memory_order_acquire);
 
-    if (tail < head) {
+    if (tail < head)
+    {
         std::memcpy(&tbuffer_[0], &buffer_[head], max_size_ - head);
         std::memcpy(&tbuffer_[max_size_ - head], &buffer_[0], tail);
-    } else if (tail > head) {
+    }
+    else if (tail > head)
+    {
         std::memcpy(&tbuffer_[0], &buffer_[head], tail - head);
-    } else {
-        if (tail == 0) {
+    }
+    else
+    {
+        if (tail == 0)
+        {
             std::memcpy(&tbuffer_[0], &buffer_[head], size_);
-        } else {
+        }
+        else
+        {
             std::memcpy(&tbuffer_[0], &buffer_[head], max_size_ - head);
             std::memcpy(&tbuffer_[max_size_ - head], &buffer_[0], tail);
         }
@@ -150,22 +201,26 @@ void xCircularBuffer::Resize(const std::size_t& size) {
     buffer_ = tbuffer_;
 }
 
-uint16 xCircularBuffer::HaveFullPackage() {
-    if (m_bNeedBody) {
-        if (Size() >= NetPackageHeadSize) {
+uint32 xCircularBuffer::HaveFullPackage()
+{
+    // 客户端帧: [uint32 u32Len][protobuf body]
+    if (m_bNeedBody)
+    {
+        if (Size() >= ClientFrameHeadSize)
+        {
+            uint32 u32Len = 0;
+            Read((uint8 *)&u32Len, ClientFrameHeadSize);
+            m_u32BodyLen = u32Len;
             m_bNeedBody = false;
-            Read((uint8*)&m_stNetPackageHead, NetPackageHeadSize);
-            if (Size() >= m_stNetPackageHead.u16BodySize + NetPackageHeadSize) {
-                m_bNeedBody = true;
-                return m_stNetPackageHead.u16BodySize + NetPackageHeadSize;
-            }
         }
-    } else {
-        if (Size() >= m_stNetPackageHead.u16BodySize + NetPackageHeadSize) {
+    }
+    if (!m_bNeedBody)
+    {
+        if (Size() >= m_u32BodyLen + ClientFrameHeadSize)
+        {
             m_bNeedBody = true;
-            return m_stNetPackageHead.u16BodySize + NetPackageHeadSize;
+            return m_u32BodyLen + ClientFrameHeadSize;
         }
     }
     return 0;
 }
-

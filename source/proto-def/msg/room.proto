@@ -1,0 +1,223 @@
+// =============================================================================
+// room.proto — 房间模块协议 (一级 Actor 类型 = AT_ROOM = 103)
+//
+// 结构规范: 消息ID枚举 => 子数据定义 => 协议定义
+// 协议定义每条消息前两个字段为 uint32 BigType / uint32 SmallType (消息路由):
+//   BigType   = 一级 actor 类型 (固定 103 = AT_ROOM)
+//   SmallType = 本模块内消息 ID (RoomMsgId 枚举)
+// =============================================================================
+syntax = "proto3";
+
+package PbRoom;
+
+import "msg/msg_id.proto";
+
+// ---------------------------------------------------------------------------
+// 消息 ID 枚举 (SmallType 路由字段取值)
+// ---------------------------------------------------------------------------
+enum RoomMsgId {
+  ROOM_MSG_NONE        = 0;
+  ROOM_CREATE_REQ      = 1;   // 客户端 -> Room: 创建房间
+  ROOM_CREATE_RSP      = 2;   // Room -> 客户端: 创建结果
+  ROOM_LIST_REQ        = 3;   // 客户端 -> Room: 拉房间列表
+  ROOM_LIST_RSP        = 4;   // Room -> 客户端: 房间列表
+  ROOM_JOIN_REQ        = 5;   // 客户端 -> Room: 加入房间
+  ROOM_JOIN_RSP        = 6;   // Room -> 客户端: 加入结果
+  ROOM_LEAVE_REQ       = 7;   // 客户端 -> Room: 离开房间
+  ROOM_LEAVE_RSP       = 8;   // Room -> 客户端: 离开结果
+  ROOM_READY_REQ       = 9;   // 客户端 -> Room: 准备/取消准备
+  ROOM_READY_RSP       = 10;  // Room -> 客户端: 准备结果
+  ROOM_KICK_REQ        = 11;  // 客户端 -> Room: 踢人 (房主)
+  ROOM_KICK_RSP        = 12;  // Room -> 客户端: 踢人结果
+  ROOM_TRANSFER_REQ    = 13;  // 客户端 -> Room: 转让房主 (房主)
+  ROOM_START_REQ       = 14;  // 客户端 -> Room: 开始战斗 (房主)
+  ROOM_START_RSP       = 15;  // Room -> 客户端: 开始结果 (含 battle_id/auth_key)
+  ROOM_INFO_NTF        = 16;  // Room -> 成员: 房间信息变更
+  ROOM_MEMBER_NTF      = 17;  // Room -> 成员: 成员列表变更
+}
+
+// ---------------------------------------------------------------------------
+// 子数据枚举
+// ---------------------------------------------------------------------------
+
+// 战斗模式
+enum RoomMode {
+  ROOM_MODE_NONE = 0;
+  ROOM_MODE_PVE  = 1;   // 合作打波次/boss
+  ROOM_MODE_PVP  = 2;   // 玩家对抗
+}
+
+// 房间可见性
+enum RoomVisibility {
+  ROOM_VIS_NONE     = 0;
+  ROOM_VIS_PUBLIC   = 1;   // 公开 (列表可见)
+  ROOM_VIS_PRIVATE  = 2;   // 私密 (仅邀请进入)
+  ROOM_VIS_PASSWORD = 3;   // 密码房 (列表可见, 输密码可进)
+}
+
+// ---------------------------------------------------------------------------
+// 子数据定义
+// ---------------------------------------------------------------------------
+
+// 房间成员条目
+message PBRoomMember {
+  int64  player_id = 1;
+  string name      = 2;
+  bool   ready     = 3;   // 是否已准备
+  bool   is_owner  = 4;   // 是否房主
+}
+
+// 房间摘要 (列表/信息用)
+message PBRoomInfo {
+  int64  room_id      = 1;
+  int64  owner_id     = 2;
+  RoomMode mode       = 3;
+  RoomVisibility visibility = 4;
+  int32  member_count = 5;
+  int32  max_members  = 6;
+  int32  state        = 7;   // 0=等待 1=战斗中
+  string name         = 8;   // 房间显示名 (房主昵称+"的房间", 战斗中追加"(战斗中)")
+}
+
+// ---------------------------------------------------------------------------
+// 协议定义
+// ---------------------------------------------------------------------------
+
+// 创建房间 (客户端 -> Room)
+message PBRoomCreateReq {
+  uint32 big_type     = 1;
+  uint32 small_type   = 2;   // = ROOM_CREATE_REQ (1)
+  RoomMode mode       = 3;
+  RoomVisibility visibility = 4;
+  string password     = 5;   // 密码房口令 (可选)
+  int32  max_members  = 6;   // 人数上限 (<=5)
+  uint32 level_id     = 7;   // 关卡 ID (11..68, 房主选定; 0/缺省=默认 11)
+  uint32 difficulty   = 8;   // 难度 (0/1/2)
+}
+
+// 创建结果 (Room -> 客户端)
+message PBRoomCreateRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = ROOM_CREATE_RSP (2)
+  PbID.ErrorCode error_code = 3;
+  int64  room_id            = 4;
+  repeated PBRoomMember members = 5;
+}
+
+// 拉房间列表 (客户端 -> Room)
+message PBRoomListReq {
+  uint32 big_type     = 1;
+  uint32 small_type   = 2;   // = ROOM_LIST_REQ (3)
+}
+
+// 房间列表 (Room -> 客户端)
+message PBRoomListRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = ROOM_LIST_RSP (4)
+  PbID.ErrorCode error_code = 3;
+  repeated PBRoomInfo rooms = 4;
+}
+
+// 加入房间 (客户端 -> Room)
+message PBRoomJoinReq {
+  uint32 big_type     = 1;
+  uint32 small_type   = 2;   // = ROOM_JOIN_REQ (5)
+  int64  room_id      = 3;
+  string password     = 4;   // 密码房口令 (可选)
+}
+
+// 加入结果 (Room -> 客户端)
+message PBRoomJoinRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = ROOM_JOIN_RSP (6)
+  PbID.ErrorCode error_code = 3;
+  int64  room_id            = 4;
+  repeated PBRoomMember members = 5;
+}
+
+// 离开房间 (客户端 -> Room)
+message PBRoomLeaveReq {
+  uint32 big_type     = 1;
+  uint32 small_type   = 2;   // = ROOM_LEAVE_REQ (7)
+  int64  room_id      = 3;
+}
+
+// 离开结果 (Room -> 客户端)
+message PBRoomLeaveRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = ROOM_LEAVE_RSP (8)
+  PbID.ErrorCode error_code = 3;
+  int64  room_id            = 4;
+}
+
+// 准备/取消准备 (客户端 -> Room)
+message PBRoomReadyReq {
+  uint32 big_type     = 1;
+  uint32 small_type   = 2;   // = ROOM_READY_REQ (9)
+  int64  room_id      = 3;
+  bool   ready        = 4;
+}
+
+// 准备结果 (Room -> 客户端)
+message PBRoomReadyRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = ROOM_READY_RSP (10)
+  PbID.ErrorCode error_code = 3;
+  int64  room_id            = 4;
+}
+
+// 踢人 (客户端 -> Room)
+message PBRoomKickReq {
+  uint32 big_type         = 1;
+  uint32 small_type       = 2;   // = ROOM_KICK_REQ (11)
+  int64  room_id          = 3;
+  int64  target_player_id = 4;
+}
+
+// 踢人结果 (Room -> 客户端)
+message PBRoomKickRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = ROOM_KICK_RSP (12)
+  PbID.ErrorCode error_code = 3;
+  int64  room_id            = 4;
+}
+
+// 转让房主 (客户端 -> Room)
+message PBRoomTransferReq {
+  uint32 big_type       = 1;
+  uint32 small_type     = 2;   // = ROOM_TRANSFER_REQ (13)
+  int64  room_id        = 3;
+  int64  new_owner_id   = 4;
+}
+
+// 开始战斗 (客户端 -> Room)
+message PBRoomStartReq {
+  uint32 big_type     = 1;
+  uint32 small_type   = 2;   // = ROOM_START_REQ (14)
+  int64  room_id      = 3;
+}
+
+// 开始结果 (Room -> 客户端)
+message PBRoomStartRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = ROOM_START_RSP (15)
+  PbID.ErrorCode error_code = 3;
+  int64  room_id            = 4;
+  int64  battle_id          = 5;   // 创建的战斗房 ActorID
+  string auth_key           = 6;   // 进入战斗的验证 Key
+}
+
+// 房间信息变更通知 (Room -> 成员)
+message PBRoomInfoNtf {
+  uint32 big_type     = 1;
+  uint32 small_type   = 2;   // = ROOM_INFO_NTF (16)
+  PBRoomInfo room     = 3;
+}
+
+// 成员列表变更通知 (Room -> 成员)
+message PBRoomMemberNtf {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = ROOM_MEMBER_NTF (17)
+  int64  room_id            = 3;
+  repeated PBRoomMember members = 4;
+}

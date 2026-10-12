@@ -1,0 +1,39 @@
+// =============================================================================
+// player_item.proto — 玩家物品子模块
+// 演示「一级 actor 类型 + 子模块二级类型」唯一确定一个 proto 文件:
+//   一级 = AT_PLAYER (201), 二级子模块 = 物品 (Item)
+// =============================================================================
+syntax = "proto3";
+
+package PbPlayerItem;
+
+import "msg/msg_id.proto";
+import "msg/account.proto";
+
+// ---------------------------------------------------------------------------
+// 消息 ID 枚举 (SmallType 路由字段取值)
+// ---------------------------------------------------------------------------
+enum PlayerItemMsgId {
+  PLAYER_ITEM_MSG_NONE      = 0;
+  PLAYER_ITEM_MSG_LIST_REQ  = 1;   // 请求物品列表
+  PLAYER_ITEM_MSG_LIST_RSP  = 2;   // 返回物品列表
+}
+
+// ---------------------------------------------------------------------------
+// 协议定义
+// ---------------------------------------------------------------------------
+
+// 物品列表请求
+message PBMsgItemListReq {
+  uint32 big_type   = 1;   // = AT_PLAYER (201)
+  uint32 small_type = 2;   // = PLAYER_ITEM_MSG_LIST_REQ (1)
+  int64  player_id  = 3;
+}
+
+// 物品列表响应
+message PBMsgItemListRsp {
+  uint32 big_type   = 1;   // = AT_PLAYER (201)
+  uint32 small_type = 2;   // = PLAYER_ITEM_MSG_LIST_RSP (2)
+  PbID.ErrorCode error_code = 3;
+  repeated PbAccount.ItemInfo items = 4;
+}

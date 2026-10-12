@@ -6,24 +6,25 @@
 #include "xDatabaseDefine.h"
 #include "tService/tThridServiceConfig.h"
 
-
 class COperatorMgr : public xSingleton<COperatorMgr>
 {
 public:
-    COperatorMgr() {}
-    ~COperatorMgr() {}
+    COperatorMgr()
+    {
+    }
+    ~COperatorMgr()
+    {
+    }
 
 public:
-    DatabaseOpNode* PopOperatorNode();
-    void PushOperatorNode(DatabaseOpNode* pNode);
+    DatabaseOpNode *PopOperatorNode();
+    void PushOperatorNode(DatabaseOpNode *pNode);
 
 public:
-    bool ConnectToDB(const ThridMysqlConfig& stConfig);
-    bool PushOperator(DatabaseOpNode* pNode);
+    bool ConnectToDB(const ThridMysqlConfig &stConfig);
+    bool PushOperator(DatabaseOpNode *pNode);
 
 public:
-
-
 private:
     xObjPool<DatabaseOpNode> m_pDatabaseOpNodePool;
 

@@ -37,7 +37,6 @@ typedef unsigned long long  uint64;
 
 // Domain type aliases (from xDefine.h)
 typedef uint64 ServiceID;
-typedef int32  ActorType;
 typedef int64  ActorID;
 
 // Net types
@@ -58,11 +57,26 @@ ACCEPT_LUA_NUMBER(uint16, lua_tonumber)
 ACCEPT_LUA_NUMBER(uint32, lua_tonumber)
 ACCEPT_LUA_NUMBER(uint64, lua_tonumber)
 // Also apply to domain typedefs (SWIG may not resolve through all typedef chains)
-ACCEPT_LUA_NUMBER(ActorType, lua_tonumber)
 ACCEPT_LUA_NUMBER(ActorID,   lua_tonumber)
 ACCEPT_LUA_NUMBER(ServiceID, lua_tonumber)
 ACCEPT_LUA_NUMBER(NetCID,    lua_tonumber)
 ACCEPT_LUA_NUMBER(GateID,    lua_tonumber)
+
+// ---------------------------------------------------------------------------
+// 返回值精度: SWIG 对 long long (int64/uint64) 的默认 out typemap 用 lua_pushnumber
+// (double), 超过 2^53 丢精度 —— 战斗哈希 (uint64 位重解释为 int64) 会被四舍五入到
+// 最近 double (近 6.4e18 处 ULP≈1024), 导致「两端哈希失配」被 double 舍入掩盖成相等
+// (M1-c 冒烟实测: 客户端 hash=...1400, 服务器 log 里读回 ...1168, 差值 232 即舍入)。
+// 改为 push 成 Lua 整数 (lua_pushinteger, lua_Integer 64 位) 保持逐位精确。
+// 注意: 只覆盖 int64/uint64 (int32 等 SWIG 默认已 push 整数, 无需改)。
+%typemap(out) int64 {
+    lua_pushinteger(L, (lua_Integer)$1);
+    SWIG_arg++;
+}
+%typemap(out) uint64 {
+    lua_pushinteger(L, (lua_Integer)$1);
+    SWIG_arg++;
+}
 
 // =========================================================================
 // Utility: convert Lua number → Lua integer
@@ -73,7 +87,7 @@ ACCEPT_LUA_NUMBER(GateID,    lua_tonumber)
 // integer before passing it to SWIG-wrapped C++ functions.
 //
 // Usage from Lua:
-//   local t = luacore.toint32(100)      -- → integer suitable for ActorType
+//   local t = luacore.toint32(100)      -- → integer suitable for actor type
 //   local id = luacore.toint64(myid)    -- → integer suitable for ActorID
 // =========================================================================
 %inline %{

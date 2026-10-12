@@ -7,13 +7,14 @@
 // =============================================================================
 // EThridServiceType — 第三方服务类型枚举
 // =============================================================================
-enum EThridServiceType {
-    EST_None        = 0,
-    EST_MySql       = 1,   // MySQL 数据库
-    EST_Redis       = 2,   // Redis 缓存
-    EST_Log         = 3,   // 日志系统
-    EST_Xml         = 4,   // XML 配置/解析
-    EST_PlatformMgr = 5,   // 平台管理 (链路追踪/上报)
+enum EThridServiceType
+{
+    EST_None = 0,
+    EST_MySql = 1,       // MySQL 数据库
+    EST_Redis = 2,       // Redis 缓存
+    EST_Log = 3,         // 日志系统
+    EST_Xml = 4,         // XML 配置/解析
+    EST_PlatformMgr = 5, // 平台管理 (链路追踪/上报)
     EST_Max
 };
 
@@ -22,54 +23,60 @@ enum EThridServiceType {
 // =============================================================================
 
 // MySQL 配置
-struct ThridMysqlConfig {
+struct ThridMysqlConfig
+{
     std::string title;
-    std::string host     = "127.0.0.1";
-    int         port     = 3306;
+    std::string host = "127.0.0.1";
+    int32 port = 3306;
     std::string dbName;
     std::string user;
     std::string passwd;
-    int         poolCount = 10;
+    int32 poolCount = 10;
 };
 
-// Redis 配置
-struct ThridRedisConfig {
+// Redis 配置 (Redis Cluster: host/port 为集群 seed 节点)
+struct ThridRedisConfig
+{
     std::string title;
-    std::string host     = "127.0.0.1";
-    int         port     = 6379;
-    int         max_conn = 20;           // 最大连接数
-    int         conn_timeout = 3;        // 连接超时(秒)
-    int         retry_interval = 1;      // 重试间隔(秒)
-    std::string user;
-    std::string authkey;
+    std::string host = "127.0.0.1"; // 集群 seed 节点 host
+    int32 port = 7000;              // 集群 seed 节点 port
+    int32 max_conn = 20;            // 连接池大小 (每节点)
+    int32 conn_timeout = 3;         // 连接超时(秒)
+    int32 retry_interval = 1;       // 弃用 (redis++ 内部自动重路由)
+    std::string user;               // ACL 用户 (空 = default)
+    std::string authkey;            // 密码 (注入连接)
 };
 
 // Log 配置
-struct ThridLogConfig {
-    std::string logPath  = "logs/";
+struct ThridLogConfig
+{
+    std::string logPath = "logs/";
     std::string logLevel = "info";
 };
 
 // XML 配置
-struct ThridXmlConfig {
+struct ThridXmlConfig
+{
     std::string configPath = "config/server.xml";
 };
 
 // 平台管理器配置
-struct ThridPlatformMgrConfig {
-    std::string platform      = "dev";
-    std::string traceEndpoint;   // 链路追踪上报地址
-    bool        enableTrace   = false;
+struct ThridPlatformMgrConfig
+{
+    std::string platform = "dev";
+    std::string traceEndpoint; // 链路追踪上报地址
+    bool enableTrace = false;
 };
 
 // =============================================================================
 // ThridServiceConfig — 统一配置容器
 // 每个 ThridService 实例只用对应自身类型的配置字段
 // =============================================================================
-struct ThridServiceConfig {
-    ThridMysqlConfig        mysql;
-    ThridRedisConfig        redis;
-    ThridLogConfig          log;
-    ThridXmlConfig          xml;
-    ThridPlatformMgrConfig  platform;
+struct ThridServiceConfig
+{
+    ThridMysqlConfig mysql;
+    ThridRedisConfig redis;
+    ThridLogConfig log;
+    ThridXmlConfig xml;
+    ThridPlatformMgrConfig platform;
 };

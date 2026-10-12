@@ -2,29 +2,36 @@
 #include "xRedis/RedisMgr.h"
 #include "xLog/xLog.h"
 
-bool tServiceRedis::Init(const ThridServiceConfig& cfg) {
-    if (m_bInitialized) {
+bool tServiceRedis::Init(const ThridServiceConfig &cfg)
+{
+    if (m_bInitialized)
+    {
         XWRN("[tServiceRedis] Already initialized: %s", m_strName.c_str());
         return true;
     }
 
     auto redisCfg = cfg.redis;
-    redisCfg.title = m_strName;
+    // 保留配置里的池标题 (e.g. "actor_cache"), 供 si_redis_* / xRecordMgr 按标题取池
 
-    if (!CRedisPoolMgr::getMe().ConnectToRedis(redisCfg)) {
-        XERR("[tServiceRedis] Init failed: %s @ %s:%d",
-             m_strName.c_str(), redisCfg.host.c_str(), redisCfg.port);
+    if (!CRedisPoolMgr::getMe().ConnectToRedis(redisCfg))
+    {
+        XERR("[tServiceRedis] Init failed: %s @ %s:%d", m_strName.c_str(), redisCfg.host.c_str(),
+             redisCfg.port);
         return false;
     }
 
     m_bInitialized = true;
-    XLOG("[tServiceRedis] Init ok: %s @ %s:%d (max_conn=%d)",
-         m_strName.c_str(), redisCfg.host.c_str(), redisCfg.port, redisCfg.max_conn);
+    XLOG("[tServiceRedis] Init ok: %s @ %s:%d (max_conn=%d)", m_strName.c_str(),
+         redisCfg.host.c_str(), redisCfg.port, redisCfg.max_conn);
     return true;
 }
 
-void tServiceRedis::Release() {
-    if (!m_bInitialized) return;
+void tServiceRedis::Release()
+{
+    if (!m_bInitialized)
+    {
+        return;
+    }
 
     // CRedisPoolMgr 连接池由析构清理
     XLOG("[tServiceRedis] Released: %s", m_strName.c_str());
