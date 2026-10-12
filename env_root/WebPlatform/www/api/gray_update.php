@@ -154,13 +154,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $r->rpush(PROC_UPDATE_LOG_KEY, time() . '|process|panel-roll|' . $version);
 
     // 同步滚动该类型进程 (batch_size=1 时每进程约 5s, 面板更新按钮会阻塞数秒)
-    $script = 'E:\RealServer\bin\windows\gray_roll.ps1';
+    // 关键: 必须 < NUL > file 2>&1 重定向三路句柄。否则 powershell 从 PHP exec 启动时
+    // stdout/stderr 走管道, .NET CLR 初始化会卡 ~30s; 且 gray_roll.ps1 里 Start-Process
+    // 拉起的子进程会继承 exec 的 stdout 管道, 导致 exec() 永不返回(面板卡死)。
+    $script  = 'E:\RealServer\bin\windows\gray_roll.ps1';
+    $logFile = $binDir . '\logs\gray_roll_' . $type . '.log';
+    @mkdir(dirname($logFile), 0777, true);
     $cmd = 'powershell -NoProfile -ExecutionPolicy Bypass -File ' . $script
-         . ' -Type ' . $type . ' -ExePath ' . $versionedExe . ' -BatchSize ' . $batchSize;
+         . ' -Type ' . $type . ' -ExePath ' . $versionedExe . ' -BatchSize ' . $batchSize
+         . ' < NUL > ' . $logFile . ' 2>&1';
     $output = [];
     $code = 0;
-    exec($cmd . ' 2>&1', $output, $code);
-    $outputText = implode("\n", $output);
+    exec($cmd, $output, $code);
+    $outputText = @file_get_contents($logFile);
+    if ($outputText === false) {
+        $outputText = implode("\n", $output);
+    }
 
     if ($code !== 0) {
         redis_hash_set($r, PROC_UPDATE_CFG_KEY, [
