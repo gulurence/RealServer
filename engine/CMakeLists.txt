@@ -329,17 +329,16 @@ else()
 endif()
 
 # ============================================================
-# 部署: 每次编译后自动把产物拷贝到 bin/windows (Windows 运行部署目录),
-# 与 bin/windows/start_cluster.ps1 的 $exe 路径一致。copy_if_different:
-# 内容相同则跳过, 避免无谓的 mtime 抖动 (运行中的旧 exe 因被占用会报错)。
+# 部署: 每次编译后把产物拷贝到 bin/windows (Windows 运行部署目录),
+# 与 bin/windows/start_cluster.ps1 的 $exe 路径一致。best-effort:
+# 运行中的旧 exe 被占用时静默跳过, 不阻断 CI 构建。
+# 灰度发布实际走 build_ci.ps1 -> api/build.php -> releases/RealServer_<version>.exe。
 # ============================================================
 if(MSVC)
     add_custom_command(TARGET RealServer POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_SOURCE_DIR}/bin/windows"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "$<TARGET_FILE:RealServer>"
-                "${CMAKE_SOURCE_DIR}/bin/windows/RealServer.exe"
-        COMMENT "Deploying RealServer.exe -> bin/windows")
+        COMMAND powershell -NoProfile -Command "Copy-Item '$<TARGET_FILE:RealServer>' '${CMAKE_SOURCE_DIR}/bin/windows/RealServer.exe' -Force -ErrorAction SilentlyContinue"
+        COMMENT "Deploying RealServer.exe -> bin/windows (best-effort)")
 endif()
 
 # Lua 5.4 is compiled directly from source into the engine
