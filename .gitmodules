@@ -7,3 +7,6 @@
 [submodule "third_part/redis-plus-plus"]
 	path = third_part/redis-plus-plus
 	url = https://github.com/sewenew/redis-plus-plus.git
+[submodule "third_part/nats.c-main"]
+	path = third_part/nats.c-main
+	url = https://github.com/nats-io/nats.c.git
