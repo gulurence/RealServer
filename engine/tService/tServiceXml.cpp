@@ -12,8 +12,9 @@ bool tServiceXml::Init(const ThridServiceConfig &cfg)
 
     // CServerConfig 由 main.cpp 在早期加载。
     // 如果尚未加载，则在此处按配置路径加载。
+    // 注意: 已加载时绝不能重复 Load, 否则会覆盖 main.cpp 解析的命令行参数 (--type/--name/--port/--platform)。
     const auto &xc = cfg.xml;
-    if (!xc.configPath.empty())
+    if (!xc.configPath.empty() && !CServerConfig::getMe().IsLoaded())
     {
         if (!CServerConfig::getMe().Load(xc.configPath))
         {

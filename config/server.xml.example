@@ -10,7 +10,7 @@
 
     <!-- ================================================================= -->
     <!-- Process Identity                                                   -->
-    <!--   type: 100=Gate 101=Login 102=Global 201=Game                    -->
+    <!--   type: 100=Gate 101=Login 102=Global 201=Game 202=Battle           -->
     <!--   name: unique process name within the cluster                    -->
     <!--   host: IP to bind gRPC server (0.0.0.0 = all interfaces)         -->
     <!--   machine: physical machine id (NodeManager 分配; 单机=0)          -->
@@ -20,7 +20,7 @@
     <!-- ================================================================= -->
     <!-- Hosted Actors — 进程类型 → 可承载 Actor 类型列表                  -->
     <!-- 缺失或某类型未声明时, 回退到 xProcessDefine.h 硬编码 switch        -->
-    <!-- Actor type: 100=Gate 101=Login 102=Friend 103=Room 104=Chat       -->
+    <!-- Actor type: 100=Gate 101=Login 102=Friend 103=Room 104=Chat 105=Config -->
     <!--             201=Player 203=Battle 204=Spectator                   -->
     <!-- ================================================================= -->
     <hosted-actors>
@@ -32,13 +32,16 @@
         </process>
         <process type="102">
             <actor type="102"/>   <!-- Friend -->
-            <actor type="103"/>   <!-- Room -->
             <actor type="104"/>   <!-- Chat -->
-            <actor type="204"/>   <!-- Spectator -->
+            <actor type="105"/>   <!-- Config -->
         </process>
         <process type="201">
             <actor type="201"/>   <!-- Player -->
+            <actor type="103"/>   <!-- Room -->
+        </process>
+        <process type="202">
             <actor type="203"/>   <!-- Battle -->
+            <actor type="204"/>   <!-- Spectator -->
         </process>
     </hosted-actors>
 

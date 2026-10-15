@@ -106,7 +106,9 @@ std::string si_pb_room_kick_rsp(int32 errorCode, int64 roomId) {
     rsp.set_room_id(roomId);
     std::string out; rsp.SerializeToString(&out); return out;
 }
-std::string si_pb_room_start_rsp(int32 errorCode, int64 roomId, int64 battleId, const std::string& authKey) {
+std::string si_pb_room_start_rsp(int32 errorCode, int64 roomId, int64 battleId,
+                                 const std::string& authKey, const std::string& hostIp = "",
+                                 int32 port = 0) {
     PbRoom::PBRoomStartRsp rsp;
     rsp.set_big_type(PbID::AT_ROOM);
     rsp.set_small_type(PbRoom::ROOM_START_RSP);
@@ -114,6 +116,8 @@ std::string si_pb_room_start_rsp(int32 errorCode, int64 roomId, int64 battleId, 
     rsp.set_room_id(roomId);
     rsp.set_battle_id(battleId);
     rsp.set_auth_key(authKey);
+    rsp.set_host_ip(hostIp);
+    rsp.set_port(port);
     std::string out; rsp.SerializeToString(&out); return out;
 }
 std::string si_pb_room_info_ntf(int64 roomId, int64 ownerId, int32 mode, int32 visibility,

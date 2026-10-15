@@ -14,7 +14,7 @@ xEngine.ActorType = {
     -- Friend 好友 (102, 单例, Global 进程)
     FRIEND = 102,
 
-    -- Room 房间 (103, 单例, Global 进程)
+    -- Room 房间 (103, 单例, Game 进程)
     ROOM = 103,
 
     -- Chat 聊天 (104, 单例, Global 进程)
@@ -26,9 +26,9 @@ xEngine.ActorType = {
     -- Player 玩家 (201, Game 进程)
     PLAYER = 201,
 
-    -- Battle 战斗 (203, 多实例, Game 进程)
+    -- Battle 战斗 (203, 多实例, Battle 进程)
     BATTLE = 203,
 
-    -- Spectator 观战 (204, 多实例, Global 进程)
+    -- Spectator 观战 (204, 多实例, Battle 进程)
     SPECTATOR = 204,
 }

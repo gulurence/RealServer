@@ -367,6 +367,8 @@ bool CActorMgr::Install(EActorType i32Type, ActorID i64ID)
     if (i32Type == EActorType_APlayer && i64ID != 0)
     {
         CPlayerActorIndex::instance()->Register((int64)i64ID, (uint64)i64ID);
+        // PlayerActor 总数 +1 (登录排队限流数据源, Login 进程据此判定是否排队)
+        CPlayerActorIndex::instance()->IncrPlayerCount();
     }
 
     // ===================================================================
@@ -503,6 +505,8 @@ bool CActorMgr::UnInstall(EActorType i32Type, ActorID i64ID)
     if (i32Type == EActorType_APlayer && i64ID != 0)
     {
         CPlayerActorIndex::instance()->Deregister((int64)i64ID);
+        // PlayerActor 总数 -1 (与 Install 的 IncrPlayerCount 对应)
+        CPlayerActorIndex::instance()->DecrPlayerCount();
     }
 
     // ===================================================================

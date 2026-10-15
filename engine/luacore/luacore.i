@@ -44,10 +44,12 @@
 #include "xRpc/RpcFrame.h"
 #include "xCluster/xLinkManager.h"
 #include "xCluster/CActorLoadManager.h"
+#include "xCluster/xProcessManager.h"
 #include "xGm/GmCommandMgr.h"
 #include "rpc/actor_mgr.pb.h"
 #include "luacore/LuaVM.h"
 #include "xNet/CNetGateway.h"
+#include "xNet/CNetBattleGateway.h"
 #include "msg/login.pb.h"
 #include "msg/account.pb.h"
 #include "msg/msg_id.pb.h"
@@ -335,6 +337,37 @@ void si_schedule_after(int32 actorType, int64 actorID, int32 delayMs, int32 msgI
 int32 si_actor_mgr_get_instance_count() {
     return (int32)CActorMgr::instance()->GetInstanceCount();
 }
+
+// 灰度迁移: 枚举本地 (type) 的全部实例 id (id≠0, 排除原型/单例), 逗号 join 返回。
+// 走 C++ CActorMgr 权威索引 (而非 Lua localInstances), 覆盖经 RPC 路径创建的
+// Player/Battle (其 delegate 实例不在 localInstances 里)。
+std::string si_actor_mgr_local_ids(int32 actorType) {
+    std::vector<CActor *> actors = CActorMgr::instance()->GetByType((EActorType)actorType);
+    std::string out;
+    for (size_t i = 0; i < actors.size(); ++i) {
+        if (!actors[i]) continue;
+        ActorID id = actors[i]->GetActorID();
+        if (id == 0) continue;
+        if (!out.empty()) out += ",";
+        out += std::to_string((int64)id);
+    }
+    return out;
+}
+
+// 灰度迁移: 调本地 CLuaActor delegate 的 data_save(saveType) 落 Redis。
+// 必须在调度线程 (DispatchSync) 内调用, 与业务 on_msg 串行不并发触碰 lua_State。
+bool si_actor_data_save(int32 actorType, int64 actorID, int32 saveType) {
+    CActor *actor = CActorMgr::instance()->Find((EActorType)actorType, actorID);
+    if (!actor) return false;
+    return ((CLuaActor *)actor)->CallDataSave(saveType);
+}
+
+// 灰度迁移: 调本地 CLuaActor delegate 的 data_load() 从 Redis 恢复内存态。
+bool si_actor_data_load(int32 actorType, int64 actorID) {
+    CActor *actor = CActorMgr::instance()->Find((EActorType)actorType, actorID);
+    if (!actor) return false;
+    return ((CLuaActor *)actor)->CallDataLoad();
+}
 %}
 
 // ================================================================
@@ -418,6 +451,135 @@ bool si_redis_zadd(const std::string& key, int64 score, const std::string& membe
         return false;
     }
     return pCli->ZAdd(key, score, member) == REDIS_OK;
+}
+
+// SADD — 集合插入 (下线列表 offline:players / 灰度迁移持久实例索引 actor:index:*)
+bool si_redis_sadd(const std::string& key, const std::string& member) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) {
+        XERR("[si_redis_sadd] no Redis client for pool 'actor_cache'");
+        return false;
+    }
+    return pCli->SAdd(key, member) == REDIS_OK;
+}
+
+// SREM — 集合删除 (下线列表 offline:players 移除 / 索引注销)
+bool si_redis_srem(const std::string& key, const std::string& member) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) {
+        XERR("[si_redis_srem] no Redis client for pool 'actor_cache'");
+        return false;
+    }
+    return pCli->SRem(key, member) == REDIS_OK;
+}
+
+// SMEMBERS — 集合全量读, 逗号 join 成字符串返回 (避免 std::vector 跨 SWIG 边界,
+// 成员均为整数 id 不含逗号, 安全)。供下线列表/灰度迁移恢复扫描用。
+std::string si_redis_smembers(const std::string& key) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return "";
+    std::vector<std::string> members;
+    if (pCli->SMembers(key, members) != REDIS_OK) return "";
+    std::string out;
+    for (size_t i = 0; i < members.size(); ++i)
+    {
+        if (i > 0) out += ",";
+        out += members[i];
+    }
+    return out;
+}
+
+// --- 计数器 / 哈希 / 列表 (登录排队 + 账户 session 同步) ---
+
+// INCR — 返回自增后的值 (Redis 不可用返回 -1)
+int64 si_redis_incr(const std::string& key) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return -1;
+    return pCli->Incr(key);
+}
+
+// DECR — 返回自减后的值 (Redis 不可用返回 -1)
+int64 si_redis_decr(const std::string& key) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return -1;
+    return pCli->Decr(key);
+}
+
+// HGET — 读哈希单字段 (字符串值, 不存在/失败返回空串)
+std::string si_redis_hget(const std::string& hash, const std::string& field) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return "";
+    std::string out;
+    if (pCli->HGet(hash, field, out) != REDIS_OK) return "";
+    return out;
+}
+
+// HSET — 写哈希单字段 (字符串值)
+bool si_redis_hset(const std::string& hash, const std::string& field, const std::string& value) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return false;
+    return pCli->HSet(hash, field, value) == REDIS_OK;
+}
+
+// RPUSH — 列表尾插 (登录排队 FIFO 入队)
+bool si_redis_rpush(const std::string& key, const std::string& value) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return false;
+    return pCli->RPush(key, value) == REDIS_OK;
+}
+
+// LPOP — 列表头弹出 (空/失败返回空串)
+std::string si_redis_lpop(const std::string& key) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return "";
+    std::string out;
+    if (pCli->LPop(key, out) != REDIS_OK) return "";
+    return out;
+}
+
+// LPOS — member 在列表中的位置 (1 起; 0=不在队中)。内部 LRANGE 全量扫描,
+// 避免 std::vector 跨越 SWIG 边界 (登录排队算位置用)。
+int64 si_redis_lpos(const std::string& key, const std::string& member) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return 0;
+    std::vector<std::string> out;
+    if (pCli->LRange(key, 0, -1, out) != REDIS_OK) return 0;
+    for (size_t i = 0; i < out.size(); ++i)
+    {
+        if (out[i] == member) return (int64)(i + 1);
+    }
+    return 0;
+}
+
+// LLEN — 列表长度 (Redis 不可用返回 -1)
+int64 si_redis_llen(const std::string& key) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return -1;
+    return pCli->LLen(key);
+}
+
+// SETNXEX — SET key value NX EX ttl (每账号登录短锁, 返回 true 仅当抢锁成功)
+bool si_redis_setnxex(const std::string& key, const std::string& value, int64 ttlSec) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return false;
+    return pCli->SetNXEx(key, value, ttlSec) == REDIS_OK;
+}
+
+// EXPIRE — 设置 key TTL (session 续期)
+bool si_redis_expire(const std::string& key, int64 ttlSec) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return false;
+    return pCli->Expire(key, ttlSec) == REDIS_OK;
+}
+
+// 本进程进程 ID (CProcessManager 启动时分配的唯一进程 ID, session 记录 gate/login 进程用)
+int64 si_get_process_id() {
+    return (int64)CProcessManager::getMe().GetProcessId();
+}
+
+// 定向踢下线: 发 RPC_METHOD_KICK 到指定 Gate 进程断开连接 cid (同账号并发登录踢旧)
+void si_gate_kick_cid(int64 processId, int64 cid) {
+    CActorLoadManager::instance()->KickGateClient(processId, cid);
 }
 
 // --- DB operations (async fire-and-forget via COperatorMgr) ---
@@ -530,9 +692,17 @@ bool si_rpc_send(int64 targetActorID, const std::string& msgData) {
 // gRPC 退役。供 Lua xEngine.ActorCreator 跨进程创建/查询/卸载 Actor。
 // ================================================================
 
-// RPC CreateActor — 统一 Actor 负载管理器挑最低负载承载进程, 远程创建 Actor
-bool si_actor_creator_rpc_create(int32 actorType, int64 actorID) {
-    return CActorLoadManager::instance()->CreateActorRemote((EActorType)actorType, actorID);
+// RPC CreateActor — 统一 Actor 负载管理器挑最低负载承载进程, 远程创建 Actor。
+// 成功返回承载进程的 "ip:listenPort" 串 (供客户端直连 Battle), 失败返回空串。
+std::string si_actor_creator_rpc_create(int32 actorType, int64 actorID) {
+    std::string ip;
+    uint16 port = 0;
+    if (!CActorLoadManager::instance()->CreateActorRemote((EActorType)actorType, actorID, &ip,
+                                                          &port))
+    {
+        return "";
+    }
+    return ip + ":" + std::to_string(port);
 }
 
 // RPC FindActor — 查询承载进程是否存在该 Actor
@@ -593,6 +763,13 @@ std::string si_net_body_wrap(int64 id, const std::string& payload) {
     for (int i = 0; i < 8; ++i) out.push_back((char)((id >> (8 * i)) & 0xFF));
     out.append(payload);
     return out;
+}
+
+// 战斗进程直连下发: 把 payload (客户端可接收的业务 protobuf) 直接推给指定玩家的
+// 直连连接 (CNetBattleGateway::SendToPlayer)。替换旧 si_push_rpc (经 Gate 转发)。
+// 无会话 (玩家已断线) 时返回 false。
+bool si_battle_gateway_send(int64 playerId, const std::string& payload) {
+    return CNetBattleGateway::instance()->SendToPlayer(playerId, payload);
 }
 %}
 
@@ -706,6 +883,34 @@ std::string si_pb_login_rsp_roles(int32 errorCode, int64 accountId, const std::s
     return out;
 }
 
+// --- PBMsgLoginRsp 解码 (error_code + account_id, Gate 登录后记录 session 用) ---
+int32 si_pb_login_rsp_error_code(const std::string& body) {
+    PbLogin::PBMsgLoginRsp rsp;
+    if (!rsp.ParseFromString(body)) return 0;
+    return (int32)rsp.error_code();
+}
+int64 si_pb_login_rsp_account_id(const std::string& body) {
+    PbLogin::PBMsgLoginRsp rsp;
+    if (!rsp.ParseFromString(body)) return 0;
+    return rsp.account().account_id();
+}
+
+// --- PBMsgLoginRsp 编码 (登录排队: error_code=ERR_QUEUED + 位置/预计等待秒) ---
+std::string si_pb_login_rsp_queued(int64 accountId, int64 queuePosition, int32 estWaitSec) {
+    PbLogin::PBMsgLoginRsp rsp;
+    rsp.set_big_type(PbID::AT_LOGIN);
+    rsp.set_small_type(PbLogin::LOGIN_MSG_LOGIN_RSP);
+    rsp.set_error_code(PbID::ERR_QUEUED);
+    rsp.set_queue_position(queuePosition);
+    rsp.set_queue_est_wait(estWaitSec);
+    if (accountId > 0) {
+        rsp.mutable_account()->set_account_id(accountId);
+    }
+    std::string out;
+    rsp.SerializeToString(&out);
+    return out;
+}
+
 // --- PBMsgSelectRoleRsp 编码 (error_code + player 信息) ---
 std::string si_pb_select_role_rsp(int32 errorCode, int64 playerId, int64 roleId,
                                   const std::string& roleName) {
@@ -716,6 +921,28 @@ std::string si_pb_select_role_rsp(int32 errorCode, int64 playerId, int64 roleId,
     rsp.mutable_player()->set_player_id(playerId);
     rsp.mutable_player()->set_role_id(roleId);
     rsp.mutable_player()->set_role_name(roleName);
+    std::string out;
+    rsp.SerializeToString(&out);
+    return out;
+}
+
+// --- PBMsgSelectRoleRsp 编码 (含战斗重连信息: battle_id/host/auth, 断线重连用) ---
+std::string si_pb_select_role_rsp_battle(int32 errorCode, int64 playerId, int64 roleId,
+                                         const std::string& roleName,
+                                         int64 battleId, const std::string& battleHost,
+                                         const std::string& battleAuth) {
+    PbLogin::PBMsgSelectRoleRsp rsp;
+    rsp.set_big_type(PbID::AT_LOGIN);
+    rsp.set_small_type(PbLogin::LOGIN_MSG_SELECT_ROLE_RSP);
+    rsp.set_error_code((PbID::ErrorCode)errorCode);
+    rsp.mutable_player()->set_player_id(playerId);
+    rsp.mutable_player()->set_role_id(roleId);
+    rsp.mutable_player()->set_role_name(roleName);
+    if (battleId > 0) {
+        rsp.set_battle_id(battleId);
+        rsp.set_battle_host(battleHost);
+        rsp.set_battle_auth(battleAuth);
+    }
     std::string out;
     rsp.SerializeToString(&out);
     return out;
@@ -732,6 +959,17 @@ std::string si_pb_create_role_rsp(int32 errorCode, int64 roleId, const std::stri
     rsp.mutable_role()->set_role_name(roleName);
     rsp.mutable_role()->set_level(level);
     rsp.mutable_role()->set_job(job);
+    std::string out;
+    rsp.SerializeToString(&out);
+    return out;
+}
+
+// --- PBMsgLogoutRsp 编码 (error_code; 登出请求无业务字段无需解码) ---
+std::string si_pb_logout_rsp(int32 errorCode) {
+    PbLogin::PBMsgLogoutRsp rsp;
+    rsp.set_big_type(PbID::AT_LOGIN);
+    rsp.set_small_type(PbLogin::LOGIN_MSG_LOGOUT_RSP);
+    rsp.set_error_code((PbID::ErrorCode)errorCode);
     std::string out;
     rsp.SerializeToString(&out);
     return out;

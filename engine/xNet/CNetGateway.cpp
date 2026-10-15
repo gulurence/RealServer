@@ -4,9 +4,12 @@
 #include "xActor/Actor.h"
 #include "xActor/ActorMsgId.h"
 #include "xCluster/xProcessDefine.h"
+#include "xRedis/RedisMgr.h"
+#include "xRedis/RedisCli.h"
 #include "xLog/xLog.h"
 
 #include <cstring>
+#include <cstdlib>
 #include <functional>
 
 // =============================================================================
@@ -112,6 +115,9 @@ CNetGateway::~CNetGateway()
 
 bool CNetGateway::Start(uint16 u16Port)
 {
+    // 取得本进程 Redis 连接 (actor_cache 池): 读限流阈值
+    m_pRedis = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+
     // 配置网络回调：包到达后回调 OnPackage 完成路由
     m_stConfig.strServiceName = "ActorNet";
     m_stConfig.strHost = "0.0.0.0";
@@ -175,6 +181,15 @@ void CNetGateway::OnPackage(void *, tcp_socket &, uint64 u64CID, NetPackageShare
         return;
     }
 
+    // 单连接消息接收限流: 先刷新阈值 (5s TTL 缓存读 Redis), 超限直接断开连接
+    GetRateLimitPerSec();
+    if (!m_limiter.Consume(u64CID))
+    {
+        XWRN("[NetGateway] rate limit exceeded cid=%lld — disconnect", u64CID);
+        Kick(u64CID);
+        return;
+    }
+
     // 帧: [uint32 u32Len][protobuf body]
     const uint8 *pData = pPackage->pPackageData;
     uint32 u32BodyLen = 0;
@@ -222,6 +237,7 @@ void CNetGateway::OnPackage(void *, tcp_socket &, uint64 u64CID, NetPackageShare
 
 void CNetGateway::OnDisconnect(void *, NetCID u64CID)
 {
+    m_limiter.Reset(u64CID);
     XLOG("[NetGateway] client disconnect cid=%lld", u64CID);
 
     // 断线是重要事件: 投递到 Gate Actor 统一收尾 (连接映射清理 / 房间按离开处理 /
@@ -284,4 +300,60 @@ bool CNetGateway::SendToCID(NetCID u64CID, const std::string &strBody)
                    }
                });
     return true;
+}
+
+int32 CNetGateway::GetRateLimitPerSec()
+{
+    std::lock_guard<std::mutex> lock(m_rateMutex);
+    auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration<double>(now - m_lastRateRead).count() < 5.0)
+    {
+        return m_rateLimitPerSec;
+    }
+    m_lastRateRead = now;
+
+    int32 rate = 0;
+    if (m_pRedis)
+    {
+        std::string val;
+        if (m_pRedis->HGet("cluster:config:cluster", "gate_rate_limit_per_sec", val) == REDIS_OK
+            && !val.empty())
+        {
+            rate = (int32)atoi(val.c_str());
+        }
+    }
+    if (rate != m_rateLimitPerSec)
+    {
+        m_rateLimitPerSec = rate;
+        m_limiter.SetRate(rate);
+        XLOG("[NetGateway] rate limit refreshed: %d msg/sec (%s)", rate,
+             rate <= 0 ? "unlimited" : "enforced");
+    }
+    return m_rateLimitPerSec;
+}
+
+void CNetGateway::Kick(NetCID u64CID)
+{
+    std::shared_ptr<tcp_socket> sock;
+    {
+        std::lock_guard<std::mutex> lock(m_sockMutex);
+        auto it = m_mapSockets.find(u64CID);
+        if (it == m_mapSockets.end() || !it->second)
+        {
+            return;
+        }
+        sock = it->second;
+    }
+    auto executor = sock->get_executor();
+    asio::post(executor,
+               [sock]()
+               {
+                   asio::error_code ec;
+                   sock->close(ec);
+               });
+}
+
+void CNetGateway::KickConnection(NetCID u64CID)
+{
+    Kick(u64CID);
 }

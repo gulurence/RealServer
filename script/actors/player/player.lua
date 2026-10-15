@@ -9,6 +9,7 @@ local PlayerMsgId = {
     LEAVE_RSP        = 4,
     SAVE_LOADOUT_REQ = 5,   -- 客户端上传/持久化枪械载具 (服务端权威)
     DISCONNECT       = 6,   -- 服务端内部断线通知 (Gate 转发, 非客户端消息)
+    ONLINE           = 7,   -- 服务端内部上线通知 (Login 转发, 置 online=1)
 }
 
 local PlayerClass = xEngine.Class.define("Player", xEngine.ActorBase)
@@ -61,6 +62,8 @@ function PlayerClass:on_rpc_forward(wrapped)
         return self:handle_save_loadout(senderId, payload)
     elseif smallType == PlayerMsgId.DISCONNECT then
         return self:handle_disconnect(senderId)
+    elseif smallType == PlayerMsgId.ONLINE then
+        return self:handle_online(senderId)
     end
 
     xEngine.Log.warn("[Player] unknown small_type=%d", smallType)
@@ -75,6 +78,17 @@ function PlayerClass:handle_disconnect(senderId)
         luacore.si_set_state_field(me, "online", "0")
     end
     xEngine.Log.info("[Player] disconnect: player=%d -> offline", self._actor_id)
+    return ""
+end
+
+-- 上线收尾 (Login 转发): 玩家在线状态落 frame 状态字段 online=1 (心跳落盘, 可恢复)。
+-- 与 handle_disconnect 配对, 补全 online 字段的 1/0 双向语义。
+function PlayerClass:handle_online(senderId)
+    local me = luacore.si_actor_mgr_find(AT.PLAYER, self._actor_id)
+    if me then
+        luacore.si_set_state_field(me, "online", "1")
+    end
+    xEngine.Log.info("[Player] online: player=%d -> online", self._actor_id)
     return ""
 end
 

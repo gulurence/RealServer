@@ -27,6 +27,7 @@ enum ERpcMethodId : uint32
     RPC_METHOD_LOGIN = 4,           // 登录链路转发 (Gate→Login, body=[op][payload])
     RPC_METHOD_FORWARD_ACTOR = 5, // 通用业务转发 (Gate→任意 Actor, body=[type][id][payload])
     RPC_METHOD_PUSH = 6, // 服务器主动推送 (业务Actor→Gate, body=[int64 playerId][payload])
+    RPC_METHOD_KICK = 7, // 定向踢下线 (Login→Gate, body=[int64 cid], 按连接 CID 断开客户端)
 };
 
 // 单帧最大 body 长度 (安全上限)

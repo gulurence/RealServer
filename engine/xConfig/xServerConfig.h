@@ -89,6 +89,12 @@ class CServerConfig : public xSingleton<CServerConfig>
 public:
     bool Load(const std::string &strXmlPath);
 
+    // 是否已加载过 server.xml (防止 tServiceXml 等模块重复 Load 覆盖命令行参数)
+    bool IsLoaded() const
+    {
+        return m_bLoaded;
+    }
+
     const ServerXmlConfig &GetConfig() const
     {
         return m_stConfig;
@@ -116,4 +122,5 @@ private:
 
 private:
     ServerXmlConfig m_stConfig;
+    bool m_bLoaded = false;
 };

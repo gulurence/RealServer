@@ -1,6 +1,6 @@
 # 房间模块（RoomActor）
 
-> 里程碑 M3 · Actor 类型 `EActorType_ARoom=103`（Global 进程）
+> 里程碑 M3 · Actor 类型 `EActorType_ARoom=103`（Game 进程）
 
 ## 定位
 

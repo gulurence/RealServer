@@ -121,8 +121,11 @@ bool CServiceDiscovery::Heartbeat()
     int64 now = (int64)time(nullptr);
     m_stSelfInfo.lastHeartbeat = now;
     const std::string &key = m_stSelfInfo.RedisKey();
-    bool ok = RedisHSet(key, "heartbeat", std::to_string(now))
-              && RedisHSet(key, "state", std::to_string(m_stSelfInfo.state));
+    // 自愈: 心跳每拍重写完整进程信息 (含 name/ip/port/authkey/id/type/host 等身份字段),
+    // 而非只写 heartbeat/state。注册 Hash 一旦因 TTL 过期 / Redis 重启 / 手动清理被删,
+    // 后续心跳若只重建运行时字段, 身份字段会永久丢失 → WebPlatform 节点显示 name 缺失
+    // (回退 "process-<id>"), 且 NodeManager::FindChildVersion 读不到 name 致灰度判断静默跳过。
+    bool ok = WriteProcessInfo(m_stSelfInfo);
     // 自愈索引: 每拍重新 SAdd 本进程 ID 到类型集合 (SAdd 幂等, 开销可忽略), 防止索引
     // 成员在边缘场景下丢失。
     RedisSAdd("cluster:process:by_type:" + std::to_string((int32)m_stSelfInfo.type),
@@ -180,6 +183,19 @@ bool CServiceDiscovery::UpdateState(EProcessState newState)
 }
 
 // =============================================================================
+// 更新排空标志
+// =============================================================================
+bool CServiceDiscovery::UpdateDrain(bool draining)
+{
+    m_stSelfInfo.draining = draining;
+    if (!m_bRedisAvailable)
+    {
+        return true;
+    }
+    return RedisHSet(m_stSelfInfo.RedisKey(), "drain", draining ? "1" : "0");
+}
+
+// =============================================================================
 // 版本 / 内容版本上报 (P9 灰度更新)
 // =============================================================================
 bool CServiceDiscovery::UpdateVersion(const std::string &version, const std::string &contentVersion)
@@ -201,6 +217,15 @@ std::string CServiceDiscovery::GetContentUpdateConfig(const std::string &field)
         return "";
     }
     return RedisHGet("cluster:update:content:config", field);
+}
+
+std::string CServiceDiscovery::GetConfig(const std::string &field)
+{
+    if (!m_bRedisAvailable)
+    {
+        return "";
+    }
+    return RedisHGet("cluster:config:cluster", field);
 }
 
 // =============================================================================
@@ -263,7 +288,8 @@ std::vector<ProcessInfo> CServiceDiscovery::GetAllRunningPeers()
     }
 
     static const EProcessType kProcessTypes[]
-        = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame};
+        = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame,
+           EProcessType_PBattle};
     for (EProcessType t : kProcessTypes)
     {
         auto peers = DiscoverPeers(t);
@@ -307,6 +333,33 @@ bool CServiceDiscovery::IsProcessRunning(EProcessType type, int64 processId) con
     return false;
 }
 
+bool CServiceDiscovery::IsHeartbeatStale(const ProcessInfo &info) const
+{
+    // 心跳超时判定: 与 DiscoverPeers / IsProcessRunning 共用 kStaleHeartbeatSeconds 阈值。
+    // 用于 CLinkManager 在选择/刷新对端时过滤「心跳已停但 state 仍为 Running」的僵尸进程。
+    int64 now = (int64)time(nullptr);
+    return (now - info.lastHeartbeat) > kStaleHeartbeatSeconds;
+}
+
+// =============================================================================
+// Actor 身份解析 — 读 cluster:actor:{type}:{id} 的 pid 字段 (存的是集群 processId)
+// =============================================================================
+int64 CServiceDiscovery::GetActorProcessId(EActorType type, int64 actorId)
+{
+    if (!m_bRedisAvailable || actorId == 0)
+    {
+        return 0;
+    }
+    std::string key
+        = "cluster:actor:" + std::to_string((int32)type) + ":" + std::to_string(actorId);
+    std::string pidStr = RedisHGet(key, "pid");
+    if (pidStr.empty())
+    {
+        return 0;
+    }
+    return atoll(pidStr.c_str());
+}
+
 // =============================================================================
 // 链接规则
 // =============================================================================
@@ -317,7 +370,8 @@ std::map<EProcessType, std::vector<EProcessType>> CServiceDiscovery::GetLinkRule
     {
         // 默认规则: 所有类型互联
         std::vector<EProcessType> all
-            = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame};
+            = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame,
+               EProcessType_PBattle};
         for (auto &t : all)
         {
             rules[t] = all;
@@ -326,7 +380,8 @@ std::map<EProcessType, std::vector<EProcessType>> CServiceDiscovery::GetLinkRule
     }
     // 从 Redis Hash 读取
     static const EProcessType kProcessTypes[]
-        = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame};
+        = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame,
+           EProcessType_PBattle};
     for (EProcessType t : kProcessTypes)
     {
         std::string val = RedisHGet("cluster:link:rules", std::to_string((int32)t));
@@ -426,6 +481,7 @@ bool CServiceDiscovery::WriteProcessInfo(const ProcessInfo &info)
     hset("host", info.host);
     hset("ip", info.ip);
     hset("port", std::to_string(info.rpcPort));
+    hset("listen_port", std::to_string(info.listenPort));
     hset("load", std::to_string(info.loadScore));
     hset("machine_id", std::to_string(info.machineId));
     hset("cpu_percent", std::to_string(info.cpuPercent));
@@ -436,6 +492,8 @@ bool CServiceDiscovery::WriteProcessInfo(const ProcessInfo &info)
     hset("state", std::to_string((int32)info.state));
     hset("heartbeat", std::to_string(info.lastHeartbeat));
     hset("authkey", info.authKey);
+    hset("os_pid", std::to_string(info.osPid));
+    hset("drain", info.draining ? "1" : "0");
     return ok;
 }
 
@@ -464,6 +522,7 @@ ProcessInfo CServiceDiscovery::ReadProcessInfo(const std::string &redisKey)
     info.host = hget("host");
     info.ip = hget("ip");
     info.rpcPort = (uint16)atoi(hget("port").c_str());
+    info.listenPort = (uint16)atoi(hget("listen_port").c_str());
     info.loadScore = atoi(hget("load").c_str());
     info.machineId = (uint32)atoi(hget("machine_id").c_str());
     info.cpuPercent = atoi(hget("cpu_percent").c_str());
@@ -474,6 +533,8 @@ ProcessInfo CServiceDiscovery::ReadProcessInfo(const std::string &redisKey)
     info.state = (EProcessState)atoi(hget("state").c_str());
     info.lastHeartbeat = atoll(hget("heartbeat").c_str());
     info.authKey = hget("authkey");
+    info.osPid = atoll(hget("os_pid").c_str());
+    info.draining = hget("drain") == "1";
     return info;
 }
 

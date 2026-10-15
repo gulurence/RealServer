@@ -92,5 +92,38 @@ $total = array_sum(array_map('count', $actorsByType));
                 </section>
             <?php endforeach; ?>
         <?php endif; ?>
+
+        <?php if ($r !== null): ?>
+            <?php $offline = $r->smembers('offline:players'); ?>
+            <section class="node-group">
+                <h2>下线列表 <span class="dim">(offline:players)</span></h2>
+                <?php if (!is_array($offline) || count($offline) === 0): ?>
+                    <div class="empty">暂无离线玩家</div>
+                <?php else: ?>
+                    <table class="table table-vcenter">
+                        <thead>
+                            <tr><th>Role ID</th><th>昵称</th><th>等级</th><th>下线时间</th><th>离线时长</th></tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($offline as $pid):
+                            $pidStr = (string)$pid;
+                            $attrs  = explode('|', (string)$r->get("player:{$pidStr}"));
+                            $name   = $attrs[0] ?? '';
+                            $level  = $attrs[1] ?? '';
+                            $ts     = (int)$r->get("offline:ts:{$pidStr}");
+                        ?>
+                            <tr>
+                                <td class="mono"><?= esc($pidStr) ?></td>
+                                <td><?= esc($name) ?></td>
+                                <td><?= esc($level) ?></td>
+                                <td class="mono"><?= $ts > 0 ? date('Y-m-d H:i:s', $ts) : '—' ?></td>
+                                <td><?= $ts > 0 ? esc(fmt_alive((string)$ts)) : '—' ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </section>
+        <?php endif; ?>
 <?php live_region_end(); ?>
 <?php layout_footer(); ?>

@@ -20,12 +20,12 @@ enum ActorType {
   AT_GATE      = 100;   // 网关 Actor (客户端接入)
   AT_LOGIN     = 101;   // 登录 Actor (登录/选角逻辑)
   AT_FRIEND    = 102;   // 好友 Actor (Global 进程, 单例)
-  AT_ROOM      = 103;   // 房间 Actor (Global 进程, 单例)
+  AT_ROOM      = 103;   // 房间 Actor (Game 进程, 单例)
   AT_CHAT      = 104;   // 聊天 Actor (Global 进程, 单例)
   AT_CONFIG    = 105;   // 配置 Actor (Global 进程, 单例, 配置热更拉取/推送)
   AT_PLAYER    = 201;   // 玩家 Actor (由 Game 进程承载)
-  AT_BATTLE    = 203;   // 战斗 Actor (Game 进程, 多实例)
-  AT_SPECTATOR = 204;   // 观战 Actor (Game 进程, 多实例)
+  AT_BATTLE    = 203;   // 战斗 Actor (Battle 进程, 多实例)
+  AT_SPECTATOR = 204;   // 观战 Actor (Battle 进程, 多实例)
 }
 
 // ---------------------------------------------------------------------------
@@ -51,5 +51,6 @@ enum ErrorCode {
   ERR_NO_AVAILABLE_PROCESS  = 1004;   // 无可用 Game 进程承载 Player
   ERR_ROLE_NAME_TAKEN       = 1005;   // 角色名已被占用
   ERR_ROLE_NAME_INVALID     = 1006;   // 角色名非法 (空/超长/含非法字符)
+  ERR_QUEUED                = 1007;   // 登录排队中 (集群 PlayerActor 满载)
   ERR_INTERNAL              = 1999;   // 内部错误
 }

@@ -43,11 +43,17 @@ public:
     // 更新进程状态
     bool UpdateState(EProcessState newState);
 
+    // 设置/清除排空标志 (Battle 进程级排空: 排空期间不再接受新 Actor 分配)
+    bool UpdateDrain(bool draining);
+
     // 更新进程版本 + 游戏内容版本 (P9 灰度更新: 心跳时上报)
     bool UpdateVersion(const std::string &version, const std::string &contentVersion);
 
     // 读 cluster:update:content:config 字段 (游戏内容灰度配置)
     std::string GetContentUpdateConfig(const std::string &field);
+
+    // 读 cluster:config:cluster 字段 (运行时全局配置, 如限流阈值等)
+    std::string GetConfig(const std::string &field);
 
     // 注销 (进程关闭时调用)
     bool Deregister();
@@ -65,6 +71,15 @@ public:
 
     // 检查进程是否在运行
     bool IsProcessRunning(EProcessType type, int64 processId) const;
+
+    // 检查进程心跳是否已超时 (超过 kStaleHeartbeatSeconds 未心跳即视为已死)。
+    // 供 CLinkManager 在选择/刷新对端时按心跳新鲜度过滤 (与 DiscoverPeers 一致)。
+    bool IsHeartbeatStale(const ProcessInfo &info) const;
+
+    // 按 (type, id) 解析 Actor 所在进程的集群 processId (读 cluster:actor:{type}:{id} 的 pid 字段)。
+    // 供 CActorLoadManager 按身份路由 (灰度迁移后 Actor 落到新进程, 消息须追到新进程执行)。
+    // 未注册/已驱逐(迁移中)返回 0。
+    int64 GetActorProcessId(EActorType type, int64 actorId);
 
     // ---- 链接规则 ----
 

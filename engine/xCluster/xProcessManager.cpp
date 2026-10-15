@@ -6,6 +6,7 @@
 #include "xActor/CActorReportMgr.h"
 #include "CActorLoadManager.h"
 #include "CPlayerActorIndex.h"
+#include "xActorId.h"
 #include "xGm/GmCommandMgr.h"
 #include "xRedis/RedisCli.h"
 #include "xBase/xSysInfo.h"
@@ -53,6 +54,7 @@ bool CProcessManager::CreateProcess(EProcessType type, const std::string &name, 
         XLOG("[ProcessManager] Redis generated process ID: %lld", id);
     }
     m_stSelfInfo.processId = id;
+    m_stSelfInfo.osPid = (int64)xActorId::GetOsPid(); // 供编排脚本把 OS pid 映射到 processId
 
     // 注册即标记心跳为「现在」, 避免刚注册、尚未发出首次心跳(5s)时被对端
     // 心跳过滤误判为下线 (僵尸进程过滤见 DiscoverPeers)。
@@ -114,6 +116,7 @@ bool CProcessManager::CreateProcessFromFallback(const ClusterLocalConfig &localC
 
     m_stSelfInfo.type = localCfg.type;
     m_stSelfInfo.processId = localCfg.processId;
+    m_stSelfInfo.osPid = (int64)xActorId::GetOsPid();
     m_stSelfInfo.processName = localCfg.name;
     m_stSelfInfo.state = EProcessState_Starting;
     m_stSelfInfo.host = cfg.process.host.empty() ? "127.0.0.1" : cfg.process.host;

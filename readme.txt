@@ -25,8 +25,9 @@ RealServer 是一个单可执行文件、多进程部署的分布式游戏服务
     ----  --------  --------------------------------------------
     100   Gate      网关 Actor（客户端接入 / 消息转发）
     101   Login     登录 Actor（账号校验 / 会话）
-    102   Global    好友 / 房间 / 聊天 / 配置 / 观战 Actor
-    201   Game      玩家 / 战斗 Actor
+    102   Global    好友 / 聊天 / 配置 Actor
+    201   Game      玩家 / 房间 Actor
+    202   Battle    战斗 / 观战 Actor（帧同步, 客户端直连）
 
 Actor 类型（EActorType）：
 
@@ -34,7 +35,7 @@ Actor 类型（EActorType）：
     AConfig(105)  APlayer(201)  ABattle(203)  ASpectator(204)
 
 每类进程预留 50 个 RPC 端口区间：
-    Gate 50551-50600 / Login 50601-50650 / Game 50651-50700 / Global 50751-50800
+    Gate 50551-50600 / Login 50601-50650 / Game 50651-50700 / Battle 50701-50750 / Global 50751-50800
 
 
 ================================================================================
@@ -137,4 +138,4 @@ Linux（依赖系统包 + CMake 源码编译 nats/redis++）：
   * 单例用 xSingleton<T>；文件名与类名同名（xActor/Actor.h ↔ CActor）。
   * 类名前缀：x*（框架基类）、C*（管理器）、t*（第三方服务）。
 
-    xService/ 为遗留/未完成的旧骨架，当前标准是 tService/，新代码勿依赖前者。
+

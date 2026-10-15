@@ -59,11 +59,15 @@ inline constexpr PBRoomStartRsp::Impl_::Impl_(
       : auth_key_(
             &::google::protobuf::internal::fixed_address_empty_string,
             ::_pbi::ConstantInitialized()),
+        host_ip_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
         big_type_{0u},
         small_type_{0u},
         room_id_{::int64_t{0}},
         battle_id_{::int64_t{0}},
         error_code_{static_cast< ::PbID::ErrorCode >(0)},
+        port_{0},
         _cached_size_{0} {}
 
 template <typename>
@@ -793,6 +797,8 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::PbRoom::PBRoomStartRsp, _impl_.room_id_),
         PROTOBUF_FIELD_OFFSET(::PbRoom::PBRoomStartRsp, _impl_.battle_id_),
         PROTOBUF_FIELD_OFFSET(::PbRoom::PBRoomStartRsp, _impl_.auth_key_),
+        PROTOBUF_FIELD_OFFSET(::PbRoom::PBRoomStartRsp, _impl_.host_ip_),
+        PROTOBUF_FIELD_OFFSET(::PbRoom::PBRoomStartRsp, _impl_.port_),
         PROTOBUF_FIELD_OFFSET(::PbRoom::PBRoomInfoNtf, _impl_._has_bits_),
         PROTOBUF_FIELD_OFFSET(::PbRoom::PBRoomInfoNtf, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -840,8 +846,8 @@ static const ::_pbi::MigrationSchema
         {175, -1, -1, sizeof(::PbRoom::PBRoomTransferReq)},
         {187, -1, -1, sizeof(::PbRoom::PBRoomStartReq)},
         {198, -1, -1, sizeof(::PbRoom::PBRoomStartRsp)},
-        {212, 223, -1, sizeof(::PbRoom::PBRoomInfoNtf)},
-        {226, -1, -1, sizeof(::PbRoom::PBRoomMemberNtf)},
+        {214, 225, -1, sizeof(::PbRoom::PBRoomInfoNtf)},
+        {228, -1, -1, sizeof(::PbRoom::PBRoomMemberNtf)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::PbRoom::_PBRoomMember_default_instance_._instance,
@@ -912,30 +918,30 @@ const char descriptor_table_protodef_msg_2froom_2eproto[] ABSL_ATTRIBUTE_SECTION
     "g_type\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022\017\n\007room"
     "_id\030\003 \001(\003\022\024\n\014new_owner_id\030\004 \001(\003\"G\n\016PBRoo"
     "mStartReq\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsmall_typ"
-    "e\030\002 \001(\r\022\017\n\007room_id\030\003 \001(\003\"\221\001\n\016PBRoomStart"
+    "e\030\002 \001(\r\022\017\n\007room_id\030\003 \001(\003\"\260\001\n\016PBRoomStart"
     "Rsp\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001("
     "\r\022#\n\nerror_code\030\003 \001(\0162\017.PbID.ErrorCode\022\017"
     "\n\007room_id\030\004 \001(\003\022\021\n\tbattle_id\030\005 \001(\003\022\020\n\010au"
-    "th_key\030\006 \001(\t\"W\n\rPBRoomInfoNtf\022\020\n\010big_typ"
-    "e\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022 \n\004room\030\003 \001("
-    "\0132\022.PbRoom.PBRoomInfo\"o\n\017PBRoomMemberNtf"
-    "\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022\017"
-    "\n\007room_id\030\003 \001(\003\022%\n\007members\030\004 \003(\0132\024.PbRoo"
-    "m.PBRoomMember*\361\002\n\tRoomMsgId\022\021\n\rROOM_MSG"
-    "_NONE\020\000\022\023\n\017ROOM_CREATE_REQ\020\001\022\023\n\017ROOM_CRE"
-    "ATE_RSP\020\002\022\021\n\rROOM_LIST_REQ\020\003\022\021\n\rROOM_LIS"
-    "T_RSP\020\004\022\021\n\rROOM_JOIN_REQ\020\005\022\021\n\rROOM_JOIN_"
-    "RSP\020\006\022\022\n\016ROOM_LEAVE_REQ\020\007\022\022\n\016ROOM_LEAVE_"
-    "RSP\020\010\022\022\n\016ROOM_READY_REQ\020\t\022\022\n\016ROOM_READY_"
-    "RSP\020\n\022\021\n\rROOM_KICK_REQ\020\013\022\021\n\rROOM_KICK_RS"
-    "P\020\014\022\025\n\021ROOM_TRANSFER_REQ\020\r\022\022\n\016ROOM_START"
-    "_REQ\020\016\022\022\n\016ROOM_START_RSP\020\017\022\021\n\rROOM_INFO_"
-    "NTF\020\020\022\023\n\017ROOM_MEMBER_NTF\020\021*D\n\010RoomMode\022\022"
-    "\n\016ROOM_MODE_NONE\020\000\022\021\n\rROOM_MODE_PVE\020\001\022\021\n"
-    "\rROOM_MODE_PVP\020\002*e\n\016RoomVisibility\022\021\n\rRO"
-    "OM_VIS_NONE\020\000\022\023\n\017ROOM_VIS_PUBLIC\020\001\022\024\n\020RO"
-    "OM_VIS_PRIVATE\020\002\022\025\n\021ROOM_VIS_PASSWORD\020\003b"
-    "\006proto3"
+    "th_key\030\006 \001(\t\022\017\n\007host_ip\030\007 \001(\t\022\014\n\004port\030\010 "
+    "\001(\005\"W\n\rPBRoomInfoNtf\022\020\n\010big_type\030\001 \001(\r\022\022"
+    "\n\nsmall_type\030\002 \001(\r\022 \n\004room\030\003 \001(\0132\022.PbRoo"
+    "m.PBRoomInfo\"o\n\017PBRoomMemberNtf\022\020\n\010big_t"
+    "ype\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022\017\n\007room_id"
+    "\030\003 \001(\003\022%\n\007members\030\004 \003(\0132\024.PbRoom.PBRoomM"
+    "ember*\361\002\n\tRoomMsgId\022\021\n\rROOM_MSG_NONE\020\000\022\023"
+    "\n\017ROOM_CREATE_REQ\020\001\022\023\n\017ROOM_CREATE_RSP\020\002"
+    "\022\021\n\rROOM_LIST_REQ\020\003\022\021\n\rROOM_LIST_RSP\020\004\022\021"
+    "\n\rROOM_JOIN_REQ\020\005\022\021\n\rROOM_JOIN_RSP\020\006\022\022\n\016"
+    "ROOM_LEAVE_REQ\020\007\022\022\n\016ROOM_LEAVE_RSP\020\010\022\022\n\016"
+    "ROOM_READY_REQ\020\t\022\022\n\016ROOM_READY_RSP\020\n\022\021\n\r"
+    "ROOM_KICK_REQ\020\013\022\021\n\rROOM_KICK_RSP\020\014\022\025\n\021RO"
+    "OM_TRANSFER_REQ\020\r\022\022\n\016ROOM_START_REQ\020\016\022\022\n"
+    "\016ROOM_START_RSP\020\017\022\021\n\rROOM_INFO_NTF\020\020\022\023\n\017"
+    "ROOM_MEMBER_NTF\020\021*D\n\010RoomMode\022\022\n\016ROOM_MO"
+    "DE_NONE\020\000\022\021\n\rROOM_MODE_PVE\020\001\022\021\n\rROOM_MOD"
+    "E_PVP\020\002*e\n\016RoomVisibility\022\021\n\rROOM_VIS_NO"
+    "NE\020\000\022\023\n\017ROOM_VIS_PUBLIC\020\001\022\024\n\020ROOM_VIS_PR"
+    "IVATE\020\002\022\025\n\021ROOM_VIS_PASSWORD\020\003b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_msg_2froom_2eproto_deps[1] =
     {
@@ -945,7 +951,7 @@ static ::absl::once_flag descriptor_table_msg_2froom_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_msg_2froom_2eproto = {
     false,
     false,
-    2767,
+    2798,
     descriptor_table_protodef_msg_2froom_2eproto,
     "msg/room.proto",
     &descriptor_table_msg_2froom_2eproto_once,
@@ -5938,6 +5944,7 @@ inline PROTOBUF_NDEBUG_INLINE PBRoomStartRsp::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
     const Impl_& from, const ::PbRoom::PBRoomStartRsp& from_msg)
       : auth_key_(arena, from.auth_key_),
+        host_ip_(arena, from.host_ip_),
         _cached_size_{0} {}
 
 PBRoomStartRsp::PBRoomStartRsp(
@@ -5957,9 +5964,9 @@ PBRoomStartRsp::PBRoomStartRsp(
                offsetof(Impl_, big_type_),
            reinterpret_cast<const char *>(&from._impl_) +
                offsetof(Impl_, big_type_),
-           offsetof(Impl_, error_code_) -
+           offsetof(Impl_, port_) -
                offsetof(Impl_, big_type_) +
-               sizeof(Impl_::error_code_));
+               sizeof(Impl_::port_));
 
   // @@protoc_insertion_point(copy_constructor:PbRoom.PBRoomStartRsp)
 }
@@ -5967,6 +5974,7 @@ inline PROTOBUF_NDEBUG_INLINE PBRoomStartRsp::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility,
     ::google::protobuf::Arena* arena)
       : auth_key_(arena),
+        host_ip_(arena),
         _cached_size_{0} {}
 
 inline void PBRoomStartRsp::SharedCtor(::_pb::Arena* arena) {
@@ -5974,9 +5982,9 @@ inline void PBRoomStartRsp::SharedCtor(::_pb::Arena* arena) {
   ::memset(reinterpret_cast<char *>(&_impl_) +
                offsetof(Impl_, big_type_),
            0,
-           offsetof(Impl_, error_code_) -
+           offsetof(Impl_, port_) -
                offsetof(Impl_, big_type_) +
-               sizeof(Impl_::error_code_));
+               sizeof(Impl_::port_));
 }
 PBRoomStartRsp::~PBRoomStartRsp() {
   // @@protoc_insertion_point(destructor:PbRoom.PBRoomStartRsp)
@@ -5987,6 +5995,7 @@ inline void PBRoomStartRsp::SharedDtor(MessageLite& self) {
   this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   ABSL_DCHECK(this_.GetArena() == nullptr);
   this_._impl_.auth_key_.Destroy();
+  this_._impl_.host_ip_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -6026,15 +6035,15 @@ const ::google::protobuf::internal::ClassData* PBRoomStartRsp::GetClassData() co
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<3, 6, 0, 38, 2> PBRoomStartRsp::_table_ = {
+const ::_pbi::TcParseTable<3, 8, 0, 53, 2> PBRoomStartRsp::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
-    6, 56,  // max_field_number, fast_idx_mask
+    8, 56,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294967232,  // skipmap
+    4294967040,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    6,  // num_field_entries
+    8,  // num_field_entries
     0,  // num_aux_entries
     offsetof(decltype(_table_), field_names),  // no aux_entries
     _class_data_.base(),
@@ -6044,7 +6053,9 @@ const ::_pbi::TcParseTable<3, 6, 0, 38, 2> PBRoomStartRsp::_table_ = {
     ::_pbi::TcParser::GetTable<::PbRoom::PBRoomStartRsp>(),  // to_prefetch
     #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
   }, {{
-    {::_pbi::TcParser::MiniParse, {}},
+    // int32 port = 8;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBRoomStartRsp, _impl_.port_), 63>(),
+     {64, 63, 0, PROTOBUF_FIELD_OFFSET(PBRoomStartRsp, _impl_.port_)}},
     // uint32 big_type = 1;
     {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBRoomStartRsp, _impl_.big_type_), 63>(),
      {8, 63, 0, PROTOBUF_FIELD_OFFSET(PBRoomStartRsp, _impl_.big_type_)}},
@@ -6063,7 +6074,9 @@ const ::_pbi::TcParseTable<3, 6, 0, 38, 2> PBRoomStartRsp::_table_ = {
     // string auth_key = 6;
     {::_pbi::TcParser::FastUS1,
      {50, 63, 0, PROTOBUF_FIELD_OFFSET(PBRoomStartRsp, _impl_.auth_key_)}},
-    {::_pbi::TcParser::MiniParse, {}},
+    // string host_ip = 7;
+    {::_pbi::TcParser::FastUS1,
+     {58, 63, 0, PROTOBUF_FIELD_OFFSET(PBRoomStartRsp, _impl_.host_ip_)}},
   }}, {{
     65535, 65535
   }}, {{
@@ -6085,12 +6098,19 @@ const ::_pbi::TcParseTable<3, 6, 0, 38, 2> PBRoomStartRsp::_table_ = {
     // string auth_key = 6;
     {PROTOBUF_FIELD_OFFSET(PBRoomStartRsp, _impl_.auth_key_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // string host_ip = 7;
+    {PROTOBUF_FIELD_OFFSET(PBRoomStartRsp, _impl_.host_ip_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // int32 port = 8;
+    {PROTOBUF_FIELD_OFFSET(PBRoomStartRsp, _impl_.port_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt32)},
   }},
   // no aux_entries
   {{
-    "\25\0\0\0\0\0\10\0"
+    "\25\0\0\0\0\0\10\7\0\0\0\0\0\0\0\0"
     "PbRoom.PBRoomStartRsp"
     "auth_key"
+    "host_ip"
   }},
 };
 
@@ -6102,9 +6122,10 @@ PROTOBUF_NOINLINE void PBRoomStartRsp::Clear() {
   (void) cached_has_bits;
 
   _impl_.auth_key_.ClearToEmpty();
+  _impl_.host_ip_.ClearToEmpty();
   ::memset(&_impl_.big_type_, 0, static_cast<::size_t>(
-      reinterpret_cast<char*>(&_impl_.error_code_) -
-      reinterpret_cast<char*>(&_impl_.big_type_)) + sizeof(_impl_.error_code_));
+      reinterpret_cast<char*>(&_impl_.port_) -
+      reinterpret_cast<char*>(&_impl_.big_type_)) + sizeof(_impl_.port_));
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
@@ -6166,6 +6187,21 @@ PROTOBUF_NOINLINE void PBRoomStartRsp::Clear() {
             target = stream->WriteStringMaybeAliased(6, _s, target);
           }
 
+          // string host_ip = 7;
+          if (!this_._internal_host_ip().empty()) {
+            const std::string& _s = this_._internal_host_ip();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "PbRoom.PBRoomStartRsp.host_ip");
+            target = stream->WriteStringMaybeAliased(7, _s, target);
+          }
+
+          // int32 port = 8;
+          if (this_._internal_port() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt32ToArrayWithField<8>(
+                    stream, this_._internal_port(), target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -6196,6 +6232,11 @@ PROTOBUF_NOINLINE void PBRoomStartRsp::Clear() {
               total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
                                               this_._internal_auth_key());
             }
+            // string host_ip = 7;
+            if (!this_._internal_host_ip().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_host_ip());
+            }
             // uint32 big_type = 1;
             if (this_._internal_big_type() != 0) {
               total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
@@ -6221,6 +6262,11 @@ PROTOBUF_NOINLINE void PBRoomStartRsp::Clear() {
               total_size += 1 +
                             ::_pbi::WireFormatLite::EnumSize(this_._internal_error_code());
             }
+            // int32 port = 8;
+            if (this_._internal_port() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
+                  this_._internal_port());
+            }
           }
           return this_.MaybeComputeUnknownFieldsSize(total_size,
                                                      &this_._impl_._cached_size_);
@@ -6237,6 +6283,9 @@ void PBRoomStartRsp::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::
   if (!from._internal_auth_key().empty()) {
     _this->_internal_set_auth_key(from._internal_auth_key());
   }
+  if (!from._internal_host_ip().empty()) {
+    _this->_internal_set_host_ip(from._internal_host_ip());
+  }
   if (from._internal_big_type() != 0) {
     _this->_impl_.big_type_ = from._impl_.big_type_;
   }
@@ -6251,6 +6300,9 @@ void PBRoomStartRsp::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::
   }
   if (from._internal_error_code() != 0) {
     _this->_impl_.error_code_ = from._impl_.error_code_;
+  }
+  if (from._internal_port() != 0) {
+    _this->_impl_.port_ = from._impl_.port_;
   }
   _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -6269,9 +6321,10 @@ void PBRoomStartRsp::InternalSwap(PBRoomStartRsp* PROTOBUF_RESTRICT other) {
   ABSL_DCHECK_EQ(arena, other->GetArena());
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.auth_key_, &other->_impl_.auth_key_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.host_ip_, &other->_impl_.host_ip_, arena);
   ::google::protobuf::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(PBRoomStartRsp, _impl_.error_code_)
-      + sizeof(PBRoomStartRsp::_impl_.error_code_)
+      PROTOBUF_FIELD_OFFSET(PBRoomStartRsp, _impl_.port_)
+      + sizeof(PBRoomStartRsp::_impl_.port_)
       - PROTOBUF_FIELD_OFFSET(PBRoomStartRsp, _impl_.big_type_)>(
           reinterpret_cast<char*>(&_impl_.big_type_),
           reinterpret_cast<char*>(&other->_impl_.big_type_));

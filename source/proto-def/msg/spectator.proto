@@ -53,6 +53,8 @@ message PBSpectateEnterRsp {
   repeated PbBattle.PBBattlePlayer players = 6;  // 花名册 (与 PBBattleEnterRsp.players 同构)
   uint32 level_id           = 8;   // 本场关卡 (battle:level:{battleId} 读出)
   uint32 difficulty         = 9;   // 本场难度
+  string host_ip            = 10;  // 战斗进程直连 IP (battle:host:{battleId} 读出, 观战直连用)
+  int32  port               = 11;  // 战斗进程直连端口 (listen_port)
 }
 
 // 退出观战 (客户端 -> Spectator)

@@ -1,12 +1,14 @@
 <?php
 // =============================================================================
-// 灰度更新 — 五部分面板
+// 灰度更新 — 面板
 //
 //   1. 统计区: 进程总数 / 更新完成数 / 等待更新数 / 完成百分比
-//   2. 进程类型下拉列 (100 Gate / 101 Login / 102 Global / 201 Game)
-//   3. 版本列表框 (所选类型可用的 Jenkins 构建版本, 最新在前)
+//   2. 进程类型下拉列 (100 Gate / 101 Login / 102 Global / 201 Game / 202 Battle;
+//      「0 所有进程」列表含 Gate, 但滚动不含 Gate, 由后端 -ExcludeType 100 保证)
+//   3. 版本列表框 (Jenkins 构建版本, 最新在前)
 //   4. 进程列表框 (所选类型全部进程 + 当前版本 + 最新/旧版本说明)
 //   5. 更新按钮 (点击后按所选类型/版本/batch_size 触发灰度滚动)
+//   6. Gate 灰度更新 (页面末尾独立按钮: Gate 正常情况下不更新, 滚动时客户端直接断链)
 //
 // 数据全部来自 api/gray_update.php (session 鉴权), 前端 fetch 联动刷新。
 // =============================================================================
@@ -23,17 +25,18 @@ layout_header('灰度更新', 'gray_update');
     <div class="stat"><div class="k">完成百分比</div><div class="v" id="st-percent">—</div></div>
 </div>
 
-<!-- ===== 第二部分: 进程类型下拉列 ===== -->
+<!-- ===== 第二部分: 进程类型下拉列 (不含 Gate) ===== -->
 <div class="card">
     <div class="card-header">进程类型</div>
     <div class="card-body">
         <div class="d-flex align-items-center gap-3">
             <select id="typeSelect" class="form-select" style="max-width:280px">
+                <option value="0">0 — 所有进程</option>
                 <?php foreach (PROCESS_TYPES as $t => $n): ?>
                     <option value="<?= (int)$t ?>"><?= (int)$t ?> — <?= esc($n) ?></option>
                 <?php endforeach; ?>
             </select>
-            <span class="dim">选择进程类型后，下方版本列表 / 进程列表 / 统计联动刷新。</span>
+            <span class="dim">选择进程类型后，下方版本列表 / 进程列表 / 统计联动刷新。进程列表含 Gate；「所有进程」滚动不含 Gate（用下方独立按钮）。</span>
         </div>
     </div>
 </div>
@@ -67,8 +70,38 @@ layout_header('灰度更新', 'gray_update');
             <button id="updateBtn" class="btn btn-primary">开始灰度更新</button>
             <span id="updateMsg" class="dim"></span>
         </div>
+        <div class="d-flex align-items-center gap-3" style="margin-top:10px">
+            <label class="mb-0 d-flex align-items-center gap-2">
+                <input id="autoRefresh" type="checkbox" checked>
+                <span>自动刷新（2 秒）</span>
+            </label>
+            <span id="updateStatus" class="badge text-bg-secondary">空闲</span>
+            <span id="lastRefresh" class="dim"></span>
+        </div>
         <div class="dim" style="margin-top:10px">
-            点击后对所选类型进程，按批大小分批滚动重启到所选版本（同步执行，期间页面会阻塞数秒）。
+            点击后对所选类型进程按批大小分批滚动重启到所选版本。异步触发，页面不阻塞；滚动过程中页面自动刷新，统计/进程列表版本逐批翻转即完成。
+        </div>
+    </div>
+</div>
+
+<!-- ===== 第六部分: Gate 灰度更新 (独立按钮, 客户端直接断链) ===== -->
+<div class="card" style="border-left:3px solid #f59f00">
+    <div class="card-header">Gate 灰度更新 <span class="dim">特殊操作 — 客户端直接断链</span></div>
+    <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+            <label class="mb-0 d-flex align-items-center gap-2">
+                <span>目标版本</span>
+                <select id="gateVersionSelect" class="form-select" style="width:220px"></select>
+            </label>
+            <label class="mb-0 d-flex align-items-center gap-2">
+                <span>批大小</span>
+                <input id="gateBatchSize" type="number" class="form-control" value="1" min="1" style="width:110px">
+            </label>
+            <button id="gateUpdateBtn" class="btn btn-warning">Gate 灰度更新</button>
+            <span id="gateUpdateMsg" class="dim"></span>
+        </div>
+        <div class="dim" style="margin-top:10px">
+            Gate 正常情况下不更新。滚动 Gate 时客户端会直接断链（需重新登录），请谨慎操作。
         </div>
     </div>
 </div>
@@ -109,6 +142,22 @@ layout_header('灰度更新', 'gray_update');
         document.getElementById('st-waiting').textContent = d.stats.waiting;
         document.getElementById('st-percent').textContent = d.stats.percent + '%';
 
+        // 灰度滚动状态徽标 + 最近刷新时间
+        var st = document.getElementById('updateStatus');
+        if (d.updating) {
+            st.textContent = '滚动中…';
+            st.className = 'badge text-bg-warning';
+        } else {
+            st.textContent = '空闲';
+            st.className = 'badge text-bg-secondary';
+        }
+        if (d.now) {
+            var t = new Date(d.now * 1000);
+            var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+            document.getElementById('lastRefresh').textContent = '最近刷新 ' +
+                pad(t.getHours()) + ':' + pad(t.getMinutes()) + ':' + pad(t.getSeconds());
+        }
+
         // 版本列表框
         var prev = state.target || d.latest;
         verSel.innerHTML = '';
@@ -125,6 +174,23 @@ layout_header('灰度更新', 'gray_update');
             });
         }
         state.target = verSel.value || d.latest;
+
+        // Gate 独立按钮的版本选择器 (同一份全局构建版本列表)
+        var gateSel = document.getElementById('gateVersionSelect');
+        var gatePrev = gateSel.value || d.latest;
+        gateSel.innerHTML = '';
+        if (!d.versions.length) {
+            var go = document.createElement('option');
+            go.value = ''; go.textContent = '（暂无已构建版本）';
+            gateSel.appendChild(go);
+        } else {
+            d.versions.forEach(function (v) {
+                var go = document.createElement('option');
+                go.value = v; go.textContent = v;
+                if (v === gatePrev) go.selected = true;
+                gateSel.appendChild(go);
+            });
+        }
 
         // 进程列表框
         var box = document.getElementById('processList');
@@ -144,13 +210,14 @@ layout_header('灰度更新', 'gray_update');
             return '<tr class="' + (p.online ? 'online' : 'offline') + '">'
                 + '<td>' + escHtml(p.name) + '</td>'
                 + '<td class="mono">' + escHtml(p.id) + '</td>'
+                + '<td class="mono">' + escHtml(p.type) + ' — ' + escHtml(p.type_name || '') + '</td>'
                 + '<td class="mono">' + (p.version ? escHtml(p.version) : '—') + '</td>'
                 + '<td>' + badge + '</td>'
                 + '<td>' + online + '</td>'
                 + '</tr>';
         }).join('');
         box.innerHTML = '<table class="table table-vcenter">'
-            + '<thead><tr><th>名称</th><th>ID</th><th>当前版本</th><th>版本说明</th><th>状态</th></tr></thead>'
+            + '<thead><tr><th>名称</th><th>ID</th><th>类型</th><th>当前版本</th><th>版本说明</th><th>状态</th></tr></thead>'
             + '<tbody>' + rows + '</tbody></table>';
     }
 
@@ -169,7 +236,8 @@ layout_header('灰度更新', 'gray_update');
         if (!ver) { alert('请先在版本列表框中选择目标版本'); return; }
         var batch = document.getElementById('batchSize').value;
         if (!batch || parseInt(batch, 10) < 1) { alert('批大小必须 ≥ 1'); return; }
-        if (!confirm('确认对类型 ' + typeSel.value + ' 的进程滚动更新到 ' + ver + ' ？')) return;
+        var gateWarn = typeSel.value === '100' ? '\n⚠️ Gate 滚动期间客户端会直接断链（需重新登录）。' : '';
+        if (!confirm('确认对类型 ' + typeSel.value + ' 的进程滚动更新到 ' + ver + ' ？' + gateWarn)) return;
 
         var msg = document.getElementById('updateMsg');
         msg.textContent = '滚动中…';
@@ -184,13 +252,54 @@ layout_header('灰度更新', 'gray_update');
         })
             .then(function (r) { return r.json(); })
             .then(function (d) {
-                msg.textContent = d.ok ? '更新完成' : ('更新失败：' + (d.error || ''));
+                msg.textContent = d.ok ? '已触发，后台滚动中…' : ('更新失败：' + (d.error || ''));
                 load();
             })
             .catch(function () { msg.textContent = '请求失败'; });
     });
 
+    // Gate 独立更新按钮: 固定走 type=100, 与常规下拉滚动隔离 (客户端直接断链)。
+    document.getElementById('gateUpdateBtn').addEventListener('click', function () {
+        var ver = document.getElementById('gateVersionSelect').value;
+        if (!ver) { alert('请先选择 Gate 目标版本'); return; }
+        var batch = document.getElementById('gateBatchSize').value;
+        if (!batch || parseInt(batch, 10) < 1) { alert('批大小必须 ≥ 1'); return; }
+        if (!confirm('确认将 Gate 滚动更新到 ' + ver + ' ？\nGate 滚动期间客户端会直接断链（需重新登录）。')) return;
+
+        var msg = document.getElementById('gateUpdateMsg');
+        msg.textContent = '滚动中…';
+        var body = new URLSearchParams();
+        body.set('type', '100');
+        body.set('version', ver);
+        body.set('batch_size', batch);
+        fetch('api/gray_update.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                msg.textContent = d.ok ? '已触发，后台滚动中…' : ('更新失败：' + (d.error || ''));
+                load();
+            })
+            .catch(function () { msg.textContent = '请求失败'; });
+    });
+
+    // 自动刷新: 滚动过程中页面每 2s 轮询一次, 统计/进程列表/状态徽标随之更新。
+    var timer = null;
+    function startAuto() {
+        if (timer) return;
+        timer = setInterval(load, 2000);
+    }
+    function stopAuto() {
+        if (timer) { clearInterval(timer); timer = null; }
+    }
+    document.getElementById('autoRefresh').addEventListener('change', function () {
+        if (this.checked) { startAuto(); load(); } else { stopAuto(); }
+    });
+
     load();
+    startAuto();   // 默认开启自动刷新
 })();
 </script>
 

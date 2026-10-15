@@ -1,4 +1,4 @@
--- battle.lua — Battle actor implementation (多实例, Game 进程, id=battle_id)
+-- battle.lua — Battle actor implementation (多实例, Battle 进程, id=battle_id)
 --
 -- 每个战斗房对应一个 BattleActor 实例 (id == battle_id)。跨进程创建由 Room 在
 -- 开始时经 ActorCreator.balanceCreate(AT.BATTLE, battleId) 触发; 本 Actor 的
@@ -19,6 +19,7 @@ local BattleMsgId = {
     FRAME_NTF     = 5, SNAPSHOT_NTF  = 6, END_NTF      = 7, LEAVE_REQ     = 8,
     LEAVE_RSP     = 9, HASH_NTF      = 10,
     DISCONNECT    = 11,  -- 内部消息 (Gate 断线收尾转发, 非客户端消息; 不入 proto)
+    SPECTATOR_ENTER = 12, -- 内部消息 (CNetBattleGateway 观战登录成功后投递, 触发下推快照; 不入 proto)
 }
 
 -- 错误码 (2001+ 为战斗模块私有码)
@@ -90,7 +91,7 @@ function BattleClass:ctor(actor_type, actor_id_or_name, actor_type_name)
     self.lastSnapshot     = nil  -- 最近一次周期快照 { frame=, state= } (req5)
     self.reconnectFrames  = {}   -- 快照帧之后缓存的逐帧输入 { {frameId=, inputsStr=}, ... } (req6)
 
-    -- 观战者 (Game 进程侧缓存; 权威名单在 Redis battle:spectator:{battleId})
+    -- 观战者 (Battle 进程侧缓存; 权威名单在 Redis battle:spectator:{battleId})
     self.spectators         = {}   -- pid -> true
     self.spectatorCacheFrame = -1  -- 上次刷新观战名单的帧号
 end
@@ -109,8 +110,88 @@ function BattleClass:onUnInstall()
     return true
 end
 
-function BattleClass:data_load(actor_data) return true end
-function BattleClass:data_save(save_type) return true end
+function BattleClass:data_load(actor_data)
+    local bid = xEngine.Number.intKey(self._actor_id)
+    local meta = xEngine.Redis.Get("battle:migrate:" .. bid)
+    if meta == nil or meta == "" then
+        return true   -- 全新战斗 (无迁移快照): 走现有 handle_enter → ensure_core 流程
+    end
+
+    -- 花名册/装备/关卡本就是 Redis 权威 (battle:roster / battle:equip / battle:level),
+    -- ensure_core 会从 Redis 重建 self.players/self.rosterOrder 并初始化核心 (seed 由
+    -- battleId 派生, 与旧进程一致)。
+    self:ensure_core()
+
+    -- 反序列化 C++ 核心模拟状态 (权威帧状态: 波次/英雄位置/冷却等)。
+    local coreState = xEngine.Redis.Get("battle:migrate:core:" .. bid)
+    if coreState ~= "" and self.core then
+        if not luacore_battle.si_battlecore_deserialize(self.core, coreState) then
+            xEngine.Log.error("[Battle] migrate: core deserialize failed battle=%d", self._actor_id)
+        end
+    end
+
+    -- 元数据: frame|startTs|finished|endReason|startNtfSent|kills(pid:count,...)
+    local fields = {}
+    for v in (meta .. "|"):gmatch("([^|]*)|") do fields[#fields + 1] = v end
+    self.frame        = tonumber(fields[1]) or 0
+    self.startTs      = tonumber(fields[2]) or luacore.si_time_cur_sec()
+    self.finished     = fields[3] == "1"
+    self.endReason    = (fields[4] ~= "" and fields[4]) or nil
+    self.startNtfSent = fields[5] == "1"
+
+    self.kills = {}
+    for rec in (((fields[6] or "") .. ",")):gmatch("([^,]*),") do
+        local pidStr, cntStr = rec:match("^(%d+):(%d+)$")
+        if pidStr then self.kills[tonumber(pidStr)] = tonumber(cntStr) end
+    end
+
+    -- 迁移后全员直连随旧进程消亡: 标记离线并重置 90s 重连窗口, 由
+    -- check_reconnect_timeouts 兜底 (超时按离开处理); 客户端断线回组队房后可重进。
+    for _, pid in ipairs(self.rosterOrder) do
+        self.entered[pid] = true
+        self.online[pid] = false
+        self.disconnectTs[pid] = luacore.si_time_cur_sec()
+    end
+
+    xEngine.Log.info("[Battle] migrate: restored battle=%d frame=%d players=%d",
+        self._actor_id, self.frame, #self.rosterOrder)
+    return true
+end
+
+function BattleClass:data_save(save_type)
+    local bid = xEngine.Number.intKey(self._actor_id)
+    if save_type == 3 then
+        -- 战斗房卸载/回收: 清迁移快照 (含二进制核心状态)
+        xEngine.Redis.Del("battle:migrate:" .. bid)
+        xEngine.Redis.Del("battle:migrate:core:" .. bid)
+        return true
+    end
+
+    if not self.core then return true end   -- 尚未初始化: 无状态可迁 (走正常开局)
+
+    -- 核心模拟状态 (二进制, 独立 key 避免定界符冲突)
+    xEngine.Redis.Set("battle:migrate:core:" .. bid,
+        luacore_battle.si_battlecore_serialize(self.core))
+
+    -- 元数据 (文本, | 定界; 字段值均不含 | 或 ,)
+    local kills = {}
+    for pid, cnt in pairs(self.kills or {}) do
+        kills[#kills + 1] = xEngine.Number.intKey(pid) .. ":" .. tostring(cnt)
+    end
+    local meta = table.concat({
+        tostring(self.frame),
+        tostring(self.startTs),
+        self.finished and "1" or "0",
+        self.endReason or "",
+        self.startNtfSent and "1" or "0",
+        table.concat(kills, ","),
+    }, "|")
+    xEngine.Redis.Set("battle:migrate:" .. bid, meta)
+
+    xEngine.Log.info("[Battle] migrate: saved battle=%d frame=%d", self._actor_id, self.frame)
+    return true
+end
+
 function BattleClass:onInit()    return true end
 function BattleClass:onCreate()  return true end
 
@@ -229,6 +310,47 @@ end
 --------------------------------------------------------------------------------
 -- 业务消息总入口
 --------------------------------------------------------------------------------
+
+-- 客户端直连消息分发 (由 CLuaActor::OnMessage 以 on_msg(self, msgId, body) 调用)。
+-- 与 Gate 同构: msgId = (BigType<<16)|SmallType, body = [8 字节 playerId][protobuf 负载]
+-- (CNetBattleGateway 已把连接身份换为 playerId 前置, 供 si_net_body_cid 还原发送方)。
+-- 回包经 si_battle_gateway_send 直接下发到该玩家的直连连接 (不经 Gate)。
+function BattleClass:on_msg(msgId, rawBody)
+    -- 内部业务消息 (高 16 位 == USER_BEGIN=1, 如 BATTLE_FINALIZE) 与客户端直连消息
+    -- (高 16 位 == AT.BATTLE=203) 共用一个 on_msg 入口, 但 msgId 空间不同:
+    -- 前者须回传给基类 ActorBase:on_msg, 经 NAMES 表分发到 on_battle_finalize_msg;
+    -- 后者才走下方 smallType 分发。混在一起会让 BATTLE_FINALIZE(0x00010005) 被当成
+    -- smallType=5 落进 unknown 分支, 60s 回收永不执行 → 战斗房不卸载/组队房残留。
+    if (msgId & 0xFFFF0000) == xEngine.MsgId.USER_BEGIN then
+        return self:super("on_msg", msgId, rawBody)
+    end
+
+    local smallType = msgId & 0xFFFF
+    local playerId = luacore.si_net_body_cid(rawBody)
+    local payload  = luacore.si_net_body_payload(rawBody)
+
+    local resp = ""
+    if smallType == BattleMsgId.ENTER_REQ then
+        resp = self:handle_enter(playerId, payload)
+    elseif smallType == BattleMsgId.INPUT_REQ then
+        self:handle_input(playerId, payload)
+    elseif smallType == BattleMsgId.LEAVE_REQ then
+        resp = self:handle_leave(playerId, payload)
+    elseif smallType == BattleMsgId.HASH_NTF then
+        self:handle_hash(playerId, payload)
+    elseif smallType == BattleMsgId.DISCONNECT then
+        self:handle_disconnect(playerId)
+    elseif smallType == BattleMsgId.SPECTATOR_ENTER then
+        self:handle_spectator_enter(playerId)
+    else
+        xEngine.Log.warn("[Battle] on_msg unknown small_type=%d", smallType)
+    end
+
+    if resp and resp ~= "" then
+        luacore.si_battle_gateway_send(playerId, resp)
+    end
+end
+
 function BattleClass:on_rpc_forward(wrapped)
     local senderId  = xEngine.Number.toInt(luacore.si_net_body_cid(wrapped))
     local payload   = luacore.si_net_body_payload(wrapped)
@@ -266,6 +388,9 @@ function BattleClass:handle_enter(senderId, payload)
     self.entered[senderId] = true
     self.online[senderId] = true          -- 进入/重连即恢复在线
     self.disconnectTs[senderId] = nil     -- 清除 90s 重连窗口计时
+    -- 直连战斗进入/重连: 玩家确认在线, 移除下线列表成员 (此路径不经过 select_role)。
+    xEngine.Redis.SRem("offline:players", xEngine.Number.intKey(senderId))
+    xEngine.Redis.Del("offline:ts:" .. xEngine.Number.intKey(senderId))
     if reconnect and self.core then
         -- 断线重连 / 中途加入: 战斗已推进, 客户端无法仅凭 seed 重建当前权威状态,
         -- 故先下发快照, 再追帧重放快照帧之后缓存的所有帧 (req6), 客户端据快照反序列化 +
@@ -283,7 +408,7 @@ function BattleClass:handle_enter(senderId, payload)
             self.startNtfSent = true
             local startMsg = luacore_battle.si_pb_battle_start_ntf(battleId, self.seed)
             for _, pid in ipairs(self.rosterOrder) do
-                luacore.si_push_rpc(pid, startMsg)
+                luacore.si_battle_gateway_send(pid, startMsg)
             end
             xEngine.Log.info("[Battle] start: battle=%d seed=%d players=%d (START_NTF broadcast)",
                 battleId, self.seed, #self.rosterOrder)
@@ -320,9 +445,9 @@ function BattleClass:push_reconnect_stream(pid)
         snapFrame = self.frame
         snapState = luacore_battle.si_battlecore_serialize(self.core)
     end
-    luacore.si_push_rpc(pid, luacore_battle.si_pb_battle_snapshot_ntf(snapFrame, snapState))
+    luacore.si_battle_gateway_send(pid, luacore_battle.si_pb_battle_snapshot_ntf(snapFrame, snapState))
     for _, rec in ipairs(self.reconnectFrames) do
-        luacore.si_push_rpc(pid, luacore_battle.si_pb_battle_frame_ntf(rec.frameId, rec.inputsStr))
+        luacore.si_battle_gateway_send(pid, luacore_battle.si_pb_battle_frame_ntf(rec.frameId, rec.inputsStr))
     end
     xEngine.Log.info("[Battle] reconnect stream: battle=%d player=%d snap_frame=%d cached_frames=%d",
         self._actor_id, pid, snapFrame, #self.reconnectFrames)
@@ -408,9 +533,9 @@ function BattleClass:flush_frame(clientFrame)
     local insStr = table.concat(insParts, ";")
     local frameMsg = luacore_battle.si_pb_battle_frame_ntf(self.frame, insStr)
     for _, pid in ipairs(self.rosterOrder) do
-        luacore.si_push_rpc(pid, frameMsg)
+        luacore.si_battle_gateway_send(pid, frameMsg)
     end
-    -- 观战者追帧 (BattleActor 在 Game 进程向 Redis 登记的观战者推帧流)
+    -- 观战者追帧 (BattleActor 在本 Battle 进程向直连观战者推帧流, 不经 Gate)
     self:push_spectator_frames(self.frame, insStr)
 
     -- 周期快照 + 重连帧缓存 (req5/6): 快照帧本身已含本帧状态, 不重复缓存; 其余帧累积
@@ -561,14 +686,35 @@ function BattleClass:finish_battle(reason, win)
     local stats = self:build_stats(win, self.duration)
     local endMsg = luacore_battle.si_pb_battle_end_ntf(self._actor_id, winSide, stats)
     for _, pid in ipairs(self.rosterOrder) do
-        luacore.si_push_rpc(pid, endMsg)
+        luacore.si_battle_gateway_send(pid, endMsg)
     end
     self:push_spectate_end()
+
+    -- 战斗结束: 断线未归 (online==false) 的玩家已无法再重连, 逐个通知 Room 移出组队房
+    -- (LEAVE_REQ → Room do_leave 删空房)。否则 Room 侧 count_members 恒 >0, 空房不删,
+    -- 组队房残留幽灵成员 (全离线 finalize 前 remove_player 不会跑, 见 check_reconnect_timeouts)。
+    for _, pid in ipairs(self.rosterOrder) do
+        if self.online[pid] == false then
+            luacore.si_forward_rpc(AT.ROOM, 0,
+                luacore.si_net_body_wrap(pid, encode_small_type(ROOM_SMALL.LEAVE_REQ)))
+        end
+    end
 
     -- 战斗结束: 通知 Room 重置状态, 所有玩家回到组队房间 (房间保留, state 回 0)。
     -- battle_id 塞进 wrap 的 cid 位, Room 经 battle:room:{battleId} 反查房间。
     luacore.si_forward_rpc(AT.ROOM, 0,
         luacore.si_net_body_wrap(self._actor_id, encode_small_type(ROOM_SMALL.BATTLE_END)))
+
+    -- 立即清 battle:byplayer (不等 60s finalize): 结算窗口内玩家断线时, Gate
+    -- on_rpc_disconnect 据此判断「是否在战斗中」, 残留会把断线误路由到已结束的 Battle
+    -- (Room 收不到 LEAVE_REQ → 组队房残留)。CAS 保护: 只清仍指向本场的映射。
+    local bid = xEngine.Number.intKey(self._actor_id)
+    for _, pid in ipairs(self.rosterOrder) do
+        local pidStr = xEngine.Number.intKey(pid)
+        if xEngine.Redis.Get("battle:byplayer:" .. pidStr) == bid then
+            xEngine.Redis.Del("battle:byplayer:" .. pidStr)
+        end
+    end
 
     xEngine.Log.info("[Battle] finish: battle=%d reason=%s win=%s duration=%d totalKills=%d",
         self._actor_id, reason, tostring(win), self.duration, self:kill_total())
@@ -679,16 +825,27 @@ function BattleClass:on_battle_finalize_msg(raw_body)
         -- 游戏未结束但所有玩家都离开 → 按失败上报战报 (无奖励)
         self:finish_battle("all_left", false)
     end
-    -- 卸载 BattleActor (本地延迟 delete) + 跨进程删除 SpectatorActor + 清理观战登记
+    -- 卸载 BattleActor (本地延迟 delete) + 全局删除 SpectatorActor (惰性创建, 可能不驻本进程,
+    -- 经 cluster:actor:{type}:{id} 路由到其实际进程卸载) + 清理观战登记
     luacore.si_actor_delete_local(AT.BATTLE, self._actor_id)
     xEngine.ActorCreator.delete(AT.SPECTATOR, self._actor_id)
-    xEngine.Redis.Del("battle:spectator:" .. xEngine.Number.intKey(self._actor_id))
+    local bid = xEngine.Number.intKey(self._actor_id)
+    -- 清理观战名单 + 观战反查映射 (spectator.lua handle_enter 写入 battle:spectator:byplayer:{pid}),
+    -- 防止残留映射指向已死战斗房 (观战者断线未走 handle_leave 时, 名单在此兜底清空)。
+    local spectatorList = xEngine.Redis.Get("battle:spectator:" .. bid) or ""
+    xEngine.Redis.Del("battle:spectator:" .. bid)
+    for pidStr in (spectatorList .. ","):gmatch("([^,]*),") do
+        if pidStr ~= "" then
+            if xEngine.Redis.Get("battle:spectator:byplayer:" .. pidStr) == bid then
+                xEngine.Redis.Del("battle:spectator:byplayer:" .. pidStr)
+            end
+        end
+    end
 
     -- 清理观战反查映射 (room.lua handle_start 写入), 防止残留映射指向已死战斗房:
     --   battle:byroom:{roomId} / battle:byplayer:{pid} / battle:room:{battleId}
     -- 比较后删除 (CAS 语义): 玩家可能在结算窗口内进入下一局, byplayer 已被改写,
     -- 此时不可误删下一局的映射。
-    local bid = xEngine.Number.intKey(self._actor_id)
     local roomId = xEngine.Redis.Get("battle:room:" .. bid)
     if roomId and roomId ~= "" then
         if xEngine.Redis.Get("battle:byroom:" .. roomId) == bid then
@@ -704,12 +861,14 @@ function BattleClass:on_battle_finalize_msg(raw_body)
             end
         end
     end
+    xEngine.Redis.Del("battle:roster:" .. bid)
+    xEngine.Redis.Del("battle:host:" .. bid)
 
     xEngine.Log.info("[Battle] finalize done: battle=%d reason=%s", self._actor_id, tostring(self.endReason))
 end
 
 --------------------------------------------------------------------------------
--- 观战 (Game 进程侧: 权威名单在 Redis, 由 Global 进程 SpectatorActor 登记)
+-- 观战 (权威名单在 Redis, 由本 Battle 进程 SpectatorActor 登记; 本 Battle 进程向直连观战者推流)
 --------------------------------------------------------------------------------
 function BattleClass:refresh_spectators()
     local raw = xEngine.Redis.Get("battle:spectator:" .. xEngine.Number.intKey(self._actor_id))
@@ -717,20 +876,22 @@ function BattleClass:refresh_spectators()
     for v in (raw or ""):gmatch("[^,]+") do
         if v ~= "" then newList[tonumber(v)] = true end
     end
-    for pid in pairs(newList) do
-        if not self.spectators[pid] then
-            self:push_spectator_snapshot(pid)   -- 新观战者先推快照对齐
-        end
-    end
     self.spectators = newList
     self.spectatorCacheFrame = self.frame
+end
+
+-- 观战者直连登录 (CNetBattleGateway 握手成功后投递 SPECTATOR_ENTER): 登记 + 下推快照对齐。
+-- 观战者与参战者共用同一套 203 帧流, 快照/帧/结束均经 si_battle_gateway_send 直发 (不经 Gate)。
+function BattleClass:handle_spectator_enter(pid)
+    self.spectators[pid] = true
+    self:push_spectator_snapshot(pid)
 end
 
 function BattleClass:push_spectator_snapshot(pid)
     if not self.core then return end
     local state = luacore_battle.si_battlecore_serialize(self.core)
-    local snap  = luacore_spectate.si_pb_spectate_snapshot_ntf(self.frame, state)
-    luacore.si_push_rpc(pid, snap)
+    local snap  = luacore_battle.si_pb_battle_snapshot_ntf(self.frame, state)
+    luacore.si_battle_gateway_send(pid, snap)
     xEngine.Log.info("[Battle] spectator snapshot: battle=%d spectator=%d frame=%d", self._actor_id, pid, self.frame)
 end
 
@@ -738,16 +899,16 @@ function BattleClass:push_spectator_frames(frameId, inputsStr)
     -- 每 10 帧刷新一次观战名单 (避免每帧 Redis 读; 新观战者最迟 0.5s 内被纳入)
     if self.frame % 10 == 0 then self:refresh_spectators() end
     if next(self.spectators) == nil then return end
-    local frameMsg = luacore_spectate.si_pb_spectate_frame_ntf(frameId, inputsStr)
+    local frameMsg = luacore_battle.si_pb_battle_frame_ntf(frameId, inputsStr)
     for pid in pairs(self.spectators) do
-        luacore.si_push_rpc(pid, frameMsg)
+        luacore.si_battle_gateway_send(pid, frameMsg)
     end
 end
 
 function BattleClass:push_spectate_end()
-    local endMsg = luacore_spectate.si_pb_spectate_end_ntf(self._actor_id)
+    local endMsg = luacore_battle.si_pb_battle_end_ntf(self._actor_id, 0, "")
     for pid in pairs(self.spectators) do
-        luacore.si_push_rpc(pid, endMsg)
+        luacore.si_battle_gateway_send(pid, endMsg)
     end
 end
 
@@ -832,7 +993,7 @@ function BattleClass:handle_hash(senderId, payload)
             if self.core then
                 local state = luacore_battle.si_battlecore_serialize(self.core)
                 local snap = luacore_battle.si_pb_battle_snapshot_ntf(self.frame, state)
-                luacore.si_push_rpc(senderId, snap)
+                luacore.si_battle_gateway_send(senderId, snap)
                 xEngine.Log.info("[Battle] push snapshot reconcile: battle=%d player=%d frame=%d",
                     self._actor_id, senderId, self.frame)
             end

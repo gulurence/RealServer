@@ -43,6 +43,12 @@ int main(int argc, char **argv)
         {
             cfg.process.name = arg.substr(7);
         }
+        else if (arg.rfind("--port=", 0) == 0)
+        {
+            // 业务 TCP 监听端口 (xNetAgent), 供 Gate/Battle 等有 Kernel_Net 的进程
+            // 在同一机器上绑定不同客户端接入端口 (多进程共读同一 server.xml)。
+            cfg.process.listenPort = (uint16)strtoul(arg.c_str() + 7, nullptr, 10);
+        }
         else if (arg.rfind("--platform=", 0) == 0)
         {
             cfg.platform = arg.substr(11);

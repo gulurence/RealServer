@@ -10,6 +10,8 @@ namespace
 // player:{playerId} 路由索引 TTL (秒): 30s ≈ 6 次心跳, 进程心跳续期;
 // 进程宕机后由 Redis 过期自动清理 (僵尸 Player 路由索引防护)。
 constexpr int64 kPlayerIndexTtlSeconds = 30;
+// PlayerActor 总数计数器键 (登录排队限流): cluster:load:player_count
+constexpr const char *kPlayerCountKey = "cluster:load:player_count";
 }
 
 // =============================================================================
@@ -210,4 +212,34 @@ bool CPlayerActorIndex::RedisExpire(const std::string &key, int64 ttlSec)
         return false;
     }
     return pCli->Expire(key, ttlSec) == REDIS_OK;
+}
+
+// =============================================================================
+// IncrPlayerCount / DecrPlayerCount — PlayerActor 总数计数器
+//
+// 登录排队限流的数据源: Login 进程读 cluster:load:player_count 判定是否超
+// player_actor_cap 上限。PlayerActor 创建成功后 Incr, 卸载时 Decr (覆盖本地
+// 创建与跨进程 RPC 创建/卸载两条路径, 见 CActorMgr::Install / UnInstall)。
+// Redis 不可用时返回 -1 (调用方忽略, 排队退化为不限流)。
+// =============================================================================
+int64 CPlayerActorIndex::IncrPlayerCount()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return -1;
+    }
+    return pCli->Incr(kPlayerCountKey);
+}
+
+int64 CPlayerActorIndex::DecrPlayerCount()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto *pCli = GetRedisCli();
+    if (!pCli)
+    {
+        return -1;
+    }
+    return pCli->Decr(kPlayerCountKey);
 }

@@ -27,6 +27,8 @@ enum BattleMsgId {
   BATTLE_LEAVE_REQ      = 8;   // 客户端 -> Battle: 中途退出
   BATTLE_LEAVE_RSP      = 9;   // Battle -> 客户端: 退出结果
   BATTLE_HASH_NTF       = 10;  // 客户端 -> Battle: 一致性校验哈希上报
+  BATTLE_LOGIN_REQ      = 12;  // 客户端 -> Battle 进程: 直连登录握手 (连接建立后首帧)
+  BATTLE_LOGIN_RSP      = 13;  // Battle 进程 -> 客户端: 直连登录结果
 }
 
 // ---------------------------------------------------------------------------
@@ -149,4 +151,24 @@ message PBBattleHashNtf {
   int64  battle_id  = 3;   // 目标战斗房 (Gate 路由到对应 BattleActor 实例)
   uint32 frame_id   = 4;
   uint64 state_hash = 5;
+}
+
+// 直连登录握手 (客户端 -> Battle 进程, 连接建立后首帧)
+// 客户端在组队房开战后拿到 Battle 进程 ip/port + authKey, 携带 PlayerID 直连,
+// 由 Battle 进程的 CNetBattleGateway 在 C++ 传输层完成校验 (battle:auth / battle:roster)。
+message PBBattleLoginReq {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = BATTLE_LOGIN_REQ (12)
+  int64  battle_id  = 3;
+  string auth_key   = 4;
+  int64  player_id  = 5;
+  bool   spectate   = 6;   // true = 观战登录 (网关改验 battle:spectator:{battleId} 名单)
+}
+
+// 直连登录结果 (Battle 进程 -> 客户端)
+message PBBattleLoginRsp {
+  uint32 big_type           = 1;
+  uint32 small_type         = 2;   // = BATTLE_LOGIN_RSP (13)
+  PbID.ErrorCode error_code = 3;
+  int64  battle_id          = 4;
 }

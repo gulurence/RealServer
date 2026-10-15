@@ -25,6 +25,8 @@ enum LoginMsgId {
   LOGIN_MSG_SELECT_ROLE_RSP  = 4;   // Gate -> 客户端: 选角结果 + Player 信息
   LOGIN_MSG_CREATE_ROLE_REQ  = 5;   // 客户端 -> Gate: 创角
   LOGIN_MSG_CREATE_ROLE_RSP  = 6;   // Gate -> 客户端: 创角结果 + RoleInfo
+  LOGIN_MSG_LOGOUT_REQ       = 7;   // 客户端 -> Gate: 主动登出 (下线列表 + 房间/战斗收尾)
+  LOGIN_MSG_LOGOUT_RSP       = 8;   // Gate -> 客户端: 登出确认
 }
 
 // ---------------------------------------------------------------------------
@@ -46,6 +48,8 @@ message PBMsgLoginRsp {
   PbID.ErrorCode error_code = 3;
   PbAccount.AccountInfo        account = 4;   // 账号信息
   repeated PbAccount.RoleInfo  roles   = 5;   // 角色列表
+  int64  queue_position = 6;   // 排队位置 (>0 表示排队中, error_code=ERR_QUEUED)
+  int32  queue_est_wait = 7;   // 预计等待秒数 (平均等待时间动态计算)
 }
 
 // 选角请求 (客户端 -> Gate)
@@ -62,6 +66,9 @@ message PBMsgSelectRoleRsp {
   uint32 small_type = 2;   // = LOGIN_MSG_SELECT_ROLE_RSP (4)
   PbID.ErrorCode error_code = 3;
   PbAccount.PlayerInfo player = 4;   // Player actor 创建完成后的玩家信息
+  int64  battle_id   = 5;   // 断线重连: >0 = 玩家当前战斗房 id (可直连重连)
+  string battle_host = 6;   // 战斗进程直连地址 "ip:port" (battle:host:{battleId})
+  string battle_auth = 7;   // 战斗重连 auth_key (battle:auth:{battleId})
 }
 
 // 创角请求 (客户端 -> Gate)
@@ -79,4 +86,17 @@ message PBMsgCreateRoleRsp {
   uint32 small_type = 2;   // = LOGIN_MSG_CREATE_ROLE_RSP (6)
   PbID.ErrorCode error_code = 3;
   PbAccount.RoleInfo role = 4;   // 创建成功的角色摘要
+}
+
+// 登出请求 (客户端 -> Gate) — 无业务字段, 发送方身份由连接映射 (connPlayer[cid]) 决定。
+message PBMsgLogoutReq {
+  uint32 big_type   = 1;   // = AT_LOGIN (101)
+  uint32 small_type = 2;   // = LOGIN_MSG_LOGOUT_REQ (7)
+}
+
+// 登出响应 (Gate -> 客户端)
+message PBMsgLogoutRsp {
+  uint32 big_type   = 1;   // = AT_LOGIN (101)
+  uint32 small_type = 2;   // = LOGIN_MSG_LOGOUT_RSP (8)
+  PbID.ErrorCode error_code = 3;
 }

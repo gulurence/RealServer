@@ -35,6 +35,9 @@ config/server.xml
 # Runtime logs
 logs/
 
+# 本地 Gitea 实例的 SQLite 数据库（非项目源码）
+data/
+
 # Runtime node registry (引擎自动维护, 每个运行根目录一份)
 local.info
 node_manager.machine

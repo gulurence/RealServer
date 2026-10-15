@@ -22,6 +22,7 @@ local MSG = {
     AUTH       = 0x00010003,  -- 鉴权 (login)
     PLAYER_SETTLE   = 0x00010004,  -- 战斗结算回传 PlayerActor (battle -> player)
     BATTLE_FINALIZE = 0x00010005,  -- BattleActor 延迟回收 (battle 自投递)
+    SPECTATOR_FINALIZE = 0x00010006,  -- SpectatorActor 空闲回收 (spectator 自投递)
 }
 
 -- msg_id → handler 名后缀 映射: on_<name>_msg
@@ -32,6 +33,7 @@ MSG.NAMES = {
     [MSG.AUTH]           = "auth",
     [MSG.PLAYER_SETTLE]  = "player_settle",
     [MSG.BATTLE_FINALIZE] = "battle_finalize",
+    [MSG.SPECTATOR_FINALIZE] = "spectator_finalize",
 }
 
 -- 判断是否业务消息 (高 16 位非 0)

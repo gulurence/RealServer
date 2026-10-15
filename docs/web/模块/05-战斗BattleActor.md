@@ -1,6 +1,6 @@
 # 战斗模块（BattleActor）
 
-> 里程碑 M5 · Actor 类型 `EActorType_ABattle=203`（Game 进程，多实例）
+> 里程碑 M5 · Actor 类型 `EActorType_ABattle=203`（Battle 进程，多实例）
 
 ## 定位
 

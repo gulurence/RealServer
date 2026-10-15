@@ -186,6 +186,26 @@ function battle_win_label($v): string
                 <?php endif; ?>
             </section>
             <?php endif; ?>
+
+            <?php if ($type === 204 && isset($report['battle']) && is_array($report['battle'])): $s = $report['battle']; ?>
+            <section class="node-group">
+                <h2>观战状态 <span class="dim">（SpectatorActor 观战席实时状态）</span></h2>
+                <table class="table table-vcenter">
+                    <tbody>
+                        <tr><th style="width:180px">观战战斗房</th><td class="mono">#<?= esc((string)($s['battle_id'] ?? '—')) ?></td></tr>
+                        <tr><th>观战人数</th><td><?= esc((string)($s['spectator_count'] ?? '—')) ?></td></tr>
+                        <tr><th>观战名单</th>
+                            <td class="mono"><?php
+                                if (!empty($s['spectators']) && is_array($s['spectators'])) {
+                                    echo esc(implode(', ', array_map('strval', $s['spectators'])));
+                                } else {
+                                    echo '—';
+                                }
+                            ?></td></tr>
+                    </tbody>
+                </table>
+            </section>
+            <?php endif; ?>
         <?php endif; ?>
 <?php live_region_end(); ?>
 <?php layout_footer(); ?>

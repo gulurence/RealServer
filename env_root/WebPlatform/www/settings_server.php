@@ -96,6 +96,26 @@ if (isset($_POST['save_global'])) {
     }
 }
 
+// ---------- ④ 网络限流 (单连接消息接收速率) 保存 ----------
+$RATE_FIELDS = [
+    'gate_rate_limit_per_sec'   => ['label' => 'Gate 单连接消息速率 (条/秒, 0=不限)'],
+    'battle_rate_limit_per_sec' => ['label' => 'Battle 单连接消息速率 (条/秒, 0=不限)'],
+];
+
+if (isset($_POST['save_rate_limit'])) {
+    if ($r === null) {
+        $notice = '无法连接 Redis，网络限流配置未保存';
+        $noticeOk = false;
+    } else {
+        $data = [];
+        foreach (array_keys($RATE_FIELDS) as $f) {
+            $data[$f] = post_str($f);
+        }
+        redis_hash_set($r, config_cluster_key(), $data);
+        $notice = '网络限流配置已写入 ' . config_cluster_key();
+    }
+}
+
 // ---------- ③ Actor 状态失效时长 保存 ----------
 if (isset($_POST['save_actor_ttl'])) {
     if ($r === null) {
@@ -220,6 +240,30 @@ layout_header('服务器基础配置', 'settings_server');
             <div class="dim" style="margin-top:14px">
                 说明：这些值由各进程周期性拉取（配 pub/sub 变更通知 <code>cluster:config:notify</code>），
                 写后数秒内生效；<code>server.xml</code> 仅保留引导信息（Redis seed / 进程身份 / auth secret）。
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ④ 网络限流 (单连接消息接收速率) -->
+<div class="card" style="margin-top:16px">
+    <div class="card-header">网络限流 <span class="dim"><?= esc(config_cluster_key()) ?></span></div>
+    <div class="card-body">
+        <form method="post" class="form">
+            <?php foreach ($RATE_FIELDS as $f => $meta): ?>
+            <div class="form-row">
+                <label><span><?= esc($meta['label']) ?></span>
+                    <input type="number" name="<?= esc($f) ?>" min="0"
+                           value="<?= esc($cfg[$f] ?? '') ?>" placeholder="0">
+                </label>
+            </div>
+            <?php endforeach; ?>
+            <div class="actions">
+                <button class="btn btn-primary" type="submit" name="save_rate_limit" value="1">保存限流配置</button>
+            </div>
+            <div class="dim" style="margin-top:14px">
+                说明：Gate 与 Battle 进程按「单连接消息接收速率」限流（令牌桶），超限<b>断开连接</b>。
+                <code>0</code> 表示不限流。进程每 5 秒缓存刷新一次阈值，写后数秒内生效。
             </div>
         </form>
     </div>

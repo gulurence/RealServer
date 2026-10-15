@@ -224,6 +224,18 @@ ProcessInfo CLinkManager::GetBestPeer(EProcessType targetType) const
         {
             continue;
         }
+        // 心跳过滤: 跳过「state 仍为 Running 但心跳已停」的僵尸进程 (灰度强杀后 Hash 尚未过期)。
+        // 与 CServiceDiscovery::DiscoverPeers 的心跳过滤一致, 避免选中已死对端导致 RPC 失败。
+        if (CServiceDiscovery::getMe().IsHeartbeatStale(conn.info))
+        {
+            continue;
+        }
+        // 排空过滤: 排空中的进程不再接受新 Actor 分配 (Battle 进程级排空; 仍保持连接
+        // 供既有 Actor 消息路由, 只是不选中承载新 Actor)。
+        if (conn.info.draining)
+        {
+            continue;
+        }
 
         // 硬过滤: CPU/内存达到满载阈值则不再向该进程分配新 Actor (资源感知, P1 默认值)
         if (conn.info.cpuPercent >= kCpuFullPercentDefault)
@@ -261,7 +273,8 @@ std::vector<ProcessInfo> CLinkManager::GetAvailablePeers(EProcessType targetType
 
     for (auto &[id, conn] : m_mapPeers)
     {
-        if (conn.info.type == targetType && conn.available && IsProcessRunning(conn.info.state))
+        if (conn.info.type == targetType && conn.available && IsProcessRunning(conn.info.state)
+            && !CServiceDiscovery::getMe().IsHeartbeatStale(conn.info) && !conn.info.draining)
         {
             result.push_back(conn.info);
         }
@@ -308,6 +321,18 @@ void CLinkManager::RefreshLoop()
                 conn.available = false;
                 conn.info.state = latest.state;
                 XCWRN("Peer marked unavailable: %s:%lld (state=%s)",
+                      ProcessTypeName(conn.info.type), (int64)id, ProcessStateName(latest.state));
+            }
+        }
+        else if (disc.IsHeartbeatStale(latest))
+        {
+            // 心跳已停但 state 仍为 Running (灰度强杀后 Hash 尚未过期): 停止分配 Actor,
+            // 与 DiscoverPeers 的心跳过滤一致。等 Hash TTL 到期 (30s) 后由 processId==0 分支移除。
+            if (conn.available)
+            {
+                conn.available = false;
+                conn.info = latest;
+                XCWRN("Peer marked stale (heartbeat stopped): %s:%lld (state=%s)",
                       ProcessTypeName(conn.info.type), (int64)id, ProcessStateName(latest.state));
             }
         }

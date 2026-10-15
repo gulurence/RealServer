@@ -12,6 +12,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <unistd.h> // getpid()
 #endif
 
 #include <cstdio>
@@ -368,6 +370,11 @@ bool CGmCommandMgr::RegisterActor(EActorType type, int64 actorId, const std::str
 
     m_cli->SAdd("cluster:actor:by_type:" + std::to_string((int32)type), idStr);
 
+    // 持久实例索引 (无 TTL): 灰度迁移「先迁后杀」与进程宕机后冷恢复的枚举数据源。
+    // cluster:actor:by_type 有 TTL, 进程死后会蒸发; 本索引独立、不过期, 只在
+    // DeregisterActor 时移除, 保证幸存者可据其重建已失联 Actor。
+    m_cli->SAdd("actor:index:" + std::to_string((int32)type), idStr);
+
     // 注册键 TTL: 进程宕机后由 Redis 过期清理 (僵尸 Actor 防护), 心跳续期见 RefreshActorRegistration
     m_cli->Expire(key, kActorRegTtlSeconds);
     m_cli->Expire("cluster:actor:by_type:" + std::to_string((int32)type), kActorRegTtlSeconds);
@@ -390,6 +397,7 @@ bool CGmCommandMgr::DeregisterActor(EActorType type, int64 actorId)
 
     m_cli->Del(key.c_str());
     m_cli->SRem("cluster:actor:by_type:" + std::to_string((int32)type), idStr);
+    m_cli->SRem("actor:index:" + std::to_string((int32)type), idStr);
 
     XLOG("[GM] DeregisterActor type=%d id=%lld", (int32)type, (int64)actorId);
     return true;
@@ -503,7 +511,7 @@ std::string CGmCommandMgr::ExecFramework(const std::vector<std::string> &argv)
     {
         return "commands: help | info | processes | actors | actor <type> <id> <cmd> | "
                "spawn <type> [name] | shutdown | loglevel <level> | reload [<actorType> [<id>]] | "
-               "hotfix <version> <relpath...>";
+               "hotfix <version> <relpath...> | migrate_save";
     }
 
     if (cmd == "info")
@@ -614,6 +622,65 @@ std::string CGmCommandMgr::ExecFramework(const std::vector<std::string> &argv)
 
         return ok ? ("reload OK — business scripts hot-reloaded" + target)
                   : ("reload FAILED — see server log" + target);
+    }
+
+    if (cmd == "migrate_save")
+    {
+        // 灰度迁移「先迁后杀」: 通知本地 Actor 把内存态落 Redis (data_save(2)),
+        // 供新进程 createLocal + data_load 恢复 (见 common/migration.lua)。
+        // 可选参数 <os_pid>: 精确瞄准被杀的进程 (gray_roll.ps1 广播到 type 频道时,
+        // 只有 OS 进程号匹配者执行, 避免误伤同类型仍在运行的其它进程)。
+        if (argv.size() >= 2)
+        {
+            int64 wantPid = 0;
+            if (std::sscanf(argv[1].c_str(), "%lld", (long long *)&wantPid) == 1 && wantPid > 0)
+            {
+#ifdef _WIN32
+                int64 selfPid = (int64)GetCurrentProcessId();
+#else
+                int64 selfPid = (int64)getpid();
+#endif
+                if (selfPid != wantPid)
+                {
+                    return "migrate_save SKIP — os_pid mismatch";
+                }
+            }
+        }
+
+        // 唯一 lua_State 只能调度线程碰, 故经 DispatchSync 串行执行 (与 reload 同款)。
+        bool ok = CActorScheduler::instance()->DispatchSync(
+            []() { return LuaVM::instance()->DoString("xEngine.ActorMigration.saveAll()"); });
+        return ok ? "migrate_save OK — local actors flushed to redis"
+                  : "migrate_save FAILED — see server log";
+    }
+
+    if (cmd == "drain")
+    {
+        // 进程级排空 (Battle 灰度滚动): 标记本进程 draining, 停止接受新 Actor 分配。
+        // 已有 Actor (进行中的战斗) 自然结束, 由 gray_roll.ps1 轮询 cluster:process:<type>:<id>
+        // 的 load==0 后再 migrate_save + 杀进程, 避免中途打断战斗。
+        // 可选参数 <os_pid>: 与 migrate_save 同款 os_pid 过滤, 广播到 type 频道时只让
+        // OS 进程号匹配者执行 (新进程启动即 draining=false, 无需 undrain)。
+        if (argv.size() >= 2)
+        {
+            int64 wantPid = 0;
+            if (std::sscanf(argv[1].c_str(), "%lld", (long long *)&wantPid) == 1 && wantPid > 0)
+            {
+#ifdef _WIN32
+                int64 selfPid = (int64)GetCurrentProcessId();
+#else
+                int64 selfPid = (int64)getpid();
+#endif
+                if (selfPid != wantPid)
+                {
+                    return "drain SKIP — os_pid mismatch";
+                }
+            }
+        }
+
+        CServiceDiscovery::getMe().UpdateDrain(true);
+        LogReply("drain requested — marking process draining (no new actors)");
+        return "drain OK — draining";
     }
 
     if (cmd == "hotfix")

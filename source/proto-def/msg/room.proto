@@ -205,6 +205,8 @@ message PBRoomStartRsp {
   int64  room_id            = 4;
   int64  battle_id          = 5;   // 创建的战斗房 ActorID
   string auth_key           = 6;   // 进入战斗的验证 Key
+  string host_ip            = 7;   // 战斗进程直连 IP (客户端直连 Battle 进程)
+  int32  port               = 8;   // 战斗进程直连端口 (客户端直连 Battle 进程)
 }
 
 // 房间信息变更通知 (Room -> 成员)

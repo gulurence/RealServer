@@ -69,12 +69,16 @@ public:
     int32 SRem(const std::string &key, const std::string &member);
     int32 SMembers(const std::string &key, std::vector<std::string> &members);
     int64 Incr(const std::string &key);
+    int64 Decr(const std::string &key);
     int32 ZAdd(const std::string &key, int64 score, const std::string &member);
     int32 ZRemRangeByRank(const std::string &key, int64 start, int64 stop);
 
-    // List (GM 应答日志)
+    // List (GM 应答日志 / 登录排队)
     int32 RPush(const std::string &key, const std::string &value);
     int32 LTrim(const std::string &key, int64 start, int64 stop);
+    int32 LPop(const std::string &key, std::string &out);
+    int32 LRange(const std::string &key, int64 start, int64 stop, std::vector<std::string> &out);
+    int64 LLen(const std::string &key);
 
     // Pub/Sub (GM 控制面广播, 集群内全局广播)
     int64 Publish(const std::string &channel, const std::string &message);

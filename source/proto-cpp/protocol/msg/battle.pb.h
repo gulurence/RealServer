@@ -78,6 +78,12 @@ extern PBBattleLeaveReqDefaultTypeInternal _PBBattleLeaveReq_default_instance_;
 class PBBattleLeaveRsp;
 struct PBBattleLeaveRspDefaultTypeInternal;
 extern PBBattleLeaveRspDefaultTypeInternal _PBBattleLeaveRsp_default_instance_;
+class PBBattleLoginReq;
+struct PBBattleLoginReqDefaultTypeInternal;
+extern PBBattleLoginReqDefaultTypeInternal _PBBattleLoginReq_default_instance_;
+class PBBattleLoginRsp;
+struct PBBattleLoginRspDefaultTypeInternal;
+extern PBBattleLoginRspDefaultTypeInternal _PBBattleLoginRsp_default_instance_;
 class PBBattlePlayer;
 struct PBBattlePlayerDefaultTypeInternal;
 extern PBBattlePlayerDefaultTypeInternal _PBBattlePlayer_default_instance_;
@@ -109,6 +115,8 @@ enum BattleMsgId : int {
   BATTLE_LEAVE_REQ = 8,
   BATTLE_LEAVE_RSP = 9,
   BATTLE_HASH_NTF = 10,
+  BATTLE_LOGIN_REQ = 12,
+  BATTLE_LOGIN_RSP = 13,
   BattleMsgId_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   BattleMsgId_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -118,8 +126,8 @@ enum BattleMsgId : int {
 bool BattleMsgId_IsValid(int value);
 extern const uint32_t BattleMsgId_internal_data_[];
 constexpr BattleMsgId BattleMsgId_MIN = static_cast<BattleMsgId>(0);
-constexpr BattleMsgId BattleMsgId_MAX = static_cast<BattleMsgId>(10);
-constexpr int BattleMsgId_ARRAYSIZE = 10 + 1;
+constexpr BattleMsgId BattleMsgId_MAX = static_cast<BattleMsgId>(13);
+constexpr int BattleMsgId_ARRAYSIZE = 13 + 1;
 const ::google::protobuf::EnumDescriptor*
 BattleMsgId_descriptor();
 template <typename T>
@@ -132,7 +140,7 @@ const std::string& BattleMsgId_Name(T value) {
 template <>
 inline const std::string& BattleMsgId_Name(BattleMsgId value) {
   return ::google::protobuf::internal::NameOfDenseEnum<BattleMsgId_descriptor,
-                                                 0, 10>(
+                                                 0, 13>(
       static_cast<int>(value));
 }
 inline bool BattleMsgId_Parse(absl::string_view name, BattleMsgId* value) {
@@ -1179,6 +1187,488 @@ class PBBattlePlayer final : public ::google::protobuf::Message
     ::uint32_t attack_;
     ::uint32_t defense_;
     ::uint32_t hp_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_msg_2fbattle_2eproto;
+};
+// -------------------------------------------------------------------
+
+class PBBattleLoginRsp final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:PbBattle.PBBattleLoginRsp) */ {
+ public:
+  inline PBBattleLoginRsp() : PBBattleLoginRsp(nullptr) {}
+  ~PBBattleLoginRsp() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(PBBattleLoginRsp* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(PBBattleLoginRsp));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR PBBattleLoginRsp(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline PBBattleLoginRsp(const PBBattleLoginRsp& from) : PBBattleLoginRsp(nullptr, from) {}
+  inline PBBattleLoginRsp(PBBattleLoginRsp&& from) noexcept
+      : PBBattleLoginRsp(nullptr, std::move(from)) {}
+  inline PBBattleLoginRsp& operator=(const PBBattleLoginRsp& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PBBattleLoginRsp& operator=(PBBattleLoginRsp&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PBBattleLoginRsp& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PBBattleLoginRsp* internal_default_instance() {
+    return reinterpret_cast<const PBBattleLoginRsp*>(
+        &_PBBattleLoginRsp_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 13;
+  friend void swap(PBBattleLoginRsp& a, PBBattleLoginRsp& b) { a.Swap(&b); }
+  inline void Swap(PBBattleLoginRsp* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PBBattleLoginRsp* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PBBattleLoginRsp* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<PBBattleLoginRsp>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const PBBattleLoginRsp& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const PBBattleLoginRsp& from) { PBBattleLoginRsp::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(PBBattleLoginRsp* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "PbBattle.PBBattleLoginRsp"; }
+
+ protected:
+  explicit PBBattleLoginRsp(::google::protobuf::Arena* arena);
+  PBBattleLoginRsp(::google::protobuf::Arena* arena, const PBBattleLoginRsp& from);
+  PBBattleLoginRsp(::google::protobuf::Arena* arena, PBBattleLoginRsp&& from) noexcept
+      : PBBattleLoginRsp(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kBigTypeFieldNumber = 1,
+    kSmallTypeFieldNumber = 2,
+    kBattleIdFieldNumber = 4,
+    kErrorCodeFieldNumber = 3,
+  };
+  // uint32 big_type = 1;
+  void clear_big_type() ;
+  ::uint32_t big_type() const;
+  void set_big_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_big_type() const;
+  void _internal_set_big_type(::uint32_t value);
+
+  public:
+  // uint32 small_type = 2;
+  void clear_small_type() ;
+  ::uint32_t small_type() const;
+  void set_small_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_small_type() const;
+  void _internal_set_small_type(::uint32_t value);
+
+  public:
+  // int64 battle_id = 4;
+  void clear_battle_id() ;
+  ::int64_t battle_id() const;
+  void set_battle_id(::int64_t value);
+
+  private:
+  ::int64_t _internal_battle_id() const;
+  void _internal_set_battle_id(::int64_t value);
+
+  public:
+  // .PbID.ErrorCode error_code = 3;
+  void clear_error_code() ;
+  ::PbID::ErrorCode error_code() const;
+  void set_error_code(::PbID::ErrorCode value);
+
+  private:
+  ::PbID::ErrorCode _internal_error_code() const;
+  void _internal_set_error_code(::PbID::ErrorCode value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:PbBattle.PBBattleLoginRsp)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      2, 4, 0,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const PBBattleLoginRsp& from_msg);
+    ::uint32_t big_type_;
+    ::uint32_t small_type_;
+    ::int64_t battle_id_;
+    int error_code_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_msg_2fbattle_2eproto;
+};
+// -------------------------------------------------------------------
+
+class PBBattleLoginReq final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:PbBattle.PBBattleLoginReq) */ {
+ public:
+  inline PBBattleLoginReq() : PBBattleLoginReq(nullptr) {}
+  ~PBBattleLoginReq() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(PBBattleLoginReq* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(PBBattleLoginReq));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR PBBattleLoginReq(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline PBBattleLoginReq(const PBBattleLoginReq& from) : PBBattleLoginReq(nullptr, from) {}
+  inline PBBattleLoginReq(PBBattleLoginReq&& from) noexcept
+      : PBBattleLoginReq(nullptr, std::move(from)) {}
+  inline PBBattleLoginReq& operator=(const PBBattleLoginReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PBBattleLoginReq& operator=(PBBattleLoginReq&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PBBattleLoginReq& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PBBattleLoginReq* internal_default_instance() {
+    return reinterpret_cast<const PBBattleLoginReq*>(
+        &_PBBattleLoginReq_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 12;
+  friend void swap(PBBattleLoginReq& a, PBBattleLoginReq& b) { a.Swap(&b); }
+  inline void Swap(PBBattleLoginReq* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PBBattleLoginReq* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PBBattleLoginReq* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<PBBattleLoginReq>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const PBBattleLoginReq& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const PBBattleLoginReq& from) { PBBattleLoginReq::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(PBBattleLoginReq* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "PbBattle.PBBattleLoginReq"; }
+
+ protected:
+  explicit PBBattleLoginReq(::google::protobuf::Arena* arena);
+  PBBattleLoginReq(::google::protobuf::Arena* arena, const PBBattleLoginReq& from);
+  PBBattleLoginReq(::google::protobuf::Arena* arena, PBBattleLoginReq&& from) noexcept
+      : PBBattleLoginReq(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kAuthKeyFieldNumber = 4,
+    kBigTypeFieldNumber = 1,
+    kSmallTypeFieldNumber = 2,
+    kBattleIdFieldNumber = 3,
+    kPlayerIdFieldNumber = 5,
+    kSpectateFieldNumber = 6,
+  };
+  // string auth_key = 4;
+  void clear_auth_key() ;
+  const std::string& auth_key() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_auth_key(Arg_&& arg, Args_... args);
+  std::string* mutable_auth_key();
+  PROTOBUF_NODISCARD std::string* release_auth_key();
+  void set_allocated_auth_key(std::string* value);
+
+  private:
+  const std::string& _internal_auth_key() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_auth_key(
+      const std::string& value);
+  std::string* _internal_mutable_auth_key();
+
+  public:
+  // uint32 big_type = 1;
+  void clear_big_type() ;
+  ::uint32_t big_type() const;
+  void set_big_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_big_type() const;
+  void _internal_set_big_type(::uint32_t value);
+
+  public:
+  // uint32 small_type = 2;
+  void clear_small_type() ;
+  ::uint32_t small_type() const;
+  void set_small_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_small_type() const;
+  void _internal_set_small_type(::uint32_t value);
+
+  public:
+  // int64 battle_id = 3;
+  void clear_battle_id() ;
+  ::int64_t battle_id() const;
+  void set_battle_id(::int64_t value);
+
+  private:
+  ::int64_t _internal_battle_id() const;
+  void _internal_set_battle_id(::int64_t value);
+
+  public:
+  // int64 player_id = 5;
+  void clear_player_id() ;
+  ::int64_t player_id() const;
+  void set_player_id(::int64_t value);
+
+  private:
+  ::int64_t _internal_player_id() const;
+  void _internal_set_player_id(::int64_t value);
+
+  public:
+  // bool spectate = 6;
+  void clear_spectate() ;
+  bool spectate() const;
+  void set_spectate(bool value);
+
+  private:
+  bool _internal_spectate() const;
+  void _internal_set_spectate(bool value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:PbBattle.PBBattleLoginReq)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      3, 6, 0,
+      42, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const PBBattleLoginReq& from_msg);
+    ::google::protobuf::internal::ArenaStringPtr auth_key_;
+    ::uint32_t big_type_;
+    ::uint32_t small_type_;
+    ::int64_t battle_id_;
+    ::int64_t player_id_;
+    bool spectate_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -4890,6 +5380,260 @@ inline ::uint64_t PBBattleHashNtf::_internal_state_hash() const {
 inline void PBBattleHashNtf::_internal_set_state_hash(::uint64_t value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.state_hash_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PBBattleLoginReq
+
+// uint32 big_type = 1;
+inline void PBBattleLoginReq::clear_big_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = 0u;
+}
+inline ::uint32_t PBBattleLoginReq::big_type() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleLoginReq.big_type)
+  return _internal_big_type();
+}
+inline void PBBattleLoginReq::set_big_type(::uint32_t value) {
+  _internal_set_big_type(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleLoginReq.big_type)
+}
+inline ::uint32_t PBBattleLoginReq::_internal_big_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.big_type_;
+}
+inline void PBBattleLoginReq::_internal_set_big_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = value;
+}
+
+// uint32 small_type = 2;
+inline void PBBattleLoginReq::clear_small_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = 0u;
+}
+inline ::uint32_t PBBattleLoginReq::small_type() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleLoginReq.small_type)
+  return _internal_small_type();
+}
+inline void PBBattleLoginReq::set_small_type(::uint32_t value) {
+  _internal_set_small_type(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleLoginReq.small_type)
+}
+inline ::uint32_t PBBattleLoginReq::_internal_small_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.small_type_;
+}
+inline void PBBattleLoginReq::_internal_set_small_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = value;
+}
+
+// int64 battle_id = 3;
+inline void PBBattleLoginReq::clear_battle_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_id_ = ::int64_t{0};
+}
+inline ::int64_t PBBattleLoginReq::battle_id() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleLoginReq.battle_id)
+  return _internal_battle_id();
+}
+inline void PBBattleLoginReq::set_battle_id(::int64_t value) {
+  _internal_set_battle_id(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleLoginReq.battle_id)
+}
+inline ::int64_t PBBattleLoginReq::_internal_battle_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.battle_id_;
+}
+inline void PBBattleLoginReq::_internal_set_battle_id(::int64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_id_ = value;
+}
+
+// string auth_key = 4;
+inline void PBBattleLoginReq::clear_auth_key() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.auth_key_.ClearToEmpty();
+}
+inline const std::string& PBBattleLoginReq::auth_key() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleLoginReq.auth_key)
+  return _internal_auth_key();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PBBattleLoginReq::set_auth_key(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.auth_key_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleLoginReq.auth_key)
+}
+inline std::string* PBBattleLoginReq::mutable_auth_key() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_auth_key();
+  // @@protoc_insertion_point(field_mutable:PbBattle.PBBattleLoginReq.auth_key)
+  return _s;
+}
+inline const std::string& PBBattleLoginReq::_internal_auth_key() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.auth_key_.Get();
+}
+inline void PBBattleLoginReq::_internal_set_auth_key(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.auth_key_.Set(value, GetArena());
+}
+inline std::string* PBBattleLoginReq::_internal_mutable_auth_key() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.auth_key_.Mutable( GetArena());
+}
+inline std::string* PBBattleLoginReq::release_auth_key() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:PbBattle.PBBattleLoginReq.auth_key)
+  return _impl_.auth_key_.Release();
+}
+inline void PBBattleLoginReq::set_allocated_auth_key(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.auth_key_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.auth_key_.IsDefault()) {
+    _impl_.auth_key_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:PbBattle.PBBattleLoginReq.auth_key)
+}
+
+// int64 player_id = 5;
+inline void PBBattleLoginReq::clear_player_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.player_id_ = ::int64_t{0};
+}
+inline ::int64_t PBBattleLoginReq::player_id() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleLoginReq.player_id)
+  return _internal_player_id();
+}
+inline void PBBattleLoginReq::set_player_id(::int64_t value) {
+  _internal_set_player_id(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleLoginReq.player_id)
+}
+inline ::int64_t PBBattleLoginReq::_internal_player_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.player_id_;
+}
+inline void PBBattleLoginReq::_internal_set_player_id(::int64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.player_id_ = value;
+}
+
+// bool spectate = 6;
+inline void PBBattleLoginReq::clear_spectate() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.spectate_ = false;
+}
+inline bool PBBattleLoginReq::spectate() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleLoginReq.spectate)
+  return _internal_spectate();
+}
+inline void PBBattleLoginReq::set_spectate(bool value) {
+  _internal_set_spectate(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleLoginReq.spectate)
+}
+inline bool PBBattleLoginReq::_internal_spectate() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.spectate_;
+}
+inline void PBBattleLoginReq::_internal_set_spectate(bool value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.spectate_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PBBattleLoginRsp
+
+// uint32 big_type = 1;
+inline void PBBattleLoginRsp::clear_big_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = 0u;
+}
+inline ::uint32_t PBBattleLoginRsp::big_type() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleLoginRsp.big_type)
+  return _internal_big_type();
+}
+inline void PBBattleLoginRsp::set_big_type(::uint32_t value) {
+  _internal_set_big_type(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleLoginRsp.big_type)
+}
+inline ::uint32_t PBBattleLoginRsp::_internal_big_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.big_type_;
+}
+inline void PBBattleLoginRsp::_internal_set_big_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = value;
+}
+
+// uint32 small_type = 2;
+inline void PBBattleLoginRsp::clear_small_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = 0u;
+}
+inline ::uint32_t PBBattleLoginRsp::small_type() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleLoginRsp.small_type)
+  return _internal_small_type();
+}
+inline void PBBattleLoginRsp::set_small_type(::uint32_t value) {
+  _internal_set_small_type(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleLoginRsp.small_type)
+}
+inline ::uint32_t PBBattleLoginRsp::_internal_small_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.small_type_;
+}
+inline void PBBattleLoginRsp::_internal_set_small_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = value;
+}
+
+// .PbID.ErrorCode error_code = 3;
+inline void PBBattleLoginRsp::clear_error_code() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.error_code_ = 0;
+}
+inline ::PbID::ErrorCode PBBattleLoginRsp::error_code() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleLoginRsp.error_code)
+  return _internal_error_code();
+}
+inline void PBBattleLoginRsp::set_error_code(::PbID::ErrorCode value) {
+  _internal_set_error_code(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleLoginRsp.error_code)
+}
+inline ::PbID::ErrorCode PBBattleLoginRsp::_internal_error_code() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return static_cast<::PbID::ErrorCode>(_impl_.error_code_);
+}
+inline void PBBattleLoginRsp::_internal_set_error_code(::PbID::ErrorCode value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.error_code_ = value;
+}
+
+// int64 battle_id = 4;
+inline void PBBattleLoginRsp::clear_battle_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_id_ = ::int64_t{0};
+}
+inline ::int64_t PBBattleLoginRsp::battle_id() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleLoginRsp.battle_id)
+  return _internal_battle_id();
+}
+inline void PBBattleLoginRsp::set_battle_id(::int64_t value) {
+  _internal_set_battle_id(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleLoginRsp.battle_id)
+}
+inline ::int64_t PBBattleLoginRsp::_internal_battle_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.battle_id_;
+}
+inline void PBBattleLoginRsp::_internal_set_battle_id(::int64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_id_ = value;
 }
 
 #ifdef __GNUC__

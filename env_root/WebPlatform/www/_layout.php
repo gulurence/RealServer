@@ -32,6 +32,7 @@ const PROCESS_TYPES = [
     101 => 'Login',
     102 => 'Global',
     201 => 'Game',
+    202 => 'Battle',
 ];
 
 const ACTOR_TYPES = [
@@ -99,6 +100,7 @@ function nav_groups(): array
         ],
         '配置' => [
             'settings_server'   => ['服务器基础配置', 'settings_server.php'],
+            'settings_game'     => ['服务器游戏配置', 'settings_game.php'],
             'settings_scaling'  => ['扩缩容配置', 'settings_scaling.php'],
             'settings_nodes'    => ['节点配置', 'settings_nodes.php'],
         ],
@@ -137,6 +139,7 @@ function nav_icon(string $key): string
         'server_logs'     => 'ti-file-text',
         'cluster'         => 'ti-layout-dashboard',
         'settings_server' => 'ti-settings',
+        'settings_game'   => 'ti-adjustments',
         'settings_scaling'=> 'ti-adjustments-horizontal',
         'settings_nodes'  => 'ti-cpu',
         'gray_update'     => 'ti-package',

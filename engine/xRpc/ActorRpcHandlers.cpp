@@ -8,6 +8,7 @@
 #include "xActor/ActorScheduler.h"
 #include "xCluster/xProcessDefine.h"
 #include "luacore/CLuaActor.h"
+#include "xNet/CNetGateway.h"
 #include "xLog/xLog.h"
 
 void RegisterActorRpcHandlers()
@@ -314,5 +315,34 @@ void RegisterActorRpcHandlers()
                          return result;
                      });
 
-    XLOG("[ActorRpc] registered %d actor RPC methods", 6);
+    // --- 定向踢下线 (Login→Gate) ---
+    // body = [int64 cid] (小端 8 字节)。由 Login 进程在「同账号并发登录踢旧」时
+    // 定向发到旧连接的 Gate 进程。直接调 CNetGateway::KickConnection 关闭 socket,
+    // 随后 xNetAgent 触发 OnDisconnect → SYS_DISCONNECT → Gate Lua on_rpc_disconnect
+    // 完成连接映射清理与离线收尾 (无需经 Lua, 无回包)。
+    server->Register(RPC_METHOD_KICK,
+                     [](const std::string &reqBody) -> RpcHandlerResult
+                     {
+                         RpcHandlerResult result;
+                         if (reqBody.size() < 8)
+                         {
+                             result.errCode = 1;
+                             return result;
+                         }
+
+                         const uint8 *p = (const uint8 *)reqBody.data();
+                         int64 cid = 0;
+                         for (int32 i = 0; i < 8; ++i)
+                         {
+                             cid |= ((int64)p[i]) << (8 * i);
+                         }
+
+                         XLOG("[KickRpc] kick connection cid=%lld", (int64)cid);
+                         CNetGateway::instance()->KickConnection((NetCID)cid);
+
+                         result.errCode = 0;
+                         return result;
+                     });
+
+    XLOG("[ActorRpc] registered %d actor RPC methods", 7);
 }

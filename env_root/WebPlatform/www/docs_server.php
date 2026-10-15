@@ -32,8 +32,9 @@ layout_header('服务端架构', 'docs_server');
             <tbody>
                 <tr><td>100</td><td>Gate</td><td>EGate</td><td>网关：客户端 TCP 接入、鉴权、协议路由</td></tr>
                 <tr><td>101</td><td>Login</td><td>ELogin</td><td>登录 / 选角 / 创角</td></tr>
-                <tr><td>102</td><td>Global</td><td>EFriend · ERoom · EChat · EConfig（单例）</td><td>全局服务：好友 / 房间 / 聊天 / 配置热更</td></tr>
-                <tr><td>201</td><td>Game</td><td>EPlayer · EBattle · ESpectator（多实例）</td><td>战斗承载：玩家 / 战斗 / 观战</td></tr>
+                <tr><td>102</td><td>Global</td><td>EFriend · EChat · EConfig（单例）</td><td>全局服务：好友 / 聊天 / 配置热更</td></tr>
+                <tr><td>201</td><td>Game</td><td>EPlayer · ERoom</td><td>游戏承载：玩家 / 房间</td></tr>
+                <tr><td>202</td><td>Battle</td><td>EBattle · ESpectator（多实例）</td><td>战斗承载：帧同步战斗 / 观战（客户端直连）</td></tr>
             </tbody>
         </table></div>
         <div class="dim">

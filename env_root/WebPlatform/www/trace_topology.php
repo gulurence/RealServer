@@ -136,7 +136,9 @@ function fetch_nodes(?RedisCluster $r): array
             $nodes[node_key($type, (int)$id)] = [
                 'type' => $type,
                 'id'   => (int)$id,
-                'name' => (string)($hash['name'] ?? ("process-{$id}")),
+                // name 缺失时回退为类型名+id (如 "Battle-284"), 比 "process-284" 更有信息量;
+                // 服务端心跳自愈后 name 会恢复为真实进程名 (如 "battle-01")。
+                'name' => (string)($hash['name'] ?? (process_type_name((string)$type) . '-' . $id)),
             ];
         }
     }
@@ -641,7 +643,7 @@ if ($isAjax) {
         });
 
         function PROCESS_LABEL(t) {
-            return {100:'Gate',101:'Login',102:'Global',201:'Game'}[t] || ('T' + t);
+            return {100:'Gate',101:'Login',102:'Global',201:'Game',202:'Battle'}[t] || ('T' + t);
         }
 
         // 根据选中态刷新全部连线的颜色/粗细/明暗

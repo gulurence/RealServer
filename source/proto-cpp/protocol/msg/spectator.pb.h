@@ -1619,6 +1619,7 @@ class PBSpectateEnterRsp final : public ::google::protobuf::Message
   // accessors -------------------------------------------------------
   enum : int {
     kPlayersFieldNumber = 6,
+    kHostIpFieldNumber = 10,
     kBigTypeFieldNumber = 1,
     kSmallTypeFieldNumber = 2,
     kBattleIdFieldNumber = 4,
@@ -1626,6 +1627,7 @@ class PBSpectateEnterRsp final : public ::google::protobuf::Message
     kSeedFieldNumber = 5,
     kLevelIdFieldNumber = 8,
     kDifficultyFieldNumber = 9,
+    kPortFieldNumber = 11,
   };
   // repeated .PbBattle.PBBattlePlayer players = 6;
   int players_size() const;
@@ -1644,6 +1646,22 @@ class PBSpectateEnterRsp final : public ::google::protobuf::Message
   const ::PbBattle::PBBattlePlayer& players(int index) const;
   ::PbBattle::PBBattlePlayer* add_players();
   const ::google::protobuf::RepeatedPtrField<::PbBattle::PBBattlePlayer>& players() const;
+  // string host_ip = 10;
+  void clear_host_ip() ;
+  const std::string& host_ip() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_host_ip(Arg_&& arg, Args_... args);
+  std::string* mutable_host_ip();
+  PROTOBUF_NODISCARD std::string* release_host_ip();
+  void set_allocated_host_ip(std::string* value);
+
+  private:
+  const std::string& _internal_host_ip() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_host_ip(
+      const std::string& value);
+  std::string* _internal_mutable_host_ip();
+
+  public:
   // uint32 big_type = 1;
   void clear_big_type() ;
   ::uint32_t big_type() const;
@@ -1714,13 +1732,23 @@ class PBSpectateEnterRsp final : public ::google::protobuf::Message
   void _internal_set_difficulty(::uint32_t value);
 
   public:
+  // int32 port = 11;
+  void clear_port() ;
+  ::int32_t port() const;
+  void set_port(::int32_t value);
+
+  private:
+  ::int32_t _internal_port() const;
+  void _internal_set_port(::int32_t value);
+
+  public:
   // @@protoc_insertion_point(class_scope:PbSpectator.PBSpectateEnterRsp)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      4, 8, 1,
-      0, 2>
+      4, 10, 1,
+      54, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -1738,6 +1766,7 @@ class PBSpectateEnterRsp final : public ::google::protobuf::Message
                           ::google::protobuf::Arena* arena, const Impl_& from,
                           const PBSpectateEnterRsp& from_msg);
     ::google::protobuf::RepeatedPtrField< ::PbBattle::PBBattlePlayer > players_;
+    ::google::protobuf::internal::ArenaStringPtr host_ip_;
     ::uint32_t big_type_;
     ::uint32_t small_type_;
     ::int64_t battle_id_;
@@ -1745,6 +1774,7 @@ class PBSpectateEnterRsp final : public ::google::protobuf::Message
     ::uint32_t seed_;
     ::uint32_t level_id_;
     ::uint32_t difficulty_;
+    ::int32_t port_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -2057,6 +2087,76 @@ inline ::uint32_t PBSpectateEnterRsp::_internal_difficulty() const {
 inline void PBSpectateEnterRsp::_internal_set_difficulty(::uint32_t value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.difficulty_ = value;
+}
+
+// string host_ip = 10;
+inline void PBSpectateEnterRsp::clear_host_ip() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.host_ip_.ClearToEmpty();
+}
+inline const std::string& PBSpectateEnterRsp::host_ip() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:PbSpectator.PBSpectateEnterRsp.host_ip)
+  return _internal_host_ip();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PBSpectateEnterRsp::set_host_ip(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.host_ip_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:PbSpectator.PBSpectateEnterRsp.host_ip)
+}
+inline std::string* PBSpectateEnterRsp::mutable_host_ip() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_host_ip();
+  // @@protoc_insertion_point(field_mutable:PbSpectator.PBSpectateEnterRsp.host_ip)
+  return _s;
+}
+inline const std::string& PBSpectateEnterRsp::_internal_host_ip() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.host_ip_.Get();
+}
+inline void PBSpectateEnterRsp::_internal_set_host_ip(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.host_ip_.Set(value, GetArena());
+}
+inline std::string* PBSpectateEnterRsp::_internal_mutable_host_ip() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.host_ip_.Mutable( GetArena());
+}
+inline std::string* PBSpectateEnterRsp::release_host_ip() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:PbSpectator.PBSpectateEnterRsp.host_ip)
+  return _impl_.host_ip_.Release();
+}
+inline void PBSpectateEnterRsp::set_allocated_host_ip(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.host_ip_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.host_ip_.IsDefault()) {
+    _impl_.host_ip_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:PbSpectator.PBSpectateEnterRsp.host_ip)
+}
+
+// int32 port = 11;
+inline void PBSpectateEnterRsp::clear_port() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.port_ = 0;
+}
+inline ::int32_t PBSpectateEnterRsp::port() const {
+  // @@protoc_insertion_point(field_get:PbSpectator.PBSpectateEnterRsp.port)
+  return _internal_port();
+}
+inline void PBSpectateEnterRsp::set_port(::int32_t value) {
+  _internal_set_port(value);
+  // @@protoc_insertion_point(field_set:PbSpectator.PBSpectateEnterRsp.port)
+}
+inline ::int32_t PBSpectateEnterRsp::_internal_port() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.port_;
+}
+inline void PBSpectateEnterRsp::_internal_set_port(::int32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.port_ = value;
 }
 
 // -------------------------------------------------------------------

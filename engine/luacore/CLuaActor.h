@@ -72,6 +72,14 @@ public:
     // @return true 若 on_gm_cmd 存在且调用成功 (outReply 已填充, 可能为空串)
     bool DispatchGmCommand(const std::string &strCmd, std::string &outReply);
 
+    // 灰度迁移: 调 Lua delegate 的 data_save(saveType) 落 Redis (2=迁移保存/3=删除清理)。
+    // 仅在调度线程 (DispatchSync/消息循环) 内调用, 与业务 on_msg 串行, 不并发触碰 lua_State。
+    bool CallDataSave(int32 i32SaveType);
+
+    // 灰度迁移: 调 Lua delegate 的 data_load() 从 Redis 恢复内存态。兼容
+    // data_load(actor_data) 签名, 以空串作参数传入。
+    bool CallDataLoad();
+
     // 收到一条消息 (msgId + raw body)，转发到 Lua delegate 的 on_msg。
     virtual void OnMessage(uint32 u32MsgId, const std::string &strBody) override;
 

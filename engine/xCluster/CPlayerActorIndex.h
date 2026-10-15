@@ -58,6 +58,11 @@ public:
     // 进程每 5s 心跳对每个 Player Actor 调用; 进程宕机后由 Redis 过期自动清理。
     void RefreshTtl(int64 playerId);
 
+    // PlayerActor 总数计数器 (登录排队限流): cluster:load:player_count。
+    // 创建 PlayerActor 成功后 Incr, 卸载时 Decr (Login 进程据此判定是否排队)。
+    int64 IncrPlayerCount();
+    int64 DecrPlayerCount();
+
 private:
     class CRedisCli *GetRedisCli() const
     {

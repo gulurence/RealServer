@@ -142,12 +142,12 @@ layout_header('客户端架构', 'docs_client');
                 <tr><td>EGate</td><td>100</td><td>Gate</td><td>网关 Actor，客户端接入</td></tr>
                 <tr><td>ELogin</td><td>101</td><td>Login</td><td>登录 / 选角 / 创角</td></tr>
                 <tr><td>EFriend</td><td>102</td><td>Global</td><td>好友（单例）</td></tr>
-                <tr><td>ERoom</td><td>103</td><td>Global</td><td>房间（单例）</td></tr>
+                <tr><td>ERoom</td><td>103</td><td>Game</td><td>房间（单例）</td></tr>
                 <tr><td>EChat</td><td>104</td><td>Global</td><td>聊天（单例）</td></tr>
                 <tr><td>EConfig</td><td>105</td><td>Global</td><td>配置热更（单例）</td></tr>
-                <tr><td>EPlayer</td><td>201</td><td>Game</td><td>玩家（Game 进程承载）</td></tr>
-                <tr><td>EBattle</td><td>203</td><td>Game</td><td>战斗（多实例）</td></tr>
-                <tr><td>ESpectator</td><td>204</td><td>Game</td><td>观战（多实例）</td></tr>
+                <tr><td>EPlayer</td><td>201</td><td>Game</td><td>玩家（多实例）</td></tr>
+                <tr><td>EBattle</td><td>203</td><td>Battle</td><td>战斗（多实例）</td></tr>
+                <tr><td>ESpectator</td><td>204</td><td>Battle</td><td>观战（多实例）</td></tr>
             </tbody>
         </table></div>
         <div class="dim">

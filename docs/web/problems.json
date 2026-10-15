@@ -140,7 +140,7 @@
       "priority": "high",
       "milestone": "M2",
       "title": "Battle/Spectator 多实例需定位到 ActorIndex 层",
-      "note": "ABattle=203 与 APlayer 同驻 Game、ASpectator=204 同驻 Global，均多实例，若 ActorID 寻址只覆盖到进程层会误投；需依赖自描述路由定位到 ActorIndex。"
+      "note": "ABattle=203 与 ASpectator=204 同驻 Battle 进程，均多实例，若 ActorID 寻址只覆盖到进程层会误投；需依赖自描述路由定位到 ActorIndex。"
     },
     {
       "id": "C1",

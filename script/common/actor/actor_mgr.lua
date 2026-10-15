@@ -281,6 +281,17 @@ function xEngine.ActorMgr.getByType(actorType)
     return localInstances[actorType] or {}
 end
 
+-- 遍历所有本地实例 (type, id, instance) → callback(type, id, instance)。
+-- 先对 type/id 拍快照再回调, 避免回调内部增删 localInstances 破坏迭代器 (灰度迁移 saveAll)。
+function xEngine.ActorMgr.forEachInstance(callback)
+    if type(callback) ~= "function" then return end
+    for actorType, instances in pairs(localInstances) do
+        for actorID, instance in pairs(instances) do
+            callback(actorType, actorID, instance)
+        end
+    end
+end
+
 function xEngine.ActorMgr.getInstanceCount()
     return luacore.si_actor_mgr_get_instance_count()
 end

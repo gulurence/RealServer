@@ -42,19 +42,19 @@ const char descriptor_table_protodef_msg_2fmsg_5fid_2eproto[] ABSL_ATTRIBUTE_SEC
     "te\022\031\n\025ACCOUNT_STATE_CREATED\020\000\022\033\n\027ACCOUNT"
     "_STATE_LOGGED_IN\020\001\022\035\n\031ACCOUNT_STATE_ROLE"
     "_LISTED\020\002\022\037\n\033ACCOUNT_STATE_ROLE_SELECTED"
-    "\020\003\022\031\n\025ACCOUNT_STATE_IN_GAME\020\004*\320\001\n\tErrorC"
+    "\020\003\022\031\n\025ACCOUNT_STATE_IN_GAME\020\004*\341\001\n\tErrorC"
     "ode\022\014\n\010ERR_NONE\020\000\022\030\n\023ERR_SESSION_INVALID"
     "\020\351\007\022\032\n\025ERR_ACCOUNT_NOT_FOUND\020\352\007\022\027\n\022ERR_R"
     "OLE_NOT_FOUND\020\353\007\022\035\n\030ERR_NO_AVAILABLE_PRO"
     "CESS\020\354\007\022\030\n\023ERR_ROLE_NAME_TAKEN\020\355\007\022\032\n\025ERR"
-    "_ROLE_NAME_INVALID\020\356\007\022\021\n\014ERR_INTERNAL\020\317\017"
-    "b\006proto3"
+    "_ROLE_NAME_INVALID\020\356\007\022\017\n\nERR_QUEUED\020\357\007\022\021"
+    "\n\014ERR_INTERNAL\020\317\017b\006proto3"
 };
 static ::absl::once_flag descriptor_table_msg_2fmsg_5fid_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_msg_2fmsg_5fid_2eproto = {
     false,
     false,
-    568,
+    585,
     descriptor_table_protodef_msg_2fmsg_5fid_2eproto,
     "msg/msg_id.proto",
     &descriptor_table_msg_2fmsg_5fid_2eproto_once,
@@ -91,7 +91,7 @@ const ::google::protobuf::EnumDescriptor* ErrorCode_descriptor() {
   return file_level_enum_descriptors_msg_2fmsg_5fid_2eproto[2];
 }
 PROTOBUF_CONSTINIT const uint32_t ErrorCode_internal_data_[] = {
-    65536u, 458752u, 1004u, 1002u, 1006u, 1001u, 1003u, 1005u, 1999u, };
+    65536u, 524288u, 1005u, 1003u, 1007u, 1002u, 1004u, 1006u, 1999u, 1001u, };
 bool ErrorCode_IsValid(int value) {
   return ::_pbi::ValidateEnum(value, ErrorCode_internal_data_);
 }

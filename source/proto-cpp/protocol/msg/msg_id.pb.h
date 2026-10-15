@@ -134,6 +134,7 @@ enum ErrorCode : int {
   ERR_NO_AVAILABLE_PROCESS = 1004,
   ERR_ROLE_NAME_TAKEN = 1005,
   ERR_ROLE_NAME_INVALID = 1006,
+  ERR_QUEUED = 1007,
   ERR_INTERNAL = 1999,
   ErrorCode_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),

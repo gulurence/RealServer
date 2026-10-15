@@ -275,3 +275,132 @@ function xEngine.Role.belongsTo(accountId, roleId)
     end
     return nil
 end
+
+--------------------------------------------------------------------------------
+-- 账户 session 同步 (跨 LoginActor 并发登录控制)
+--   account:{id}:session → Hash, 记录该账户「当前整体游戏状态」登录→离线:
+--     state        0=OFFLINE 1=LOGGED_IN 2=ROLE_SELECTED 3=IN_GAME 4=IN_BATTLE
+--     login_process 当前登录所在 Login 进程 ID
+--     gate_process  当前连接所在 Gate 进程 ID (踢旧时定向断开用)
+--     cid           当前连接在 Gate 上的 CID
+--     token / last_seen / kicked
+--   整体设 TTL (30s), 心跳/消息续期; 进程宕机后由 Redis 过期兜底清理。
+--------------------------------------------------------------------------------
+xEngine.SessionState = {
+    OFFLINE       = 0,
+    LOGGED_IN     = 1,
+    ROLE_SELECTED = 2,
+    IN_GAME       = 3,
+    IN_BATTLE     = 4,
+}
+
+xEngine.AccountSession = {}
+
+function xEngine.AccountSession.key(accountId)
+    return "account:" .. xEngine.Number.intKey(accountId) .. ":session"
+end
+
+function xEngine.AccountSession.lockKey(accountId)
+    return "account:" .. xEngine.Number.intKey(accountId) .. ":login-lock"
+end
+
+--- 读 session 单字段 (不存在/空返回 nil)
+function xEngine.AccountSession.getField(accountId, field)
+    local v = xEngine.Redis.HGet(xEngine.AccountSession.key(accountId), field)
+    if v == nil or v == "" then return nil end
+    return v
+end
+
+--- 读 session 状态 (缺省 OFFLINE)
+function xEngine.AccountSession.getState(accountId)
+    return tonumber(xEngine.AccountSession.getField(accountId, "state"))
+        or xEngine.SessionState.OFFLINE
+end
+
+--- 写 session 字段 (fields: field→value, 内部 tostring; 每次写刷新 TTL)
+function xEngine.AccountSession.set(accountId, fields)
+    local key = xEngine.AccountSession.key(accountId)
+    for k, v in pairs(fields) do
+        xEngine.Redis.HSet(key, k, tostring(v))
+    end
+    xEngine.Redis.Expire(key, 30)
+end
+
+--- 每账号登录短锁 (SET NX EX), 串行化并发登录; 成功返回 true
+function xEngine.AccountSession.acquireLock(accountId, ttlSec)
+    return xEngine.Redis.SetNxEx(xEngine.AccountSession.lockKey(accountId), "1", ttlSec or 5)
+end
+
+function xEngine.AccountSession.releaseLock(accountId)
+    return xEngine.Redis.Del(xEngine.AccountSession.lockKey(accountId))
+end
+
+--------------------------------------------------------------------------------
+-- 登录排队 (集群 PlayerActor 满载时的软限流)
+--   queue:login                 → List, FIFO 存 accountId
+--   queue:login:meta:{accountId} → Hash (enqueue_ts), 幂等入队标记
+--   queue:login:avg_interval    → 平均放行间隔 (秒), 由每次出队滚动更新
+--   queue:login:last_dequeue_ts → 上次出队时间戳 (算间隔用)
+--------------------------------------------------------------------------------
+xEngine.LoginQueue = {}
+
+local QUEUE_KEY      = "queue:login"
+local QUEUE_META     = "queue:login:meta:"
+local QUEUE_AVG      = "queue:login:avg_interval"
+local QUEUE_LAST_OUT = "queue:login:last_dequeue_ts"
+
+function xEngine.LoginQueue.metaKey(accountId)
+    return QUEUE_META .. xEngine.Number.intKey(accountId)
+end
+
+--- 幂等入队 (已在队则跳过)
+function xEngine.LoginQueue.enqueue(accountId)
+    local metaKey = xEngine.LoginQueue.metaKey(accountId)
+    if xEngine.Redis.HGet(metaKey, "enqueue_ts") ~= "" then
+        return
+    end
+    xEngine.Redis.HSet(metaKey, "enqueue_ts", tostring(luacore.si_time_cur_sec()))
+    xEngine.Redis.RPush(QUEUE_KEY, xEngine.Number.intKey(accountId))
+end
+
+--- 队列位置 (1 起; 0 = 不在队中)
+function xEngine.LoginQueue.position(accountId)
+    return xEngine.Redis.LPos(QUEUE_KEY, xEngine.Number.intKey(accountId))
+end
+
+--- 队头出队并清理 meta; 空队返回 nil
+function xEngine.LoginQueue.pop()
+    local v = xEngine.Redis.LPop(QUEUE_KEY)
+    if v and v ~= "" then
+        xEngine.Redis.Del(QUEUE_META .. v)
+        return tonumber(v)
+    end
+    return nil
+end
+
+--- 移除指定账户 (未必在队头; 幂等删除 meta, 但 Redis List 的按值删除代价高,
+--  故仅在「该账户本就在队头」场景由 pop 出队; 此处仅清理 meta 供兜底)
+function xEngine.LoginQueue.removeMeta(accountId)
+    return xEngine.Redis.Del(xEngine.LoginQueue.metaKey(accountId))
+end
+
+--- 预计等待秒 = 位置 × 平均放行间隔 (平均等待时间)
+function xEngine.LoginQueue.estWait(position)
+    local avg = tonumber(xEngine.Redis.Get(QUEUE_AVG)) or 1
+    return math.max(0, position * avg)
+end
+
+--- 出队放行时更新滚动平均间隔 (interval = 距上次放行的秒数)
+function xEngine.LoginQueue.recordDequeue()
+    local now = luacore.si_time_cur_sec()
+    local last = tonumber(xEngine.Redis.Get(QUEUE_LAST_OUT))
+    if last and last > 0 then
+        local interval = now - last
+        if interval > 0 then
+            local avg = tonumber(xEngine.Redis.Get(QUEUE_AVG)) or 1
+            avg = avg * 0.9 + interval * 0.1
+            xEngine.Redis.Set(QUEUE_AVG, tostring(avg))
+        end
+    end
+    xEngine.Redis.Set(QUEUE_LAST_OUT, tostring(now))
+end

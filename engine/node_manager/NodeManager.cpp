@@ -40,7 +40,8 @@ const int32 kStaleProcessSec = 15; // 进程心跳超时 (采集资源时过滤�
 const char *kMachineCacheFile = "node_manager.machine";
 
 const EProcessType kAllProcessTypes[]
-    = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame};
+    = {EProcessType_PGate, EProcessType_PLogin, EProcessType_PGlobal, EProcessType_PGame,
+       EProcessType_PBattle};
 
 std::string NodeKey(uint32 machineId)
 {

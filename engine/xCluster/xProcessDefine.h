@@ -43,10 +43,11 @@ inline std::vector<EActorType> GetHostedActorTypes(EProcessType t)
     case EProcessType_PLogin:
         return {EActorType_ALogin};
     case EProcessType_PGlobal:
-        return {EActorType_AFriend, EActorType_ARoom, EActorType_AChat, EActorType_AConfig,
-                EActorType_ASpectator};
+        return {EActorType_AFriend, EActorType_AChat, EActorType_AConfig};
     case EProcessType_PGame:
-        return {EActorType_APlayer, EActorType_ABattle};
+        return {EActorType_APlayer, EActorType_ARoom};
+    case EProcessType_PBattle:
+        return {EActorType_ABattle, EActorType_ASpectator};
     default:
         return {};
     }
@@ -64,7 +65,7 @@ inline EProcessType ActorTypeToProcessType(EActorType actorType)
     case EActorType_AFriend:
         return EProcessType_PGlobal;
     case EActorType_ARoom:
-        return EProcessType_PGlobal;
+        return EProcessType_PGame;
     case EActorType_AChat:
         return EProcessType_PGlobal;
     case EActorType_AConfig:
@@ -72,9 +73,9 @@ inline EProcessType ActorTypeToProcessType(EActorType actorType)
     case EActorType_APlayer:
         return EProcessType_PGame;
     case EActorType_ABattle:
-        return EProcessType_PGame;
+        return EProcessType_PBattle;
     case EActorType_ASpectator:
-        return EProcessType_PGlobal;
+        return EProcessType_PBattle;
     default:
         return EProcessType_None;
     }
@@ -135,6 +136,8 @@ inline const char *ProcessTypeName(EProcessType t)
         return "Global";
     case EProcessType_PGame:
         return "Game";
+    case EProcessType_PBattle:
+        return "Battle";
     default:
         return "Unknown";
     }
@@ -149,6 +152,7 @@ inline bool IsValidProcessType(EProcessType t)
     case EProcessType_PLogin:
     case EProcessType_PGlobal:
     case EProcessType_PGame:
+    case EProcessType_PBattle:
         return true;
     default:
         return false;
@@ -217,6 +221,8 @@ struct ProcessInfo
     std::string contentVersion = "1.0.0"; // 游戏内容版本 (灰度更新动态切换)
     EProcessState state = EProcessState_Starting;
     int64 lastHeartbeat = 0; // Unix 秒时间戳
+    bool draining = false;   // 排空中: 不再接受新 Actor 分配 (Battle 进程级排空用, 见 gray_roll.ps1)
+    int64 osPid = 0;         // 本进程 OS PID (供编排脚本把 OS pid 映射到 processId 轮询排空进度)
 
     // Redis Hash 序列化 key
     std::string RedisKey() const
@@ -231,7 +237,7 @@ struct ProcessInfo
 // 各类型进程的基础 RPC 端口 (类型基础端口 + 递增分配)
 //
 // 每个类型预留 50 个端口区间, 避免同机多实例与相邻类型冲突:
-//   Gate 50551-50600 / Login 50601-50650 / Game 50651-50700 / Global 50751-50800
+//   Gate 50551-50600 / Login 50601-50650 / Game 50651-50700 / Battle 50701-50750 / Global 50751-50800
 //
 // 注: 原 50051-50250 与 Windows 的 Docker/Hyper-V/WSL 保留端口段 (50000-50366)
 // 重叠, 会导致 Login/Game 的 RPC 服务端 bind 静默失败 (50060-50159 被系统排除),
@@ -249,6 +255,8 @@ inline uint16 GetBasePortForType(EProcessType type)
         return 50751;
     case EProcessType_PGame:
         return 50651;
+    case EProcessType_PBattle:
+        return 50701;
     default:
         return 0; // 未知进程类型: 0 = 无效端口, 由调用方显式校验
     }

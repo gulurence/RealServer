@@ -154,6 +154,66 @@ struct PBBattlePlayerDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PBBattlePlayerDefaultTypeInternal _PBBattlePlayer_default_instance_;
 
+inline constexpr PBBattleLoginRsp::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : big_type_{0u},
+        small_type_{0u},
+        battle_id_{::int64_t{0}},
+        error_code_{static_cast< ::PbID::ErrorCode >(0)},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR PBBattleLoginRsp::PBBattleLoginRsp(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct PBBattleLoginRspDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR PBBattleLoginRspDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~PBBattleLoginRspDefaultTypeInternal() {}
+  union {
+    PBBattleLoginRsp _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PBBattleLoginRspDefaultTypeInternal _PBBattleLoginRsp_default_instance_;
+
+inline constexpr PBBattleLoginReq::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : auth_key_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        big_type_{0u},
+        small_type_{0u},
+        battle_id_{::int64_t{0}},
+        player_id_{::int64_t{0}},
+        spectate_{false},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR PBBattleLoginReq::PBBattleLoginReq(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct PBBattleLoginReqDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR PBBattleLoginReqDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~PBBattleLoginReqDefaultTypeInternal() {}
+  union {
+    PBBattleLoginReq _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PBBattleLoginReqDefaultTypeInternal _PBBattleLoginReq_default_instance_;
+
 inline constexpr PBBattleLeaveRsp::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : big_type_{0u},
@@ -563,6 +623,32 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleHashNtf, _impl_.battle_id_),
         PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleHashNtf, _impl_.frame_id_),
         PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleHashNtf, _impl_.state_hash_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginReq, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginReq, _impl_.big_type_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginReq, _impl_.small_type_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginReq, _impl_.battle_id_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginReq, _impl_.auth_key_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginReq, _impl_.player_id_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginReq, _impl_.spectate_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginRsp, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginRsp, _impl_.big_type_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginRsp, _impl_.small_type_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginRsp, _impl_.error_code_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginRsp, _impl_.battle_id_),
 };
 
 static const ::_pbi::MigrationSchema
@@ -579,6 +665,8 @@ static const ::_pbi::MigrationSchema
         {131, -1, -1, sizeof(::PbBattle::PBBattleLeaveReq)},
         {143, -1, -1, sizeof(::PbBattle::PBBattleLeaveRsp)},
         {154, -1, -1, sizeof(::PbBattle::PBBattleHashNtf)},
+        {167, -1, -1, sizeof(::PbBattle::PBBattleLoginReq)},
+        {181, -1, -1, sizeof(::PbBattle::PBBattleLoginRsp)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::PbBattle::_PBBattlePlayerInput_default_instance_._instance,
@@ -593,6 +681,8 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::PbBattle::_PBBattleLeaveReq_default_instance_._instance,
     &::PbBattle::_PBBattleLeaveRsp_default_instance_._instance,
     &::PbBattle::_PBBattleHashNtf_default_instance_._instance,
+    &::PbBattle::_PBBattleLoginReq_default_instance_._instance,
+    &::PbBattle::_PBBattleLoginRsp_default_instance_._instance,
 };
 const char descriptor_table_protodef_msg_2fbattle_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
@@ -635,14 +725,21 @@ const char descriptor_table_protodef_msg_2fbattle_2eproto[] ABSL_ATTRIBUTE_SECTI
     "pe\030\002 \001(\r\022#\n\nerror_code\030\003 \001(\0162\017.PbID.Erro"
     "rCode\"p\n\017PBBattleHashNtf\022\020\n\010big_type\030\001 \001"
     "(\r\022\022\n\nsmall_type\030\002 \001(\r\022\021\n\tbattle_id\030\003 \001("
-    "\003\022\020\n\010frame_id\030\004 \001(\r\022\022\n\nstate_hash\030\005 \001(\004*"
-    "\376\001\n\013BattleMsgId\022\023\n\017BATTLE_MSG_NONE\020\000\022\024\n\020"
-    "BATTLE_ENTER_REQ\020\001\022\024\n\020BATTLE_ENTER_RSP\020\002"
-    "\022\024\n\020BATTLE_START_NTF\020\003\022\024\n\020BATTLE_INPUT_R"
-    "EQ\020\004\022\024\n\020BATTLE_FRAME_NTF\020\005\022\027\n\023BATTLE_SNA"
-    "PSHOT_NTF\020\006\022\022\n\016BATTLE_END_NTF\020\007\022\024\n\020BATTL"
-    "E_LEAVE_REQ\020\010\022\024\n\020BATTLE_LEAVE_RSP\020\t\022\023\n\017B"
-    "ATTLE_HASH_NTF\020\nb\006proto3"
+    "\003\022\020\n\010frame_id\030\004 \001(\r\022\022\n\nstate_hash\030\005 \001(\004\""
+    "\202\001\n\020PBBattleLoginReq\022\020\n\010big_type\030\001 \001(\r\022\022"
+    "\n\nsmall_type\030\002 \001(\r\022\021\n\tbattle_id\030\003 \001(\003\022\020\n"
+    "\010auth_key\030\004 \001(\t\022\021\n\tplayer_id\030\005 \001(\003\022\020\n\010sp"
+    "ectate\030\006 \001(\010\"p\n\020PBBattleLoginRsp\022\020\n\010big_"
+    "type\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022#\n\nerror_"
+    "code\030\003 \001(\0162\017.PbID.ErrorCode\022\021\n\tbattle_id"
+    "\030\004 \001(\003*\252\002\n\013BattleMsgId\022\023\n\017BATTLE_MSG_NON"
+    "E\020\000\022\024\n\020BATTLE_ENTER_REQ\020\001\022\024\n\020BATTLE_ENTE"
+    "R_RSP\020\002\022\024\n\020BATTLE_START_NTF\020\003\022\024\n\020BATTLE_"
+    "INPUT_REQ\020\004\022\024\n\020BATTLE_FRAME_NTF\020\005\022\027\n\023BAT"
+    "TLE_SNAPSHOT_NTF\020\006\022\022\n\016BATTLE_END_NTF\020\007\022\024"
+    "\n\020BATTLE_LEAVE_REQ\020\010\022\024\n\020BATTLE_LEAVE_RSP"
+    "\020\t\022\023\n\017BATTLE_HASH_NTF\020\n\022\024\n\020BATTLE_LOGIN_"
+    "REQ\020\014\022\024\n\020BATTLE_LOGIN_RSP\020\rb\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_msg_2fbattle_2eproto_deps[1] =
     {
@@ -652,13 +749,13 @@ static ::absl::once_flag descriptor_table_msg_2fbattle_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_msg_2fbattle_2eproto = {
     false,
     false,
-    1864,
+    2155,
     descriptor_table_protodef_msg_2fbattle_2eproto,
     "msg/battle.proto",
     &descriptor_table_msg_2fbattle_2eproto_once,
     descriptor_table_msg_2fbattle_2eproto_deps,
     1,
-    12,
+    14,
     schemas,
     file_default_instances,
     TableStruct_msg_2fbattle_2eproto::offsets,
@@ -671,9 +768,9 @@ const ::google::protobuf::EnumDescriptor* BattleMsgId_descriptor() {
   return file_level_enum_descriptors_msg_2fbattle_2eproto[0];
 }
 PROTOBUF_CONSTINIT const uint32_t BattleMsgId_internal_data_[] = {
-    720896u, 0u, };
+    720896u, 32u, 6u, };
 bool BattleMsgId_IsValid(int value) {
-  return 0 <= value && value <= 10;
+  return 0 <= value && value <= 13 && ((14335u >> value) & 1) != 0;
 }
 // ===================================================================
 
@@ -4755,6 +4852,649 @@ void PBBattleHashNtf::InternalSwap(PBBattleHashNtf* PROTOBUF_RESTRICT other) {
 }
 
 ::google::protobuf::Metadata PBBattleHashNtf::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class PBBattleLoginReq::_Internal {
+ public:
+};
+
+PBBattleLoginReq::PBBattleLoginReq(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:PbBattle.PBBattleLoginReq)
+}
+inline PROTOBUF_NDEBUG_INLINE PBBattleLoginReq::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::PbBattle::PBBattleLoginReq& from_msg)
+      : auth_key_(arena, from.auth_key_),
+        _cached_size_{0} {}
+
+PBBattleLoginReq::PBBattleLoginReq(
+    ::google::protobuf::Arena* arena,
+    const PBBattleLoginReq& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  PBBattleLoginReq* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, big_type_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, big_type_),
+           offsetof(Impl_, spectate_) -
+               offsetof(Impl_, big_type_) +
+               sizeof(Impl_::spectate_));
+
+  // @@protoc_insertion_point(copy_constructor:PbBattle.PBBattleLoginReq)
+}
+inline PROTOBUF_NDEBUG_INLINE PBBattleLoginReq::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : auth_key_(arena),
+        _cached_size_{0} {}
+
+inline void PBBattleLoginReq::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, big_type_),
+           0,
+           offsetof(Impl_, spectate_) -
+               offsetof(Impl_, big_type_) +
+               sizeof(Impl_::spectate_));
+}
+PBBattleLoginReq::~PBBattleLoginReq() {
+  // @@protoc_insertion_point(destructor:PbBattle.PBBattleLoginReq)
+  SharedDtor(*this);
+}
+inline void PBBattleLoginReq::SharedDtor(MessageLite& self) {
+  PBBattleLoginReq& this_ = static_cast<PBBattleLoginReq&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.auth_key_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* PBBattleLoginReq::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) PBBattleLoginReq(arena);
+}
+constexpr auto PBBattleLoginReq::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(PBBattleLoginReq),
+                                            alignof(PBBattleLoginReq));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull PBBattleLoginReq::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_PBBattleLoginReq_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &PBBattleLoginReq::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<PBBattleLoginReq>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &PBBattleLoginReq::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<PBBattleLoginReq>(), &PBBattleLoginReq::ByteSizeLong,
+            &PBBattleLoginReq::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_._cached_size_),
+        false,
+    },
+    &PBBattleLoginReq::kDescriptorMethods,
+    &descriptor_table_msg_2fbattle_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* PBBattleLoginReq::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 6, 0, 42, 2> PBBattleLoginReq::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    6, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967232,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    6,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::PbBattle::PBBattleLoginReq>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // uint32 big_type = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBBattleLoginReq, _impl_.big_type_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.big_type_)}},
+    // uint32 small_type = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBBattleLoginReq, _impl_.small_type_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.small_type_)}},
+    // int64 battle_id = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PBBattleLoginReq, _impl_.battle_id_), 63>(),
+     {24, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.battle_id_)}},
+    // string auth_key = 4;
+    {::_pbi::TcParser::FastUS1,
+     {34, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.auth_key_)}},
+    // int64 player_id = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PBBattleLoginReq, _impl_.player_id_), 63>(),
+     {40, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.player_id_)}},
+    // bool spectate = 6;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(PBBattleLoginReq, _impl_.spectate_), 63>(),
+     {48, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.spectate_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint32 big_type = 1;
+    {PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.big_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // uint32 small_type = 2;
+    {PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.small_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // int64 battle_id = 3;
+    {PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.battle_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // string auth_key = 4;
+    {PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.auth_key_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // int64 player_id = 5;
+    {PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.player_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // bool spectate = 6;
+    {PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.spectate_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kBool)},
+  }},
+  // no aux_entries
+  {{
+    "\31\0\0\0\10\0\0\0"
+    "PbBattle.PBBattleLoginReq"
+    "auth_key"
+  }},
+};
+
+PROTOBUF_NOINLINE void PBBattleLoginReq::Clear() {
+// @@protoc_insertion_point(message_clear_start:PbBattle.PBBattleLoginReq)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.auth_key_.ClearToEmpty();
+  ::memset(&_impl_.big_type_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.spectate_) -
+      reinterpret_cast<char*>(&_impl_.big_type_)) + sizeof(_impl_.spectate_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* PBBattleLoginReq::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const PBBattleLoginReq& this_ = static_cast<const PBBattleLoginReq&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* PBBattleLoginReq::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const PBBattleLoginReq& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:PbBattle.PBBattleLoginReq)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint32 big_type = 1;
+          if (this_._internal_big_type() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                1, this_._internal_big_type(), target);
+          }
+
+          // uint32 small_type = 2;
+          if (this_._internal_small_type() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                2, this_._internal_small_type(), target);
+          }
+
+          // int64 battle_id = 3;
+          if (this_._internal_battle_id() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<3>(
+                    stream, this_._internal_battle_id(), target);
+          }
+
+          // string auth_key = 4;
+          if (!this_._internal_auth_key().empty()) {
+            const std::string& _s = this_._internal_auth_key();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "PbBattle.PBBattleLoginReq.auth_key");
+            target = stream->WriteStringMaybeAliased(4, _s, target);
+          }
+
+          // int64 player_id = 5;
+          if (this_._internal_player_id() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<5>(
+                    stream, this_._internal_player_id(), target);
+          }
+
+          // bool spectate = 6;
+          if (this_._internal_spectate() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteBoolToArray(
+                6, this_._internal_spectate(), target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:PbBattle.PBBattleLoginReq)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t PBBattleLoginReq::ByteSizeLong(const MessageLite& base) {
+          const PBBattleLoginReq& this_ = static_cast<const PBBattleLoginReq&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t PBBattleLoginReq::ByteSizeLong() const {
+          const PBBattleLoginReq& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:PbBattle.PBBattleLoginReq)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // string auth_key = 4;
+            if (!this_._internal_auth_key().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_auth_key());
+            }
+            // uint32 big_type = 1;
+            if (this_._internal_big_type() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_big_type());
+            }
+            // uint32 small_type = 2;
+            if (this_._internal_small_type() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_small_type());
+            }
+            // int64 battle_id = 3;
+            if (this_._internal_battle_id() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_battle_id());
+            }
+            // int64 player_id = 5;
+            if (this_._internal_player_id() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_player_id());
+            }
+            // bool spectate = 6;
+            if (this_._internal_spectate() != 0) {
+              total_size += 2;
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void PBBattleLoginReq::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<PBBattleLoginReq*>(&to_msg);
+  auto& from = static_cast<const PBBattleLoginReq&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:PbBattle.PBBattleLoginReq)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_auth_key().empty()) {
+    _this->_internal_set_auth_key(from._internal_auth_key());
+  }
+  if (from._internal_big_type() != 0) {
+    _this->_impl_.big_type_ = from._impl_.big_type_;
+  }
+  if (from._internal_small_type() != 0) {
+    _this->_impl_.small_type_ = from._impl_.small_type_;
+  }
+  if (from._internal_battle_id() != 0) {
+    _this->_impl_.battle_id_ = from._impl_.battle_id_;
+  }
+  if (from._internal_player_id() != 0) {
+    _this->_impl_.player_id_ = from._impl_.player_id_;
+  }
+  if (from._internal_spectate() != 0) {
+    _this->_impl_.spectate_ = from._impl_.spectate_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void PBBattleLoginReq::CopyFrom(const PBBattleLoginReq& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:PbBattle.PBBattleLoginReq)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void PBBattleLoginReq::InternalSwap(PBBattleLoginReq* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.auth_key_, &other->_impl_.auth_key_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.spectate_)
+      + sizeof(PBBattleLoginReq::_impl_.spectate_)
+      - PROTOBUF_FIELD_OFFSET(PBBattleLoginReq, _impl_.big_type_)>(
+          reinterpret_cast<char*>(&_impl_.big_type_),
+          reinterpret_cast<char*>(&other->_impl_.big_type_));
+}
+
+::google::protobuf::Metadata PBBattleLoginReq::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class PBBattleLoginRsp::_Internal {
+ public:
+};
+
+PBBattleLoginRsp::PBBattleLoginRsp(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:PbBattle.PBBattleLoginRsp)
+}
+PBBattleLoginRsp::PBBattleLoginRsp(
+    ::google::protobuf::Arena* arena, const PBBattleLoginRsp& from)
+    : PBBattleLoginRsp(arena) {
+  MergeFrom(from);
+}
+inline PROTOBUF_NDEBUG_INLINE PBBattleLoginRsp::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void PBBattleLoginRsp::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, big_type_),
+           0,
+           offsetof(Impl_, error_code_) -
+               offsetof(Impl_, big_type_) +
+               sizeof(Impl_::error_code_));
+}
+PBBattleLoginRsp::~PBBattleLoginRsp() {
+  // @@protoc_insertion_point(destructor:PbBattle.PBBattleLoginRsp)
+  SharedDtor(*this);
+}
+inline void PBBattleLoginRsp::SharedDtor(MessageLite& self) {
+  PBBattleLoginRsp& this_ = static_cast<PBBattleLoginRsp&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* PBBattleLoginRsp::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) PBBattleLoginRsp(arena);
+}
+constexpr auto PBBattleLoginRsp::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(PBBattleLoginRsp),
+                                            alignof(PBBattleLoginRsp));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull PBBattleLoginRsp::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_PBBattleLoginRsp_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &PBBattleLoginRsp::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<PBBattleLoginRsp>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &PBBattleLoginRsp::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<PBBattleLoginRsp>(), &PBBattleLoginRsp::ByteSizeLong,
+            &PBBattleLoginRsp::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_._cached_size_),
+        false,
+    },
+    &PBBattleLoginRsp::kDescriptorMethods,
+    &descriptor_table_msg_2fbattle_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* PBBattleLoginRsp::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 4, 0, 0, 2> PBBattleLoginRsp::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    4, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967280,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    4,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::PbBattle::PBBattleLoginRsp>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // int64 battle_id = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PBBattleLoginRsp, _impl_.battle_id_), 63>(),
+     {32, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_.battle_id_)}},
+    // uint32 big_type = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBBattleLoginRsp, _impl_.big_type_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_.big_type_)}},
+    // uint32 small_type = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBBattleLoginRsp, _impl_.small_type_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_.small_type_)}},
+    // .PbID.ErrorCode error_code = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBBattleLoginRsp, _impl_.error_code_), 63>(),
+     {24, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_.error_code_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint32 big_type = 1;
+    {PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_.big_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // uint32 small_type = 2;
+    {PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_.small_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // .PbID.ErrorCode error_code = 3;
+    {PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_.error_code_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kOpenEnum)},
+    // int64 battle_id = 4;
+    {PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_.battle_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+PROTOBUF_NOINLINE void PBBattleLoginRsp::Clear() {
+// @@protoc_insertion_point(message_clear_start:PbBattle.PBBattleLoginRsp)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&_impl_.big_type_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.error_code_) -
+      reinterpret_cast<char*>(&_impl_.big_type_)) + sizeof(_impl_.error_code_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* PBBattleLoginRsp::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const PBBattleLoginRsp& this_ = static_cast<const PBBattleLoginRsp&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* PBBattleLoginRsp::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const PBBattleLoginRsp& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:PbBattle.PBBattleLoginRsp)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint32 big_type = 1;
+          if (this_._internal_big_type() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                1, this_._internal_big_type(), target);
+          }
+
+          // uint32 small_type = 2;
+          if (this_._internal_small_type() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                2, this_._internal_small_type(), target);
+          }
+
+          // .PbID.ErrorCode error_code = 3;
+          if (this_._internal_error_code() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteEnumToArray(
+                3, this_._internal_error_code(), target);
+          }
+
+          // int64 battle_id = 4;
+          if (this_._internal_battle_id() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<4>(
+                    stream, this_._internal_battle_id(), target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:PbBattle.PBBattleLoginRsp)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t PBBattleLoginRsp::ByteSizeLong(const MessageLite& base) {
+          const PBBattleLoginRsp& this_ = static_cast<const PBBattleLoginRsp&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t PBBattleLoginRsp::ByteSizeLong() const {
+          const PBBattleLoginRsp& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:PbBattle.PBBattleLoginRsp)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // uint32 big_type = 1;
+            if (this_._internal_big_type() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_big_type());
+            }
+            // uint32 small_type = 2;
+            if (this_._internal_small_type() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_small_type());
+            }
+            // int64 battle_id = 4;
+            if (this_._internal_battle_id() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_battle_id());
+            }
+            // .PbID.ErrorCode error_code = 3;
+            if (this_._internal_error_code() != 0) {
+              total_size += 1 +
+                            ::_pbi::WireFormatLite::EnumSize(this_._internal_error_code());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void PBBattleLoginRsp::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<PBBattleLoginRsp*>(&to_msg);
+  auto& from = static_cast<const PBBattleLoginRsp&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:PbBattle.PBBattleLoginRsp)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_big_type() != 0) {
+    _this->_impl_.big_type_ = from._impl_.big_type_;
+  }
+  if (from._internal_small_type() != 0) {
+    _this->_impl_.small_type_ = from._impl_.small_type_;
+  }
+  if (from._internal_battle_id() != 0) {
+    _this->_impl_.battle_id_ = from._impl_.battle_id_;
+  }
+  if (from._internal_error_code() != 0) {
+    _this->_impl_.error_code_ = from._impl_.error_code_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void PBBattleLoginRsp::CopyFrom(const PBBattleLoginRsp& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:PbBattle.PBBattleLoginRsp)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void PBBattleLoginRsp::InternalSwap(PBBattleLoginRsp* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_.error_code_)
+      + sizeof(PBBattleLoginRsp::_impl_.error_code_)
+      - PROTOBUF_FIELD_OFFSET(PBBattleLoginRsp, _impl_.big_type_)>(
+          reinterpret_cast<char*>(&_impl_.big_type_),
+          reinterpret_cast<char*>(&other->_impl_.big_type_));
+}
+
+::google::protobuf::Metadata PBBattleLoginRsp::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // @@protoc_insertion_point(namespace_scope)

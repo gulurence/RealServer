@@ -25,6 +25,13 @@
 xEngine = xEngine or {}
 xEngine.ActorCreator = {}
 
+-- 解析 si_actor_creator_rpc_create 返回的 "ip:port" → (ip, port)
+local function split_addr(addr)
+    if not addr or addr == "" then return nil, nil end
+    local ip, port = addr:match("^(.-):(%d+)$")
+    return ip, port and tonumber(port) or nil
+end
+
 --------------------------------------------------------------------------------
 -- Global operations: create / find / delete / query
 --------------------------------------------------------------------------------
@@ -44,10 +51,12 @@ function xEngine.ActorCreator.create(actorType, actorID)
 
     -- 远程 → 自建 RPC + 负载均衡 (C++ 挑最低负载承载进程)
     xEngine.Log.info("[ActorCreator] create: rpc balance type=%d id=%d", actorType, actorID)
-    local ok = luacore.si_actor_creator_rpc_create(actorType, actorID)
-    if ok then
-        xEngine.Log.info("[ActorCreator] create: remote ok")
-        return { _actor_type = actorType, _actor_id = actorID, _remote = true }
+    local addr = luacore.si_actor_creator_rpc_create(actorType, actorID)
+    if addr and addr ~= "" then
+        local ip, port = split_addr(addr)
+        xEngine.Log.info("[ActorCreator] create: remote ok addr=%s", addr)
+        return { _actor_type = actorType, _actor_id = actorID, _remote = true,
+                 _host_ip = ip, _listen_port = port }
     end
     xEngine.Log.error("[ActorCreator] create: rpc failed type=%d id=%d", actorType, actorID)
     return nil
@@ -70,9 +79,16 @@ end
 
 --- Delete an actor globally.
 function xEngine.ActorCreator.delete(actorType, actorID)
-    -- 本进程 → 本地删除
+    -- 本进程 → 本地删除。分两条索引:
+    --   1) Lua localInstances (createLocal 创建的实例, 有 Lua 表需 data_save/onUnInstall 清理)
+    --   2) C++ CActorMgr 权威索引 (RPC 路径 ActorCreator::Create 创建的 Player/Battle/Spectator
+    --      delegate 实例, 不在 localInstances 里)。旧实现只查 findLocal, 漏掉这类实例,
+    --      误走远程卸载 → 本进程的观战/Battle 实例删不掉、注册残留 (WebPlatform 残留根因)。
     if xEngine.ActorMgr.findLocal(actorType, actorID) then
         return xEngine.ActorMgr.deleteLocal(actorType, actorID)
+    end
+    if luacore.si_actor_mgr_find(actorType, actorID) then
+        return luacore.si_actor_delete_local(actorType, actorID)
     end
 
     -- 远程 → 自建 RPC 卸载
@@ -110,10 +126,13 @@ function xEngine.ActorCreator.balanceCreate(actorType, actorID)
         return xEngine.ActorMgr.createLocal(actorType, actorID)
     end
 
-    local ok = luacore.si_actor_creator_rpc_create(actorType, actorID)
-    if ok then
-        xEngine.Log.info("[ActorCreator] balanceCreate: remote ok type=%d id=%d", actorType, actorID)
-        return { _actor_type = actorType, _actor_id = actorID, _remote = true }
+    local addr = luacore.si_actor_creator_rpc_create(actorType, actorID)
+    if addr and addr ~= "" then
+        local ip, port = split_addr(addr)
+        xEngine.Log.info("[ActorCreator] balanceCreate: remote ok type=%d id=%d addr=%s",
+            actorType, actorID, addr)
+        return { _actor_type = actorType, _actor_id = actorID, _remote = true,
+                 _host_ip = ip, _listen_port = port }
     end
     xEngine.Log.error("[ActorCreator] balanceCreate: rpc failed type=%d id=%d", actorType, actorID)
     return nil

@@ -615,11 +615,13 @@ class PBRoomStartRsp final : public ::google::protobuf::Message
   // accessors -------------------------------------------------------
   enum : int {
     kAuthKeyFieldNumber = 6,
+    kHostIpFieldNumber = 7,
     kBigTypeFieldNumber = 1,
     kSmallTypeFieldNumber = 2,
     kRoomIdFieldNumber = 4,
     kBattleIdFieldNumber = 5,
     kErrorCodeFieldNumber = 3,
+    kPortFieldNumber = 8,
   };
   // string auth_key = 6;
   void clear_auth_key() ;
@@ -635,6 +637,22 @@ class PBRoomStartRsp final : public ::google::protobuf::Message
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_auth_key(
       const std::string& value);
   std::string* _internal_mutable_auth_key();
+
+  public:
+  // string host_ip = 7;
+  void clear_host_ip() ;
+  const std::string& host_ip() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_host_ip(Arg_&& arg, Args_... args);
+  std::string* mutable_host_ip();
+  PROTOBUF_NODISCARD std::string* release_host_ip();
+  void set_allocated_host_ip(std::string* value);
+
+  private:
+  const std::string& _internal_host_ip() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_host_ip(
+      const std::string& value);
+  std::string* _internal_mutable_host_ip();
 
   public:
   // uint32 big_type = 1;
@@ -687,13 +705,23 @@ class PBRoomStartRsp final : public ::google::protobuf::Message
   void _internal_set_error_code(::PbID::ErrorCode value);
 
   public:
+  // int32 port = 8;
+  void clear_port() ;
+  ::int32_t port() const;
+  void set_port(::int32_t value);
+
+  private:
+  ::int32_t _internal_port() const;
+  void _internal_set_port(::int32_t value);
+
+  public:
   // @@protoc_insertion_point(class_scope:PbRoom.PBRoomStartRsp)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      3, 6, 0,
-      38, 2>
+      3, 8, 0,
+      53, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -711,11 +739,13 @@ class PBRoomStartRsp final : public ::google::protobuf::Message
                           ::google::protobuf::Arena* arena, const Impl_& from,
                           const PBRoomStartRsp& from_msg);
     ::google::protobuf::internal::ArenaStringPtr auth_key_;
+    ::google::protobuf::internal::ArenaStringPtr host_ip_;
     ::uint32_t big_type_;
     ::uint32_t small_type_;
     ::int64_t room_id_;
     ::int64_t battle_id_;
     int error_code_;
+    ::int32_t port_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -6644,6 +6674,76 @@ inline void PBRoomStartRsp::set_allocated_auth_key(std::string* value) {
     _impl_.auth_key_.Set("", GetArena());
   }
   // @@protoc_insertion_point(field_set_allocated:PbRoom.PBRoomStartRsp.auth_key)
+}
+
+// string host_ip = 7;
+inline void PBRoomStartRsp::clear_host_ip() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.host_ip_.ClearToEmpty();
+}
+inline const std::string& PBRoomStartRsp::host_ip() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:PbRoom.PBRoomStartRsp.host_ip)
+  return _internal_host_ip();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PBRoomStartRsp::set_host_ip(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.host_ip_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:PbRoom.PBRoomStartRsp.host_ip)
+}
+inline std::string* PBRoomStartRsp::mutable_host_ip() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_host_ip();
+  // @@protoc_insertion_point(field_mutable:PbRoom.PBRoomStartRsp.host_ip)
+  return _s;
+}
+inline const std::string& PBRoomStartRsp::_internal_host_ip() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.host_ip_.Get();
+}
+inline void PBRoomStartRsp::_internal_set_host_ip(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.host_ip_.Set(value, GetArena());
+}
+inline std::string* PBRoomStartRsp::_internal_mutable_host_ip() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.host_ip_.Mutable( GetArena());
+}
+inline std::string* PBRoomStartRsp::release_host_ip() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:PbRoom.PBRoomStartRsp.host_ip)
+  return _impl_.host_ip_.Release();
+}
+inline void PBRoomStartRsp::set_allocated_host_ip(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.host_ip_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.host_ip_.IsDefault()) {
+    _impl_.host_ip_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:PbRoom.PBRoomStartRsp.host_ip)
+}
+
+// int32 port = 8;
+inline void PBRoomStartRsp::clear_port() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.port_ = 0;
+}
+inline ::int32_t PBRoomStartRsp::port() const {
+  // @@protoc_insertion_point(field_get:PbRoom.PBRoomStartRsp.port)
+  return _internal_port();
+}
+inline void PBRoomStartRsp::set_port(::int32_t value) {
+  _internal_set_port(value);
+  // @@protoc_insertion_point(field_set:PbRoom.PBRoomStartRsp.port)
+}
+inline ::int32_t PBRoomStartRsp::_internal_port() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.port_;
+}
+inline void PBRoomStartRsp::_internal_set_port(::int32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.port_ = value;
 }
 
 // -------------------------------------------------------------------

@@ -417,6 +417,24 @@ int64 CRedisCli::Incr(const std::string &key)
     }
 }
 
+int64 CRedisCli::Decr(const std::string &key)
+{
+    if (!m_cluster)
+    {
+        return -1;
+    }
+    try
+    {
+        return (int64)m_cluster->decr(key);
+    }
+    catch (const sw::redis::Error &e)
+    {
+        XERR("CRedisCli::Decr error [host:%s,port:%d,key:%s,error:%s] !!!", m_redisHost,
+             m_redisPort, key.c_str(), e.what());
+        return -1;
+    }
+}
+
 int32 CRedisCli::ZAdd(const std::string &key, int64 score, const std::string &member)
 {
     if (!m_cluster)
@@ -490,6 +508,67 @@ int32 CRedisCli::LTrim(const std::string &key, int64 start, int64 stop)
         XERR("CRedisCli::LTrim error [host:%s,port:%d,key:%s,error:%s] !!!", m_redisHost,
              m_redisPort, key.c_str(), e.what());
         return REDIS_ERROR;
+    }
+}
+
+int32 CRedisCli::LPop(const std::string &key, std::string &out)
+{
+    if (!m_cluster)
+    {
+        return REDIS_ERROR;
+    }
+    try
+    {
+        auto v = m_cluster->lpop(key);
+        if (!v)
+        {
+            return REDIS_ERROR; // 列表为空
+        }
+        out = std::move(*v);
+        return REDIS_OK;
+    }
+    catch (const sw::redis::Error &e)
+    {
+        XERR("CRedisCli::LPop error [host:%s,port:%d,key:%s,error:%s] !!!", m_redisHost,
+             m_redisPort, key.c_str(), e.what());
+        return REDIS_ERROR;
+    }
+}
+
+int32 CRedisCli::LRange(const std::string &key, int64 start, int64 stop, std::vector<std::string> &out)
+{
+    if (!m_cluster)
+    {
+        return REDIS_ERROR;
+    }
+    try
+    {
+        m_cluster->lrange(key, (int64)start, (int64)stop, std::back_inserter(out));
+        return REDIS_OK;
+    }
+    catch (const sw::redis::Error &e)
+    {
+        XERR("CRedisCli::LRange error [host:%s,port:%d,key:%s,error:%s] !!!", m_redisHost,
+             m_redisPort, key.c_str(), e.what());
+        return REDIS_ERROR;
+    }
+}
+
+int64 CRedisCli::LLen(const std::string &key)
+{
+    if (!m_cluster)
+    {
+        return -1;
+    }
+    try
+    {
+        return (int64)m_cluster->llen(key);
+    }
+    catch (const sw::redis::Error &e)
+    {
+        XERR("CRedisCli::LLen error [host:%s,port:%d,key:%s,error:%s] !!!", m_redisHost,
+             m_redisPort, key.c_str(), e.what());
+        return -1;
     }
 }
 

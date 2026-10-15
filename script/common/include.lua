@@ -23,6 +23,7 @@ require("common.rpc")
 require("common.account")
 require("common.util.include")
 require("common.actor.include")
+require("common.migration")
 
 -- LuaHotFix 热更插件 (全局公共模块): xEngine.HotFix
 xEngine.HotFix = require("common.hotfix")

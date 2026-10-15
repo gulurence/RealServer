@@ -4,10 +4,14 @@
 #include "xActor/ActorMgr.h"
 #include "xConfig/xServerConfig.h"
 #include "xLinkManager.h"
+#include "xServiceDiscovery.h"
 #include "xRpc/CRpcTcpClient.h"
 #include "xRpc/RpcFrame.h"
 #include "rpc/actor_mgr.pb.h"
 #include "xLog/xLog.h"
+
+#include <chrono>
+#include <thread>
 
 // =============================================================================
 // Init — 从启动进程类型拉取「负载类型」并注册
@@ -61,9 +65,37 @@ ProcessInfo CActorLoadManager::PickProcessForActor(EActorType t) const
 }
 
 // =============================================================================
+// ResolveActorProcess — 按身份定位 Actor 所在进程 (灰度迁移后消息须追到新进程)
+//
+// 多实例 Actor (Player/Battle/Spectator, id!=0) 迁移后, 其 cluster:actor:{type}:{id}
+// 的 pid 字段已由新进程 RegisterActor 更新; 按身份定位才能把消息切到新进程执行,
+// 而不是负载均衡地打到「负载最低」的进程 (可能不承载该 Actor, 接收端 Find 落空)。
+// 单例 (id==0) 与未注册/已驱逐(迁移中)者回落负载均衡。
+// =============================================================================
+ProcessInfo CActorLoadManager::ResolveActorProcess(EActorType t, ActorID id) const
+{
+    if (id != 0)
+    {
+        int64 pid = CServiceDiscovery::getMe().GetActorProcessId(t, id);
+        // IsPeerAvailable: 跳过已死/心跳超时的对端 (否则会路由到僵尸进程再等 RPC 失败);
+        // 排空中的进程仍 available=true, 故此处不会误排 (既有战斗消息仍要路由到它)。
+        if (pid != 0 && CLinkManager::instance()->IsPeerAvailable(pid))
+        {
+            ProcessInfo peer = CLinkManager::instance()->GetPeerInfo(pid);
+            if (peer.processId != 0)
+            {
+                return peer;
+            }
+        }
+    }
+    return PickProcessForActor(t);
+}
+
+// =============================================================================
 // CreateActorRemote — 挑进程 + 发 RPC 创建
 // =============================================================================
-bool CActorLoadManager::CreateActorRemote(EActorType t, ActorID id)
+bool CActorLoadManager::CreateActorRemote(EActorType t, ActorID id, std::string *outIp,
+                                          uint16 *outPort)
 {
     ProcessInfo peer = PickProcessForActor(t);
     if (peer.processId == 0)
@@ -87,8 +119,16 @@ bool CActorLoadManager::CreateActorRemote(EActorType t, ActorID id)
              result.code);
         return false;
     }
-    XLOG("[ActorLoad] CreateRemote ok: type=%d id=%lld on process=%lld", (int32)t, (int64)id,
-         (int64)peer.processId);
+    if (outIp)
+    {
+        *outIp = peer.ip;
+    }
+    if (outPort)
+    {
+        *outPort = peer.listenPort;
+    }
+    XLOG("[ActorLoad] CreateRemote ok: type=%d id=%lld on process=%lld ip=%s listen=%u",
+         (int32)t, (int64)id, (int64)peer.processId, peer.ip.c_str(), peer.listenPort);
     return true;
 }
 
@@ -108,7 +148,7 @@ bool CActorLoadManager::FindActorRemote(EActorType t, ActorID id, bool *outFound
         *outRemoteType = 0;
     }
 
-    ProcessInfo peer = PickProcessForActor(t);
+    ProcessInfo peer = ResolveActorProcess(t, id);
     if (peer.processId == 0)
     {
         return false;
@@ -142,7 +182,7 @@ bool CActorLoadManager::FindActorRemote(EActorType t, ActorID id, bool *outFound
 // =============================================================================
 bool CActorLoadManager::UninstallActorRemote(EActorType t, ActorID id)
 {
-    ProcessInfo peer = PickProcessForActor(t);
+    ProcessInfo peer = ResolveActorProcess(t, id);
     if (peer.processId == 0)
     {
         return false;
@@ -161,6 +201,11 @@ bool CActorLoadManager::UninstallActorRemote(EActorType t, ActorID id)
     {
         XERR("[ActorLoad] UninstallRemote failed: transport_ok=%d code=%d", (int32)result.ok,
              result.code);
+        if (!result.ok)
+        {
+            // 传输失败: 立即摘除疑似已死的对端 (灰度强杀后的即时自愈)
+            CLinkManager::instance()->DisconnectFromPeer(peer.processId);
+        }
         return false;
     }
     return true;
@@ -187,6 +232,8 @@ std::string CActorLoadManager::LoginRemote(int32 op, const std::string &payload)
     if (!result.ok)
     {
         XERR("[LoginRpc] failed: transport_ok=%d code=%d", (int32)result.ok, result.code);
+        // 传输失败: 立即摘除疑似已死的对端 (灰度强杀旧 Login 后避免一直选中死连接, 下次改选新进程)
+        CLinkManager::instance()->DisconnectFromPeer(peer.processId);
         return "";
     }
     return result.rspBody;
@@ -200,7 +247,38 @@ std::string CActorLoadManager::LoginRemote(int32 op, const std::string &payload)
 // =============================================================================
 std::string CActorLoadManager::ForwardToActor(EActorType t, ActorID id, const std::string &payload)
 {
-    ProcessInfo peer = PickProcessForActor(t);
+    // 迁移窗口内有界重试: 灰度「先迁后杀」在 saveAll 驱逐 cluster:actor:{type}:{id} 后、
+    // 新进程 RegisterActor 之前, pid 短暂为空。此处在途消息按身份重查并短暂等待 Actor
+    // 重现, 而非立即回落负载均衡 (可能打到不承载该 Actor 的进程而丢包) —— 客户端无感切换。
+    // 正常路径一次 Redis HGET 即命中, 无额外延迟; 重试仅在 id!=0 且身份未命中时触发。
+    constexpr int32 kMigrateResolveRetry = 5;
+    constexpr int32 kMigrateResolveRetryMs = 200;
+
+    ProcessInfo peer;
+    if (id != 0)
+    {
+        for (int32 attempt = 0; attempt < kMigrateResolveRetry; ++attempt)
+        {
+            int64 pid = CServiceDiscovery::getMe().GetActorProcessId(t, id);
+            if (pid != 0 && CLinkManager::instance()->IsPeerAvailable(pid))
+            {
+                peer = CLinkManager::instance()->GetPeerInfo(pid);
+                if (peer.processId != 0)
+                {
+                    break;
+                }
+            }
+            peer = ProcessInfo{};
+            if (attempt + 1 < kMigrateResolveRetry)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(kMigrateResolveRetryMs));
+            }
+        }
+    }
+    if (peer.processId == 0)
+    {
+        peer = PickProcessForActor(t);
+    }
     if (peer.processId == 0)
     {
         XERR("[ForwardRpc] no available process for actor type=%d", (int32)t);
@@ -234,6 +312,8 @@ std::string CActorLoadManager::ForwardToActor(EActorType t, ActorID id, const st
         {
             XERR("[ForwardRpc] failed: transport_ok=%d code=%d type=%d", (int32)result.ok,
                  result.code, (int32)t);
+            // 传输失败: 立即摘除疑似已死的对端 (灰度强杀后的即时自愈, 下次改选其它进程)
+            CLinkManager::instance()->DisconnectFromPeer(peer.processId);
         }
         return "";
     }
@@ -266,6 +346,29 @@ void CActorLoadManager::PushToGate(int64 playerId, const std::string &payload)
     reqBody.append(payload);
 
     CRpcTcpClient::instance()->SubmitRaw(peer.processId, RPC_METHOD_PUSH, reqBody);
+}
+
+// =============================================================================
+// KickGateClient — 定向踢下线 (同账号并发登录「踢旧允许新」)
+//
+// body = [int64 cid] (小端)。发到指定 processId 的 Gate 进程, 其 RPC_METHOD_KICK
+// handler 直接断开该连接。异步无回包 (踢下线无业务响应)。
+// =============================================================================
+void CActorLoadManager::KickGateClient(int64 processId, int64 cid)
+{
+    if (processId <= 0 || cid <= 0)
+    {
+        return;
+    }
+
+    std::string reqBody;
+    reqBody.reserve(8);
+    for (int32 i = 0; i < 8; ++i)
+    {
+        reqBody.push_back((char)((cid >> (8 * i)) & 0xFF));
+    }
+
+    CRpcTcpClient::instance()->SubmitRaw(processId, RPC_METHOD_KICK, reqBody);
 }
 
 // =============================================================================

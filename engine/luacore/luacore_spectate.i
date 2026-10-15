@@ -27,7 +27,8 @@
 // playersStr: "player_id,name,spawn_index,primary_gun,level,exp,gold,attack,defense,hp,g0,g1,...,g5;..."
 // 与 si_pb_battle_enter_rsp 逐字段同构, 客户端复用 PBBattleEnterRsp 的花名册解析进入战斗场景。
 std::string si_pb_spectate_enter_rsp(int32 errorCode, int64 battleId, uint32 seed,
-                                     const std::string& playersStr, uint32 levelId, uint32 difficulty) {
+                                     const std::string& playersStr, uint32 levelId, uint32 difficulty,
+                                     const std::string& hostIp, int32 port) {
     PbSpectator::PBSpectateEnterRsp rsp;
     rsp.set_big_type(PbID::AT_SPECTATOR);
     rsp.set_small_type(PbSpectator::SPECTATE_ENTER_RSP);
@@ -36,6 +37,8 @@ std::string si_pb_spectate_enter_rsp(int32 errorCode, int64 battleId, uint32 see
     rsp.set_seed(seed);
     rsp.set_level_id(levelId);
     rsp.set_difficulty(difficulty);
+    rsp.set_host_ip(hostIp);
+    rsp.set_port(port);
     for (auto& rec : pb_split(playersStr, ';')) {
         if (rec.empty()) continue;
         auto f = pb_split(rec, ',');

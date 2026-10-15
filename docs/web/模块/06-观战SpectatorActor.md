@@ -1,6 +1,6 @@
 # 观战模块（SpectatorActor）
 
-> 里程碑 M6 · Actor 类型 `EActorType_ASpectator=204`（Global 进程，多实例）
+> 里程碑 M6 · Actor 类型 `EActorType_ASpectator=204`（Battle 进程，多实例）
 
 ## 定位
 

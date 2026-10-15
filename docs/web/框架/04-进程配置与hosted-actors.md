@@ -40,17 +40,16 @@
         </process>
         <process type="102">
             <actor type="102"/>   <!-- Friend -->
-            <actor type="103"/>   <!-- Room -->
             <actor type="104"/>   <!-- Chat -->
+            <actor type="105"/>   <!-- Config -->
         </process>
         <process type="201">
             <actor type="201"/>   <!-- Player -->
-            <actor type="202"/>   <!-- World (备用) -->
-            <actor type="203"/>   <!-- Battle -->
-            <actor type="204"/>   <!-- Spectator -->
+            <actor type="103"/>   <!-- Room -->
         </process>
         <process type="202">
-            <actor type="202"/>   <!-- World -->
+            <actor type="203"/>   <!-- Battle -->
+            <actor type="204"/>   <!-- Spectator -->
         </process>
     </hosted-actors>
 </server>

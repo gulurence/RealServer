@@ -76,6 +76,7 @@ bool CServerConfig::Load(const std::string &strXmlPath)
          (int32)m_stConfig.process.type, m_stConfig.hostedActors.size(),
          m_stConfig.clusterFallback.peers.size(), m_stConfig.redisConfigs.size(),
          m_stConfig.dbConfigs.size());
+    m_bLoaded = true;
     return true;
 }
 

@@ -17,8 +17,9 @@ enum EProcessType : int32
     EProcessType_None = 0,
     EProcessType_PGate = 100,   // 网关进程
     EProcessType_PLogin = 101,  // 登录进程
-    EProcessType_PGlobal = 102, // 全局进程 (承载 Friend/Room/Chat/Spectator Actor)
-    EProcessType_PGame = 201,   // 游戏进程 (承载 Player/Battle Actor)
+    EProcessType_PGlobal = 102, // 全局进程 (承载 Friend/Chat/Config Actor)
+    EProcessType_PGame = 201,   // 游戏进程 (承载 Player/Room Actor)
+    EProcessType_PBattle = 202, // 战斗进程 (承载 Battle/Spectator Actor, 客户端直连)
     EProcessType_Max
 };
 
@@ -29,12 +30,12 @@ enum EActorType : int32
     EActorType_AGate = 100,      // 网关 Actor
     EActorType_ALogin = 101,     // 登录 Actor
     EActorType_AFriend = 102,    // 好友 Actor (单例, Global 进程)
-    EActorType_ARoom = 103,      // 房间 Actor (单例, Global 进程)
+    EActorType_ARoom = 103,      // 房间 Actor (单例, Game 进程)
     EActorType_AChat = 104,      // 聊天 Actor (单例, Global 进程)
     EActorType_AConfig = 105,    // 配置 Actor (单例, Global 进程, 配置热更拉取/推送)
     EActorType_APlayer = 201,    // 玩家 Actor (Game 进程)
-    EActorType_ABattle = 203,    // 战斗 Actor (多实例, Game 进程)
-    EActorType_ASpectator = 204, // 观战 Actor (多实例, Global 进程)
+    EActorType_ABattle = 203,    // 战斗 Actor (多实例, Battle 进程)
+    EActorType_ASpectator = 204, // 观战 Actor (多实例, Battle 进程)
     EActorType_Max
 };
 

@@ -40,6 +40,10 @@ inline uint32 GetKernelModulesForType(EProcessType type)
         // 有状态进程: 需要 MySQL 持久化, 无网络接入
         return Kernel_Scheduler | Kernel_Grpc | Kernel_Redis | Kernel_MySql | Kernel_Log
                | Kernel_Xml | Kernel_Platform;
+    case EProcessType_PBattle:
+        // 战斗进程: 客户端直连 (Kernel_Net), 战斗花名册/鉴权走 Redis, 无 MySQL 持久化
+        return Kernel_Scheduler | Kernel_Grpc | Kernel_Redis | Kernel_Net | Kernel_Log
+               | Kernel_Xml | Kernel_Platform;
     default:
         return Kernel_Scheduler | Kernel_Grpc | Kernel_Log | Kernel_Xml;
     }

@@ -67,6 +67,12 @@ extern PBMsgLoginReqDefaultTypeInternal _PBMsgLoginReq_default_instance_;
 class PBMsgLoginRsp;
 struct PBMsgLoginRspDefaultTypeInternal;
 extern PBMsgLoginRspDefaultTypeInternal _PBMsgLoginRsp_default_instance_;
+class PBMsgLogoutReq;
+struct PBMsgLogoutReqDefaultTypeInternal;
+extern PBMsgLogoutReqDefaultTypeInternal _PBMsgLogoutReq_default_instance_;
+class PBMsgLogoutRsp;
+struct PBMsgLogoutRspDefaultTypeInternal;
+extern PBMsgLogoutRspDefaultTypeInternal _PBMsgLogoutRsp_default_instance_;
 class PBMsgSelectRoleReq;
 struct PBMsgSelectRoleReqDefaultTypeInternal;
 extern PBMsgSelectRoleReqDefaultTypeInternal _PBMsgSelectRoleReq_default_instance_;
@@ -88,6 +94,8 @@ enum LoginMsgId : int {
   LOGIN_MSG_SELECT_ROLE_RSP = 4,
   LOGIN_MSG_CREATE_ROLE_REQ = 5,
   LOGIN_MSG_CREATE_ROLE_RSP = 6,
+  LOGIN_MSG_LOGOUT_REQ = 7,
+  LOGIN_MSG_LOGOUT_RSP = 8,
   LoginMsgId_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   LoginMsgId_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -97,8 +105,8 @@ enum LoginMsgId : int {
 bool LoginMsgId_IsValid(int value);
 extern const uint32_t LoginMsgId_internal_data_[];
 constexpr LoginMsgId LoginMsgId_MIN = static_cast<LoginMsgId>(0);
-constexpr LoginMsgId LoginMsgId_MAX = static_cast<LoginMsgId>(6);
-constexpr int LoginMsgId_ARRAYSIZE = 6 + 1;
+constexpr LoginMsgId LoginMsgId_MAX = static_cast<LoginMsgId>(8);
+constexpr int LoginMsgId_ARRAYSIZE = 8 + 1;
 const ::google::protobuf::EnumDescriptor*
 LoginMsgId_descriptor();
 template <typename T>
@@ -111,7 +119,7 @@ const std::string& LoginMsgId_Name(T value) {
 template <>
 inline const std::string& LoginMsgId_Name(LoginMsgId value) {
   return ::google::protobuf::internal::NameOfDenseEnum<LoginMsgId_descriptor,
-                                                 0, 6>(
+                                                 0, 8>(
       static_cast<int>(value));
 }
 inline bool LoginMsgId_Parse(absl::string_view name, LoginMsgId* value) {
@@ -342,6 +350,422 @@ class PBMsgSelectRoleReq final : public ::google::protobuf::Message
     ::uint32_t small_type_;
     ::int64_t account_id_;
     ::int64_t role_id_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_msg_2flogin_2eproto;
+};
+// -------------------------------------------------------------------
+
+class PBMsgLogoutRsp final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:PbLogin.PBMsgLogoutRsp) */ {
+ public:
+  inline PBMsgLogoutRsp() : PBMsgLogoutRsp(nullptr) {}
+  ~PBMsgLogoutRsp() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(PBMsgLogoutRsp* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(PBMsgLogoutRsp));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR PBMsgLogoutRsp(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline PBMsgLogoutRsp(const PBMsgLogoutRsp& from) : PBMsgLogoutRsp(nullptr, from) {}
+  inline PBMsgLogoutRsp(PBMsgLogoutRsp&& from) noexcept
+      : PBMsgLogoutRsp(nullptr, std::move(from)) {}
+  inline PBMsgLogoutRsp& operator=(const PBMsgLogoutRsp& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PBMsgLogoutRsp& operator=(PBMsgLogoutRsp&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PBMsgLogoutRsp& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PBMsgLogoutRsp* internal_default_instance() {
+    return reinterpret_cast<const PBMsgLogoutRsp*>(
+        &_PBMsgLogoutRsp_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 7;
+  friend void swap(PBMsgLogoutRsp& a, PBMsgLogoutRsp& b) { a.Swap(&b); }
+  inline void Swap(PBMsgLogoutRsp* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PBMsgLogoutRsp* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PBMsgLogoutRsp* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<PBMsgLogoutRsp>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const PBMsgLogoutRsp& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const PBMsgLogoutRsp& from) { PBMsgLogoutRsp::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(PBMsgLogoutRsp* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "PbLogin.PBMsgLogoutRsp"; }
+
+ protected:
+  explicit PBMsgLogoutRsp(::google::protobuf::Arena* arena);
+  PBMsgLogoutRsp(::google::protobuf::Arena* arena, const PBMsgLogoutRsp& from);
+  PBMsgLogoutRsp(::google::protobuf::Arena* arena, PBMsgLogoutRsp&& from) noexcept
+      : PBMsgLogoutRsp(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kBigTypeFieldNumber = 1,
+    kSmallTypeFieldNumber = 2,
+    kErrorCodeFieldNumber = 3,
+  };
+  // uint32 big_type = 1;
+  void clear_big_type() ;
+  ::uint32_t big_type() const;
+  void set_big_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_big_type() const;
+  void _internal_set_big_type(::uint32_t value);
+
+  public:
+  // uint32 small_type = 2;
+  void clear_small_type() ;
+  ::uint32_t small_type() const;
+  void set_small_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_small_type() const;
+  void _internal_set_small_type(::uint32_t value);
+
+  public:
+  // .PbID.ErrorCode error_code = 3;
+  void clear_error_code() ;
+  ::PbID::ErrorCode error_code() const;
+  void set_error_code(::PbID::ErrorCode value);
+
+  private:
+  ::PbID::ErrorCode _internal_error_code() const;
+  void _internal_set_error_code(::PbID::ErrorCode value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:PbLogin.PBMsgLogoutRsp)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      2, 3, 0,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const PBMsgLogoutRsp& from_msg);
+    ::uint32_t big_type_;
+    ::uint32_t small_type_;
+    int error_code_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_msg_2flogin_2eproto;
+};
+// -------------------------------------------------------------------
+
+class PBMsgLogoutReq final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:PbLogin.PBMsgLogoutReq) */ {
+ public:
+  inline PBMsgLogoutReq() : PBMsgLogoutReq(nullptr) {}
+  ~PBMsgLogoutReq() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(PBMsgLogoutReq* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(PBMsgLogoutReq));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR PBMsgLogoutReq(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline PBMsgLogoutReq(const PBMsgLogoutReq& from) : PBMsgLogoutReq(nullptr, from) {}
+  inline PBMsgLogoutReq(PBMsgLogoutReq&& from) noexcept
+      : PBMsgLogoutReq(nullptr, std::move(from)) {}
+  inline PBMsgLogoutReq& operator=(const PBMsgLogoutReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PBMsgLogoutReq& operator=(PBMsgLogoutReq&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PBMsgLogoutReq& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PBMsgLogoutReq* internal_default_instance() {
+    return reinterpret_cast<const PBMsgLogoutReq*>(
+        &_PBMsgLogoutReq_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 6;
+  friend void swap(PBMsgLogoutReq& a, PBMsgLogoutReq& b) { a.Swap(&b); }
+  inline void Swap(PBMsgLogoutReq* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PBMsgLogoutReq* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PBMsgLogoutReq* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<PBMsgLogoutReq>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const PBMsgLogoutReq& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const PBMsgLogoutReq& from) { PBMsgLogoutReq::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(PBMsgLogoutReq* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "PbLogin.PBMsgLogoutReq"; }
+
+ protected:
+  explicit PBMsgLogoutReq(::google::protobuf::Arena* arena);
+  PBMsgLogoutReq(::google::protobuf::Arena* arena, const PBMsgLogoutReq& from);
+  PBMsgLogoutReq(::google::protobuf::Arena* arena, PBMsgLogoutReq&& from) noexcept
+      : PBMsgLogoutReq(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kBigTypeFieldNumber = 1,
+    kSmallTypeFieldNumber = 2,
+  };
+  // uint32 big_type = 1;
+  void clear_big_type() ;
+  ::uint32_t big_type() const;
+  void set_big_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_big_type() const;
+  void _internal_set_big_type(::uint32_t value);
+
+  public:
+  // uint32 small_type = 2;
+  void clear_small_type() ;
+  ::uint32_t small_type() const;
+  void set_small_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_small_type() const;
+  void _internal_set_small_type(::uint32_t value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:PbLogin.PBMsgLogoutReq)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      1, 2, 0,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const PBMsgLogoutReq& from_msg);
+    ::uint32_t big_type_;
+    ::uint32_t small_type_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -972,11 +1396,46 @@ class PBMsgSelectRoleRsp final : public ::google::protobuf::Message
 
   // accessors -------------------------------------------------------
   enum : int {
+    kBattleHostFieldNumber = 6,
+    kBattleAuthFieldNumber = 7,
     kPlayerFieldNumber = 4,
     kBigTypeFieldNumber = 1,
     kSmallTypeFieldNumber = 2,
+    kBattleIdFieldNumber = 5,
     kErrorCodeFieldNumber = 3,
   };
+  // string battle_host = 6;
+  void clear_battle_host() ;
+  const std::string& battle_host() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_battle_host(Arg_&& arg, Args_... args);
+  std::string* mutable_battle_host();
+  PROTOBUF_NODISCARD std::string* release_battle_host();
+  void set_allocated_battle_host(std::string* value);
+
+  private:
+  const std::string& _internal_battle_host() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_battle_host(
+      const std::string& value);
+  std::string* _internal_mutable_battle_host();
+
+  public:
+  // string battle_auth = 7;
+  void clear_battle_auth() ;
+  const std::string& battle_auth() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_battle_auth(Arg_&& arg, Args_... args);
+  std::string* mutable_battle_auth();
+  PROTOBUF_NODISCARD std::string* release_battle_auth();
+  void set_allocated_battle_auth(std::string* value);
+
+  private:
+  const std::string& _internal_battle_auth() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_battle_auth(
+      const std::string& value);
+  std::string* _internal_mutable_battle_auth();
+
+  public:
   // .PbAccount.PlayerInfo player = 4;
   bool has_player() const;
   void clear_player() ;
@@ -1012,6 +1471,16 @@ class PBMsgSelectRoleRsp final : public ::google::protobuf::Message
   void _internal_set_small_type(::uint32_t value);
 
   public:
+  // int64 battle_id = 5;
+  void clear_battle_id() ;
+  ::int64_t battle_id() const;
+  void set_battle_id(::int64_t value);
+
+  private:
+  ::int64_t _internal_battle_id() const;
+  void _internal_set_battle_id(::int64_t value);
+
+  public:
   // .PbID.ErrorCode error_code = 3;
   void clear_error_code() ;
   ::PbID::ErrorCode error_code() const;
@@ -1027,8 +1496,8 @@ class PBMsgSelectRoleRsp final : public ::google::protobuf::Message
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      2, 4, 1,
-      0, 2>
+      3, 7, 1,
+      57, 2>
       _table_;
 
   friend class ::google::protobuf::MessageLite;
@@ -1047,9 +1516,12 @@ class PBMsgSelectRoleRsp final : public ::google::protobuf::Message
                           const PBMsgSelectRoleRsp& from_msg);
     ::google::protobuf::internal::HasBits<1> _has_bits_;
     ::google::protobuf::internal::CachedSize _cached_size_;
+    ::google::protobuf::internal::ArenaStringPtr battle_host_;
+    ::google::protobuf::internal::ArenaStringPtr battle_auth_;
     ::PbAccount::PlayerInfo* player_;
     ::uint32_t big_type_;
     ::uint32_t small_type_;
+    ::int64_t battle_id_;
     int error_code_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -1441,6 +1913,8 @@ class PBMsgLoginRsp final : public ::google::protobuf::Message
     kBigTypeFieldNumber = 1,
     kSmallTypeFieldNumber = 2,
     kErrorCodeFieldNumber = 3,
+    kQueueEstWaitFieldNumber = 7,
+    kQueuePositionFieldNumber = 6,
   };
   // repeated .PbAccount.RoleInfo roles = 5;
   int roles_size() const;
@@ -1504,12 +1978,32 @@ class PBMsgLoginRsp final : public ::google::protobuf::Message
   void _internal_set_error_code(::PbID::ErrorCode value);
 
   public:
+  // int32 queue_est_wait = 7;
+  void clear_queue_est_wait() ;
+  ::int32_t queue_est_wait() const;
+  void set_queue_est_wait(::int32_t value);
+
+  private:
+  ::int32_t _internal_queue_est_wait() const;
+  void _internal_set_queue_est_wait(::int32_t value);
+
+  public:
+  // int64 queue_position = 6;
+  void clear_queue_position() ;
+  ::int64_t queue_position() const;
+  void set_queue_position(::int64_t value);
+
+  private:
+  ::int64_t _internal_queue_position() const;
+  void _internal_set_queue_position(::int64_t value);
+
+  public:
   // @@protoc_insertion_point(class_scope:PbLogin.PBMsgLoginRsp)
  private:
   class _Internal;
   friend class ::google::protobuf::internal::TcParser;
   static const ::google::protobuf::internal::TcParseTable<
-      3, 5, 2,
+      3, 7, 2,
       0, 2>
       _table_;
 
@@ -1534,6 +2028,8 @@ class PBMsgLoginRsp final : public ::google::protobuf::Message
     ::uint32_t big_type_;
     ::uint32_t small_type_;
     int error_code_;
+    ::int32_t queue_est_wait_;
+    ::int64_t queue_position_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
   union { Impl_ _impl_; };
@@ -1876,6 +2372,50 @@ PBMsgLoginRsp::_internal_mutable_roles() {
   return &_impl_.roles_;
 }
 
+// int64 queue_position = 6;
+inline void PBMsgLoginRsp::clear_queue_position() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.queue_position_ = ::int64_t{0};
+}
+inline ::int64_t PBMsgLoginRsp::queue_position() const {
+  // @@protoc_insertion_point(field_get:PbLogin.PBMsgLoginRsp.queue_position)
+  return _internal_queue_position();
+}
+inline void PBMsgLoginRsp::set_queue_position(::int64_t value) {
+  _internal_set_queue_position(value);
+  // @@protoc_insertion_point(field_set:PbLogin.PBMsgLoginRsp.queue_position)
+}
+inline ::int64_t PBMsgLoginRsp::_internal_queue_position() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.queue_position_;
+}
+inline void PBMsgLoginRsp::_internal_set_queue_position(::int64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.queue_position_ = value;
+}
+
+// int32 queue_est_wait = 7;
+inline void PBMsgLoginRsp::clear_queue_est_wait() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.queue_est_wait_ = 0;
+}
+inline ::int32_t PBMsgLoginRsp::queue_est_wait() const {
+  // @@protoc_insertion_point(field_get:PbLogin.PBMsgLoginRsp.queue_est_wait)
+  return _internal_queue_est_wait();
+}
+inline void PBMsgLoginRsp::set_queue_est_wait(::int32_t value) {
+  _internal_set_queue_est_wait(value);
+  // @@protoc_insertion_point(field_set:PbLogin.PBMsgLoginRsp.queue_est_wait)
+}
+inline ::int32_t PBMsgLoginRsp::_internal_queue_est_wait() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.queue_est_wait_;
+}
+inline void PBMsgLoginRsp::_internal_set_queue_est_wait(::int32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.queue_est_wait_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // PBMsgSelectRoleReq
@@ -2127,6 +2667,124 @@ inline void PBMsgSelectRoleRsp::set_allocated_player(::PbAccount::PlayerInfo* va
 
   _impl_.player_ = reinterpret_cast<::PbAccount::PlayerInfo*>(value);
   // @@protoc_insertion_point(field_set_allocated:PbLogin.PBMsgSelectRoleRsp.player)
+}
+
+// int64 battle_id = 5;
+inline void PBMsgSelectRoleRsp::clear_battle_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_id_ = ::int64_t{0};
+}
+inline ::int64_t PBMsgSelectRoleRsp::battle_id() const {
+  // @@protoc_insertion_point(field_get:PbLogin.PBMsgSelectRoleRsp.battle_id)
+  return _internal_battle_id();
+}
+inline void PBMsgSelectRoleRsp::set_battle_id(::int64_t value) {
+  _internal_set_battle_id(value);
+  // @@protoc_insertion_point(field_set:PbLogin.PBMsgSelectRoleRsp.battle_id)
+}
+inline ::int64_t PBMsgSelectRoleRsp::_internal_battle_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.battle_id_;
+}
+inline void PBMsgSelectRoleRsp::_internal_set_battle_id(::int64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_id_ = value;
+}
+
+// string battle_host = 6;
+inline void PBMsgSelectRoleRsp::clear_battle_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_host_.ClearToEmpty();
+}
+inline const std::string& PBMsgSelectRoleRsp::battle_host() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:PbLogin.PBMsgSelectRoleRsp.battle_host)
+  return _internal_battle_host();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PBMsgSelectRoleRsp::set_battle_host(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_host_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:PbLogin.PBMsgSelectRoleRsp.battle_host)
+}
+inline std::string* PBMsgSelectRoleRsp::mutable_battle_host() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_battle_host();
+  // @@protoc_insertion_point(field_mutable:PbLogin.PBMsgSelectRoleRsp.battle_host)
+  return _s;
+}
+inline const std::string& PBMsgSelectRoleRsp::_internal_battle_host() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.battle_host_.Get();
+}
+inline void PBMsgSelectRoleRsp::_internal_set_battle_host(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_host_.Set(value, GetArena());
+}
+inline std::string* PBMsgSelectRoleRsp::_internal_mutable_battle_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.battle_host_.Mutable( GetArena());
+}
+inline std::string* PBMsgSelectRoleRsp::release_battle_host() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:PbLogin.PBMsgSelectRoleRsp.battle_host)
+  return _impl_.battle_host_.Release();
+}
+inline void PBMsgSelectRoleRsp::set_allocated_battle_host(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_host_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.battle_host_.IsDefault()) {
+    _impl_.battle_host_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:PbLogin.PBMsgSelectRoleRsp.battle_host)
+}
+
+// string battle_auth = 7;
+inline void PBMsgSelectRoleRsp::clear_battle_auth() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_auth_.ClearToEmpty();
+}
+inline const std::string& PBMsgSelectRoleRsp::battle_auth() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:PbLogin.PBMsgSelectRoleRsp.battle_auth)
+  return _internal_battle_auth();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PBMsgSelectRoleRsp::set_battle_auth(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_auth_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:PbLogin.PBMsgSelectRoleRsp.battle_auth)
+}
+inline std::string* PBMsgSelectRoleRsp::mutable_battle_auth() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_battle_auth();
+  // @@protoc_insertion_point(field_mutable:PbLogin.PBMsgSelectRoleRsp.battle_auth)
+  return _s;
+}
+inline const std::string& PBMsgSelectRoleRsp::_internal_battle_auth() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.battle_auth_.Get();
+}
+inline void PBMsgSelectRoleRsp::_internal_set_battle_auth(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_auth_.Set(value, GetArena());
+}
+inline std::string* PBMsgSelectRoleRsp::_internal_mutable_battle_auth() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.battle_auth_.Mutable( GetArena());
+}
+inline std::string* PBMsgSelectRoleRsp::release_battle_auth() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:PbLogin.PBMsgSelectRoleRsp.battle_auth)
+  return _impl_.battle_auth_.Release();
+}
+inline void PBMsgSelectRoleRsp::set_allocated_battle_auth(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_auth_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.battle_auth_.IsDefault()) {
+    _impl_.battle_auth_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:PbLogin.PBMsgSelectRoleRsp.battle_auth)
 }
 
 // -------------------------------------------------------------------
@@ -2428,6 +3086,124 @@ inline void PBMsgCreateRoleRsp::set_allocated_role(::PbAccount::RoleInfo* value)
 
   _impl_.role_ = reinterpret_cast<::PbAccount::RoleInfo*>(value);
   // @@protoc_insertion_point(field_set_allocated:PbLogin.PBMsgCreateRoleRsp.role)
+}
+
+// -------------------------------------------------------------------
+
+// PBMsgLogoutReq
+
+// uint32 big_type = 1;
+inline void PBMsgLogoutReq::clear_big_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = 0u;
+}
+inline ::uint32_t PBMsgLogoutReq::big_type() const {
+  // @@protoc_insertion_point(field_get:PbLogin.PBMsgLogoutReq.big_type)
+  return _internal_big_type();
+}
+inline void PBMsgLogoutReq::set_big_type(::uint32_t value) {
+  _internal_set_big_type(value);
+  // @@protoc_insertion_point(field_set:PbLogin.PBMsgLogoutReq.big_type)
+}
+inline ::uint32_t PBMsgLogoutReq::_internal_big_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.big_type_;
+}
+inline void PBMsgLogoutReq::_internal_set_big_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = value;
+}
+
+// uint32 small_type = 2;
+inline void PBMsgLogoutReq::clear_small_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = 0u;
+}
+inline ::uint32_t PBMsgLogoutReq::small_type() const {
+  // @@protoc_insertion_point(field_get:PbLogin.PBMsgLogoutReq.small_type)
+  return _internal_small_type();
+}
+inline void PBMsgLogoutReq::set_small_type(::uint32_t value) {
+  _internal_set_small_type(value);
+  // @@protoc_insertion_point(field_set:PbLogin.PBMsgLogoutReq.small_type)
+}
+inline ::uint32_t PBMsgLogoutReq::_internal_small_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.small_type_;
+}
+inline void PBMsgLogoutReq::_internal_set_small_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PBMsgLogoutRsp
+
+// uint32 big_type = 1;
+inline void PBMsgLogoutRsp::clear_big_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = 0u;
+}
+inline ::uint32_t PBMsgLogoutRsp::big_type() const {
+  // @@protoc_insertion_point(field_get:PbLogin.PBMsgLogoutRsp.big_type)
+  return _internal_big_type();
+}
+inline void PBMsgLogoutRsp::set_big_type(::uint32_t value) {
+  _internal_set_big_type(value);
+  // @@protoc_insertion_point(field_set:PbLogin.PBMsgLogoutRsp.big_type)
+}
+inline ::uint32_t PBMsgLogoutRsp::_internal_big_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.big_type_;
+}
+inline void PBMsgLogoutRsp::_internal_set_big_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = value;
+}
+
+// uint32 small_type = 2;
+inline void PBMsgLogoutRsp::clear_small_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = 0u;
+}
+inline ::uint32_t PBMsgLogoutRsp::small_type() const {
+  // @@protoc_insertion_point(field_get:PbLogin.PBMsgLogoutRsp.small_type)
+  return _internal_small_type();
+}
+inline void PBMsgLogoutRsp::set_small_type(::uint32_t value) {
+  _internal_set_small_type(value);
+  // @@protoc_insertion_point(field_set:PbLogin.PBMsgLogoutRsp.small_type)
+}
+inline ::uint32_t PBMsgLogoutRsp::_internal_small_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.small_type_;
+}
+inline void PBMsgLogoutRsp::_internal_set_small_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = value;
+}
+
+// .PbID.ErrorCode error_code = 3;
+inline void PBMsgLogoutRsp::clear_error_code() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.error_code_ = 0;
+}
+inline ::PbID::ErrorCode PBMsgLogoutRsp::error_code() const {
+  // @@protoc_insertion_point(field_get:PbLogin.PBMsgLogoutRsp.error_code)
+  return _internal_error_code();
+}
+inline void PBMsgLogoutRsp::set_error_code(::PbID::ErrorCode value) {
+  _internal_set_error_code(value);
+  // @@protoc_insertion_point(field_set:PbLogin.PBMsgLogoutRsp.error_code)
+}
+inline ::PbID::ErrorCode PBMsgLogoutRsp::_internal_error_code() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return static_cast<::PbID::ErrorCode>(_impl_.error_code_);
+}
+inline void PBMsgLogoutRsp::_internal_set_error_code(::PbID::ErrorCode value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.error_code_ = value;
 }
 
 #ifdef __GNUC__

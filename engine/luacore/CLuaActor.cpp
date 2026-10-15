@@ -426,3 +426,77 @@ bool CLuaActor::CallLuaMethod(const char *pszMethodName)
     lua_pop(m_pL, 2); // pop result and table
     return bResult;
 }
+
+// -------------------------------------------------------------------
+// 灰度迁移 — 数据落盘/恢复 (灰度更新「先迁后杀」用)
+// -------------------------------------------------------------------
+// Player/Battle 经 RPC 路径创建 (ActorCreator::Create → CLuaActor::Create),
+// 其权威运行态都挂在 delegate 表 (instance B) 上, 不在 Lua localInstances 里。
+// 迁移保存/恢复必须经 C++ CActorMgr 定位 delegate 后调用 data_save/data_load,
+// 与业务 on_msg 同线程串行执行 (由迁移脚本经 DispatchSync 进入调度线程)。
+
+bool CLuaActor::CallDataSave(int32 i32SaveType)
+{
+    if (!m_pL || m_iLuaDelegateRef == LUA_NOREF)
+    {
+        return true; // 无 Lua 委托 — 无状态可保存, 视为成功
+    }
+
+    lua_rawgeti(m_pL, LUA_REGISTRYINDEX, m_iLuaDelegateRef); // [table]
+    lua_getfield(m_pL, -1, "data_save");                     // [table, method]
+
+    if (!lua_isfunction(m_pL, -1))
+    {
+        lua_pop(m_pL, 2); // pop method, table
+        return true;      // 未定义 data_save — 视为成功
+    }
+
+    lua_pushvalue(m_pL, -2);                         // [table, method, self]
+    lua_pushinteger(m_pL, (lua_Integer)i32SaveType); // [.., saveType]
+
+    // 调 data_save(self, saveType) — 2 参数, 1 布尔结果
+    if (lua_pcall(m_pL, 2, 1, 0) != LUA_OK)
+    {
+        XERR("[CLuaActor:%s] Lua error in data_save: %s", GetActorName().c_str(),
+             lua_tostring(m_pL, -1));
+        lua_pop(m_pL, 2); // pop error, table
+        return false;
+    }
+
+    bool bResult = lua_toboolean(m_pL, -1);
+    lua_pop(m_pL, 2); // pop result, table
+    return bResult;
+}
+
+bool CLuaActor::CallDataLoad()
+{
+    if (!m_pL || m_iLuaDelegateRef == LUA_NOREF)
+    {
+        return true; // 无 Lua 委托 — 无状态可恢复, 视为成功
+    }
+
+    lua_rawgeti(m_pL, LUA_REGISTRYINDEX, m_iLuaDelegateRef); // [table]
+    lua_getfield(m_pL, -1, "data_load");                     // [table, method]
+
+    if (!lua_isfunction(m_pL, -1))
+    {
+        lua_pop(m_pL, 2); // pop method, table
+        return true;      // 未定义 data_load — 视为成功
+    }
+
+    lua_pushvalue(m_pL, -2);   // [table, method, self]
+    lua_pushstring(m_pL, "");  // [.., actor_data] (兼容 data_load(actor_data) 签名)
+
+    // 调 data_load(self, "") — 2 参数, 1 布尔结果
+    if (lua_pcall(m_pL, 2, 1, 0) != LUA_OK)
+    {
+        XERR("[CLuaActor:%s] Lua error in data_load: %s", GetActorName().c_str(),
+             lua_tostring(m_pL, -1));
+        lua_pop(m_pL, 2); // pop error, table
+        return false;
+    }
+
+    bool bResult = lua_toboolean(m_pL, -1);
+    lua_pop(m_pL, 2); // pop result, table
+    return bResult;
+}

@@ -11,6 +11,7 @@
 #include "xActor/ActorScheduler.h"
 #include "xActor/CActorReportMgr.h"
 #include "xNet/CNetGateway.h"
+#include "xNet/CNetBattleGateway.h"
 #include "luacore/LuaVM.h"
 #include "tService/tServiceMgr.h"
 #include "tService/tThridService.h"
@@ -246,6 +247,13 @@ bool CProcessEnv::OnActorInit()
         }
     }
 
+    // 灰度迁移「先迁后杀」恢复: 新进程启动后扫描 actor:index:* 重建孤儿 Actor
+    // (data_load 从 Redis 恢复 + Install→RegisterActor 更新路由)。唯一 lua_State 只能
+    // 调度线程碰, 故经 DispatchSync 串行执行 (与 GM migrate_save/reload 同款)。
+    // Redis 不可用/无孤儿属正常路径 (首次启动), run() 内部安全降级。
+    CActorScheduler::instance()->DispatchSync(
+        []() { return LuaVM::instance()->DoString("xEngine.ActorMigration.run()"); });
+
     return true;
 }
 
@@ -258,11 +266,21 @@ bool CProcessEnv::OnRunning()
     auto &procMgr = CProcessManager::getMe();
     auto &linkMgr = CLinkManager::getMe();
 
-    // 网络接入层 — 仅 Gate 启用 (Kernel_Net)
+    // 网络接入层 — Gate 与 Battle 都启用 (Kernel_Net); 按进程类型分流:
+    //   Gate   → CNetGateway (路由到 Gate Actor)
+    //   Battle → CNetBattleGateway (客户端直连, 路由到 BattleActor)
     if (HasModule(Kernel_Net))
     {
-        XLOG("[INIT] Starting network gateway (port=%u)", cfg.process.listenPort);
-        CNetGateway::instance()->Start(cfg.process.listenPort);
+        if (m_eType == EProcessType_PBattle)
+        {
+            XLOG("[INIT] Starting battle network gateway (port=%u)", cfg.process.listenPort);
+            CNetBattleGateway::instance()->Start(cfg.process.listenPort);
+        }
+        else
+        {
+            XLOG("[INIT] Starting network gateway (port=%u)", cfg.process.listenPort);
+            CNetGateway::instance()->Start(cfg.process.listenPort);
+        }
     }
 
     // 标记进程为 Running 状态

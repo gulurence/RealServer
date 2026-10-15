@@ -34,7 +34,8 @@ local EC = {
     NOT_FRIEND      = 2002,
 }
 
--- 单例内存态 (存于 xEngine.friend_state, 跨热更保留)
+-- 单例内存态 (存于 xEngine.friend_state, 跨热更保留; 新进程 isFresh 时从 Redis 回读)
+local isFresh = (xEngine.friend_state == nil)
 local hot = xEngine.friend_state or {}
 xEngine.friend_state = hot
 if not hot.friends then hot.friends = {} end
@@ -44,6 +45,52 @@ if not hot.names then hot.names = {} end
 local friends = hot.friends   -- playerId -> { [friendId] = true }
 local pending = hot.pending   -- targetId -> { [applicantId] = true }
 local names   = hot.names     -- playerId -> 昵称 (尽力缓存)
+
+-- friend:index = "pid:fid,fid;...|target:app,app;..." (names 不持久化, 缺省回退 "player_<pid>")
+local function parse_friends(raw)
+    local outF, outP = {}, {}
+    local friendsStr, pendingStr = (raw or ""):match("^(.-)|(.*)$")
+    if not friendsStr then friendsStr = raw or "" end
+    for seg in friendsStr:gmatch("[^;]+") do
+        local pidStr, fidsStr = seg:match("^(.-):(.*)$")
+        if pidStr then
+            local pid = xEngine.Number.toInt(tonumber(pidStr))
+            if pid then
+                outF[pid] = outF[pid] or {}
+                for fidStr in fidsStr:gmatch("[^,]+") do
+                    local fid = xEngine.Number.toInt(tonumber(fidStr))
+                    if fid then outF[pid][fid] = true end
+                end
+            end
+        end
+    end
+    for seg in (pendingStr or ""):gmatch("[^;]+") do
+        local targetStr, appsStr = seg:match("^(.-):(.*)$")
+        if targetStr then
+            local target = xEngine.Number.toInt(tonumber(targetStr))
+            if target then
+                outP[target] = outP[target] or {}
+                for appStr in appsStr:gmatch("[^,]+") do
+                    local app = xEngine.Number.toInt(tonumber(appStr))
+                    if app then outP[target][app] = true end
+                end
+            end
+        end
+    end
+    return outF, outP
+end
+
+if isFresh then
+    local raw = xEngine.Redis.Get("friend:index")
+    if raw and raw ~= "" then
+        friends, pending = parse_friends(raw)
+        hot.friends = friends
+        hot.pending = pending
+        local nf = 0
+        for _ in pairs(friends) do nf = nf + 1 end
+        xEngine.Log.info("[Friend] fresh reload: %d friend-owner(s) restored from Redis", nf)
+    end
+end
 
 local FriendClass = xEngine.Class.define("Friend", xEngine.ActorBase)
 
@@ -61,6 +108,28 @@ function FriendClass:data_load(actor_data) return true end
 function FriendClass:data_save(save_type) return true end
 function FriendClass:onInit()    return true end
 function FriendClass:onCreate()  return true end
+
+-- 序列化好友关系: "pid:fid,fid;...|target:app,app;..." (names 不持久化)
+function FriendClass:serialize_friend()
+    local fparts = {}
+    for pid, set in pairs(friends) do
+        local fids = {}
+        for fid in pairs(set) do fids[#fids + 1] = xEngine.Number.intKey(fid) end
+        fparts[#fparts + 1] = xEngine.Number.intKey(pid) .. ":" .. table.concat(fids, ",")
+    end
+    local pparts = {}
+    for target, set in pairs(pending) do
+        local apps = {}
+        for app in pairs(set) do apps[#apps + 1] = xEngine.Number.intKey(app) end
+        pparts[#pparts + 1] = xEngine.Number.intKey(target) .. ":" .. table.concat(apps, ",")
+    end
+    return table.concat(fparts, ";") .. "|" .. table.concat(pparts, ";")
+end
+
+-- 落 Redis: friend:index 单键保存全量好友/申请 (新进程 fresh 回读重建)
+function FriendClass:save_friend()
+    xEngine.Redis.Set("friend:index", self:serialize_friend())
+end
 
 --------------------------------------------------------------------------------
 -- 业务消息总入口 (Gate 转发而来)
@@ -97,6 +166,7 @@ function FriendClass:handle_add(senderId, payload)
     pending[targetId] = pending[targetId] or {}
     pending[targetId][senderId] = true
     names[senderId] = names[senderId] or ("player_" .. xEngine.Number.intKey(senderId))
+    self:save_friend()   -- 申请落库
 
     xEngine.Log.info("[Friend] add: %d -> %d (pending)", senderId, targetId)
     -- 生产: 向 targetId 的在线连接推送 ADD_APPLY_NTF(applicantId, applicantName)
@@ -117,6 +187,7 @@ function FriendClass:handle_accept(senderId, payload)
         friends[friendId][senderId] = true
         xEngine.Log.info("[Friend] accept: %d <-> %d", senderId, friendId)
     end
+    self:save_friend()   -- 申请(接受/拒绝)处理落库
 
     return luacore_friend.si_pb_friend_accept_rsp(EC.NONE, friendId)
 end
@@ -138,6 +209,7 @@ function FriendClass:handle_del(senderId, payload)
     local friendId = luacore.si_pb_varint_field(payload, 3)
     if friends[senderId] then friends[senderId][friendId] = nil end
     if friends[friendId] then friends[friendId][senderId] = nil end
+    self:save_friend()   -- 删好友落库
     xEngine.Log.info("[Friend] del: %d -/-> %d", senderId, friendId)
     return luacore_friend.si_pb_friend_del_rsp(EC.NONE, friendId)
 end

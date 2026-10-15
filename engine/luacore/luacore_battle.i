@@ -204,6 +204,12 @@ std::string si_battlecore_serialize(int64 handle) {
     battlecore::CBattleCore* core = si_battlecore_get(handle);
     return core ? core->SerializeState() : std::string();
 }
+// 反序列化恢复战斗核心状态 (灰度迁移「先迁后杀」的恢复端): 目标进程创建 BattleActor 后,
+// 用旧进程序列化的快照重建权威帧状态。返回 false 仅当 handle 无效或反序列化失败。
+bool si_battlecore_deserialize(int64 handle, const std::string& data) {
+    battlecore::CBattleCore* core = si_battlecore_get(handle);
+    return core && core->DeserializeState(data);
+}
 // 返回 int64 而非 uint64: SWIG 对 uint64 走 lua_Number(double) 丢失 53 位精度,
 // 且 >=2^63 时 Lua %d 无法格式化; 对 int64 走 lua_Integer 精确 64 位。这里把
 // uint64 哈希按位重解释为 int64 (two's complement), 与客户端读回字段

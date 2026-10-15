@@ -1738,12 +1738,20 @@ void BattleGame::Step(uint32_t frame, CBattleRng& rng, uint32_t& nextId, std::ve
     // 存活队友数 standing; standing>0 时 respawnTimer += standing (多人站立加速复活),
     // 达到 kRespawnFrames 复活 (原地, 满血, 站姿)。纯位置判定, 不消耗 RNG, 不影响 PRNG 流;
     // 复用本帧最终坐标 (英雄更新/受击已在上方完成)。
+    // 单人战斗 (仅 1 个英雄): 无队友可救, 死亡后 respawnTimer 每帧自增 1 (免队友站立),
+    // 同样 kRespawnFrames 帧后原地满血直接复活; 死亡次数照常累计, 供 Lua 侧
+    // 「总死亡 > kMaxTotalDeaths」判负 (与多人一致)。
+    const bool solo = (m_heroes.size() == 1);
     for (auto& h : m_heroes) {
         if (h.alive) continue;
         int32_t standing = 0;
-        for (const auto& t : m_heroes) {
-            if (!t.alive || t.player_id == h.player_id) continue;
-            if (FxDistPx(t.x, t.y, h.x, h.y) < kRespawnRangePx) ++standing;
+        if (solo) {
+            standing = 1;   // 单人: 固定每帧 +1, 无需队友站立即可自动复活
+        } else {
+            for (const auto& t : m_heroes) {
+                if (!t.alive || t.player_id == h.player_id) continue;
+                if (FxDistPx(t.x, t.y, h.x, h.y) < kRespawnRangePx) ++standing;
+            }
         }
         if (standing > 0) {
             h.respawnTimer += standing;

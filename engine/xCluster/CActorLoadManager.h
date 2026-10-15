@@ -40,7 +40,9 @@ public:
     ProcessInfo PickProcessForActor(EActorType t) const;
 
     // 远程创建: 挑进程 + 发 RPC_METHOD_CREATE_ACTOR
-    bool CreateActorRemote(EActorType t, ActorID id);
+    // 成功时输出承载进程的 ip / listenPort (供客户端直连 Battle 等场景)
+    bool CreateActorRemote(EActorType t, ActorID id, std::string *outIp = nullptr,
+                           uint16 *outPort = nullptr);
 
     // 远程查询: outFound/outRemoteType 始终被赋值
     bool FindActorRemote(EActorType t, ActorID id, bool *outFound, int32 *outRemoteType);
@@ -62,6 +64,17 @@ public:
     // payload 为客户端可直接接收的业务 protobuf (Gate 侧按 playerId → cid 转发)。
     void PushToGate(int64 playerId, const std::string &payload);
 
+    // 定向踢下线: 向指定 processId 的 Gate 进程发 RPC_METHOD_KICK, 断开连接 cid
+    // (同账号并发登录「踢旧允许新」)。异步无回包。
+    void KickGateClient(int64 processId, int64 cid);
+
     // 本进程负载 (供心跳上报)
     int32 GetLocalLoad() const;
+
+private:
+    // 按 (type, id) 定位 Actor 所在进程:
+    //   id!=0 → 读 cluster:actor:{type}:{id} 的 pid 字段 (灰度迁移后 Actor 落到新进程),
+    //           命中且对端在线则返回该进程; 否则回落 PickProcessForActor (负载均衡)。
+    //   id==0 → 单例, 直接负载均衡 (每个承载进程都持有单例)。
+    ProcessInfo ResolveActorProcess(EActorType t, ActorID id) const;
 };

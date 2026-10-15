@@ -3,6 +3,10 @@
 > 目标：把单机 Cocos2d-x 射击游戏（`client/soulofgun/samples/HelloCpp`）接入 RealServer，
 > 实现「登录 → 创建/选择角色 → 大厅 → 组队房间 → 开始战斗 → 帧同步对战 → 结算退房」完整流程。
 > 本文为前期梳理，给出客户端改动点、服务器新增功能、协议定义与分阶段实施计划。
+>
+> ⚠️ **现状偏离提示（2026-10-13）**：本文为设计期规划，进程/Actor 承载关系已随实现演进，以
+> `engine/xCluster/xProcessDefine.h` 与 `docs/web/框架/01-类型系统与进程划分.md` 为准：**Room(103) 现由 Game(201) 承载**、
+> **Battle(203)/Spectator(204) 现由 Battle 进程(202) 承载**、**World 进程/Actor 已移除**。下文「Room→Global / Battle→Game / Spectator→Global / World」均为历史设计。
 
 ---
 

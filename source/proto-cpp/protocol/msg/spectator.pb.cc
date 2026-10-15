@@ -199,6 +199,9 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
 inline constexpr PBSpectateEnterRsp::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : players_{},
+        host_ip_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
         big_type_{0u},
         small_type_{0u},
         battle_id_{::int64_t{0}},
@@ -206,6 +209,7 @@ inline constexpr PBSpectateEnterRsp::Impl_::Impl_(
         seed_{0u},
         level_id_{0u},
         difficulty_{0u},
+        port_{0},
         _cached_size_{0} {}
 
 template <typename>
@@ -262,6 +266,8 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::PbSpectator::PBSpectateEnterRsp, _impl_.players_),
         PROTOBUF_FIELD_OFFSET(::PbSpectator::PBSpectateEnterRsp, _impl_.level_id_),
         PROTOBUF_FIELD_OFFSET(::PbSpectator::PBSpectateEnterRsp, _impl_.difficulty_),
+        PROTOBUF_FIELD_OFFSET(::PbSpectator::PBSpectateEnterRsp, _impl_.host_ip_),
+        PROTOBUF_FIELD_OFFSET(::PbSpectator::PBSpectateEnterRsp, _impl_.port_),
         ~0u,  // no _has_bits_
         PROTOBUF_FIELD_OFFSET(::PbSpectator::PBSpectateLeaveReq, _internal_metadata_),
         ~0u,  // no _extensions_
@@ -326,11 +332,11 @@ static const ::_pbi::MigrationSchema
     schemas[] ABSL_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
         {0, -1, -1, sizeof(::PbSpectator::PBSpectateEnterReq)},
         {12, -1, -1, sizeof(::PbSpectator::PBSpectateEnterRsp)},
-        {28, -1, -1, sizeof(::PbSpectator::PBSpectateLeaveReq)},
-        {40, -1, -1, sizeof(::PbSpectator::PBSpectateLeaveRsp)},
-        {51, -1, -1, sizeof(::PbSpectator::PBSpectateSnapshotNtf)},
-        {63, -1, -1, sizeof(::PbSpectator::PBSpectateFrameNtf)},
-        {75, -1, -1, sizeof(::PbSpectator::PBSpectateEndNtf)},
+        {30, -1, -1, sizeof(::PbSpectator::PBSpectateLeaveReq)},
+        {42, -1, -1, sizeof(::PbSpectator::PBSpectateLeaveRsp)},
+        {53, -1, -1, sizeof(::PbSpectator::PBSpectateSnapshotNtf)},
+        {65, -1, -1, sizeof(::PbSpectator::PBSpectateFrameNtf)},
+        {77, -1, -1, sizeof(::PbSpectator::PBSpectateEndNtf)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::PbSpectator::_PBSpectateEnterReq_default_instance_._instance,
@@ -347,29 +353,30 @@ const char descriptor_table_protodef_msg_2fspectator_2eproto[] ABSL_ATTRIBUTE_SE
     "msg_id.proto\032\020msg/battle.proto\"`\n\022PBSpec"
     "tateEnterReq\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsmall_"
     "type\030\002 \001(\r\022\021\n\tbattle_id\030\003 \001(\003\022\021\n\tplayer_"
-    "id\030\004 \001(\003\"\321\001\n\022PBSpectateEnterRsp\022\020\n\010big_t"
+    "id\030\004 \001(\003\"\360\001\n\022PBSpectateEnterRsp\022\020\n\010big_t"
     "ype\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022#\n\nerror_c"
     "ode\030\003 \001(\0162\017.PbID.ErrorCode\022\021\n\tbattle_id\030"
     "\004 \001(\003\022\014\n\004seed\030\005 \001(\r\022)\n\007players\030\006 \003(\0132\030.P"
     "bBattle.PBBattlePlayer\022\020\n\010level_id\030\010 \001(\r"
-    "\022\022\n\ndifficulty\030\t \001(\r\"`\n\022PBSpectateLeaveR"
-    "eq\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r"
-    "\022\021\n\tbattle_id\030\003 \001(\003\022\021\n\tplayer_id\030\004 \001(\003\"_"
-    "\n\022PBSpectateLeaveRsp\022\020\n\010big_type\030\001 \001(\r\022\022"
-    "\n\nsmall_type\030\002 \001(\r\022#\n\nerror_code\030\003 \001(\0162\017"
-    ".PbID.ErrorCode\"^\n\025PBSpectateSnapshotNtf"
-    "\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022\020"
-    "\n\010frame_id\030\003 \001(\r\022\r\n\005state\030\004 \001(\014\"[\n\022PBSpe"
-    "ctateFrameNtf\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsmall"
-    "_type\030\002 \001(\r\022\020\n\010frame_id\030\003 \001(\r\022\r\n\005frame\030\004"
-    " \001(\014\"K\n\020PBSpectateEndNtf\022\020\n\010big_type\030\001 \001"
-    "(\r\022\022\n\nsmall_type\030\002 \001(\r\022\021\n\tbattle_id\030\003 \001("
-    "\003*\321\001\n\016SpectatorMsgId\022\026\n\022SPECTATOR_MSG_NO"
-    "NE\020\000\022\026\n\022SPECTATE_ENTER_REQ\020\001\022\026\n\022SPECTATE"
-    "_ENTER_RSP\020\002\022\026\n\022SPECTATE_LEAVE_REQ\020\003\022\026\n\022"
-    "SPECTATE_LEAVE_RSP\020\004\022\031\n\025SPECTATE_SNAPSHO"
-    "T_NTF\020\005\022\026\n\022SPECTATE_FRAME_NTF\020\006\022\024\n\020SPECT"
-    "ATE_END_NTF\020\007b\006proto3"
+    "\022\022\n\ndifficulty\030\t \001(\r\022\017\n\007host_ip\030\n \001(\t\022\014\n"
+    "\004port\030\013 \001(\005\"`\n\022PBSpectateLeaveReq\022\020\n\010big"
+    "_type\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022\021\n\tbattl"
+    "e_id\030\003 \001(\003\022\021\n\tplayer_id\030\004 \001(\003\"_\n\022PBSpect"
+    "ateLeaveRsp\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsmall_t"
+    "ype\030\002 \001(\r\022#\n\nerror_code\030\003 \001(\0162\017.PbID.Err"
+    "orCode\"^\n\025PBSpectateSnapshotNtf\022\020\n\010big_t"
+    "ype\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022\020\n\010frame_i"
+    "d\030\003 \001(\r\022\r\n\005state\030\004 \001(\014\"[\n\022PBSpectateFram"
+    "eNtf\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001"
+    "(\r\022\020\n\010frame_id\030\003 \001(\r\022\r\n\005frame\030\004 \001(\014\"K\n\020P"
+    "BSpectateEndNtf\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsma"
+    "ll_type\030\002 \001(\r\022\021\n\tbattle_id\030\003 \001(\003*\321\001\n\016Spe"
+    "ctatorMsgId\022\026\n\022SPECTATOR_MSG_NONE\020\000\022\026\n\022S"
+    "PECTATE_ENTER_REQ\020\001\022\026\n\022SPECTATE_ENTER_RS"
+    "P\020\002\022\026\n\022SPECTATE_LEAVE_REQ\020\003\022\026\n\022SPECTATE_"
+    "LEAVE_RSP\020\004\022\031\n\025SPECTATE_SNAPSHOT_NTF\020\005\022\026"
+    "\n\022SPECTATE_FRAME_NTF\020\006\022\024\n\020SPECTATE_END_N"
+    "TF\020\007b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_msg_2fspectator_2eproto_deps[2] =
     {
@@ -380,7 +387,7 @@ static ::absl::once_flag descriptor_table_msg_2fspectator_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_msg_2fspectator_2eproto = {
     false,
     false,
-    1061,
+    1092,
     descriptor_table_protodef_msg_2fspectator_2eproto,
     "msg/spectator.proto",
     &descriptor_table_msg_2fspectator_2eproto_once,
@@ -709,6 +716,7 @@ inline PROTOBUF_NDEBUG_INLINE PBSpectateEnterRsp::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
     const Impl_& from, const ::PbSpectator::PBSpectateEnterRsp& from_msg)
       : players_{visibility, arena, from.players_},
+        host_ip_(arena, from.host_ip_),
         _cached_size_{0} {}
 
 PBSpectateEnterRsp::PBSpectateEnterRsp(
@@ -728,9 +736,9 @@ PBSpectateEnterRsp::PBSpectateEnterRsp(
                offsetof(Impl_, big_type_),
            reinterpret_cast<const char *>(&from._impl_) +
                offsetof(Impl_, big_type_),
-           offsetof(Impl_, difficulty_) -
+           offsetof(Impl_, port_) -
                offsetof(Impl_, big_type_) +
-               sizeof(Impl_::difficulty_));
+               sizeof(Impl_::port_));
 
   // @@protoc_insertion_point(copy_constructor:PbSpectator.PBSpectateEnterRsp)
 }
@@ -738,6 +746,7 @@ inline PROTOBUF_NDEBUG_INLINE PBSpectateEnterRsp::Impl_::Impl_(
     ::google::protobuf::internal::InternalVisibility visibility,
     ::google::protobuf::Arena* arena)
       : players_{visibility, arena},
+        host_ip_(arena),
         _cached_size_{0} {}
 
 inline void PBSpectateEnterRsp::SharedCtor(::_pb::Arena* arena) {
@@ -745,9 +754,9 @@ inline void PBSpectateEnterRsp::SharedCtor(::_pb::Arena* arena) {
   ::memset(reinterpret_cast<char *>(&_impl_) +
                offsetof(Impl_, big_type_),
            0,
-           offsetof(Impl_, difficulty_) -
+           offsetof(Impl_, port_) -
                offsetof(Impl_, big_type_) +
-               sizeof(Impl_::difficulty_));
+               sizeof(Impl_::port_));
 }
 PBSpectateEnterRsp::~PBSpectateEnterRsp() {
   // @@protoc_insertion_point(destructor:PbSpectator.PBSpectateEnterRsp)
@@ -757,6 +766,7 @@ inline void PBSpectateEnterRsp::SharedDtor(MessageLite& self) {
   PBSpectateEnterRsp& this_ = static_cast<PBSpectateEnterRsp&>(self);
   this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.host_ip_.Destroy();
   this_._impl_.~Impl_();
 }
 
@@ -772,7 +782,7 @@ constexpr auto PBSpectateEnterRsp::InternalNewImpl_() {
                   ::google::protobuf::Message::internal_visibility()),
   });
   if (arena_bits.has_value()) {
-    return ::google::protobuf::internal::MessageCreator::ZeroInit(
+    return ::google::protobuf::internal::MessageCreator::CopyInit(
         sizeof(PBSpectateEnterRsp), alignof(PBSpectateEnterRsp), *arena_bits);
   } else {
     return ::google::protobuf::internal::MessageCreator(&PBSpectateEnterRsp::PlacementNew_,
@@ -808,15 +818,15 @@ const ::google::protobuf::internal::ClassData* PBSpectateEnterRsp::GetClassData(
   return _class_data_.base();
 }
 PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
-const ::_pbi::TcParseTable<4, 8, 1, 0, 2> PBSpectateEnterRsp::_table_ = {
+const ::_pbi::TcParseTable<4, 10, 1, 54, 2> PBSpectateEnterRsp::_table_ = {
   {
     0,  // no _has_bits_
     0, // no _extensions_
-    9, 120,  // max_field_number, fast_idx_mask
+    11, 120,  // max_field_number, fast_idx_mask
     offsetof(decltype(_table_), field_lookup_table),
-    4294966848,  // skipmap
+    4294965312,  // skipmap
     offsetof(decltype(_table_), field_entries),
-    8,  // num_field_entries
+    10,  // num_field_entries
     1,  // num_aux_entries
     offsetof(decltype(_table_), aux_entries),
     _class_data_.base(),
@@ -852,8 +862,12 @@ const ::_pbi::TcParseTable<4, 8, 1, 0, 2> PBSpectateEnterRsp::_table_ = {
     // uint32 difficulty = 9;
     {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBSpectateEnterRsp, _impl_.difficulty_), 63>(),
      {72, 63, 0, PROTOBUF_FIELD_OFFSET(PBSpectateEnterRsp, _impl_.difficulty_)}},
-    {::_pbi::TcParser::MiniParse, {}},
-    {::_pbi::TcParser::MiniParse, {}},
+    // string host_ip = 10;
+    {::_pbi::TcParser::FastUS1,
+     {82, 63, 0, PROTOBUF_FIELD_OFFSET(PBSpectateEnterRsp, _impl_.host_ip_)}},
+    // int32 port = 11;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBSpectateEnterRsp, _impl_.port_), 63>(),
+     {88, 63, 0, PROTOBUF_FIELD_OFFSET(PBSpectateEnterRsp, _impl_.port_)}},
     {::_pbi::TcParser::MiniParse, {}},
     {::_pbi::TcParser::MiniParse, {}},
     {::_pbi::TcParser::MiniParse, {}},
@@ -885,9 +899,18 @@ const ::_pbi::TcParseTable<4, 8, 1, 0, 2> PBSpectateEnterRsp::_table_ = {
     // uint32 difficulty = 9;
     {PROTOBUF_FIELD_OFFSET(PBSpectateEnterRsp, _impl_.difficulty_), 0, 0,
     (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // string host_ip = 10;
+    {PROTOBUF_FIELD_OFFSET(PBSpectateEnterRsp, _impl_.host_ip_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // int32 port = 11;
+    {PROTOBUF_FIELD_OFFSET(PBSpectateEnterRsp, _impl_.port_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt32)},
   }}, {{
     {::_pbi::TcParser::GetTable<::PbBattle::PBBattlePlayer>()},
   }}, {{
+    "\36\0\0\0\0\0\0\0\0\7\0\0\0\0\0\0"
+    "PbSpectator.PBSpectateEnterRsp"
+    "host_ip"
   }},
 };
 
@@ -899,9 +922,10 @@ PROTOBUF_NOINLINE void PBSpectateEnterRsp::Clear() {
   (void) cached_has_bits;
 
   _impl_.players_.Clear();
+  _impl_.host_ip_.ClearToEmpty();
   ::memset(&_impl_.big_type_, 0, static_cast<::size_t>(
-      reinterpret_cast<char*>(&_impl_.difficulty_) -
-      reinterpret_cast<char*>(&_impl_.big_type_)) + sizeof(_impl_.difficulty_));
+      reinterpret_cast<char*>(&_impl_.port_) -
+      reinterpret_cast<char*>(&_impl_.big_type_)) + sizeof(_impl_.port_));
   _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
@@ -980,6 +1004,21 @@ PROTOBUF_NOINLINE void PBSpectateEnterRsp::Clear() {
                 9, this_._internal_difficulty(), target);
           }
 
+          // string host_ip = 10;
+          if (!this_._internal_host_ip().empty()) {
+            const std::string& _s = this_._internal_host_ip();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "PbSpectator.PBSpectateEnterRsp.host_ip");
+            target = stream->WriteStringMaybeAliased(10, _s, target);
+          }
+
+          // int32 port = 11;
+          if (this_._internal_port() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt32ToArrayWithField<11>(
+                    stream, this_._internal_port(), target);
+          }
+
           if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
             target =
                 ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -1014,6 +1053,11 @@ PROTOBUF_NOINLINE void PBSpectateEnterRsp::Clear() {
             }
           }
            {
+            // string host_ip = 10;
+            if (!this_._internal_host_ip().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_host_ip());
+            }
             // uint32 big_type = 1;
             if (this_._internal_big_type() != 0) {
               total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
@@ -1049,6 +1093,11 @@ PROTOBUF_NOINLINE void PBSpectateEnterRsp::Clear() {
               total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
                   this_._internal_difficulty());
             }
+            // int32 port = 11;
+            if (this_._internal_port() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(
+                  this_._internal_port());
+            }
           }
           return this_.MaybeComputeUnknownFieldsSize(total_size,
                                                      &this_._impl_._cached_size_);
@@ -1064,6 +1113,9 @@ void PBSpectateEnterRsp::MergeImpl(::google::protobuf::MessageLite& to_msg, cons
 
   _this->_internal_mutable_players()->MergeFrom(
       from._internal_players());
+  if (!from._internal_host_ip().empty()) {
+    _this->_internal_set_host_ip(from._internal_host_ip());
+  }
   if (from._internal_big_type() != 0) {
     _this->_impl_.big_type_ = from._impl_.big_type_;
   }
@@ -1085,6 +1137,9 @@ void PBSpectateEnterRsp::MergeImpl(::google::protobuf::MessageLite& to_msg, cons
   if (from._internal_difficulty() != 0) {
     _this->_impl_.difficulty_ = from._impl_.difficulty_;
   }
+  if (from._internal_port() != 0) {
+    _this->_impl_.port_ = from._impl_.port_;
+  }
   _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -1098,11 +1153,14 @@ void PBSpectateEnterRsp::CopyFrom(const PBSpectateEnterRsp& from) {
 
 void PBSpectateEnterRsp::InternalSwap(PBSpectateEnterRsp* PROTOBUF_RESTRICT other) {
   using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   _impl_.players_.InternalSwap(&other->_impl_.players_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.host_ip_, &other->_impl_.host_ip_, arena);
   ::google::protobuf::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(PBSpectateEnterRsp, _impl_.difficulty_)
-      + sizeof(PBSpectateEnterRsp::_impl_.difficulty_)
+      PROTOBUF_FIELD_OFFSET(PBSpectateEnterRsp, _impl_.port_)
+      + sizeof(PBSpectateEnterRsp::_impl_.port_)
       - PROTOBUF_FIELD_OFFSET(PBSpectateEnterRsp, _impl_.big_type_)>(
           reinterpret_cast<char*>(&_impl_.big_type_),
           reinterpret_cast<char*>(&other->_impl_.big_type_));

@@ -2,14 +2,17 @@
 
 #include "xNetDefine.h"
 #include "xBase/xSingleton.h"
+#include "CTokenBucketLimiter.h"
 
 #include <atomic>
+#include <chrono>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 
 class xNetAgent;
+class CRedisCli;
 
 // =============================================================================
 // CNetGateway — 网络接入层 (新)
@@ -47,6 +50,17 @@ public:
     // 线程安全 (可在任意线程调用, 内部投递到 socket 的 executor 异步写)。
     bool SendToCID(NetCID u64CID, const std::string &strBody);
 
+    // 主动断开指定连接 (供 RPC_METHOD_KICK 同账号并发登录踢旧使用)。
+    // 关闭 socket 后由 xNetAgent 触发 OnDisconnect → on_rpc_disconnect 完成收尾。
+    void KickConnection(NetCID u64CID);
+
+private:
+    // 限流阈值 (5s TTL 缓存读 cluster:config:cluster 的 gate_rate_limit_per_sec)
+    int32 GetRateLimitPerSec();
+
+    // 主动断开连接 (限流超限)
+    void Kick(NetCID u64CID);
+
 private:
     NetAgentConfigST m_stConfig;
     std::unique_ptr<xNetAgent> m_pAgent;
@@ -55,4 +69,13 @@ private:
     // CID → socket 映射 (发送通道)
     std::map<NetCID, std::shared_ptr<tcp_socket>> m_mapSockets;
     std::mutex m_sockMutex;
+
+    // 本进程 Redis 连接 (读限流阈值; actor_cache 池, Start 时一次取得)
+    CRedisCli *m_pRedis = nullptr;
+
+    // 单连接限流
+    CTokenBucketLimiter m_limiter;
+    int32 m_rateLimitPerSec = 0;
+    std::chrono::steady_clock::time_point m_lastRateRead{};
+    std::mutex m_rateMutex;
 };

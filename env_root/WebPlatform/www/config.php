@@ -181,6 +181,7 @@ const NODE_ALL_KEY = 'cluster:node:all';
 const ALERT_KEY   = 'cluster:alert';
 
 function config_cluster_key(): string  { return 'cluster:config:cluster'; }
+function config_game_key(): string      { return 'cluster:config:game'; }
 function config_actor_state_ttl_key(): string { return 'cluster:config:actor-state-ttl'; }
 function config_process_key(int $type): string { return 'cluster:config:process:' . $type; }
 function config_node_key(int $machineId): string { return 'cluster:config:node:' . $machineId; }
