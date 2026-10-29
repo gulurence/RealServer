@@ -3,7 +3,6 @@
 #include "xLog/xLog.h"
 #include "xConfig/xServerConfig.h"
 #include "xRedis/RedisMgr.h"
-#include "xScheduler/xSchedulerMgr.h"
 #include "xRpc/CRpcTcpServer.h"
 #include "xRpc/CRpcTcpClient.h"
 #include "xRpc/ActorRpcHandlers.h"
@@ -17,6 +16,7 @@
 #include "tService/tThridService.h"
 #include "xCluster/xProcessManager.h"
 #include "xCluster/xServiceDiscovery.h"
+#include "xCluster/xLocalInfo.h"
 #include "xCluster/xLinkManager.h"
 #include "xCluster/CActorLoadManager.h"
 #include "xTrace/CTraceManager.h"
@@ -104,9 +104,6 @@ bool CProcessEnv::OnKernelEnable()
 
     // Actor 数据监控上报模块 (订阅 cluster:actor:report:req, 复用共享 RedisCluster)
     CActorReportMgr::instance()->Init(CGmCommandMgr::instance()->GetCli());
-
-    // 调度器 (Kernel_Scheduler) — 所有类型都需要
-    xSchedulerMgr::getMe().Init(4 /*协程线程*/, 4 /*同步线程*/);
 
     // 自建 asio-TCP RPC 服务器 + 客户端 (gRPC 退役)
     RegisterActorRpcHandlers();
@@ -293,8 +290,11 @@ bool CProcessEnv::OnRunning()
          procMgr.GetSelfInfo().rpcPort);
     XLOG("[INIT] ============================================================");
 
+    // 安装 Ctrl+C / SIGTERM 处理器 → RequestShutdown (进程内优雅关闭)
+    procMgr.InstallSignalHandlers();
+
     int32 refreshCounter = 0;
-    while (true)
+    while (!procMgr.IsShutdownRequested())
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         refreshCounter++;
@@ -308,28 +308,81 @@ bool CProcessEnv::OnRunning()
         }
     }
 
-    return true; // unreachable
+    XLOG("[INIT] Shutdown requested — exiting main loop");
+    return true;
 }
 
 // =============================================================================
-// OnStop — 优雅关闭 (主循环为死循环, 正常不可达)
+// OnStop — 优雅关闭 (状态标记 + 落盘 + 停网关 + 注销 + 停调度/RPC + 释放)
+//
+// 主循环 OnRunning 在 RequestShutdown (Ctrl+C / GM shutdown / 灰度重启) 后退出,
+// 此处按序完成收尾。唯一 lua_State 只能调度线程触碰, 因此 saveAll / UnInstallAll
+// 必须经 CActorScheduler::DispatchSync 投递到调度线程串行执行。
 // =============================================================================
 void CProcessEnv::OnStop()
 {
     auto &procMgr = CProcessManager::getMe();
     auto &discovery = CServiceDiscovery::getMe();
 
+    XLOG("[INIT] ============================================================");
+    XLOG("[INIT] Graceful shutdown sequence begin");
+    XLOG("[INIT] ============================================================");
+
+    // 1. 状态标记 Stopping
     procMgr.SetState(EProcessState_Stopping);
-    XLOG("[INIT] Shutting down...");
+
+    // 2. 排空: 停止接受新 Actor 分配 (手动关闭路径无 gray_roll 预排空, 这里补一刀)
+    discovery.UpdateDrain(true);
+
+    // 3. 落盘: 本进程 Actor 内存态 flush 到 Redis (幂等, 供灰度迁移/宕机恢复)。
+    //    saveAll 会回调 Lua → DispatchSync 串行执行 (与 GM migrate_save/reload 同款)。
+    CActorScheduler::instance()->DispatchSync(
+        []() { LuaVM::instance()->DoString("xEngine.ActorMigration.saveAll()"); });
+
+    // 4. 停网关 (停止接收新客户端连接; xNetAgent 为 detach 线程, 随进程退出回收)
+    if (HasModule(Kernel_Net))
+    {
+        if (m_eType == EProcessType_PBattle)
+        {
+            CNetBattleGateway::instance()->Stop();
+        }
+        else
+        {
+            CNetGateway::instance()->Stop();
+        }
+    }
+
+    // 5. 停心跳
     procMgr.StopHeartbeat();
+
+    // 5.5 停链路追踪上报线程 (join 后台线程并做最后一次异步冲刷, Redis 此时仍可用)
+    CTraceManager::instance()->Stop();
+
+    // 6. 状态标记 Shutdown + 注销服务发现
     discovery.UpdateState(EProcessState_Shutdown);
     discovery.Deregister();
 
-    for (auto type : CActorMgr::instance()->GetHostedTypes())
-    {
-        CActorMgr::instance()->UnInstallAll(type);
-    }
+    // 7. 清理本机节点注册文件 local.info (Remove 现首次被真正调用)
+    CLocalInfo::getMe().Remove(procMgr.GetProcessId());
+
+    // 8. 卸载所有 Actor (on_uninstall 会回调 Lua → 必须调度线程串行)
+    CActorScheduler::instance()->DispatchSync([]() {
+        for (auto type : CActorMgr::instance()->GetHostedTypes())
+        {
+            CActorMgr::instance()->UnInstallAll(type);
+        }
+    });
+
+    // 9. 停 RPC 服务端/客户端 + Actor 调度器 (停 io_context, 避免静态析构期线程 join 阻塞)
+    CRpcTcpServer::instance()->Stop();
+    CRpcTcpClient::instance()->Stop();
+    CActorScheduler::instance()->Stop();
+
+    // 10. 停 GM 订阅 + 释放 Lua
     CGmCommandMgr::instance()->Shutdown();
     LuaVM::instance()->Release();
-    XLOG("[INIT] Server stopped");
+
+    XLOG("[INIT] ============================================================");
+    XLOG("[INIT] Server stopped gracefully");
+    XLOG("[INIT] ============================================================");
 }

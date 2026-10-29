@@ -13,7 +13,7 @@ REM --- MSG protocols (--cpp_out only) ---
 if errorlevel 1 goto :err
 
 REM --- RPC protocols (--cpp_out only; service 块不生成 C++，已弃用 gRPC) ---
-%PROTOC% --cpp_out=%OUT% --proto_path=. rpc/actor_mgr.proto rpc/myservice.proto
+%PROTOC% --cpp_out=%OUT% --proto_path=. rpc/actor_mgr.proto
 if errorlevel 1 goto :err
 
 echo Done. Generated C++ sources under %OUT%

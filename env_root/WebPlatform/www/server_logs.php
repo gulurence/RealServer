@@ -11,6 +11,7 @@ require_once __DIR__ . '/_layout.php';
 
 const TAIL_LINES    = 300;      // 显示末尾行数
 const TAIL_MAXBYTES = 524288;   // 尾部读取窗口 (字节, 足够 300 行典型日志)
+const LOG_LEVELS    = ['trace', 'debug', 'info', 'warn', 'error', 'critical'];   // 日志等级下拉选项 (spdlog)
 
 // ---- 日志文件名 → 友好显示名 (进程名映射与 start_cluster.ps1 一致) ----
 function log_label(string $f): string
@@ -77,6 +78,30 @@ function render_log_tail(string $text): string
     return implode("\n", $out);
 }
 
+// ---- 按日志等级过滤行: 仅保留含 "[level]" 标记的行 (不区分大小写) ----
+function filter_log_level(string $text, string $level): string
+{
+    if ($text === '' || $level === '') return $text;
+    $needle = '[' . strtolower($level) . ']';
+    $out = [];
+    foreach (explode("\n", $text) as $line) {
+        if (str_contains(strtolower($line), $needle)) $out[] = $line;
+    }
+    return implode("\n", $out);
+}
+
+// ---- 按日志内容关键字过滤行 (不区分大小写的子串匹配) ----
+function filter_log_content(string $text, string $q): string
+{
+    if ($text === '' || $q === '') return $text;
+    $needle = strtolower($q);
+    $out = [];
+    foreach (explode("\n", $text) as $line) {
+        if (str_contains(strtolower($line), $needle)) $out[] = $line;
+    }
+    return implode("\n", $out);
+}
+
 $logDir   = REALSERVER_LOG_DIR;
 $logFiles = is_dir($logDir) ? list_log_files($logDir) : [];
 
@@ -91,10 +116,35 @@ if ($selected === '' || !isset($logFiles[$selected])) {
     if ($selected === '') $selected = (string)(array_key_first($logFiles) ?? '');
 }
 
+// 日志等级过滤 (''=全部): 仅保留含 "[level]" 标记的行
+$level = (string)($_GET['level'] ?? '');
+if ($level !== '' && !in_array($level, LOG_LEVELS, true)) $level = '';
+
+// 日志内容查询 (''=全部): 仅保留包含关键字的行 (不区分大小写)
+$q = trim((string)($_GET['q'] ?? ''));
+
 $logPath  = $logFiles !== [] ? $logDir . DIRECTORY_SEPARATOR . $selected : '';
 $tailText = $logPath !== '' ? read_tail($logPath, TAIL_LINES, TAIL_MAXBYTES) : '';
+if ($level !== '' && $tailText !== '') {
+    $tailText = filter_log_level($tailText, $level);
+}
+if ($q !== '' && $tailText !== '') {
+    $tailText = filter_log_content($tailText, $q);
+}
 $logSize  = $logPath !== '' ? (int)(@filesize($logPath) ?: 0) : 0;
 $logMtime = $logPath !== '' ? (int)(@filemtime($logPath) ?: 0) : 0;
+
+// 空态提示 (区分 无内容 / 等级过滤 / 内容过滤 / 组合过滤)
+$emptyMsg = '暂无日志内容（文件为空或尚未产生输出）。';
+if ($tailText === '') {
+    if ($q !== '' && $level !== '') {
+        $emptyMsg = '没有匹配「' . $q . '」且日志等级为「' . $level . '」的日志行（当前文件末尾 ' . TAIL_LINES . ' 行内）。';
+    } elseif ($q !== '') {
+        $emptyMsg = '没有匹配「' . $q . '」的日志行（当前文件末尾 ' . TAIL_LINES . ' 行内）。';
+    } elseif ($level !== '') {
+        $emptyMsg = '该日志等级「' . $level . '」暂无匹配行（当前文件末尾 ' . TAIL_LINES . ' 行内）。';
+    }
+}
 
 layout_header('服务器进程日志', 'server_logs');
 ?>
@@ -114,13 +164,28 @@ layout_header('服务器进程日志', 'server_logs');
                     <option value="<?= esc($f) ?>"<?= $f === $selected ? ' selected' : '' ?>><?= esc($label) ?></option>
                 <?php endforeach; ?>
             </select>
+            <label class="form-label mb-0" for="level-select">日志等级</label>
+            <select id="level-select" class="form-select" style="max-width:180px">
+                <option value=""<?= $level === '' ? ' selected' : '' ?>>全部</option>
+                <?php foreach (LOG_LEVELS as $lv): ?>
+                    <option value="<?= esc($lv) ?>"<?= $level === $lv ? ' selected' : '' ?>><?= esc($lv) ?></option>
+                <?php endforeach; ?>
+            </select>
+            <form method="get" action="server_logs.php" class="d-flex align-items-center gap-2" style="margin:0">
+                <input type="hidden" name="log" value="<?= esc($selected) ?>">
+                <input type="hidden" name="level" value="<?= esc($level) ?>">
+                <label class="form-label mb-0" for="log-q">日志内容</label>
+                <input type="text" id="log-q" name="q" value="<?= esc($q) ?>" class="form-control" style="max-width:220px" placeholder="关键字（匹配日志行内容）">
+                <button type="submit" class="btn btn-sm btn-primary">查询</button>
+                <?php if ($q !== ''): ?><a class="btn btn-sm btn-link" href="server_logs.php?log=<?= urlencode($selected) ?>&level=<?= urlencode($level) ?>">清除</a><?php endif; ?>
+            </form>
             <span class="dim">共 <?= count($logFiles) ?> 个日志 · 显示末尾 <?= TAIL_LINES ?> 行</span>
         </div>
     </div>
 </div>
 <?php endif; ?>
 
-<?php autorefresh(1, '立即刷新'); ?>
+<?php autorefresh(3, '立即刷新', true); ?>
 <?php live_region_start(); ?>
 
 <div class="card">
@@ -128,10 +193,12 @@ layout_header('服务器进程日志', 'server_logs');
         <strong><?= esc($logFiles[$selected] ?? $selected) ?></strong>
         <span class="dim mono"><?= esc($logPath) ?></span>
         <span class="dim"><?= $logSize > 0 ? number_format($logSize) . ' 字节' : '空文件' ?> · <?= $logMtime > 0 ? date('Y-m-d H:i:s', $logMtime) : '—' ?></span>
+        <?php if ($level !== ''): ?><span class="badge">等级: <?= esc($level) ?></span><?php endif; ?>
+        <?php if ($q !== ''): ?><span class="badge">内容: <?= esc($q) ?></span><?php endif; ?>
     </div>
     <div class="card-body p-0">
         <?php if ($tailText === ''): ?>
-            <div class="empty">暂无日志内容（文件为空或尚未产生输出）。</div>
+            <div class="empty"><?= esc($emptyMsg) ?></div>
         <?php else: ?>
             <pre id="log-view" class="log-view"><?= render_log_tail($tailText) ?></pre>
         <?php endif; ?>
@@ -148,6 +215,15 @@ layout_header('服务器进程日志', 'server_logs');
     if (sel) sel.addEventListener('change', function () {
         var u = new URL(location.href);
         u.searchParams.set('log', sel.value);
+        location.href = u.toString();
+    });
+
+    // 日志等级切换 → 带 level 参数整页跳转 (''=全部, 删除参数)
+    var lv = document.getElementById('level-select');
+    if (lv) lv.addEventListener('change', function () {
+        var u = new URL(location.href);
+        if (lv.value === '') u.searchParams.delete('level');
+        else u.searchParams.set('level', lv.value);
         location.href = u.toString();
     });
 

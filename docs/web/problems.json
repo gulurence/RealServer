@@ -76,11 +76,11 @@
       "id": "A6",
       "group": "A-RPC 层",
       "module": "框架/03-RPC层与asio迁移.md",
-      "status": "open",
+      "status": "done",
       "priority": "low",
       "milestone": "",
       "title": "RpcCallMgr/xNatsCall.h 遗留宏混 std::cout",
-      "note": "为兼容 xService/xNats 旧骨架保留，其宏内混 std::cout 违反日志规范；待旧骨架清理时一并移除。"
+      "note": "旧骨架 xService/xScheduler/xEvent/xNats 与 xRpc 的 RpcCallMgr 遗留线程已整体移除，xNatsCall.h 随 xNats 一并删除，其混 std::cout 的宏已不存在。"
     },
     {
       "id": "A7",
@@ -160,7 +160,7 @@
       "priority": "high",
       "milestone": "M2",
       "title": "PID 复用碰撞",
-      "note": "PID 仅 16 位且 OS 回收复用；同机先后两进程拿到同 PID 时，旧进程残留 player:*/cluster:actor:* 索引指向错误进程；需进程心跳存活校验 + 启动清理本 PID 残留。"
+      "note": "PID 仅 16 位且 OS 回收复用；同机先后两进程拿到同 PID 时，旧进程残留 player:*/cluster:actor:* 索引指向错误进程；需进程心跳存活校验 + 启动清理本 PID 残留。复核：16 位 PID 仅用于全局 ActorID 打包，路由 processId 走 Redis INCR 序列、OS PID 以 int64 全宽存 os_pid，故本项只影响全局 ActorID 段、不影响进程寻址。"
     },
     {
       "id": "C3",
@@ -180,7 +180,7 @@
       "priority": "med",
       "milestone": "M2",
       "title": "PID 位宽不足（OS PID 可超 65535）",
-      "note": "Linux 默认 PID 上限 4M，打包进 16 位会截断、低位相同而碰撞；需限制 PID 上限或改用 24 位 PID 段（会挤占 ActorIndex/保留位）。"
+      "note": "Linux 默认 PID 上限 4M，打包进 16 位会截断、低位相同而碰撞；需限制 PID 上限或改用 24 位 PID 段（会挤占 ActorIndex/保留位）。复核：16 位 PID 仅用于全局 ActorID 打包的进程段、不参与路由；路由 processId 走 Redis INCR、OS PID 全宽存 os_pid、local.info 存稳定 processId，故 OS PID 超 65535 不影响寻址，设计无问题。"
     },
     {
       "id": "C5",

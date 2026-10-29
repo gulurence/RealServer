@@ -20,6 +20,8 @@ local BattleMsgId = {
     LEAVE_RSP     = 9, HASH_NTF      = 10,
     DISCONNECT    = 11,  -- 内部消息 (Gate 断线收尾转发, 非客户端消息; 不入 proto)
     SPECTATOR_ENTER = 12, -- 内部消息 (CNetBattleGateway 观战登录成功后投递, 触发下推快照; 不入 proto)
+    SPECTATE_FOLLOW = 14, -- 客户端(观战者)切换跟随目标 (入 proto)
+    SPECTATOR_LIST  = 15, -- 下推观战列表 (入 proto)
 }
 
 -- 错误码 (2001+ 为战斗模块私有码)
@@ -94,6 +96,8 @@ function BattleClass:ctor(actor_type, actor_id_or_name, actor_type_name)
     -- 观战者 (Battle 进程侧缓存; 权威名单在 Redis battle:spectator:{battleId})
     self.spectators         = {}   -- pid -> true
     self.spectatorCacheFrame = -1  -- 上次刷新观战名单的帧号
+    self.spectatorFollow    = {}   -- pid -> target_pid (显式跟随目标; 缺省=花名册第一个)
+    self.lastSpectatorListKey = "" -- 上次推送的观战列表变化键 (pid/target 串, 变化检测防重复广播)
 end
 
 function BattleClass:onInstall()
@@ -342,6 +346,8 @@ function BattleClass:on_msg(msgId, rawBody)
         self:handle_disconnect(playerId)
     elseif smallType == BattleMsgId.SPECTATOR_ENTER then
         self:handle_spectator_enter(playerId)
+    elseif smallType == BattleMsgId.SPECTATE_FOLLOW then
+        self:handle_spectate_follow(playerId, payload)
     else
         xEngine.Log.warn("[Battle] on_msg unknown small_type=%d", smallType)
     end
@@ -863,6 +869,7 @@ function BattleClass:on_battle_finalize_msg(raw_body)
     end
     xEngine.Redis.Del("battle:roster:" .. bid)
     xEngine.Redis.Del("battle:host:" .. bid)
+    xEngine.Redis.Del("battle:spectator:follow:" .. bid)
 
     xEngine.Log.info("[Battle] finalize done: battle=%d reason=%s", self._actor_id, tostring(self.endReason))
 end
@@ -878,6 +885,8 @@ function BattleClass:refresh_spectators()
     end
     self.spectators = newList
     self.spectatorCacheFrame = self.frame
+    self:load_spectator_follow()   -- 同步跟随映射 (灰度迁移恢复端也靠它重建)
+    self:push_spectator_list()     -- 名单/跟随变化时广播观战列表
 end
 
 -- 观战者直连登录 (CNetBattleGateway 握手成功后投递 SPECTATOR_ENTER): 登记 + 下推快照对齐。
@@ -885,6 +894,98 @@ end
 function BattleClass:handle_spectator_enter(pid)
     self.spectators[pid] = true
     self:push_spectator_snapshot(pid)
+    self:push_spectator_list()     -- 观战者即时进入列表, 不等下个 10 帧刷新
+end
+
+--------------------------------------------------------------------------------
+-- 观战列表 (观战者 -> 其跟随的战斗玩家, 实时推送)
+--------------------------------------------------------------------------------
+-- 观战者昵称 (观战者不在 self.players 花名册内, 需经 Role 热数据查; 缺省回退占位)
+local function player_name(pid)
+    local attrs = xEngine.Role.parseAttrs(pid)
+    return (attrs.name and attrs.name ~= "") and attrs.name or ("player_" .. xEngine.Number.intKey(pid))
+end
+
+function BattleClass:spectator_follow_key()
+    return "battle:spectator:follow:" .. xEngine.Number.intKey(self._actor_id)
+end
+
+-- Redis "specPid:targetPid,..." -> self.spectatorFollow (灰度迁移恢复端重建)
+function BattleClass:load_spectator_follow()
+    local raw = xEngine.Redis.Get(self:spectator_follow_key()) or ""
+    local m = {}
+    for pair in (raw .. ","):gmatch("([^,]*),") do
+        if pair ~= "" then
+            local spec, tgt = pair:match("^(%d+):(%d+)$")
+            if spec then m[tonumber(spec)] = tonumber(tgt) end
+        end
+    end
+    self.spectatorFollow = m
+end
+
+function BattleClass:save_spectator_follow()
+    local parts = {}
+    for pid, tgt in pairs(self.spectatorFollow) do
+        table.insert(parts, xEngine.Number.intKey(pid) .. ":" .. xEngine.Number.intKey(tgt))
+    end
+    xEngine.Redis.Set(self:spectator_follow_key(), table.concat(parts, ","))
+end
+
+-- 观战者切换跟随目标 (直连 REQ): 校验目标在花名册 → 存映射 → 广播
+function BattleClass:handle_spectate_follow(pid, payload)
+    local targetId = xEngine.Number.toInt(luacore.si_pb_varint_field(payload, 4))
+    if targetId == 0 or not self.players[targetId] then
+        xEngine.Log.warn("[Battle] spectate_follow: invalid target battle=%d spectator=%d target=%d",
+            self._actor_id, pid, targetId)
+        return ""
+    end
+    self.spectatorFollow[pid] = targetId
+    self:save_spectator_follow()
+    self:push_spectator_list()
+    return ""
+end
+
+-- 变化检测键 (仅 pid/target, 不含昵称; 排序去重, 避免每次刷新空读 Role 昵称)
+function BattleClass:spectator_change_key()
+    local default = self.rosterOrder[1] or 0
+    local parts = {}
+    for pid in pairs(self.spectators) do
+        local tgt = self.spectatorFollow[pid]
+        if not tgt or not self.players[tgt] then tgt = default end
+        table.insert(parts, xEngine.Number.intKey(pid) .. ":" .. xEngine.Number.intKey(tgt))
+    end
+    table.sort(parts)
+    return table.concat(parts, ",")
+end
+
+-- 构建观战列表串 "spec_id,spec_name,tgt_id,tgt_name;..." (缺省跟随花名册第一个玩家)
+function BattleClass:build_spectator_list_str()
+    local default = self.rosterOrder[1] or 0
+    local parts = {}
+    for pid in pairs(self.spectators) do
+        local tgt = self.spectatorFollow[pid]
+        if not tgt or not self.players[tgt] then tgt = default end
+        local tgtName = (tgt ~= 0 and self.players[tgt]) and self.players[tgt].name or ""
+        table.insert(parts, table.concat({
+            xEngine.Number.intKey(pid), player_name(pid),
+            xEngine.Number.intKey(tgt), tgtName,
+        }, ","))
+    end
+    return table.concat(parts, ";")
+end
+
+-- 广播观战列表给参战者 + 观战者 (变化才推, 串比较去重)
+function BattleClass:push_spectator_list()
+    local key = self:spectator_change_key()
+    if key == self.lastSpectatorListKey then return end
+    self.lastSpectatorListKey = key
+    local msg = luacore_battle.si_pb_battle_spectator_list_ntf(self._actor_id, self:build_spectator_list_str())
+    local targets = {}
+    for _, pid in ipairs(self.rosterOrder) do targets[pid] = true end
+    for pid in pairs(self.spectators) do targets[pid] = true end
+    for pid in pairs(targets) do
+        luacore.si_battle_gateway_send(pid, msg)
+    end
 end
 
 function BattleClass:push_spectator_snapshot(pid)

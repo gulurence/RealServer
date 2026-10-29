@@ -29,6 +29,10 @@ public:
     ~CRpcTcpClient();
 
     void Init(); // 启动 io_context 线程
+
+    // 优雅关闭: 停 io_context 使 thread_proc 退出 (detach 线程随进程退出回收)。
+    void Stop();
+
     bool Connect(int64 peerId, const std::string &host, uint16 port);
 
     // 主动断开与某对端的 TCP 连接 (有向链接规则热更新/主动移除时调用)
@@ -85,11 +89,12 @@ public:
     RawRpcResult CallSyncRaw(int64 peerId, uint32 methodId, const std::string &reqBody,
                              uint32 timeoutMs = 5000);
 
-    // 异步原始字节 RPC (fire-and-forget): 服务器主动推送无回包, 忽略结果。
-    // 用于 Actor 线程上发推送而不阻塞 (RPC_METHOD_PUSH 等无业务回包场景)。
-    void SubmitRaw(int64 peerId, uint32 methodId, const std::string &reqBody)
+    // 异步原始字节 RPC (fire-and-forget): 服务器主动推送无回包, 忽略业务响应。
+    // 返回是否成功提交 (false = 无连接, Submit 返回 requestId==0); 调用方据此日志,
+    // 避免推送被静默丢弃 (此前 void 返回导致 PushToGate 等无法感知无连接失败)。
+    bool SubmitRaw(int64 peerId, uint32 methodId, const std::string &reqBody)
     {
-        Submit(peerId, methodId, reqBody, [](int32, const std::string &) {});
+        return Submit(peerId, methodId, reqBody, [](int32, const std::string &) {}) != 0;
     }
 
     virtual void thread_proc() override;

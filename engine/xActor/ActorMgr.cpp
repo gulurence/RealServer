@@ -4,6 +4,7 @@
 #include "tService/tServiceMgr.h"
 #include "xCluster/xProcessDefine.h"    // EActorType_APlayer 等枚举
 #include "xCluster/CPlayerActorIndex.h" // player:{id} → actorId 路由索引
+#include "xCluster/xServiceDiscovery.h" // 实例增删时即时回写负载 (FlushLoad)
 #include "xGm/GmCommandMgr.h"           // Actor 实例注册 (K8s 风格管理)
 #include "xLog/xLog.h"
 
@@ -157,40 +158,46 @@ bool CActorMgr::AddInstance(CActor *pActor)
         return false;
     }
 
-    std::lock_guard<std::mutex> lock(m_stLock);
-
-    // --- 提取 key 信息 ---
-    // GetActorType() / GetActorID() 是 CActor 虚函数，返回注册时设定的值。
-    EActorType type = pActor->GetActorType();
-    ActorID id = pActor->GetActorID();
-
-    XLOG("[ActorMgr] AddInstance: requesting type=%d id=%lld name=\"%s\"", type, id,
-         pActor->GetActorName().c_str());
-
-    // --- 获取或创建内层 map ---
-    // m_mapInstances 是 unordered_map<EActorType, map<ActorID, CActor*>>
-    // operator[] 对 key=type 不存在时自动创建空的 inner map。
-    auto &innerMap = m_mapInstances[type];
-
-    // --- 重复检查 ---
-    // 同一 (type, id) 不能有两个 CActor 对象，说明上层逻辑有误。
-    if (innerMap.find(id) != innerMap.end())
     {
-        XERR("[ActorMgr] AddInstance: FAIL — duplicate type=%d id=%lld "
-             "(existing name=\"%s\", attempted name=\"%s\")",
-             type, id, innerMap[id]->GetActorName().c_str(), pActor->GetActorName().c_str());
-        return false;
-    }
+        std::lock_guard<std::mutex> lock(m_stLock);
 
-    // --- 插入 ---
-    innerMap[id] = pActor;
+        // --- 提取 key 信息 ---
+        // GetActorType() / GetActorID() 是 CActor 虚函数，返回注册时设定的值。
+        EActorType type = pActor->GetActorType();
+        ActorID id = pActor->GetActorID();
 
-    // --- 统计当前该类型总数 ---
-    size_t typeCount = innerMap.size();
+        XLOG("[ActorMgr] AddInstance: requesting type=%d id=%lld name=\"%s\"", type, id,
+             pActor->GetActorName().c_str());
 
-    XLOG("[ActorMgr] AddInstance: OK — type=%d id=%lld name=\"%s\" "
-         "(type_count=%zu, total_types=%zu)",
-         type, id, pActor->GetActorName().c_str(), typeCount, m_mapInstances.size());
+        // --- 获取或创建内层 map ---
+        // m_mapInstances 是 unordered_map<EActorType, map<ActorID, CActor*>>
+        // operator[] 对 key=type 不存在时自动创建空的 inner map。
+        auto &innerMap = m_mapInstances[type];
+
+        // --- 重复检查 ---
+        // 同一 (type, id) 不能有两个 CActor 对象，说明上层逻辑有误。
+        if (innerMap.find(id) != innerMap.end())
+        {
+            XERR("[ActorMgr] AddInstance: FAIL — duplicate type=%d id=%lld "
+                 "(existing name=\"%s\", attempted name=\"%s\")",
+                 type, id, innerMap[id]->GetActorName().c_str(), pActor->GetActorName().c_str());
+            return false;
+        }
+
+        // --- 插入 ---
+        innerMap[id] = pActor;
+
+        // --- 统计当前该类型总数 ---
+        size_t typeCount = innerMap.size();
+
+        XLOG("[ActorMgr] AddInstance: OK — type=%d id=%lld name=\"%s\" "
+             "(type_count=%zu, total_types=%zu)",
+             type, id, pActor->GetActorName().c_str(), typeCount, m_mapInstances.size());
+    } // 释放 m_stLock
+
+    // 实例数变化即时回写 Redis 负载: 若不即时, 负载均衡每次被动读到的都是 5s 心跳
+    // 才刷新的陈旧 load, 并发建 Actor (登录/开局风暴) 会扎堆选中同一低负载节点。
+    CServiceDiscovery::getMe().FlushLoad((int32)GetInstanceCount());
     return true;
 }
 
@@ -209,48 +216,53 @@ bool CActorMgr::AddInstance(CActor *pActor)
 //       以保持 m_mapInstances 的整洁（后续查找不存在类型时直接返回空）。
 CActor *CActorMgr::RemoveInstance(EActorType i32Type, ActorID i64ID)
 {
-    std::lock_guard<std::mutex> lock(m_stLock);
-
-    XLOG("[ActorMgr] RemoveInstance: requesting type=%d id=%lld", i32Type, i64ID);
-
-    // --- 查找外层 map（按类型）---
-    auto outerIt = m_mapInstances.find(i32Type);
-    if (outerIt == m_mapInstances.end())
+    CActor *pActor = nullptr;
     {
-        XWRN("[ActorMgr] RemoveInstance: NOT FOUND — type=%d has no entries at all", i32Type);
-        return nullptr;
-    }
+        std::lock_guard<std::mutex> lock(m_stLock);
 
-    // --- 查找内层 map（按 ID）---
-    auto &innerMap = outerIt->second;
-    auto innerIt = innerMap.find(i64ID);
-    if (innerIt == innerMap.end())
-    {
-        XWRN("[ActorMgr] RemoveInstance: NOT FOUND — type=%d id=%lld "
-             "(type has %zu entries, but id not among them)",
-             i32Type, i64ID, innerMap.size());
-        return nullptr;
-    }
+        XLOG("[ActorMgr] RemoveInstance: requesting type=%d id=%lld", i32Type, i64ID);
 
-    // --- 移除条目 ---
-    CActor *pActor = innerIt->second;
-    innerMap.erase(innerIt);
+        // --- 查找外层 map（按类型）---
+        auto outerIt = m_mapInstances.find(i32Type);
+        if (outerIt == m_mapInstances.end())
+        {
+            XWRN("[ActorMgr] RemoveInstance: NOT FOUND — type=%d has no entries at all", i32Type);
+            return nullptr;
+        }
 
-    XLOG("[ActorMgr] RemoveInstance: erased type=%d id=%lld name=\"%s\" "
-         "(type_count=%zu→%zu)",
-         i32Type, i64ID, pActor->GetActorName().c_str(), innerMap.size() + 1, innerMap.size());
+        // --- 查找内层 map（按 ID）---
+        auto &innerMap = outerIt->second;
+        auto innerIt = innerMap.find(i64ID);
+        if (innerIt == innerMap.end())
+        {
+            XWRN("[ActorMgr] RemoveInstance: NOT FOUND — type=%d id=%lld "
+                 "(type has %zu entries, but id not among them)",
+                 i32Type, i64ID, innerMap.size());
+            return nullptr;
+        }
 
-    // --- 外键清理 ---
-    // 如果该类型下已无任何实例，删除外层条目以保持结构整洁。
-    // 这样后续 Find/GetByType 等查询可以直接从外层不存在判断。
-    if (innerMap.empty())
-    {
-        m_mapInstances.erase(outerIt);
-        XLOG("[ActorMgr] RemoveInstance: type=%d outer map removed — no instances remain "
-             "(total_types=%zu→%zu)",
-             i32Type, m_mapInstances.size() + 1, m_mapInstances.size());
-    }
+        // --- 移除条目 ---
+        pActor = innerIt->second;
+        innerMap.erase(innerIt);
 
+        XLOG("[ActorMgr] RemoveInstance: erased type=%d id=%lld name=\"%s\" "
+             "(type_count=%zu→%zu)",
+             i32Type, i64ID, pActor->GetActorName().c_str(), innerMap.size() + 1, innerMap.size());
+
+        // --- 外键清理 ---
+        // 如果该类型下已无任何实例，删除外层条目以保持结构整洁。
+        // 这样后续 Find/GetByType 等查询可以直接从外层不存在判断。
+        if (innerMap.empty())
+        {
+            m_mapInstances.erase(outerIt);
+            XLOG("[ActorMgr] RemoveInstance: type=%d outer map removed — no instances remain "
+                 "(total_types=%zu→%zu)",
+                 i32Type, m_mapInstances.size() + 1, m_mapInstances.size());
+        }
+    } // 释放 m_stLock
+
+    // 实例数变化即时回写 Redis 负载 (同 AddInstance, 释放槽位即时可见)。
+    CServiceDiscovery::getMe().FlushLoad((int32)GetInstanceCount());
     return pActor;
 }
 

@@ -96,8 +96,6 @@ typedef unsigned long uint64;
 #define countof(array) (sizeof(array) / sizeof((array)[0]))
 #endif
 
-#define NATS_RESPONSE_BUFF_SIZE 65535
-
 typedef uint64 ServiceID;
 
 // 全局类型系统枚举 (进程类型 / Actor 类型 / 进程状态), 见 xTypeDefine.h。

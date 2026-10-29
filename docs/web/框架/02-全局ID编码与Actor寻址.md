@@ -125,9 +125,9 @@ uint32 idx = xActorId::GetActorIndex(actorId);  // 定位进程内 Actor
 | ID | 状态 | 优先级 | 归期 | 问题 | 处理/方向 |
 |---|---|---|---|---|---|
 | **C1** | 🔴 仍开放 | 高 | M2 | MachineID 唯一性派生未落地 | 编解码与索引已就位，但 Redis 按物理机唯一 ID 派生 MachineID 的逻辑未实现；若多实例同时注册同机存在竞态，可能拿重复 MachineID 导致跨机 ActorID 碰撞。 |
-| **C2** | 🔴 仍开放 | 高 | M2 | PID 复用碰撞 | PID 仅 16 位且 OS 回收复用；同机先后两进程拿到同 PID 时，旧进程残留 player:*/cluster:actor:* 索引指向错误进程；需进程心跳存活校验 + 启动清理本 PID 残留。 |
+| **C2** | 🔴 仍开放 | 高 | M2 | PID 复用碰撞 | PID 仅 16 位且 OS 回收复用；同机先后两进程拿到同 PID 时，旧进程残留 player:*/cluster:actor:* 索引指向错误进程；需进程心跳存活校验 + 启动清理本 PID 残留。复核：16 位 PID 仅用于全局 ActorID 打包，路由 processId 走 Redis INCR 序列、OS PID 以 int64 全宽存 os_pid，故本项只影响全局 ActorID 段、不影响进程寻址。 |
 | **C3** | 🔴 仍开放 | 中 | M2 | ActorIndex 24 位溢出回绕 | 约 1677 万上限；不重启累计创建超限时自增回绕会撞现存实例；分配时需检测回绕并拒绝或复用已释放索引。 |
-| **C4** | 🔴 仍开放 | 中 | M2 | PID 位宽不足（OS PID 可超 65535） | Linux 默认 PID 上限 4M，打包进 16 位会截断、低位相同而碰撞；需限制 PID 上限或改用 24 位 PID 段（会挤占 ActorIndex/保留位）。 |
+| **C4** | 🔴 仍开放 | 中 | M2 | PID 位宽不足（OS PID 可超 65535） | Linux 默认 PID 上限 4M，打包进 16 位会截断、低位相同而碰撞；需限制 PID 上限或改用 24 位 PID 段（会挤占 ActorIndex/保留位）。复核：16 位 PID 仅用于全局 ActorID 打包的进程段、不参与路由；路由 processId 走 Redis INCR、OS PID 全宽存 os_pid、local.info 存稳定 processId，故 OS PID 超 65535 不影响寻址，设计无问题。 |
 | **C5** | 🔴 仍开放 | 高 | M2 | 跨进程缓存一致性 | 本地缓存为纯内存快照、无主动失效推送；A 改 B 缓时 B 读到过期 ActorID，需依赖 Invalidate+失败回查，或改 Redis Pub/Sub 广播失效。 |
 | **C6** | 🔴 仍开放 | 高 | M2 | 进程崩溃脏缓存/脏键（player:* 无 TTL） | 崩溃不清 Redis 残留 player:{id} 脏键；他进程缓存可能仍指向死进程；兜底=目标进程存活校验+路由失败回查+player:* 加 TTL 定期清理。 |
 | **C7** | 🔴 仍开放 | 中 | M2 | 过渡态 id→id 恒等映射 | ActorID 尚未切换全局自描述（实例 ID 沿用业务 roleId），Register(id,id) 暂存恒等映射；全局 ID 接入创建链路前，本索引无跨进程定位实际收益。 |

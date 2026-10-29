@@ -21,6 +21,11 @@ local EC = {
     INTERNAL             = 1999,
 }
 
+-- 登录中状态 (LOGGED_IN/ROLE_SELECTED) 的陈旧判定阈值 (秒):
+-- 同账号并发登录时, 旧登录若在此时长内仍处于「登录中」(尚未进入游戏), 拒绝新登录;
+-- 超过此时长视为陈旧登录, 允许新登录覆盖。须小于 session TTL(30s), 否则 session 键先过期。
+local LOGIN_TIMEOUT_SEC = 15
+
 -- 编码仅含 small_type(field 2, varint) 的最小 protobuf 负载: tag = (2<<3)|0 = 0x10。
 -- (与 gate.lua 同款 helper; 供选角上线时通知 Player Actor 恢复 online=1 用)
 local function encode_small_type(smallType)
@@ -81,10 +86,21 @@ function LoginClass:on_rpc_login(reqBody)
     return ""
 end
 
+-- 进程级缓存 player_actor_cap: 每次登录都 HGet 一次 → 缓存 5s (登录热路径省 1 往返)。
+-- 单例 Login (id=0) 每进程仅一份, 模块级缓存即每进程一份; Lua 热更重载自然失效。
+local capCache = { value = 0, expireAt = 0 }
+local CAP_CACHE_TTL = 5
+
 -- 读取 PlayerActor 数量上限 (cluster:config:game 的 player_actor_cap; 0=不限)
 function LoginClass:get_player_actor_cap()
+    local now = luacore.si_time_cur_sec()
+    if capCache.expireAt > now then
+        return capCache.value
+    end
     local v = xEngine.Redis.HGet("cluster:config:game", "player_actor_cap")
-    return tonumber(v) or 0
+    capCache.value = tonumber(v) or 0
+    capCache.expireAt = now + CAP_CACHE_TTL
+    return capCache.value
 end
 
 -- 登录: 校验 Session → session 同步(踢旧允许新) → 排队判定 → 返回 LoginRsp
@@ -104,7 +120,7 @@ function LoginClass:rpc_login(payload)
     end
 
     -- 登录排队: 集群 PlayerActor 满载时入队, 返回排队位置 + 预计等待 (平均等待时间)。
-    -- 排队阶段不踢旧 (旧连接仍在线), 待放行时再由下方「踢旧允许新」处理。
+    -- 排队阶段不踢旧 (旧连接仍在线), 待放行时再由下方「顶号/超时判定」处理。
     local cap = self:get_player_actor_cap()
     if cap > 0 then
         local count = tonumber(xEngine.Redis.Get("cluster:load:player_count")) or 0
@@ -119,37 +135,59 @@ function LoginClass:rpc_login(payload)
         end
     end
 
-    -- 有空位: 若本账户之前在排队, 此刻放行, 出队并更新平均放行间隔
-    if xEngine.LoginQueue.position(accountId) > 0 then
+    -- 有空位: 若本账户之前在排队, 此刻放行, 出队并更新平均放行间隔。
+    -- 仅当排队开关开启 (cap>0) 时队列才可能非空; cap=0 (默认) 直接跳过, 省一次 LRANGE 往返。
+    if cap > 0 and xEngine.LoginQueue.position(accountId) > 0 then
         xEngine.LoginQueue.pop()
         xEngine.LoginQueue.recordDequeue()
     end
 
-    -- 踢旧允许新: 确要放行新连接时, 若已有活跃 session (state != OFFLINE) 且带
-    -- 旧 Gate 连接信息, 定向断开旧连接
-    local oldState = xEngine.AccountSession.getState(accountId)
-    if oldState > xEngine.SessionState.OFFLINE then
-        local gateProcess = tonumber(xEngine.AccountSession.getField(accountId, "gate_process"))
-        local cid = tonumber(xEngine.AccountSession.getField(accountId, "cid"))
-        if gateProcess and gateProcess > 0 and cid and cid > 0 then
-            xEngine.Log.info("[Login] login: account=%d kick old gate=%d cid=%d",
-                accountId, gateProcess, cid)
-            luacore.si_gate_kick_cid(gateProcess, cid)
+    -- 一次读全量 session 字段 (state/last_seen/gate_process/cid), 区分「已进入游戏 → 顶号」
+    -- 与「登录中 → 超时判定」, 替代逐个 getField 的多次 Redis 往返。
+    local sess     = xEngine.AccountSession.getAll(accountId)
+    local oldState = tonumber(sess.state) or xEngine.SessionState.OFFLINE
+    local lastSeen = tonumber(sess.last_seen) or 0
+    local now      = luacore.si_time_cur_sec()
+
+    -- 登录中 (LOGGED_IN/ROLE_SELECTED): 未超时则拒绝新登录 (并发登录互相覆盖防护),
+    -- 已超时视为陈旧登录, 放行并按顶号流程替换。
+    if oldState == xEngine.SessionState.LOGGED_IN or oldState == xEngine.SessionState.ROLE_SELECTED then
+        if now - lastSeen <= LOGIN_TIMEOUT_SEC then
+            xEngine.AccountSession.releaseLock(accountId)
+            xEngine.Log.warn("[Login] login: account=%d logging in (state=%d, %ds ago), reject",
+                accountId, oldState, now - lastSeen)
+            return luacore.si_pb_login_rsp(EC.SESSION_INVALID, 0, "")
         end
-        xEngine.AccountSession.set(accountId, { kicked = 1 })
+        xEngine.Log.info("[Login] login: account=%d stale login (state=%d, %ds ago), replace",
+            accountId, oldState, now - lastSeen)
     end
 
-    -- 写新 session (gate_process/cid 由 Gate 回包后补写)
+    -- 已进入游戏 (IN_GAME/IN_BATTLE) 或陈旧登录: 顶号踢旧连接。先写 kicked 标记再异步踢旧,
+    -- 旧连接的断线收尾据此跳过离线处理 (避免覆盖新 session); 新连接所在 Gate 回包后补写
+    -- gate_process/cid 完成「更新 Gate 客户端信息」。
+    local oldGateProcess = tonumber(sess.gate_process)
+    local oldCid         = tonumber(sess.cid)
+    local kickedOld = false
+    if oldGateProcess and oldGateProcess > 0 and oldCid and oldCid > 0 then
+        kickedOld = true
+        xEngine.AccountSession.set(accountId, { kicked = 1 })
+        xEngine.Log.info("[Login] login: account=%d kick old gate=%d cid=%d (state=%d)",
+            accountId, oldGateProcess, oldCid, oldState)
+        luacore.si_gate_kick_cid(oldGateProcess, oldCid)
+    end
+
+    -- 写新 session (gate_process/cid 由新连接所在 Gate 回包后补写)
     xEngine.AccountSession.set(accountId, {
         state         = xEngine.SessionState.LOGGED_IN,
         login_process = luacore.si_get_process_id(),
         token         = token,
-        last_seen     = luacore.si_time_cur_sec(),
-        kicked        = 0,
+        last_seen     = now,
+        kicked        = kickedOld and 1 or 0,
     })
     xEngine.AccountSession.releaseLock(accountId)
 
-    xEngine.Account.setState(accountId, xEngine.AccountState.LOGGED_IN)
+    -- 账户状态机: 登录即进入 ROLE_LISTED (回包携带角色列表); 中间态 LOGGED_IN 无观察者,
+    -- 折叠为单次写 (省 1 次 Redis Set)。
     xEngine.Account.setState(accountId, xEngine.AccountState.ROLE_LISTED)
 
     local username = "account_" .. xEngine.Number.intKey(accountId)
@@ -178,11 +216,12 @@ function LoginClass:rpc_create_role(payload)
         return luacore.si_pb_create_role_rsp(EC.ROLE_NAME_TAKEN, 0, "", 0, 0)
     end
 
-    -- 角色 id 分配: accountId*1000 + 序号 (同步、全局唯一, 免 Redis INCR)
-    local count  = #xEngine.Role.listRoles(accountId)
-    local roleId = accountId * 1000 + count + 1
+    -- 角色 id 分配: accountId*1000 + 序号 (同步、全局唯一, 免 Redis INCR)。
+    -- 一次 listRoles 复用到底: 既算序号又传给 addRole 追加, 省 addRole 内二次 listRoles 往返。
+    local roles  = xEngine.Role.listRoles(accountId)
+    local roleId = accountId * 1000 + #roles + 1
 
-    if not xEngine.Role.addRole(accountId, roleId, roleName, 1, job) then
+    if not xEngine.Role.addRole(accountId, roleId, roleName, 1, job, nil, roles) then
         return luacore.si_pb_create_role_rsp(EC.INTERNAL, 0, "", 0, 0)
     end
 
@@ -229,7 +268,7 @@ function LoginClass:rpc_select_role(payload)
     local pidKey = xEngine.Number.intKey(roleId)
     xEngine.Redis.SRem("offline:players", pidKey)
     xEngine.Redis.Del("offline:ts:" .. pidKey)
-    luacore.si_forward_rpc(AT.PLAYER, roleId,
+    luacore.si_forward_rpc_async(AT.PLAYER, roleId,
         luacore.si_net_body_wrap(roleId, encode_small_type(PLAYER_ONLINE)))
 
     xEngine.Account.setState(accountId, xEngine.AccountState.IN_GAME)
@@ -251,6 +290,7 @@ function LoginClass:rpc_select_role(payload)
             battle_host = battleHost,
             battle_auth = battleAuth,
             last_seen   = luacore.si_time_cur_sec(),
+            kicked      = 0,   -- 顶号流程结束: 新连接完成选角, 清除踢旧标记
         })
         xEngine.Log.info("[Login] select_role: player=%d reconnect battle=%d host=%s",
             playerId, battleId, battleHost)
@@ -262,6 +302,7 @@ function LoginClass:rpc_select_role(payload)
     xEngine.AccountSession.set(accountId, {
         state = xEngine.SessionState.IN_GAME,
         last_seen = luacore.si_time_cur_sec(),
+        kicked = 0,   -- 顶号流程结束: 新连接完成选角, 清除踢旧标记
     })
 
     xEngine.Log.info("[Login] select_role: player=%d created on Game", playerId)

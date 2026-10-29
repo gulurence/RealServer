@@ -70,6 +70,12 @@ local BATTLE_BIG = {
     [204] = AT.SPECTATOR,    -- spectator
 }
 
+-- 观战模块小类型 (镜像 spectator.proto SpectatorMsgId)
+local SpectatorMsgId = {
+    ENTER_REQ = 1, ENTER_RSP = 2, LEAVE_REQ = 3, LEAVE_RSP = 4,
+    SNAPSHOT_NTF = 5, FRAME_NTF = 6, END_NTF = 7,
+}
+
 -- 断线收尾用到的跨模块小类型 (镜像 room.lua RoomMsgId / player.lua PlayerMsgId)。
 -- Gate 合成服务端内部消息时只编码 small_type 字段 (目标 Actor 的 on_rpc_forward
 -- 仅读 si_pb_small_type), 不携带客户端 protobuf。
@@ -83,6 +89,100 @@ local DISCONNECT_SMALL = {
 -- 编码仅含 small_type(field 2, varint) 的最小 protobuf 负载: tag = (2<<3)|0 = 0x10。
 local function encode_small_type(smallType)
     return string.char(0x10, smallType % 0x100)
+end
+
+--------------------------------------------------------------------------------
+-- 观战席位权威操作 (纯 Redis, 在 Gate 本地执行, 不 forward 到 Battle 进程的 SpectatorActor)。
+-- SpectatorActor 与 BattleActor 一一对应、同在 Battle 进程, 而 Gate 无直连 Battle 的链接规则
+-- (RPC 单跳), 无法 forward 过去; 但观战席位权威名单 battle:spectator:{battleId} 由 Battle 进程
+-- 的 BattleActor (每 10 帧 refresh_spectators) 与 CNetBattleGateway (观战直连登录校验) 读取,
+-- 故登记/移除只需写 Redis。反向索引 battle:spectator:byplayer:{pid} → battleId 供断线收尾定位。
+--------------------------------------------------------------------------------
+
+-- 登记观战席位: 追加 pid 到 battle:spectator:{battleId} (幂等去重), 写反向索引 (TTL 兜底)。
+local function spectator_register(battleId, pid)
+    local sid  = xEngine.Number.intKey(pid)
+    local key  = "battle:spectator:" .. xEngine.Number.intKey(battleId)
+    local list = {}
+    for v in (xEngine.Redis.Get(key) or ""):gmatch("[^,]+") do
+        if v ~= "" and v ~= sid then list[#list + 1] = v end
+    end
+    list[#list + 1] = sid
+    xEngine.Redis.Set(key, table.concat(list, ","))
+
+    local byPlayerKey = "battle:spectator:byplayer:" .. sid
+    xEngine.Redis.Set(byPlayerKey, xEngine.Number.intKey(battleId))
+    xEngine.Redis.Expire(byPlayerKey, 86400)
+end
+
+-- 移除观战席位: 从 battle:spectator:{battleId} 剔除 pid, 清反向索引。
+local function spectator_unregister(battleId, pid)
+    local sid  = xEngine.Number.intKey(pid)
+    local key  = "battle:spectator:" .. xEngine.Number.intKey(battleId)
+    local list = {}
+    for v in (xEngine.Redis.Get(key) or ""):gmatch("[^,]+") do
+        if v ~= "" and v ~= sid then list[#list + 1] = v end
+    end
+    if #list > 0 then
+        xEngine.Redis.Set(key, table.concat(list, ","))
+    else
+        xEngine.Redis.Del(key)
+    end
+    xEngine.Redis.Del("battle:spectator:byplayer:" .. sid)
+end
+
+-- 从 Redis 重建战斗房花名册 playersStr (镜像 battle.lua players_str / spectator.lua 组装逻辑):
+-- 观战者不参与模拟, 但进入战斗场景需要与参战者完全一致的花名册/种子/关卡数据。
+-- 返回 playersStr ("pid,name,spawnIndex,primaryGun,level,exp,gold,attack,defense,hp,g0..g5;..."),
+--       levelId, difficulty。
+local function spectator_build_players_str(battleId)
+    local bkey = xEngine.Number.intKey(battleId)
+    local roster = xEngine.Redis.Get("battle:roster:" .. bkey) or ""
+    if roster == "" then roster = "0" end
+
+    local lvlId, lvlDiff =
+        (xEngine.Redis.Get("battle:level:" .. bkey) or ""):match("^(%d+),(%d+)$")
+    local levelId    = lvlId and tonumber(lvlId) or 11
+    local difficulty = lvlDiff and tonumber(lvlDiff) or 0
+
+    local equipStr = xEngine.Redis.Get("battle:equip:" .. bkey) or ""
+    local equipMap = {}
+    for rec in (equipStr .. ";"):gmatch("([^;]*);") do
+        local pidStr, gunStr, guns = rec:match("^(%d+):(%d+):(.+)$")
+        if pidStr and gunStr then
+            equipMap[tonumber(pidStr)] = { tonumber(gunStr), guns or "22,22,22,22,22,22" }
+        end
+    end
+
+    local parts, idx = {}, 0
+    for pidStr in (roster .. ","):gmatch("([^,]*),") do
+        if pidStr ~= "" then
+            local pid = tonumber(pidStr)
+            local eq  = equipMap[pid]
+            local attrs = xEngine.Role.parseAttrs(pid)
+            local name = (attrs.name and attrs.name ~= "") and attrs.name or ("player_" .. pidStr)
+            parts[#parts + 1] = table.concat({
+                xEngine.Number.intKey(pid), name, tostring(idx),
+                tostring(eq and eq[1] or 0), tostring(attrs.level or 1),
+                tostring(attrs.exp or 0), tostring(attrs.gold or 0),
+                tostring(attrs.attack or 10), tostring(attrs.defense or 0), tostring(attrs.hp or 100),
+                (eq and eq[2]) or "22,22,22,22,22,22",
+            }, ",")
+            idx = idx + 1
+        end
+    end
+    return table.concat(parts, ";"), levelId, difficulty
+end
+
+-- 读战斗进程直连地址 battle:host:{battleId} = "ip:listen_port" (room.lua handle_start 写入),
+-- 观战者据此直连 Battle 进程握手追帧。返回 hostIp, port。
+local function spectator_read_host(battleId)
+    local addr = xEngine.Redis.Get("battle:host:" .. xEngine.Number.intKey(battleId)) or ""
+    if addr ~= "" then
+        local ip, p = addr:match("^([^:]+):(%d+)$")
+        if ip and p then return ip, tonumber(p) or 0 end
+    end
+    return "", 0
 end
 
 local GateClass = xEngine.Class.define("Gate", xEngine.ActorBase)
@@ -148,19 +248,14 @@ function GateClass:on_msg(msgId, rawBody)
         -- 多实例 Actor: 目标 id = 消息内 battle_id (field 3)
         local targetId = luacore.si_pb_varint_field(payload, 3)
         local actorType = BATTLE_BIG[bigType]
-        -- 观战目标可为 battle_id / 房间列表 ID / player_id, 统一解析为 live battle_id
         if actorType == AT.SPECTATOR then
-            targetId = self:resolve_spectate_battle(targetId)
-            -- 惰性创建: 仅客户端发起观战请求时才创建 SpectatorActor (与 BattleActor
-            -- 经 Redis 同步), 避免每场战斗常驻一个空转的观战实例。
-            self:ensure_spectator(targetId)
-        end
-        local resp = self:forward_business(cid, actorType, targetId, payload)
-        if (resp == nil or resp == "") and actorType == AT.SPECTATOR then
-            -- 观战目标战斗房不存在 (SpectatorActor 未创建): 回错误码, 避免客户端静默挂起
-            xEngine.Log.warn("[Gate] spectate: target=%d not found, reply error", targetId)
-            luacore.si_net_send(cid,
-                luacore_spectate.si_pb_spectate_enter_rsp(EC.BATTLE_NOT_FOUND, targetId, 0, "", 0, 0, "", 0))
+            -- 观战: SpectatorActor 与 BattleActor 一一对应、同在 Battle 进程, 而 Gate 无
+            -- 直连 Battle 的链接规则 (RPC 单跳), 无法 forward 到 SpectatorActor。观战
+            -- ENTER/LEAVE 是纯 Redis 席位登记 (权威名单 battle:spectator:{battleId},
+            -- 由 Battle 进程 BattleActor/CNetBattleGateway 读取), 故在 Gate 本地处理并回包。
+            self:handle_spectate_local(cid, payload)
+        else
+            self:forward_business(cid, actorType, targetId, payload)
         end
     elseif bigType == AT.PLAYER then
         -- 多实例 Actor: 目标 id = 发送方自身 player_id (选角后已登记 connPlayer[cid])
@@ -201,44 +296,78 @@ function GateClass:resolve_spectate_battle(inputId)
 end
 
 --------------------------------------------------------------------------------
--- 惰性创建观战实例: 仅在客户端首次发起观战请求 (且战斗房仍在) 时创建 SpectatorActor。
--- SpectatorActor 与 BattleActor 通过 Redis (battle:roster/level/equip/spectator) 同步状态,
--- 不需要同进程; 已存在则复用, 不重复创建。
+-- 观战 ENTER/LEAVE 本地处理 (纯 Redis, 不 forward 到 Battle 进程的 SpectatorActor):
+-- 席位权威名单 battle:spectator:{battleId} 由 Battle 进程读取, 故登记/移除只需写 Redis;
+-- 回包在本地直接 si_net_send (on_msg 返回值被忽略, 与 forward_business 一致)。
 --------------------------------------------------------------------------------
-function GateClass:ensure_spectator(battleId)
-    if not battleId or battleId <= 0 then return false end
-    local bkey = xEngine.Number.intKey(battleId)
+function GateClass:handle_spectate_local(cid, payload)
+    local smallType = luacore.si_pb_small_type(payload)
+    local resp
+    if smallType == SpectatorMsgId.ENTER_REQ then
+        resp = self:spectate_enter_local(cid, payload)
+    elseif smallType == SpectatorMsgId.LEAVE_REQ then
+        resp = self:spectate_leave_local(cid, payload)
+    else
+        xEngine.Log.warn("[Gate] spectate: unknown small_type=%d", smallType)
+        return ""
+    end
+    if resp and resp ~= "" then
+        luacore.si_net_send(cid, resp)
+    end
+    return resp
+end
 
-    -- 战斗房仍在才创建 (roster 空 = 未开战/已结束), 避免残留指向已死战斗房的空转实例
-    local roster = xEngine.Redis.Get("battle:roster:" .. bkey)
+-- 请求观战: 校验战斗房仍在 → 登记观战席位 → 回 ENTER_RSP (花名册 + 直连 host:port)。
+function GateClass:spectate_enter_local(cid, payload)
+    local playerId = connPlayer[cid]
+    if not playerId then
+        xEngine.Log.warn("[Gate] spectate enter: cid=%d no identity, drop", cid)
+        return ""
+    end
+
+    -- 观战目标可为 battle_id / 房间列表 ID / player_id, 统一解析为 live battle_id
+    local inputId  = luacore.si_pb_varint_field(payload, 3)
+    local battleId = self:resolve_spectate_battle(inputId)
+    if not battleId or battleId <= 0 then
+        return luacore_spectate.si_pb_spectate_enter_rsp(EC.BATTLE_NOT_FOUND, battleId or 0, 0, "", 0, 0, "", 0)
+    end
+
+    -- 战斗房仍在才允许进入 (roster 空 = 未开战/已结束), 避免渲染假花名册
+    local roster = xEngine.Redis.Get("battle:roster:" .. xEngine.Number.intKey(battleId))
     if not roster or roster == "" then
-        xEngine.Log.warn("[Gate] ensure_spectator: battle=%d not active, skip create", battleId)
-        return false
+        xEngine.Log.warn("[Gate] spectate enter: battle=%d roster empty, reject", battleId)
+        return luacore_spectate.si_pb_spectate_enter_rsp(EC.BATTLE_NOT_FOUND, battleId, 0, "", 0, 0, "", 0)
     end
 
-    -- 已存在则复用: 读注册 Hash cluster:actor:204:{id} 的 pid 字段 (与 C++ ResolveActorProcess
-    -- 同一权威源), 跨进程可辨存在性, 避免重复创建。
-    local pid = xEngine.Redis.HGet("cluster:actor:" .. AT.SPECTATOR .. ":" .. bkey, "pid")
-    if pid ~= "" then
-        return true
-    end
+    -- 登记席位 (battle:spectator:{battleId} + 反向索引), 供 Battle 进程校验直连登录
+    spectator_register(battleId, playerId)
 
-    -- 创建锁: 并发观战同一新战斗时只允许一个请求创建 (SETNXEX 原子占锁), 抢不到则说明
-    -- 其它请求正在创建, 本次不重复建 (后续 forward 兜底, 客户端可重试观战)。
-    local lockKey = "battle:spectator:create_lock:" .. bkey
-    if not xEngine.Redis.SetNxEx(lockKey, "1", 3) then
-        xEngine.Log.info("[Gate] ensure_spectator: battle=%d create in progress by another request", battleId)
-        return false
-    end
+    local seed = (xEngine.Number.toInt(battleId) % 0xFFFFFFFF) + 1
+    local playersStr, levelId, difficulty = spectator_build_players_str(battleId)
+    local hostIp, port = spectator_read_host(battleId)
 
-    local s = xEngine.ActorCreator.balanceCreate(AT.SPECTATOR, battleId)
-    xEngine.Redis.Del(lockKey)
-    if s then
-        xEngine.Log.info("[Gate] ensure_spectator: lazily created spectator battle=%d", battleId)
-        return true
+    xEngine.Log.info("[Gate] spectate enter: battle=%d spectator=%d seed=%d level=%d diff=%d host=%s:%d",
+        battleId, playerId, seed, levelId, difficulty, hostIp, port)
+    return luacore_spectate.si_pb_spectate_enter_rsp(EC.NONE, battleId, seed, playersStr, levelId, difficulty, hostIp, port)
+end
+
+-- 退出观战: 移除观战席位 → 回 LEAVE_RSP。
+function GateClass:spectate_leave_local(cid, payload)
+    local playerId = connPlayer[cid]
+    if not playerId then
+        return ""
     end
-    xEngine.Log.error("[Gate] ensure_spectator: create failed battle=%d", battleId)
-    return false
+    local battleId = luacore.si_pb_varint_field(payload, 3)
+    -- 客户端可能未带 battle_id, 经反向索引 battle:spectator:byplayer:{pid} 反查
+    if not battleId or battleId <= 0 then
+        local s = xEngine.Redis.Get("battle:spectator:byplayer:" .. xEngine.Number.intKey(playerId))
+        battleId = s and s ~= "" and (tonumber(s) or 0) or 0
+    end
+    if battleId and battleId > 0 then
+        spectator_unregister(battleId, playerId)
+    end
+    xEngine.Log.info("[Gate] spectate leave: battle=%d spectator=%d", battleId or 0, playerId)
+    return luacore_spectate.si_pb_spectate_leave_rsp(EC.NONE)
 end
 
 --------------------------------------------------------------------------------
@@ -363,15 +492,29 @@ function GateClass:do_disconnect_cleanup(cid)
     local playerId = connPlayer[cid]
     local accountId = connAccount[cid]
 
+    xEngine.Log.info("[Gate] disconnect cleanup: cid=%d player=%d account=%d",
+        cid, playerId or 0, accountId or 0)
+
+    -- 顶号踢旧: 该连接被同账号新登录定向断开 (login.lua 先写 kicked=1 再异步踢)。
+    -- 仅清本连接的 cid 映射, 不动 playerConn[playerId] (新连接已接管该玩家) 也不做
+    -- 离线收尾 (离线列表/Player 离线/房间战斗分派/session 置 OFFLINE), 避免覆盖新 session;
+    -- kicked 标记待新连接完成选角后由 login.lua rpc_select_role 清 0。
+    if accountId then
+        local kicked = tonumber(xEngine.AccountSession.getField(accountId, "kicked")) or 0
+        if kicked == 1 then
+            connPlayer[cid] = nil
+            connAccount[cid] = nil
+            xEngine.Log.info("[Gate] disconnect cleanup: account=%d kicked, skip offline", accountId)
+            return
+        end
+    end
+
     -- 1) 清理连接映射 (双向), 避免断线后残留连接/身份占用。
     connPlayer[cid] = nil
     connAccount[cid] = nil
     if playerId then
         playerConn[playerId] = nil
     end
-
-    xEngine.Log.info("[Gate] disconnect cleanup: cid=%d player=%d account=%d",
-        cid, playerId or 0, accountId or 0)
 
     -- 尚未选角 (无玩家身份): 仅清连接 + session 置 offline, 无业务收尾。
     if not playerId then
@@ -430,13 +573,12 @@ function GateClass:do_disconnect_cleanup(cid)
             luacore.si_net_body_wrap(playerId, encode_small_type(DISCONNECT_SMALL.ROOM_LEAVE)))
     end
 
-    -- 观战收尾: 玩家在观战 (battle:spectator:byplayer 存在) → 通知 SpectatorActor 移除观战席位
-    -- (观战者断线不经过 LEAVE_REQ, 走 handle_leave 统一移除 + 空席触发空闲回收)。
+    -- 观战收尾: 玩家在观战 (battle:spectator:byplayer 存在) → 本地移除观战席位
+    -- (观战者断线不经过 LEAVE_REQ; 席位为纯 Redis 权威名单, 无需 forward 到 Battle 进程)。
     local spectateIdStr = xEngine.Redis.Get("battle:spectator:byplayer:" .. pidKey)
     local spectateId    = spectateIdStr and spectateIdStr ~= "" and (tonumber(spectateIdStr) or 0) or 0
     if spectateId > 0 then
-        luacore.si_forward_rpc(AT.SPECTATOR, spectateId,
-            luacore.si_net_body_wrap(playerId, encode_small_type(DISCONNECT_SMALL.SPECTATOR_LEAVE)))
+        spectator_unregister(spectateId, playerId)
     end
 
     -- 4) Player Actor 状态置离线: 合成 DISCONNECT 通知, Player 落 frame 状态字段 online=0。

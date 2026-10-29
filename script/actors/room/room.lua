@@ -39,6 +39,10 @@ local EC = {
     ROOM_IN_BATTLE     = 2107,
 }
 
+-- 房间状态 (state 字段): 0=等待, 1=战斗中, 2=开局中 (异步开局防重复点击)。
+-- 2 为异步开局引入: handle_start 先落 state=2 再投递异步创建, 完成时切 1, 失败回滚 0。
+local ROOM_STATE = { WAITING = 0, BATTLE = 1, STARTING = 2 }
+
 -- 单例内存态 (存于 xEngine.room_state, 跨热更保留; 计数器放进可变表使自增写回持久)
 -- isFresh: 新进程(xEngine.room_state 为 nil) vs 热更(内存态仍在, 不回读 Redis)
 local isFresh = (xEngine.room_state == nil)
@@ -61,6 +65,8 @@ end
 
 local rooms      = hot.rooms       -- roomId -> { ownerId, mode, visibility, password, maxMembers, state, members={pid -> {name,ready,isOwner}} }
 local playerRoom = hot.playerRoom  -- pid -> roomId
+if not hot.pendingStarts then hot.pendingStarts = {} end
+local pendingStarts = hot.pendingStarts  -- roomId -> { battleId, authKey, ownerId, pids } (异步开局上下文)
 
 -- 房间内存态反序列化: "ownerId|mode|visibility|maxMembers|levelId|difficulty|state|battleId|members_str"
 -- (字段 | 分隔, 成员 ; 分隔, 成员内 , 分隔; 角色名已排除 ,;|: 故安全; 密码不持久化)。
@@ -181,6 +187,20 @@ function RoomClass:save_room(roomId)
     local idStr = xEngine.Number.intKey(roomId)
     xEngine.Redis.Set("room:data:" .. idStr, self:serialize_room(room))
     xEngine.Redis.SAdd("room:ids", idStr)
+end
+
+-- 房间读穿透: 每次从 Redis 读最新房间态 (多 Game 进程下, 房间可能建在其它进程,
+-- 本进程内存 rooms 表不权威)。读到后回填本地缓存供 do_leave/广播复用。
+function RoomClass:load_room(roomId)
+    local raw = xEngine.Redis.Get("room:data:" .. xEngine.Number.intKey(roomId))
+    if raw and raw ~= "" then
+        local room = parse_room(raw)
+        rooms[roomId] = room
+        for pid in pairs(room.members) do playerRoom[pid] = roomId end
+        return room
+    end
+    rooms[roomId] = nil
+    return nil
 end
 
 function RoomClass:remove_room(roomId)
@@ -315,9 +335,7 @@ function RoomClass:handle_create(senderId, payload)
         self:do_leave(playerRoom[senderId], senderId)
     end
 
-    local roomId = counters.nextRoomId
-    counters.nextRoomId = counters.nextRoomId + 1
-    xEngine.Redis.Set("room:counter:nextRoomId", xEngine.Number.intKey(counters.nextRoomId))
+    local roomId = xEngine.Redis.Incr("room:counter:nextRoomId")
     local room = {
         ownerId    = senderId,
         mode       = mode,
@@ -346,7 +364,7 @@ end
 function RoomClass:handle_join(senderId, payload)
     local roomId   = xEngine.Number.toInt(luacore.si_pb_varint_field(payload, 3))
     local password = luacore.si_pb_string_field(payload, 4)
-    local room = rooms[roomId]
+    local room = self:load_room(roomId)
     if not room then return luacore_room.si_pb_room_join_rsp(EC.ROOM_NOT_FOUND, roomId, "") end
 
     -- 幂等: 自己已在本房 (战斗结束回房后客户端重新 join 刷新「我的房间」成员),
@@ -388,7 +406,7 @@ function RoomClass:handle_leave(senderId, payload)
     if roomId <= 0 then
         roomId = playerRoom[senderId]
     end
-    if not roomId or not rooms[roomId] then
+    if not roomId or not self:load_room(roomId) then
         return luacore_room.si_pb_room_leave_rsp(EC.ROOM_NOT_FOUND, roomId or 0)
     end
     self:do_leave(roomId, senderId)
@@ -399,7 +417,7 @@ end
 function RoomClass:handle_ready(senderId, payload)
     local roomId = xEngine.Number.toInt(luacore.si_pb_varint_field(payload, 3))
     local ready  = luacore.si_pb_bool_field(payload, 4)
-    local room = rooms[roomId]
+    local room = self:load_room(roomId)
     if not room or not room.members[senderId] then
         return luacore_room.si_pb_room_ready_rsp(EC.ROOM_NOT_FOUND, roomId)
     end
@@ -412,7 +430,7 @@ end
 function RoomClass:handle_kick(senderId, payload)
     local roomId   = xEngine.Number.toInt(luacore.si_pb_varint_field(payload, 3))
     local targetId = xEngine.Number.toInt(luacore.si_pb_varint_field(payload, 4))
-    local room = rooms[roomId]
+    local room = self:load_room(roomId)
     if not room then return luacore_room.si_pb_room_kick_rsp(EC.ROOM_NOT_FOUND, roomId) end
     if room.ownerId ~= senderId then return luacore_room.si_pb_room_kick_rsp(EC.ROOM_NOT_OWNER, roomId) end
     if targetId == senderId then return luacore_room.si_pb_room_kick_rsp(EC.INTERNAL, roomId) end
@@ -429,7 +447,7 @@ end
 function RoomClass:handle_transfer(senderId, payload)
     local roomId     = xEngine.Number.toInt(luacore.si_pb_varint_field(payload, 3))
     local newOwnerId = xEngine.Number.toInt(luacore.si_pb_varint_field(payload, 4))
-    local room = rooms[roomId]
+    local room = self:load_room(roomId)
     if not room or room.ownerId ~= senderId then return "" end
     local target = room.members[newOwnerId]
     if not target then return "" end
@@ -445,9 +463,15 @@ end
 
 function RoomClass:handle_start(senderId, payload)
     local roomId = xEngine.Number.toInt(luacore.si_pb_varint_field(payload, 3))
-    local room = rooms[roomId]
+    local room = self:load_room(roomId)
     if not room then return luacore_room.si_pb_room_start_rsp(EC.ROOM_NOT_FOUND, roomId, 0, "") end
     if room.ownerId ~= senderId then return luacore_room.si_pb_room_start_rsp(EC.ROOM_NOT_OWNER, roomId, 0, "") end
+
+    -- 防重复开局: 已在战斗或开局中 (异步创建尚未完成) 一律拒绝, 避免双 START 双开。
+    local st = xEngine.Number.toInt(room.state)
+    if st == ROOM_STATE.BATTLE or st == ROOM_STATE.STARTING then
+        return luacore_room.si_pb_room_start_rsp(EC.ROOM_IN_BATTLE, roomId, 0, "")
+    end
 
     for pid, m in pairs(room.members) do
         if not m.ready then
@@ -455,15 +479,18 @@ function RoomClass:handle_start(senderId, payload)
         end
     end
 
-    local battleId = counters.nextBattleId
-    counters.nextBattleId = counters.nextBattleId + 1
-    xEngine.Redis.Set("room:counter:nextBattleId", xEngine.Number.intKey(counters.nextBattleId))
+    local battleId = xEngine.Redis.Incr("room:counter:nextBattleId")
     local authKey = "bk" .. xEngine.Number.intKey(battleId) .. "-" .. tostring(luacore.si_rand_between(100000, 999999))
 
-    -- 写 Redis: 战斗房花名册 (逗号分隔 pid) + 进入校验 auth_key + 关卡配置 (levelId,difficulty)
+    -- 写 Redis: 战斗房花名册 (逗号分隔 pid) + 进入校验 auth_key + 关卡配置 (levelId,difficulty)。
+    -- 同时捕获成员 pid 快照 (数字, 供异步阶段反查映射/广播; 花名册用字符串拼逗号)。
     local pids = {}
-    for pid, _ in pairs(room.members) do table.insert(pids, xEngine.Number.intKey(pid)) end
-    xEngine.Redis.Set("battle:roster:" .. xEngine.Number.intKey(battleId), table.concat(pids, ","))
+    local rosterParts = {}
+    for pid, _ in pairs(room.members) do
+        pids[#pids + 1] = pid
+        rosterParts[#rosterParts + 1] = xEngine.Number.intKey(pid)
+    end
+    xEngine.Redis.Set("battle:roster:" .. xEngine.Number.intKey(battleId), table.concat(rosterParts, ","))
     xEngine.Redis.Set("battle:auth:" .. xEngine.Number.intKey(battleId), authKey)
     xEngine.Redis.Set("battle:level:" .. xEngine.Number.intKey(battleId),
         tostring(room.levelId) .. "," .. tostring(room.difficulty))
@@ -482,11 +509,68 @@ function RoomClass:handle_start(senderId, payload)
     end
     xEngine.Redis.Set("battle:equip:" .. xEngine.Number.intKey(battleId), table.concat(equipParts, ";"))
 
+    -- 标记「开局中」并落库, 防重复点击 (异步创建完成前再次 START 会被上方状态检查拒绝)。
+    room.state = ROOM_STATE.STARTING
+    self:save_room(roomId)
+
+    -- 存异步开局上下文 (成员花名册/校验码/房主), 供异步阶段完成跨进程创建与广播。
+    pendingStarts[roomId] = {
+        battleId = battleId,
+        authKey  = authKey,
+        ownerId  = senderId,
+        pids     = pids,
+    }
+
+    -- 异步开局: 把跨进程创建 BattleActor/SpectatorActor (同步 RPC, 慢) 移到消息循环的
+    -- 后续阶段执行, 本函数立即返回空串, 不阻塞 Room 单例消息循环 —— 消除多房间并发
+    -- 开局时「单 lua_State 串行排队」导致的 start/ready 超时。最终 START_RSP 经
+    -- si_push_rpc 推送给房主与成员 (见 on_room_start_async_msg)。
+    luacore.si_schedule_after(AT.ROOM, 0, 0, xEngine.MsgId.ROOM_START_ASYNC, xEngine.Number.intKey(roomId))
+
+    xEngine.Log.info("[Room] start(queued): room=%d battle=%d owner=%d", roomId, battleId, senderId)
+    return ""
+end
+
+-- 异步开局第二阶段 (消息循环内执行): 完成跨进程 BattleActor/SpectatorActor 创建、
+-- 直连地址/观战映射落 Redis、房间状态切「战斗中」, 最后向全体成员(含房主)推送 START_RSP。
+-- body = roomId 十进制串。跨进程 balanceCreate 虽仍同步阻塞本调度线程, 但已从 handle_start
+-- 的同步链路拆出, 各房间的「Redis 准备 + 校验」阶段可交错, 不再整段串行排队。
+function RoomClass:on_room_start_async_msg(raw_body)
+    local roomId = tonumber(raw_body)
+    if not roomId then
+        xEngine.Log.warn("[Room] start async: bad body %q", tostring(raw_body))
+        return
+    end
+
+    local ctx = pendingStarts[roomId]
+    pendingStarts[roomId] = nil
+    if not ctx then
+        xEngine.Log.warn("[Room] start async: no pending ctx room=%d", roomId)
+        return
+    end
+
+    local battleId = ctx.battleId
+    local authKey  = ctx.authKey
+    local ownerId  = ctx.ownerId
+    local bid      = xEngine.Number.intKey(battleId)
+
     -- 跨进程创建 BattleActor 实例 (id=battle_id), 负载均衡到 Battle 进程
     local actor = xEngine.ActorCreator.balanceCreate(AT.BATTLE, battleId)
     if not actor then
-        xEngine.Log.error("[Room] start: create battle failed battleId=%d", battleId)
-        return luacore_room.si_pb_room_start_rsp(EC.INTERNAL, roomId, 0, "")
+        -- 失败回滚: 房间回到等待态并清掉本次写入的花名册/校验等键, 通知房主开局失败。
+        local room = self:load_room(roomId)
+        if room and xEngine.Number.toInt(room.state) == ROOM_STATE.STARTING then
+            room.state = ROOM_STATE.WAITING
+            room.battleId = nil
+            self:save_room(roomId)
+        end
+        xEngine.Redis.Del("battle:roster:" .. bid)
+        xEngine.Redis.Del("battle:auth:" .. bid)
+        xEngine.Redis.Del("battle:level:" .. bid)
+        xEngine.Redis.Del("battle:equip:" .. bid)
+        xEngine.Log.error("[Room] start async: create battle failed battleId=%d room=%d", battleId, roomId)
+        luacore.si_push_rpc(ownerId, luacore_room.si_pb_room_start_rsp(EC.INTERNAL, roomId, 0, ""))
+        return
     end
 
     -- 战斗进程直连地址: 客户端拿到 ip:port + authKey + battleId + PlayerID 直连 Battle 进程
@@ -494,43 +578,50 @@ function RoomClass:handle_start(senderId, payload)
     local battlePort = actor._listen_port or 0
     -- 观战者直连同样走 Battle 进程: 写入 battle:host:{battleId} = "ip:listen_port",
     -- 由 SpectatorActor handle_enter 读出回给观战客户端 (战斗结束 battle.lua 清理)。
-    xEngine.Redis.Set("battle:host:" .. xEngine.Number.intKey(battleId),
-        battleHost .. ":" .. tostring(battlePort))
-
-    -- 观战实例 (SpectatorActor) 不再开局即建: 改为惰性创建 —— 仅在客户端首次发起观战
-    -- 请求时由 Gate 创建 (见 gate.lua ensure_spectator), 避免每场战斗都常驻一个空转的
-    -- 观战 Actor。战斗结束时 BattleActor finalize 仍会全局删除对应 SpectatorActor。
+    xEngine.Redis.Set("battle:host:" .. bid, battleHost .. ":" .. tostring(battlePort))
 
     -- 观战按「房间列表 ID / 玩家 ID」反查 live battle_id 的映射 (Gate 进程解析观战目标用;
     -- 战斗结束由 battle.lua on_battle_finalize_msg 清理, 避免残留指向已死战斗房)。
     --   battle:byroom:{roomId}   = battleId   (房列表 ID → 战斗房)
     --   battle:byplayer:{pid}    = battleId   (参战玩家 → 战斗房)
     --   battle:room:{battleId}   = roomId     (反向索引, 供结束清理 battle:byroom)
-    xEngine.Redis.Set("battle:byroom:" .. xEngine.Number.intKey(roomId), xEngine.Number.intKey(battleId))
-    xEngine.Redis.Set("battle:room:" .. xEngine.Number.intKey(battleId), xEngine.Number.intKey(roomId))
-    for pid, _ in pairs(room.members) do
-        xEngine.Redis.Set("battle:byplayer:" .. xEngine.Number.intKey(pid), xEngine.Number.intKey(battleId))
+    xEngine.Redis.Set("battle:byroom:" .. xEngine.Number.intKey(roomId), bid)
+    xEngine.Redis.Set("battle:room:" .. bid, xEngine.Number.intKey(roomId))
+    for _, pid in ipairs(ctx.pids) do
+        xEngine.Redis.Set("battle:byplayer:" .. xEngine.Number.intKey(pid), bid)
     end
 
-    room.state = 1
-    room.battleId = battleId
-    self:save_room(roomId)   -- 开局状态落库 (state=1,battleId)
-    xEngine.Log.info("[Room] start: room=%d battle=%d auth=%s", roomId, battleId, authKey)
-
-    -- 开局广播: 房主经 START_RSP 直接回包获知, 其余成员经推送链路获知 (START_NTF)。
-    -- 复用 start_rsp 负载 (battle_id + auth_key), 客户端按 ROOM_START_RSP 路由进入战斗。
-    for pid in pairs(room.members) do
-        if pid ~= senderId then
-            luacore.si_push_rpc(pid,
-                luacore_room.si_pb_room_start_rsp(EC.NONE, roomId, battleId, authKey, battleHost, battlePort))
-        end
+    -- 房间切「战斗中」并落库
+    local room = self:load_room(roomId)
+    if room then
+        room.state = ROOM_STATE.BATTLE
+        room.battleId = battleId
+        self:save_room(roomId)
     end
 
-    -- 房间保留: 开局后房间仍留在列表 (名称带「(战斗中)」), 供观战/识别;
-    -- playerRoom 映射也保留, 战斗结束由 battle.lua 通知回房 (state 回 0, 全员回组队房)。
+    xEngine.Log.info("[Room] start(async): room=%d battle=%d auth=%s host=%s:%d",
+        roomId, battleId, authKey, battleHost, battlePort)
+
+    -- 开局广播: 房主与成员统一经推送链路获知 START_RSP (异步开局无同步回包)。
+    local rsp = luacore_room.si_pb_room_start_rsp(EC.NONE, roomId, battleId, authKey, battleHost, battlePort)
+    for _, pid in ipairs(ctx.pids) do
+        luacore.si_push_rpc(pid, rsp)
+    end
+    -- 推送可观测锚点: 记录本房已推送的成员数, 供与 Gate 侧「no connection, drop」/写失败
+    -- 计数对账, 定位 START_RSP 静默丢失是发生在推送端、传输层还是客户端超时断线。
+    xEngine.Log.info("[Room] start rsp pushed: room=%d battle=%d members=%d",
+        roomId, battleId, #ctx.pids)
+
+    -- 房间保留: 开局后房间仍留在列表 (名称带「(战斗中)」), 供观战/识别。
     self:broadcast_list()
 
-    return luacore_room.si_pb_room_start_rsp(EC.NONE, roomId, battleId, authKey, battleHost, battlePort)
+    -- 观战实例 (SpectatorActor) 与 BattleActor 一一对应、同在 Battle 进程: 后置到
+    -- START_RSP 推送之后创建, 其 CallSync 阻塞不再挡开局回包 (BATTLE 创建仍在前,
+    -- 因 START_RSP 需要其 host/port)。战斗结束 BattleActor finalize 全局删除。
+    local spec = xEngine.ActorCreator.balanceCreate(AT.SPECTATOR, battleId)
+    if not spec then
+        xEngine.Log.warn("[Room] start async: create spectator failed battleId=%d", battleId)
+    end
 end
 
 -- 战斗结束回房 (battle.lua finish_battle 经 si_forward_rpc 通知): 房间保留、状态回等待、
@@ -538,7 +629,7 @@ end
 function RoomClass:handle_battle_end(battleId)
     local roomIdStr = xEngine.Redis.Get("battle:room:" .. xEngine.Number.intKey(battleId))
     local roomId = roomIdStr and xEngine.Number.toInt(tonumber(roomIdStr))
-    local room = roomId and rooms[roomId]
+    local room = roomId and self:load_room(roomId)
     if not room then
         xEngine.Log.info("[Room] battle end: room not found battle=%d", battleId)
         return ""

@@ -40,6 +40,37 @@ function xEngine.Redis.HSet(hash, field, value)
     return luacore.si_redis_hset(hash, field, value)
 end
 
+--- 哈希: HGETALL / HMSET (批量, 登录 session 热路径)
+--- HGetAll 返回 table (field → value); HMSet 接受 table, 单次往返批量写
+function xEngine.Redis.HGetAll(hash)
+    local raw = luacore.si_redis_hgetall(hash)
+    local out = {}
+    if raw == nil or raw == "" then
+        return out
+    end
+    for field, value in raw:gmatch("([^=\n]+)=([^\n]*)") do
+        out[field] = value
+    end
+    return out
+end
+
+function xEngine.Redis.HMSet(hash, fields)
+    local parts = {}
+    for k, v in pairs(fields) do
+        parts[#parts + 1] = k .. "=" .. tostring(v)
+    end
+    return luacore.si_redis_hmset(hash, table.concat(parts, "\n"))
+end
+
+--- HMSET + EXPIRE 合并为单次往返 (账户 session 同步: 写字段并刷新 TTL)
+function xEngine.Redis.HMSetEx(hash, fields, ttlSec)
+    local parts = {}
+    for k, v in pairs(fields) do
+        parts[#parts + 1] = k .. "=" .. tostring(v)
+    end
+    return luacore.si_redis_hmset_ex(hash, table.concat(parts, "\n"), ttlSec)
+end
+
 --- 列表: RPUSH / LPOP / LPOS / LLEN (登录排队 FIFO)
 function xEngine.Redis.RPush(key, value)
     return luacore.si_redis_rpush(key, value)

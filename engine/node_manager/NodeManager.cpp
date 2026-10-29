@@ -27,9 +27,11 @@ namespace
 {
 const int32 kHeartbeatInterval = 5;  // 机器心跳周期 (秒)
 const int32 kReconcileInterval = 2;  // 期望数收敛周期 (秒)
+const int32 kLaunchIntervalSec = 2;  // 连续拉起子进程间隔 (秒), 等前一个完成 RPC 端口分配避免竞争
 const int32 kAutoScaleInterval = 10; // 自动扩缩容控制器周期 (秒, Leader 专用)
 const int32 kMaxRestartCount = 5;    // 连续崩溃上限, 超此标记 faulted 停止拉起
 const int32 kMaxBackoffSec = 60;     // 退避重启封顶 (秒)
+const int32 kGracefulStopTimeoutSec = 20; // 优雅停止兜底硬杀时限 (秒)
 const char *kNodeAllKey = "cluster:node:all";
 const char *kAlertKey = "cluster:alert";
 const char *kCrashLogKey = "cluster:crash:log";
@@ -59,6 +61,39 @@ bool PathExists(const std::string &path)
 #else
     return access(path.c_str(), F_OK) == 0;
 #endif
+}
+
+// 客户端监听端口基础值 — 仅 Gate/Battle 有客户端直连网关 (Kernel_Net), 需同机多实例互斥。
+// 与 RPC 端口 (50551+) 分开: Gate 10080-10099 / Battle 10100-10119 (各预留 20 端口)。
+// Gate-1 保持 10080 与 TestClientGo 默认网关端口一致。
+uint16 ClientBasePort(EProcessType type)
+{
+    switch (type)
+    {
+    case EProcessType_PGate:
+        return 10080;
+    case EProcessType_PBattle:
+        return 10100;
+    default:
+        return 0; // 无客户端监听端口 (Login/Game/Global)
+    }
+}
+
+// 按实例序号分配客户端监听端口 (name 形如 "Gate-3" → 10080 + (3-1) = 10082)。
+uint16 ResolveClientPort(EProcessType type, const std::string &name)
+{
+    uint16 base = ClientBasePort(type);
+    if (base == 0)
+    {
+        return 0;
+    }
+    size_t dash = name.rfind('-');
+    int32 seq = (dash != std::string::npos) ? atoi(name.c_str() + dash + 1) : 1;
+    if (seq < 1)
+    {
+        seq = 1;
+    }
+    return (uint16)(base + seq - 1);
 }
 } // namespace
 
@@ -108,7 +143,7 @@ bool CNodeManager::Init(int32 argc, char **argv)
 void CNodeManager::Shutdown()
 {
     m_running = false;
-    // 停止所有子进程 (优雅: 先尝试 graceful 标记 + 终止)
+    // 停止所有子进程 (优雅: 先 PUBLISH shutdown 让进程走 OnStop 落盘退出, 超时由 Reap 硬杀兜底)
     std::lock_guard<std::mutex> lock(m_mutex);
     for (auto &c : m_children)
     {
@@ -117,17 +152,7 @@ void CNodeManager::Shutdown()
             continue;
         }
         c.graceful = true;
-#ifdef _WINDOWS
-        if (c.handle)
-        {
-            TerminateProcess(c.handle, 0);
-        }
-#else
-        if (c.osPid)
-        {
-            kill((pid_t)c.osPid, SIGTERM);
-        }
-#endif
+        RequestChildStop(c);
     }
     XLOG("[NodeManager] shutdown requested");
 }
@@ -405,7 +430,9 @@ void CNodeManager::ReconcileProcesses()
                 std::string name = NextName(type);
                 if (LaunchProcess(type, name))
                 {
-                    // 成功; 计数由 m_children 反映
+                    // 成功; 计数由 m_children 反映。等前一个子进程完成 RPC 端口分配
+                    // (local.info) 再起下一个, 避免同类型端口竞争 (与手动部署 2s stagger 一致)。
+                    std::this_thread::sleep_for(std::chrono::seconds(kLaunchIntervalSec));
                 }
                 else
                 {
@@ -432,17 +459,7 @@ void CNodeManager::ReconcileProcesses()
                 }
                 c.graceful = true;
                 excess--;
-#ifdef _WINDOWS
-                if (c.handle)
-                {
-                    TerminateProcess(c.handle, 0);
-                }
-#else
-                if (c.osPid)
-                {
-                    kill((pid_t)c.osPid, SIGTERM);
-                }
-#endif
+                RequestChildStop(c);
                 XLOG("[NodeManager] scaling down: stop %s type=%s", c.name.c_str(),
                      ProcessTypeName(type));
             }
@@ -521,6 +538,10 @@ std::string CNodeManager::NextName(EProcessType type) const
 // =============================================================================
 bool CNodeManager::StartChild(ChildInfo &c)
 {
+    // Gate/Battle 有客户端直连网关, 需同机互斥的监听端口 (按实例序号分配);
+    // 其余类型无客户端监听, 不传 --port (沿用 server.xml 默认, 不会绑网关)。
+    uint16 clientPort = ResolveClientPort(c.type, c.name);
+
 #ifdef _WINDOWS
     char exePath[MAX_PATH] = {0};
     DWORD n = GetModuleFileNameA(nullptr, exePath, MAX_PATH);
@@ -537,6 +558,10 @@ bool CNodeManager::StartChild(ChildInfo &c)
     std::string cmdline = "\"" + exe + "\"" + " --type=" + std::to_string((int32)c.type)
                           + " --name=" + c.name + " --machine=" + std::to_string(m_machineId)
                           + " --platform=" + m_platform;
+    if (clientPort != 0)
+    {
+        cmdline += " --port=" + std::to_string((int32)clientPort);
+    }
 
     STARTUPINFOA si;
     PROCESS_INFORMATION pi;
@@ -572,8 +597,17 @@ bool CNodeManager::StartChild(ChildInfo &c)
         std::string aName = "--name=" + c.name;
         std::string aMachine = "--machine=" + std::to_string(m_machineId);
         std::string aPlatform = "--platform=" + m_platform;
-        execl("./RealServer", "RealServer", aType.c_str(), aName.c_str(), aMachine.c_str(),
-              aPlatform.c_str(), (char *)nullptr);
+        if (clientPort != 0)
+        {
+            std::string aPort = "--port=" + std::to_string((int32)clientPort);
+            execl("./RealServer", "RealServer", aType.c_str(), aName.c_str(), aMachine.c_str(),
+                  aPlatform.c_str(), aPort.c_str(), (char *)nullptr);
+        }
+        else
+        {
+            execl("./RealServer", "RealServer", aType.c_str(), aName.c_str(), aMachine.c_str(),
+                  aPlatform.c_str(), (char *)nullptr);
+        }
         _exit(127); // exec 失败
     }
     c.osPid = (uint32)pid;
@@ -642,6 +676,16 @@ void CNodeManager::ReapExitedChildren()
             }
         }
 #endif
+        // 优雅停止但超时未退出 → 硬杀兜底 (只杀一次, 清 deadline 避免重复)
+        if (!exited && it->graceful && it->gracefulDeadline > 0
+            && (int64)time(nullptr) >= it->gracefulDeadline)
+        {
+            XWRN("[NodeManager] graceful stop timeout — hard kill %s (pid=%u)", it->name.c_str(),
+                 it->osPid);
+            HardKillChild(*it);
+            it->gracefulDeadline = 0;
+        }
+
         if (!exited)
         {
             ++it;
@@ -688,6 +732,43 @@ void CNodeManager::ReapExitedChildren()
                      + std::to_string(backoff) + "s");
         ++it;
     }
+}
+
+// =============================================================================
+// 优雅停止子进程 — PUBLISH "shutdown <os_pid>" 到该类型的 GM 频道, 目标进程走
+// OnStop (saveAll + deregister) 干净退出; 登记 gracefulDeadline, 由 ReapExitedChildren
+// 在超时后硬杀兜底。无 Redis 可用时退化为立即硬杀 (保持旧行为)。
+// =============================================================================
+void CNodeManager::RequestChildStop(ChildInfo &c)
+{
+    if (m_cli && c.osPid)
+    {
+        std::string channel = "cluster:gm:type:" + std::to_string((int32)c.type);
+        std::string msg = "shutdown " + std::to_string(c.osPid);
+        m_cli->Publish(channel, msg);
+        c.gracefulDeadline = (int64)time(nullptr) + kGracefulStopTimeoutSec;
+        XLOG("[NodeManager] graceful stop requested: %s (pid=%u, channel=%s)", c.name.c_str(),
+             c.osPid, channel.c_str());
+    }
+    else
+    {
+        HardKillChild(c);
+    }
+}
+
+void CNodeManager::HardKillChild(ChildInfo &c)
+{
+#ifdef _WINDOWS
+    if (c.handle)
+    {
+        TerminateProcess(c.handle, 0);
+    }
+#else
+    if (c.osPid)
+    {
+        kill((pid_t)c.osPid, SIGTERM);
+    }
+#endif
 }
 
 // =============================================================================
@@ -879,9 +960,9 @@ void CNodeManager::AutoScale()
 // 进程级灰度更新 (P9)
 //
 // Leader 读 cluster:update:process:config (version/batch_size/status), 当 status=rolling
-// 时, 把「上报版本 != 目标版本」的本机子进程按批 graceful 重启 (TerminateProcess),
-// 随后 ReconcileProcesses 会按 desired 拉起新进程, 形成滚动替换。换二进制本身由部署侧
-// 完成, 此处仅下发「重启以生效」意图。
+// 时, 把「上报版本 != 目标版本」的本机子进程按批 graceful 重启 (PUBLISH shutdown, 超时
+// 硬杀兜底), 随后 ReconcileProcesses 会按 desired 拉起新进程, 形成滚动替换。换二进制本身
+// 由部署侧完成, 此处仅下发「重启以生效」意图。
 // =============================================================================
 void CNodeManager::ProcessUpdateGray()
 {
@@ -960,17 +1041,7 @@ void CNodeManager::ProcessUpdateGray()
         }
         c.graceful = true;
         ++done;
-#ifdef _WINDOWS
-        if (c.handle)
-        {
-            TerminateProcess(c.handle, 0);
-        }
-#else
-        if (c.osPid)
-        {
-            kill((pid_t)c.osPid, SIGTERM);
-        }
-#endif
+        RequestChildStop(c);
         LogUpdateLog(c.name + " rolling restart → " + target);
         XLOG("[NodeManager] process-update gray: restart %s (target %s)", c.name.c_str(),
              target.c_str());

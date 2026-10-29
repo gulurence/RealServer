@@ -29,6 +29,8 @@ enum BattleMsgId {
   BATTLE_HASH_NTF       = 10;  // 客户端 -> Battle: 一致性校验哈希上报
   BATTLE_LOGIN_REQ      = 12;  // 客户端 -> Battle 进程: 直连登录握手 (连接建立后首帧)
   BATTLE_LOGIN_RSP      = 13;  // Battle 进程 -> 客户端: 直连登录结果
+  BATTLE_SPECTATE_FOLLOW_REQ = 14;  // 客户端(观战者) -> Battle: 切换跟随目标
+  BATTLE_SPECTATOR_LIST_NTF  = 15;  // Battle -> 全员: 观战列表 (观战者 + 其跟随的战斗玩家)
 }
 
 // ---------------------------------------------------------------------------
@@ -171,4 +173,28 @@ message PBBattleLoginRsp {
   uint32 small_type         = 2;   // = BATTLE_LOGIN_RSP (13)
   PbID.ErrorCode error_code = 3;
   int64  battle_id          = 4;
+}
+
+// 观战列表项 (Battle -> 全员: 一位观战者 + 其当前跟随的战斗玩家)
+message PBBattleSpectatorEntry {
+  int64  spectator_id   = 1;   // 观战者 pid
+  string spectator_name = 2;   // 观战者昵称
+  int64  target_id      = 3;   // 其跟随的战斗玩家 pid
+  string target_name    = 4;   // 其跟随的战斗玩家昵称
+}
+
+// 观战者切换跟随目标 (客户端(观战者) -> Battle)
+message PBBattleSpectateFollowReq {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = BATTLE_SPECTATE_FOLLOW_REQ (14)
+  int64  battle_id  = 3;
+  int64  target_id  = 4;   // 要跟随的战斗玩家 pid (花名册内)
+}
+
+// 观战列表推送 (Battle -> 参战者 + 观战者)
+message PBBattleSpectatorListNtf {
+  uint32 big_type   = 1;
+  uint32 small_type = 2;   // = BATTLE_SPECTATOR_LIST_NTF (15)
+  int64  battle_id  = 3;
+  repeated PBBattleSpectatorEntry spectators = 4;
 }

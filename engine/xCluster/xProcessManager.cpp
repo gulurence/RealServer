@@ -13,6 +13,31 @@
 #include "xLog/xLog.h"
 #include <chrono>
 #include <ctime>
+#include <csignal>
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+// =============================================================================
+// 信号 / 控制台事件处理 → 进程内优雅关闭 (替代硬杀)
+// =============================================================================
+#ifdef _WIN32
+static BOOL WINAPI OnConsoleCtrl(DWORD dwCtrlType)
+{
+    if (dwCtrlType == CTRL_C_EVENT || dwCtrlType == CTRL_BREAK_EVENT || dwCtrlType == CTRL_CLOSE_EVENT
+        || dwCtrlType == CTRL_SHUTDOWN_EVENT)
+    {
+        CProcessManager::instance()->RequestShutdown();
+        return TRUE; // 已处理, 阻止默认终止, 走 OnStop 优雅关闭
+    }
+    return FALSE;
+}
+#else
+static void OnSignal(int sig)
+{
+    CProcessManager::instance()->RequestShutdown();
+}
+#endif
 
 // =============================================================================
 // CreateProcess — 进程节点初始化全流程
@@ -289,4 +314,28 @@ bool CProcessManager::SetState(EProcessState state)
     }
     XCLOG("State changed: %s → %s", ProcessStateName(m_stSelfInfo.state), ProcessStateName(state));
     return true;
+}
+
+// =============================================================================
+// Graceful shutdown
+// =============================================================================
+void CProcessManager::RequestShutdown()
+{
+    bool expected = false;
+    if (m_shutdownRequested.compare_exchange_strong(expected, true))
+    {
+        XLOG("[ProcessManager] Graceful shutdown requested");
+    }
+}
+
+void CProcessManager::InstallSignalHandlers()
+{
+#ifdef _WIN32
+    SetConsoleCtrlHandler(OnConsoleCtrl, TRUE);
+    XLOG("[ProcessManager] Console ctrl handler installed (Ctrl+C/Close → graceful shutdown)");
+#else
+    std::signal(SIGINT, OnSignal);
+    std::signal(SIGTERM, OnSignal);
+    XLOG("[ProcessManager] Signal handlers installed (SIGINT/SIGTERM → graceful shutdown)");
+#endif
 }

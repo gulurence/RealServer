@@ -11,7 +11,7 @@
 - `cd source/proto-def && ./make.bat` — 重新生成 proto（protoc → `source/proto-cpp`）
 - `./engine/RealServer` — 运行（**工作目录必须同时包含 `config/` 和 `script/`**，因为代码里用相对路径加载）
 
-Linux 构建走另一分支：`cmake -B build && cmake --build build`（依赖 pkg-config 的 mysql/mariadb、libxml2、hiredis、protobuf、grpc；nats.c 与 redis-plus-plus 由 CMake 源码编译）。
+Linux 构建走另一分支：`cmake -B build && cmake --build build`（依赖 pkg-config 的 mysql/mariadb、libxml2、hiredis、protobuf；redis-plus-plus 由 CMake 源码编译）。
 
 ## Code Style
 
@@ -29,13 +29,11 @@ Linux 构建走另一分支：`cmake -B build && cmake --build build`（依赖 p
 关键架构约束：
 
 - `engine/` — 引擎框架，全部 C++，按模块划分：
-  - `xActor/` — **Actor 模型核心**（`CActorMgr` 两级索引 `type→(id→actor)`，`ActorCreator` 跨进程创建）
-  - `xCluster/` — 进程集群：服务发现（Redis）、链接管理（gRPC）、心跳、负载
-  - `xScheduler/` — 协程（C++20 coroutine）+ 同步双线程池调度器
-  - `xEvent/` — 协议分发（`xEventDispatcher` 按 `(msgType<<32)|msgID` 注册回调）
+  - `xActor/` — **Actor 模型核心**（`CActorMgr` 两级索引 `type→(id→actor)`，`ActorCreator` 跨进程创建）+ 协程调度器 `CActorScheduler`（单 io_context + Actor 消息循环）
+  - `xCluster/` — 进程集群：服务发现（Redis）、链接管理（asio-TCP RPC）、心跳、负载
   - `tService/` — 第三方服务管理（Redis/MySQL/Log/Xml/Platform，**引用计数共享复用**）
   - `xRecord/` — 持久化：读走 Redis 缓存 miss 回源 DB，写走 Redis 同步 + DB 异步
-  - `xDatabase/ xRedis/ xNats/ xNet/ xShareMem/ xConfig/ xLog/` — 基础设施
+  - `xDatabase/ xRedis/ xNet/ xShareMem/ xConfig/ xLog/` — 基础设施
   - `luacore/` — SWIG 接口（`.i`）生成 Lua 绑定，导出 `si_*` 前缀 C 接口
   - `main.cpp` — 进程入口，11 阶段启动流程
 - `source/proto-def/`（`.proto` 源定义）→ `source/proto-cpp/`（protoc 生成物，**勿手改**）
@@ -58,8 +56,7 @@ Linux 构建走另一分支：`cmake -B build && cmake --build build`（依赖 p
 
 - 配置是 **XML**（`config/server.xml`），不是 JSON 也不是 `.env`；运行时相对路径加载 `config/server.xml` 和 `script/`
 - `main.cpp` 主循环是 `while(true)` 死循环，后面的优雅关闭代码**实际不可达**（代码注释已自认 unreachable）
-- 两套服务框架并存：`xService/` 是遗留/未完成的旧骨架（`ServiceLogin::Create()` 返回 `nullptr`），当前标准是 `tService/`，不要在新代码里依赖 `xService`
-- `third_part/` 被 `.gitignore` 忽略，构建前需先备好依赖（Windows 用 vcpkg/预装第三方，Linux 用系统包 + CMake 源码编译 nats/redis++）
+- `third_part/` 被 `.gitignore` 忽略，构建前需先备好依赖（Windows 用 vcpkg/预装第三方，Linux 用系统包 + CMake 源码编译 redis++）
 - `source/proto-def/make.bat` 里 `grpc_cpp_plugin` 路径**写死**为 `D:/vcpkg-master/...`，需按本机路径调整；且该文件是 GBK 乱码，注意编码
 - Redis 不可用时可走本地回退配置（`server.xml` 的 `<cluster><local>` 段），这是无 Redis 环境的测试模式
 - `source/proto-cpp/` 和 `engine/luacore_generated/` 都是生成物，勿直接编辑

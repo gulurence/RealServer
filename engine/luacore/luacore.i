@@ -572,6 +572,61 @@ bool si_redis_expire(const std::string& key, int64 ttlSec) {
     return pCli->Expire(key, ttlSec) == REDIS_OK;
 }
 
+// HGETALL — 一次读整个哈希, 序列化为 "field=value\nfield=value\n..." 返回 (登录 session
+// 热路径: 替代逐个 HGET 的多次往返)。字段名不含 '='、值不含换行 (session 字段均为数字/token)。
+std::string si_redis_hgetall(const std::string& hash) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return "";
+    std::map<std::string, std::string> fields;
+    if (pCli->HGetAll(hash, fields) != REDIS_OK) return "";
+    std::string out;
+    for (const auto& kv : fields) {
+        if (!out.empty()) out += "\n";
+        out += kv.first + "=" + kv.second;
+    }
+    return out;
+}
+
+// HMSET — 批量写哈希字段 (输入 "field=value\nfield=value\n..."), 单次往返 (登录 session 同步)。
+bool si_redis_hmset(const std::string& hash, const std::string& fieldsStr) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return false;
+    std::map<std::string, std::string> fields;
+    size_t pos = 0;
+    while (pos < fieldsStr.size()) {
+        size_t nl = fieldsStr.find('\n', pos);
+        std::string pair = (nl == std::string::npos) ? fieldsStr.substr(pos)
+                                                     : fieldsStr.substr(pos, nl - pos);
+        size_t eq = pair.find('=');
+        if (eq != std::string::npos) {
+            fields[pair.substr(0, eq)] = pair.substr(eq + 1);
+        }
+        if (nl == std::string::npos) break;
+        pos = nl + 1;
+    }
+    return pCli->HMSet(hash, fields) == REDIS_OK;
+}
+
+// HMSETEX — HMSET + EXPIRE 合并为单次往返 (账户 session 同步热路径: 写字段并刷新 TTL)。
+bool si_redis_hmset_ex(const std::string& hash, const std::string& fieldsStr, int64 ttlSec) {
+    auto* pCli = CRedisPoolMgr::getMe().GetRedisCli("actor_cache");
+    if (!pCli) return false;
+    std::map<std::string, std::string> fields;
+    size_t pos = 0;
+    while (pos < fieldsStr.size()) {
+        size_t nl = fieldsStr.find('\n', pos);
+        std::string pair = (nl == std::string::npos) ? fieldsStr.substr(pos)
+                                                     : fieldsStr.substr(pos, nl - pos);
+        size_t eq = pair.find('=');
+        if (eq != std::string::npos) {
+            fields[pair.substr(0, eq)] = pair.substr(eq + 1);
+        }
+        if (nl == std::string::npos) break;
+        pos = nl + 1;
+    }
+    return pCli->HMSetEx(hash, fields, ttlSec) == REDIS_OK;
+}
+
 // 本进程进程 ID (CProcessManager 启动时分配的唯一进程 ID, session 记录 gate/login 进程用)
 int64 si_get_process_id() {
     return (int64)CProcessManager::getMe().GetProcessId();
@@ -1049,6 +1104,11 @@ bool  si_pb_bool_field(const std::string& body, int32 fieldNumber) {
 // 返回其生成的客户端回包 protobuf (失败/超时返回空串)。
 std::string si_forward_rpc(int32 actorType, int64 actorID, const std::string& payload) {
     return CActorLoadManager::instance()->ForwardToActor((EActorType)actorType, actorID, payload);
+}
+
+// 异步转发 (fire-and-forget, 无回包): 通知类转发 (如选角后置 Player online=1), 不阻塞。
+void si_forward_rpc_async(int32 actorType, int64 actorID, const std::string& payload) {
+    CActorLoadManager::instance()->ForwardToActorAsync((EActorType)actorType, actorID, payload);
 }
 
 // 服务器主动推送: 把 payload (客户端可接收的业务 protobuf) 推给指定玩家的连接。

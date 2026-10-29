@@ -102,7 +102,13 @@ inline bool IsValidActorId(uint64 actorId)
 }
 
 // 操作系统 PID (Windows GetCurrentProcessId / POSIX getpid)
-// 注: PID 字段仅 16 位, OS PID 超 65535 时会被打包时截断 (见潜在问题)。
+//
+// 注: PID 段仅 16 位, 但它只用于「本物理机进程身份」的位打包, 无需全局唯一:
+//   - 真正跨机路由用 processId (Redis INCR 序列, 全宽 int64 存于 Redis),
+//     与这里的 16 位 PID 段无关;
+//   - OS PID 全宽以 int64 存 Redis 的 os_pid 字段, 编排脚本据此把 OS pid
+//     映射回 processId; 本地注册文件 local.info 存的也是稳定 processId。
+//   因此 16 位 PID 足够 (仅标记本机进程, 超 65535 由本地注册/Redis 校正), 无问题。
 inline uint32 GetOsPid()
 {
 #ifdef _WINDOWS

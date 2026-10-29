@@ -1476,36 +1476,64 @@ static uint8_t GunToBulletClass(uint8_t gunType) {
     }
 }
 
-// 枪型 → 枪口偏移 (平行方向, px)。数值从 guns0.dat 各枪 fire_right 帧 rectRed 的枪口
-// X 中心 + 身体 hand 挂点偏移(-3) 校准: 手枪58-3 / 机枪53-3 / 散弹60-3 / 狙击71-3 /
-// 加特林83-3 / 火箭筒67-3。原联网路径硬编码 *20 过小, 子弹出生在枪身里, 造成「武器与子弹
-// 初始位置不对齐」。垂直方向还有 ~12px 手高偏移, 因各朝向镜像不一致暂未建模 (见文档)。
-static int32_t GunToMuzzleOffset(uint8_t gunType) {
+// 枪型 → 枪口偏移表行索引 (0..5, 与 GunMuzzleOffset 表行序一致)。
+static int32_t GunToMuzzleTableIndex(uint8_t gunType) {
     switch (gunType) {
-        case kGunJuJi:        return 68;   // 狙击
-        case kGunSanDan:      return 57;   // 散弹
-        case kGunHuoJianTong: return 64;   // 火箭筒
-        case kGunJiQiang:     return 50;   // 机枪
-        case kGunJiaTeLin:    return 80;   // 加特林
-        case kGunShouQiang:
-        default:              return 55;   // 手枪
+        case kGunShouQiang:    return 0;   // 手枪
+        case kGunJiQiang:      return 1;   // 机枪
+        case kGunSanDan:       return 2;   // 散弹
+        case kGunJuJi:         return 3;   // 狙击
+        case kGunJiaTeLin:     return 4;   // 加特林
+        case kGunHuoJianTong:  return 5;   // 火箭筒
+        default:               return 0;
     }
 }
 
+// 枪口偏移 (px, 相对英雄脚底锚点) 按「枪型 × 8 方向」逐帧实测。原实现只取右朝向的平行偏移
+// + 常数手高做旋转近似, 但 8 朝向是手绘预制帧、镜像不一致: 如手枪枪口右 55 / 左 -26 /
+// 上 12 / 下 9, 横向差近 30px, 导致除正右外所有朝向「子弹发射位置与枪口不对齐」。
+// 数值从 guns0.dat 各枪 fire_<朝向> 帧 rectRed 枪口中心 + hero0.dat stand_<朝向> 帧身体
+// hand 挂点顶边校准。dir 编码同 AngleToEightDirFx: 1=上 2=右上 3=右 4=右下 5=下 6=左下
+// 7=左 8=左上。
+static void GunMuzzleOffset(uint8_t gunType, uint8_t dir, int32_t& mx, int32_t& my) {
+    static const int32_t kMx[6][8] = {
+        //   上    右上   右    右下   下    左下   左    左上
+        {  12,   48,   55,   25,    9,  -19,  -26,   -5 },  // 手枪
+        {   6,   49,   50,   23,    8,  -29,  -38,    6 },  // 机枪
+        {   8,   48,   57,   27,   10,  -32,  -36,  -10 },  // 散弹
+        {  11,   62,   68,   34,   14,  -40,  -48,   -6 },  // 狙击
+        {  10,   76,   80,   40,   18,  -48,  -62,  -20 },  // 加特林
+        {  28,   74,   64,   15,   -8,  -29,  -45,   11 },  // 火箭筒
+    };
+    static const int32_t kMy[6][8] = {
+        {  56,   31,   18,   -9,  -12,    2,   19,   43 },  // 手枪
+        {  68,   31,   23,  -12,  -15,    5,   22,   47 },  // 机枪
+        {  51,   35,   14,  -16,  -17,    2,   17,   68 },  // 散弹
+        {  70,   33,   15,  -24,  -28,    2,   20,   66 },  // 狙击
+        {  73,   25,    3,  -44,  -47,  -22,    2,   68 },  // 加特林
+        {  77,   39,   25,   -6,  -11,   15,   34,   70 },  // 火箭筒
+    };
+    const int32_t gi = GunToMuzzleTableIndex(gunType);
+    const int32_t di = (dir >= 1 && dir <= 8) ? (dir - 1) : 2;   // 非法方向回退到右(3)
+    mx = kMx[gi][di];
+    my = kMy[gi][di];
+}
+
 // 英雄开火 → 产子弹实体 (原 StageScene::fireNetHeroes → WeaponManager::fireNetBullet →
-// createABullet 的联网路径)。枪口 = 英雄坐标 + 射击方向单位向量*GunToMuzzleOffset(枪型);
-// 反怪弹伤害在 UpdateBullet 里走 kGunHurtValue, 故 b.hurt 留 0 (仅炮台弹/火箭筒命中用)。
+// createABullet 的联网路径)。枪口位置按 8 方向查表 (与枪渲染 animDir 同量化), 保证子弹
+// 出生点与枪口逐帧对齐; 飞行方向仍用连续瞄准角 aimRadians。反怪弹伤害在 UpdateBullet 里
+// 走 kGunHurtValue, 故 b.hurt 留 0 (仅炮台弹/火箭筒命中用)。
 static void SpawnHeroBullet(const HeroState& h, uint8_t gunType, fx_t aimRadians,
                             std::vector<BulletState>& outBullets, uint32_t& nextId) {
-    fx_t s, c;
-    FxSinCos(aimRadians, s, c);   // s=sin(角度), c=cos(角度); 方向 = (c, s) (Y 向上数学坐标)
-    const fx_t muzzle = FxFromInt(GunToMuzzleOffset(gunType));
+    const uint8_t dir = AngleToEightDirFx(aimRadians);   // 与 h.animDir 同量化, 匹配枪渲染帧
+    int32_t mx, my;
+    GunMuzzleOffset(gunType, dir, mx, my);
     BulletState b;
     b.id      = nextId++;
     b.classId = GunToBulletClass(gunType);
     b.action  = kBulletMove;
-    b.x       = h.x + FxMul(c, muzzle);
-    b.y       = h.y + FxMul(s, muzzle);
+    b.x       = h.x + FxFromInt(mx);
+    b.y       = h.y + FxFromInt(my);
     b.rotate  = aimRadians;
     b.speed   = FxFromInt(kHeroBulletSpeed);
     b.hurt    = 0;   // 反怪弹伤害走 kGunHurtValue; b.hurt 仅炮台弹命中英雄用

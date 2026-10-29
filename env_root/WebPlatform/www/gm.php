@@ -6,6 +6,32 @@
 require_once __DIR__ . '/_layout.php';
 
 const GM_REPLY_KEY = 'cluster:gm:replies';
+const GM_REPLIES_PER_PAGE = 10;   // 应答日志每页条数
+
+/** 应答日志分页/查询链接: 保留 q/page, 覆盖指定参数 (null/'' 移除) */
+function gm_href(array $overrides): string
+{
+    $params = [];
+    foreach (['q', 'page'] as $k) {
+        if (isset($_GET[$k]) && (string)$_GET[$k] !== '') {
+            $params[$k] = (string)$_GET[$k];
+        }
+    }
+    foreach ($overrides as $k => $v) {
+        if ($v === null || $v === '') {
+            unset($params[$k]);
+        } else {
+            $params[$k] = (string)$v;
+        }
+    }
+    $qs = http_build_query($params);
+    return 'gm.php' . ($qs !== '' ? '?' . $qs : '');
+}
+
+function gm_page_href(int $page): string
+{
+    return gm_href(['page' => $page]);
+}
 
 $r = redis();
 $sent = false;
@@ -39,6 +65,20 @@ if ($r !== null) {
         $replies = array_reverse($raw);   // 最新在前
     }
 }
+$total = count($replies);
+
+// 应答内容查询 (子串, 不区分大小写)
+$q = trim((string)($_GET['q'] ?? ''));
+if ($q !== '') {
+    $replies = array_values(array_filter($replies, fn($line) => stripos((string)$line, $q) !== false));
+}
+$filteredTotal = count($replies);
+
+// 分页: 每页 GM_REPLIES_PER_PAGE 条
+$pages = max(1, (int)ceil($filteredTotal / GM_REPLIES_PER_PAGE));
+$page  = max(1, min((int)($_GET['page'] ?? 1), $pages));
+$offset = ($page - 1) * GM_REPLIES_PER_PAGE;
+$pageReplies = array_slice($replies, $offset, GM_REPLIES_PER_PAGE);
 ?>
 <?php layout_header('GM 控制台', 'gm'); ?>
         <section class="node-group">
@@ -72,20 +112,47 @@ if ($r !== null) {
             <h2>应答日志 <span class="dim">（cluster:gm:replies，最新在前）</span></h2>
             <?php if ($r === null): ?>
                 <div class="empty">⚠️ 无法连接 Redis。</div>
-            <?php elseif (empty($replies)): ?>
-                <div class="empty">暂无应答 —— 发送一条命令后，各进程会把结果写回这里。</div>
             <?php else: ?>
-                <table class="table table-vcenter">
-                    <thead><tr><th>#</th><th>应答</th></tr></thead>
-                    <tbody>
-                    <?php foreach ($replies as $i => $line): ?>
-                        <tr>
-                            <td class="mono"><?= count($replies) - $i ?></td>
-                            <td class="mono"><?= esc($line) ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
+                <form method="get" action="gm.php" class="form-row" style="margin-bottom:14px;">
+                    <label style="flex:1 1 280px;">
+                        <span>查询（应答内容关键字）</span>
+                        <input type="text" name="q" value="<?= esc($q) ?>" class="form-control" placeholder="输入应答内容关键字">
+                    </label>
+                    <button type="submit" class="btn btn-primary">查询</button>
+                    <?php if ($q !== ''): ?><a class="btn btn-link" href="<?= esc(gm_href(['q' => null, 'page' => null])) ?>">清除</a><?php endif; ?>
+                </form>
+
+                <?php if ($total === 0): ?>
+                    <div class="empty">暂无应答 —— 发送一条命令后，各进程会把结果写回这里。</div>
+                <?php elseif ($filteredTotal === 0): ?>
+                    <div class="empty">没有匹配「<?= esc($q) ?>」的应答。</div>
+                <?php else: ?>
+                    <table class="table table-vcenter">
+                        <thead><tr><th>#</th><th>应答</th></tr></thead>
+                        <tbody>
+                        <?php foreach ($pageReplies as $j => $line): ?>
+                            <tr>
+                                <td class="mono"><?= $offset + $j + 1 ?></td>
+                                <td class="mono"><?= esc($line) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+
+                    <?php if ($pages > 1): ?>
+                    <div class="actions" style="justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                        <div class="dim">第 <?= $page ?> / <?= $pages ?> 页 · 共 <?= $filteredTotal ?> 条</div>
+                        <div class="actions">
+                            <?php if ($page > 1): ?>
+                                <a class="btn btn-sm btn-outline-secondary" href="<?= esc(gm_page_href($page - 1)) ?>">上一页</a>
+                            <?php endif; ?>
+                            <?php if ($page < $pages): ?>
+                                <a class="btn btn-sm btn-outline-secondary" href="<?= esc(gm_page_href($page + 1)) ?>">下一页</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                <?php endif; ?>
             <?php endif; ?>
         </section>
 <?php layout_footer(); ?>

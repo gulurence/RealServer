@@ -1,0 +1,9 @@
+# 基础依赖（mock 占位 + 后处理必需）
+Pillow>=10.0
+PyYAML>=6.0
+
+# 真实 provider 需要（用 siliconflow/comfyui/gemini 时安装）
+requests>=2.31
+
+# ui 资产去背景（可选）：装不上则自动退回「色键去除」兜底
+# rembg>=2.0

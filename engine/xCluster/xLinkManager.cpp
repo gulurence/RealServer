@@ -205,65 +205,108 @@ bool CLinkManager::IsPeerAvailable(int64 processId) const
 // =============================================================================
 ProcessInfo CLinkManager::GetBestPeer(EProcessType targetType) const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-
-    ProcessInfo best;
-    bool found = false;
-
-    for (auto &[id, conn] : m_mapPeers)
+    // 候选先快照 (已连接且可用于分配者), 释放锁后再逐一到 Redis 拉最新负载,
+    // 避免持锁期间做 Redis 往返阻塞链路刷新/连接等操作。
+    std::vector<ProcessInfo> candidates;
     {
-        if (conn.info.type != targetType)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        for (auto &[id, conn] : m_mapPeers)
         {
-            continue;
+            if (conn.info.type == targetType && conn.available)
+            {
+                candidates.push_back(conn.info);
+            }
         }
-        if (!conn.available)
+    }
+
+    auto &disc = CServiceDiscovery::getMe();
+
+    // 先收集通过全部硬过滤的候选 (Redis 可读、运行中、心跳新鲜、非排空、CPU/内存未满载、
+    // Actor 数未超软上限)。过滤语义与旧逻辑一致, 只是把「挑最优」拆成两步以便平手轮询。
+    std::vector<ProcessInfo> viable;
+    viable.reserve(candidates.size());
+    for (auto &cached : candidates)
+    {
+        // 被动拉取最新负载信息: 每次选节点都实时读 Redis, 取代本地缓存里陈旧的
+        // loadScore/cpu/mem (缓存仅由 RefreshLoop 每 10s 刷新, 并发创建时会扎堆选同一低负载节点)。
+        ProcessInfo info = disc.GetProcessInfo(cached.type, cached.processId);
+        if (info.processId == 0)
         {
-            continue;
+            continue; // Redis 读不到 (已注销/键过期): 不选陈旧节点
         }
-        if (!IsProcessRunning(conn.info.state))
+        if (!IsProcessRunning(info.state))
         {
             continue;
         }
         // 心跳过滤: 跳过「state 仍为 Running 但心跳已停」的僵尸进程 (灰度强杀后 Hash 尚未过期)。
         // 与 CServiceDiscovery::DiscoverPeers 的心跳过滤一致, 避免选中已死对端导致 RPC 失败。
-        if (CServiceDiscovery::getMe().IsHeartbeatStale(conn.info))
+        if (disc.IsHeartbeatStale(info))
         {
             continue;
         }
         // 排空过滤: 排空中的进程不再接受新 Actor 分配 (Battle 进程级排空; 仍保持连接
         // 供既有 Actor 消息路由, 只是不选中承载新 Actor)。
-        if (conn.info.draining)
+        if (info.draining)
         {
             continue;
         }
 
         // 硬过滤: CPU/内存达到满载阈值则不再向该进程分配新 Actor (资源感知, P1 默认值)
-        if (conn.info.cpuPercent >= kCpuFullPercentDefault)
+        if (info.cpuPercent >= kCpuFullPercentDefault)
         {
             continue;
         }
-        if (conn.info.memPercent >= kMemFullPercentDefault)
+        if (info.memPercent >= kMemFullPercentDefault)
         {
             continue;
         }
         // 软上限: 单进程 Actor 数超限则跳过 (0 = 不限)
-        if (kActorMaxPerProcessDefault > 0 && conn.info.loadScore >= kActorMaxPerProcessDefault)
+        if (kActorMaxPerProcessDefault > 0 && info.loadScore >= kActorMaxPerProcessDefault)
         {
             continue;
         }
 
-        // 加权挑选: Actor 数优先, 相同比 CPU, 再比内存
-        if (!found || conn.info.loadScore < best.loadScore
-            || (conn.info.loadScore == best.loadScore && conn.info.cpuPercent < best.cpuPercent)
-            || (conn.info.loadScore == best.loadScore && conn.info.cpuPercent == best.cpuPercent
-                && conn.info.memPercent < best.memPercent))
+        viable.push_back(info);
+    }
+
+    if (viable.empty())
+    {
+        return ProcessInfo{};
+    }
+
+    // 加权挑选: Actor 数优先, 相同比 CPU, 再比内存 (与旧比较器语义一致)
+    ProcessInfo best = viable[0];
+    for (auto &info : viable)
+    {
+        if (info.loadScore < best.loadScore
+            || (info.loadScore == best.loadScore && info.cpuPercent < best.cpuPercent)
+            || (info.loadScore == best.loadScore && info.cpuPercent == best.cpuPercent
+                && info.memPercent < best.memPercent))
         {
-            best = conn.info;
-            found = true;
+            best = info;
         }
     }
 
-    return best;
+    // 平手轮询: 收集与最优 (loadScore/cpu/mem) 完全相同的候选, 轮询选一个。修复单例进程
+    // (Login 等 actor 数恒等) 负载恒等时恒选 processId 最小者导致的扎堆单点 (login-01 吃满、
+    // login-02/03 空转)。Game/Battle 负载不同时 ties.size()==1, 语义不变。
+    std::vector<ProcessInfo> ties;
+    ties.reserve(viable.size());
+    for (auto &info : viable)
+    {
+        if (info.loadScore == best.loadScore && info.cpuPercent == best.cpuPercent
+            && info.memPercent == best.memPercent)
+        {
+            ties.push_back(info);
+        }
+    }
+
+    if (ties.size() <= 1)
+    {
+        return best;
+    }
+    size_t idx = (size_t)((m_rrCounter++) % (int64)ties.size());
+    return ties[idx];
 }
 
 std::vector<ProcessInfo> CLinkManager::GetAvailablePeers(EProcessType targetType) const

@@ -9,23 +9,15 @@ set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # 获取源代码文件（包括子目录）
 file(GLOB X_BASE            "${SOURCE_DIR}/xBase/*.h"       "${SOURCE_DIR}/xBase/*.cpp")
 file(GLOB X_ERRORCODE       "${SOURCE_DIR}/xErrorCode/*.h"  "${SOURCE_DIR}/xErrorCode/*.cpp")
-file(GLOB X_SHAREMEM        "${SOURCE_DIR}/xShareMem/*.h"   "${SOURCE_DIR}/xShareMem/*.cpp")
 file(GLOB X_CONFIG          "${SOURCE_DIR}/xConfig/*.h"     "${SOURCE_DIR}/xConfig/*.cpp")
 file(GLOB X_LOG             "${SOURCE_DIR}/xLog/*.h"        "${SOURCE_DIR}/xLog/*.cpp")
 file(GLOB X_NET             "${SOURCE_DIR}/xNet/*.h"        "${SOURCE_DIR}/xNet/*.cpp")
 file(GLOB X_DATABASE        "${SOURCE_DIR}/xDatabase/*.h"   "${SOURCE_DIR}/xDatabase/*.cpp")
 file(GLOB X_REDIS           "${SOURCE_DIR}/xRedis/*.h"      "${SOURCE_DIR}/xRedis/*.cpp")
-file(GLOB X_NATS            "${SOURCE_DIR}/xNats/*.h"       "${SOURCE_DIR}/xNats/*.cpp")
-file(GLOB X_COMMAND         "${SOURCE_DIR}/xCommand/*.h"    "${SOURCE_DIR}/xCommand/*.cpp")
-file(GLOB X_EVENT           "${SOURCE_DIR}/xEvent/*.h"      "${SOURCE_DIR}/xEvent/*.cpp")
-file(GLOB X_SCHEDULER       "${SOURCE_DIR}/xScheduler/*.h"  "${SOURCE_DIR}/xScheduler/*.cpp")
 file(GLOB X_RPC             "${SOURCE_DIR}/xRpc/*.h"        "${SOURCE_DIR}/xRpc/*.cpp")
-file(GLOB X_SERVICE         "${SOURCE_DIR}/xService/*.h"    "${SOURCE_DIR}/xService/*.cpp")
 file(GLOB X_TSERVICE        "${SOURCE_DIR}/tService/*.h"    "${SOURCE_DIR}/tService/*.cpp")
 file(GLOB X_ACTOR           "${SOURCE_DIR}/xActor/*.h"      "${SOURCE_DIR}/xActor/*.cpp")
 file(GLOB X_RECORD          "${SOURCE_DIR}/xRecord/*.h"     "${SOURCE_DIR}/xRecord/*.cpp")
-file(GLOB X_SERVER          "${SOURCE_DIR}/xServer/*.h"     "${SOURCE_DIR}/xServer/*.cpp")
-file(GLOB X_WEBCONSOLE      "${SOURCE_DIR}/xWebConsole/*.h" "${SOURCE_DIR}/xWebConsole/*.cpp")
 file(GLOB X_CLUSTER          "${SOURCE_DIR}/xCluster/*.h"   "${SOURCE_DIR}/xCluster/*.cpp")
 file(GLOB X_TRACE            "${SOURCE_DIR}/xTrace/*.h"     "${SOURCE_DIR}/xTrace/*.cpp")
 file(GLOB X_GM               "${SOURCE_DIR}/xGm/*.h"        "${SOURCE_DIR}/xGm/*.cpp")
@@ -51,11 +43,10 @@ list(REMOVE_ITEM X_LUA_SRC
 set(SWIG_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/luacore_generated")
 file(MAKE_DIRECTORY ${SWIG_GENERATED_DIR})
 
-# 子文件 (base/*.i, actor/*.i, pb_util.i) 被各模块 .i %include
+# 子文件 (base/xDefine.i, pb_util.i) 被各模块 .i %include
 file(GLOB SWIG_I_DEPENDS
     "${SOURCE_DIR}/luacore/*.i"
-    "${SOURCE_DIR}/luacore/base/*.i"
-    "${SOURCE_DIR}/luacore/actor/*.i")
+    "${SOURCE_DIR}/luacore/base/*.i")
 
 set(LUACORE_MODULES
     luacore
@@ -111,23 +102,15 @@ file(GLOB X_PROTO_MSG
 set(SOURCES
     ${X_BASE}
     ${X_ERRORCODE}
-    ${X_SHAREMEM}
     ${X_CONFIG}
     ${X_LOG}
     ${X_NET}
     ${X_DATABASE}
     ${X_REDIS}
-    ${X_NATS}
-    ${X_COMMAND}
-    ${X_EVENT}
-    ${X_SCHEDULER}
     ${X_RPC}
-    ${X_SERVICE}
     ${X_TSERVICE}
     ${X_ACTOR}
     ${X_RECORD}
-    ${X_SERVER}
-    ${X_WEBCONSOLE}
     ${X_CLUSTER}
     ${X_TRACE}
     ${X_GM}
@@ -146,24 +129,16 @@ set(SOURCES
 # 将源文件分组（在 Visual Studio 中显示为目录结构）
 source_group("src/xBase"       FILES ${X_BASE})
 source_group("src/xErrorCode"  FILES ${X_ERRORCODE})
-source_group("src/xShareMem"   FILES ${X_SHAREMEM})
 source_group("src/xConfig"     FILES ${X_CONFIG})
 source_group("src/xLog"        FILES ${X_LOG})
 source_group("src/xNet"        FILES ${X_NET})
 source_group("src/xDatabase"   FILES ${X_DATABASE})
 source_group("src/xRedis"      FILES ${X_REDIS})
-source_group("src/xNats"       FILES ${X_NATS})
-source_group("src/xCommand"    FILES ${X_COMMAND})
-source_group("src/xEvent"      FILES ${X_EVENT})
-source_group("src/xScheduler"  FILES ${X_SCHEDULER})
 source_group("src/xRpc"        FILES ${X_RPC})
-source_group("src/xService"    FILES ${X_SERVICE})
 source_group("src/tService"    FILES ${X_TSERVICE})
 source_group("src/xActor"      FILES ${X_ACTOR})
 source_group("src/xRecord"     FILES ${X_RECORD})
 source_group("src/main"        FILES ${X_MAIN})
-source_group("src/xServer"     FILES ${X_SERVER})
-source_group("src/xWebConsole" FILES ${X_WEBCONSOLE})
 source_group("src/xCluster"    FILES ${X_CLUSTER})
 source_group("src/xTrace"      FILES ${X_TRACE})
 source_group("src/xGm"         FILES ${X_GM})
@@ -230,7 +205,6 @@ endif()
 target_include_directories(RealServer PUBLIC
     ${SOURCE_DIR}   # 确保包含 engine 目录下的所有头文件
     ${CMAKE_SOURCE_DIR}/third_part  # 如果需要第三方库头文件
-    ${CMAKE_SOURCE_DIR}/third_part/nats.c-main  # nats 头文件路径
     ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src
     ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src/sw/redis++/cxx17
     ${CMAKE_SOURCE_DIR}/third_part/redis-plus-plus/src/sw/redis++/no_tls
@@ -282,17 +256,6 @@ endif()
 # ============================================================
 # Bundled third-party library builds
 # ============================================================
-if(NOT MSVC)
-    # nats.c — no system package on Debian (Linux only)
-    set(NATS_BUILD_WITH_TLS ON CACHE BOOL "" FORCE)
-    set(NATS_BUILD_STREAMING OFF CACHE BOOL "" FORCE)
-    set(NATS_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-    set(NATS_BUILD_LIB_STATIC ON CACHE BOOL "" FORCE)
-    set(NATS_BUILD_LIB_SHARED OFF CACHE BOOL "" FORCE)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/third_part/nats.c-main
-                     ${CMAKE_BINARY_DIR}/nats-build)
-endif()
-
 # redis-plus-plus — 源码编译静态库 (两分支共用; sync RedisCluster 不依赖 libuv)
 set(REDIS_PLUS_PLUS_CXX_STANDARD 17 CACHE STRING "" FORCE)
 set(REDIS_PLUS_PLUS_BUILD_TEST OFF CACHE BOOL "" FORCE)
@@ -310,7 +273,6 @@ if(NOT MSVC)
         PkgConfig::LIBXML2
         PkgConfig::HIREDIS
         PkgConfig::PROTOBUF
-        nats_static
         redis++_static
         pthread
         dl

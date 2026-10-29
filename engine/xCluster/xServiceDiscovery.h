@@ -34,8 +34,14 @@ public:
     // 心跳 — 更新状态 + 时间戳 (由定时器每 5 秒调用)
     bool Heartbeat();
 
-    // 更新负载分数
+    // 更新负载分数 (同时刷新内存自描述 m_stSelfInfo 与 Redis, 由心跳线程每 5s 调用)
     bool UpdateLoad(int32 loadScore);
+
+    // 即时上报负载到 Redis (仅写 cluster:process:{type}:{id} 的 load 字段, 不动 m_stSelfInfo)。
+    // 供 CActorMgr 在 Actor 实例增删时实时回写, 使负载均衡的被动读取看到最新值,
+    // 避免并发建 Actor 在 5s 心跳窗口内读到陈旧 load 而扎堆选同一低负载节点。
+    // 线程安全 (内部走 m_redisMutex + RedisCluster 自带线程安全)。
+    bool FlushLoad(int32 loadScore);
 
     // 更新资源占用 (CPU% / RSS MB / 内存%) — 心跳时采样写入
     bool UpdateResource(int32 cpuPercent, int64 memRssMb, int32 memPercent);

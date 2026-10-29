@@ -8,7 +8,7 @@ RealServer 是一个单可执行文件、多进程部署的分布式游戏服务
   * Actor 模型         —— 业务以 Actor 为单元，跨进程创建 / 路由 / 负载均衡
   * Lua 脚本热逻辑     —— 玩法逻辑全部写在 Lua（SWIG 生成绑定），支持热更
   * 进程集群           —— 服务发现（Redis）+ 进程间链接 + 心跳 + 负载
-  * 协程调度器         —— C++20 coroutine + 同步双线程池
+  * 协程调度器         —— C++20 coroutine + Actor 消息循环（CActorScheduler）
   * 持久化             —— 读走 Redis 缓存 miss 回源 DB，写走 Redis 同步 + DB 异步
 
 进程身份由 config/server.xml 的 <process type> 决定，同一份二进制按配置
@@ -50,12 +50,10 @@ RealServer/
 │   ├── main.cpp            # 进程入口，11 阶段启动流程
 │   ├── xActor/             # Actor 模型核心（CActorMgr 两级索引 type→(id→actor)）
 │   ├── xCluster/           # 进程集群：服务发现 / 链接管理 / 心跳 / 负载
-│   ├── xScheduler/         # 协程 + 双线程池调度器
-│   ├── xEvent/             # 协议分发（按 (msgType<<32)|msgID 注册回调）
 │   ├── xRpc/               # asio-TCP 进程间 RPC
 │   ├── xRecord/            # 持久化（Redis 缓存 + DB 异步落库）
 │   ├── tService/           # 第三方服务管理（Redis/MySQL/Log/Xml/Platform，引用计数复用）
-│   ├── xDatabase/ xRedis/ xNats/ xNet/ xShareMem/ xConfig/ xLog/ xBase/
+│   ├── xDatabase/ xRedis/ xNet/ xShareMem/ xConfig/ xLog/ xBase/
 │   ├── luacore/            # SWIG 接口（.i）→ 生成 Lua 绑定，导出 si_* 前缀 C 接口
 │   ├── luacore_generated/  # SWIG 生成物（勿手改）
 │   └── node_manager/       # NodeManager 物理机守护进程（独立轻量二进制）
@@ -87,7 +85,7 @@ Windows（MSVC）：
 
     产物：build/engine/RealServer（编译后自动拷贝到 bin/windows/RealServer.exe）
 
-Linux（依赖系统包 + CMake 源码编译 nats/redis++）：
+Linux（依赖系统包 + CMake 源码编译 redis++）：
 
     cmake -B build
     cmake --build build
@@ -95,7 +93,7 @@ Linux（依赖系统包 + CMake 源码编译 nats/redis++）：
     依赖：pkg-config 的 mysql/mariadb、libxml2、hiredis、protobuf
 
 注：third_part/ 不在版本库内，构建前需先备好第三方依赖
-（Windows 用 vcpkg/预装，Linux 用系统包 + CMake 源码编译 nats.c 与 redis-plus-plus）。
+（Windows 用 vcpkg/预装，Linux 用系统包 + CMake 源码编译 redis-plus-plus）。
 
 
 ================================================================================
@@ -122,9 +120,6 @@ Linux（依赖系统包 + CMake 源码编译 nats/redis++）：
 
 生成物落到 source/proto-cpp/（*.pb.cc / *.pb.h），禁止手改生成文件。
 
-注意：make.bat 中 grpc_cpp_plugin 路径写死为 D:/vcpkg-master/...，
-需按本机路径调整；该文件为 GBK 编码。
-
 
 ================================================================================
  开发约定（摘要，详见 document/ 与 CLAUDE.md）
@@ -137,5 +132,6 @@ Linux（依赖系统包 + CMake 源码编译 nats/redis++）：
   * 日志走 XLOG/XERR/XWRN（集群用 XCLOG/XCERR/XCWRN），禁止 std::cout/printf。
   * 单例用 xSingleton<T>；文件名与类名同名（xActor/Actor.h ↔ CActor）。
   * 类名前缀：x*（框架基类）、C*（管理器）、t*（第三方服务）。
+
 
 

@@ -1,4 +1,5 @@
 #include "xServiceDiscovery.h"
+#include "xProcessMetrics.h"
 #include "xRedis/RedisMgr.h"
 #include "xRedis/RedisCli.h"
 #include "xLog/xLog.h"
@@ -144,6 +145,18 @@ bool CServiceDiscovery::Heartbeat()
 bool CServiceDiscovery::UpdateLoad(int32 loadScore)
 {
     m_stSelfInfo.loadScore = loadScore;
+    if (!m_bRedisAvailable)
+    {
+        return true;
+    }
+    return RedisHSet(m_stSelfInfo.RedisKey(), "load", std::to_string(loadScore));
+}
+
+// =============================================================================
+// 即时上报负载 (仅写 Redis, 不动 m_stSelfInfo)
+// =============================================================================
+bool CServiceDiscovery::FlushLoad(int32 loadScore)
+{
     if (!m_bRedisAvailable)
     {
         return true;
@@ -459,42 +472,13 @@ bool CServiceDiscovery::WriteProcessInfo(const ProcessInfo &info)
         return false;
     }
 
-    bool ok = true;
-    auto hset = [&](const char *field, const std::string &val)
+    // 批量写: 一次 HMSet 替代逐字段 HSet (心跳回写路径, 19 字段 → 1 次往返)。
+    std::map<std::string, std::string> fields;
+    for (const auto &metric : xProcessMetrics::kProcessMetrics)
     {
-        if (!ok)
-        {
-            return;
-        }
-        RecordDataST d;
-        d.Resize((int32)val.size());
-        memcpy(d.MutableData(), val.data(), val.size());
-        d.SetSize((int32)val.size());
-        if (pCli->HSet(info.RedisKey(), field, &d) != REDIS_OK)
-        {
-            ok = false;
-        }
-    };
-    hset("type", std::to_string((int32)info.type));
-    hset("id", std::to_string(info.processId));
-    hset("name", info.processName);
-    hset("host", info.host);
-    hset("ip", info.ip);
-    hset("port", std::to_string(info.rpcPort));
-    hset("listen_port", std::to_string(info.listenPort));
-    hset("load", std::to_string(info.loadScore));
-    hset("machine_id", std::to_string(info.machineId));
-    hset("cpu_percent", std::to_string(info.cpuPercent));
-    hset("mem_rss_mb", std::to_string(info.memRssMb));
-    hset("mem_percent", std::to_string(info.memPercent));
-    hset("version", info.version);
-    hset("content_version", info.contentVersion);
-    hset("state", std::to_string((int32)info.state));
-    hset("heartbeat", std::to_string(info.lastHeartbeat));
-    hset("authkey", info.authKey);
-    hset("os_pid", std::to_string(info.osPid));
-    hset("drain", info.draining ? "1" : "0");
-    return ok;
+        fields[metric.field] = metric.get(info);
+    }
+    return pCli->HMSet(info.RedisKey(), fields) == REDIS_OK;
 }
 
 ProcessInfo CServiceDiscovery::ReadProcessInfo(const std::string &redisKey)
@@ -507,34 +491,21 @@ ProcessInfo CServiceDiscovery::ReadProcessInfo(const std::string &redisKey)
         return info;
     }
 
-    auto hget = [&](const char *field) -> std::string
+    // 批量读: 一次 HGetAll 替代逐字段 HGet。此函数是 GetBestPeer 的每登录热路径
+    // (选节点 × 候选数), 原 19 次逐字段 HGet 的往返是 Gate 登录转发串行点的主因。
+    std::map<std::string, std::string> fields;
+    if (pCli->HGetAll(redisKey, fields) != REDIS_OK)
     {
-        RecordDataST d;
-        if (pCli->HGet(redisKey, field, &d) == REDIS_OK && d.Size() > 0)
-        {
-            return std::string(d.Data(), d.Size());
-        }
-        return "";
-    };
-    info.type = (EProcessType)atoi(hget("type").c_str());
-    info.processId = atoll(hget("id").c_str());
-    info.processName = hget("name");
-    info.host = hget("host");
-    info.ip = hget("ip");
-    info.rpcPort = (uint16)atoi(hget("port").c_str());
-    info.listenPort = (uint16)atoi(hget("listen_port").c_str());
-    info.loadScore = atoi(hget("load").c_str());
-    info.machineId = (uint32)atoi(hget("machine_id").c_str());
-    info.cpuPercent = atoi(hget("cpu_percent").c_str());
-    info.memRssMb = atoll(hget("mem_rss_mb").c_str());
-    info.memPercent = atoi(hget("mem_percent").c_str());
-    info.version = hget("version");
-    info.contentVersion = hget("content_version");
-    info.state = (EProcessState)atoi(hget("state").c_str());
-    info.lastHeartbeat = atoll(hget("heartbeat").c_str());
-    info.authKey = hget("authkey");
-    info.osPid = atoll(hget("os_pid").c_str());
-    info.draining = hget("drain") == "1";
+        return info;
+    }
+
+    // 逐字段反序列化; 缺失字段回填空串 (数值归 0), 与原逐字段 hget 语义一致。
+    for (const auto &metric : xProcessMetrics::kProcessMetrics)
+    {
+        auto it = fields.find(metric.field);
+        std::string val = (it != fields.end()) ? it->second : std::string();
+        metric.set(info, val);
+    }
     return info;
 }
 

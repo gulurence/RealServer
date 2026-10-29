@@ -22,6 +22,15 @@ void CRpcTcpServer::Register(uint32 u32MethodId, RpcHandler handler)
     m_mapHandlers[u32MethodId] = std::move(handler);
 }
 
+void CRpcTcpServer::Stop()
+{
+    if (m_ioc)
+    {
+        m_ioc->stop();
+        XLOG("[RpcTcpServer] stop requested — io_context stopped");
+    }
+}
+
 awaitable<void> CRpcTcpServer::Session(tcp_socket socket)
 {
     for (;;)
@@ -115,9 +124,9 @@ void CRpcTcpServer::thread_proc()
 {
     try
     {
-        asio::io_context ioc(1);
-        co_spawn(ioc, Listener(m_u16Port), detached);
-        ioc.run();
+        m_ioc = std::make_shared<asio::io_context>(1);
+        co_spawn(*m_ioc, Listener(m_u16Port), detached);
+        m_ioc->run();
     }
     catch (std::exception &e)
     {

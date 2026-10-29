@@ -3,6 +3,8 @@
 #include <spdlog/spdlog.h>
 #include "spdlog/sinks/stdout_color_sinks.h"
 
+#include <chrono>
+
 xLog::xLog(void)
 {
 }
@@ -28,6 +30,11 @@ void xLog::Init(const char *prop)
     std::vector<spdlog::sink_ptr> sinks = {sink, console_sink};
     _logger = std::make_shared<spdlog::logger>(service_name, sinks.begin(), sinks.end());
     spdlog::set_default_logger(_logger);
+
+    // 周期性异步冲刷 (spdlog 后台线程每 1s flush 一次), 替代逐条日志同步 flush。
+    // 逐条 flush 是登录/RPC 热路径的无谓磁盘/文件缓冲同步开销, 改为秒级 flush 后
+    // 日志仍能及时落盘, 但日志调用本身不再阻塞等待落盘。
+    spdlog::flush_every(std::chrono::seconds(1));
 
     XLOG("[INIT] xLog initialized — console + rotating file: %s", logFileName.c_str());
 
@@ -100,5 +107,4 @@ void xLog::Print(const char *file, int32 line, const char *funtion, Level level,
         _logger->error(strlog);
         break;
     }
-    _logger->flush();
 }

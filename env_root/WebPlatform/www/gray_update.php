@@ -46,7 +46,8 @@ layout_header('灰度更新', 'gray_update');
     <div class="card-header">可用版本 <span class="dim">Jenkins 编译好的构建（最新在前）</span></div>
     <div class="card-body">
         <select id="versionSelect" size="6" class="form-select" style="max-width:640px"></select>
-        <div class="dim" style="margin-top:8px">选择目标版本后，统计与「最新/旧版本」判定随之更新。</div>
+        <div id="verPager" class="actions" style="justify-content:space-between; align-items:center; flex-wrap:wrap; margin-top:8px;"></div>
+        <div class="dim" style="margin-top:8px">选择目标版本后，统计与「最新/旧版本」判定随之更新。每页显示 6 个版本，最新在前。</div>
     </div>
 </div>
 
@@ -110,7 +111,9 @@ layout_header('灰度更新', 'gray_update');
 (function () {
     var typeSel = document.getElementById('typeSelect');
     var verSel  = document.getElementById('versionSelect');
-    var state = { type: typeSel.value, target: '' };
+    var state = { type: typeSel.value, target: '', processPage: 1, verPage: 1 };
+    var PAGE_SIZE = 8;            // 进程列表每页条数
+    var VERSION_PAGE_SIZE = 6;    // 可用版本列表每页条数
 
     function escHtml(s) {
         var d = document.createElement('div');
@@ -158,22 +161,51 @@ layout_header('灰度更新', 'gray_update');
                 pad(t.getHours()) + ':' + pad(t.getMinutes()) + ':' + pad(t.getSeconds());
         }
 
-        // 版本列表框
-        var prev = state.target || d.latest;
+        // 可用版本列表框 (分页, 每页 VERSION_PAGE_SIZE 条, 最新在前)
+        if (!state.target) state.target = d.latest || '';
+        var verTotal = d.versions.length;
+        var verPages = Math.max(1, Math.ceil(verTotal / VERSION_PAGE_SIZE));
+        if (state.verPage > verPages) state.verPage = verPages;
+        if (state.verPage < 1) state.verPage = 1;
+        var verStart = (state.verPage - 1) * VERSION_PAGE_SIZE;
+        var verPageItems = d.versions.slice(verStart, verStart + VERSION_PAGE_SIZE);
+
         verSel.innerHTML = '';
-        if (!d.versions.length) {
-            var o = document.createElement('option');
-            o.value = ''; o.textContent = '（暂无已构建版本）';
-            verSel.appendChild(o);
+        if (!verTotal) {
+            var vo = document.createElement('option');
+            vo.value = ''; vo.textContent = '（暂无已构建版本）';
+            verSel.appendChild(vo);
+            state.target = '';
         } else {
-            d.versions.forEach(function (v) {
+            // 已选版本不在本页时钉在首项并标注, 保证选择不丢失
+            var pinned = state.target && verPageItems.indexOf(state.target) === -1;
+            var verOptions = pinned ? [state.target].concat(verPageItems) : verPageItems;
+            verOptions.forEach(function (v) {
                 var o = document.createElement('option');
-                o.value = v; o.textContent = v;
-                if (v === prev) o.selected = true;
+                o.value = v;
+                o.textContent = (pinned && v === state.target) ? v + '（已选）' : v;
+                if (v === state.target) o.selected = true;
                 verSel.appendChild(o);
             });
         }
-        state.target = verSel.value || d.latest;
+
+        // 版本分页控件
+        var verPager = document.getElementById('verPager');
+        if (verPager) {
+            if (!verTotal) {
+                verPager.innerHTML = '';
+            } else {
+                verPager.innerHTML = '<div class="dim">第 ' + state.verPage + ' / ' + verPages + ' 页 · 共 ' + verTotal + ' 个版本</div>'
+                    + '<div class="actions">'
+                    + (state.verPage > 1 ? '<button class="btn btn-sm btn-outline-secondary" id="verPrev">上一页</button>' : '')
+                    + (state.verPage < verPages ? '<button class="btn btn-sm btn-outline-secondary" id="verNext">下一页</button>' : '')
+                    + '</div>';
+                var vp = document.getElementById('verPrev');
+                var vn = document.getElementById('verNext');
+                if (vp) vp.addEventListener('click', function () { state.verPage--; load(); });
+                if (vn) vn.addEventListener('click', function () { state.verPage++; load(); });
+            }
+        }
 
         // Gate 独立按钮的版本选择器 (同一份全局构建版本列表)
         var gateSel = document.getElementById('gateVersionSelect');
@@ -192,15 +224,22 @@ layout_header('灰度更新', 'gray_update');
             });
         }
 
-        // 进程列表框
+        // 进程列表框 (分页, 每页 PAGE_SIZE 条)
         var box = document.getElementById('processList');
         if (!d.processes.length) {
             box.className = 'empty';
             box.textContent = '暂无进程注册（cluster:process:*:*）。';
             return;
         }
+        var total = d.processes.length;
+        var pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+        if (state.processPage > pages) state.processPage = pages;
+        if (state.processPage < 1) state.processPage = 1;
+        var start = (state.processPage - 1) * PAGE_SIZE;
+        var pageItems = d.processes.slice(start, start + PAGE_SIZE);
+
         box.className = 'table-responsive';
-        var rows = d.processes.map(function (p) {
+        var rows = pageItems.map(function (p) {
             var badge = p.is_latest
                 ? '<span class="badge text-bg-success">最新</span>'
                 : '<span class="badge text-bg-warning">旧版本</span>';
@@ -216,14 +255,31 @@ layout_header('灰度更新', 'gray_update');
                 + '<td>' + online + '</td>'
                 + '</tr>';
         }).join('');
-        box.innerHTML = '<table class="table table-vcenter">'
+        var html = '<table class="table table-vcenter">'
             + '<thead><tr><th>名称</th><th>ID</th><th>类型</th><th>当前版本</th><th>版本说明</th><th>状态</th></tr></thead>'
             + '<tbody>' + rows + '</tbody></table>';
+
+        if (pages > 1) {
+            html += '<div class="actions" style="justify-content:space-between; align-items:center; flex-wrap:wrap; margin-top:10px;">'
+                + '<div class="dim">第 ' + state.processPage + ' / ' + pages + ' 页 · 共 ' + total + ' 个进程</div>'
+                + '<div class="actions">'
+                + (state.processPage > 1 ? '<button class="btn btn-sm btn-outline-secondary" id="procPrev">上一页</button>' : '')
+                + (state.processPage < pages ? '<button class="btn btn-sm btn-outline-secondary" id="procNext">下一页</button>' : '')
+                + '</div></div>';
+        }
+        box.innerHTML = html;
+
+        // innerHTML 重建后需重新绑定分页按钮
+        var prevBtn = document.getElementById('procPrev');
+        var nextBtn = document.getElementById('procNext');
+        if (prevBtn) prevBtn.addEventListener('click', function () { state.processPage--; load(); });
+        if (nextBtn) nextBtn.addEventListener('click', function () { state.processPage++; load(); });
     }
 
     typeSel.addEventListener('change', function () {
         state.type = typeSel.value;
         state.target = '';
+        state.processPage = 1;   // 切换类型后回到第一页
         load();
     });
     verSel.addEventListener('change', function () {

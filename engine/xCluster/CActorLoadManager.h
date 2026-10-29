@@ -60,6 +60,11 @@ public:
     // @return 目标 Actor 返回的客户端回包 protobuf (失败/超时返回空串)
     std::string ForwardToActor(EActorType t, ActorID id, const std::string &payload);
 
+    // 通用业务转发的异步版 (fire-and-forget, 无回包): 与 ForwardToActor 相同的进程定位,
+    // 但用 SubmitRaw 异步发送, 不阻塞调用线程。供「通知类」转发 (如选角后置 Player online=1)
+    // 使用 —— 其回包为空串且调用方不消费, 阻塞等待是无谓的登录热路径延迟。
+    void ForwardToActorAsync(EActorType t, ActorID id, const std::string &payload);
+
     // 服务器主动推送: 向持有该玩家连接的 Gate 进程发 RPC_METHOD_PUSH (异步, 无回包)。
     // payload 为客户端可直接接收的业务 protobuf (Gate 侧按 playerId → cid 转发)。
     void PushToGate(int64 playerId, const std::string &payload);
@@ -77,4 +82,9 @@ private:
     //           命中且对端在线则返回该进程; 否则回落 PickProcessForActor (负载均衡)。
     //   id==0 → 单例, 直接负载均衡 (每个承载进程都持有单例)。
     ProcessInfo ResolveActorProcess(EActorType t, ActorID id) const;
+
+    // 转发定位 (同步/异步转发共用): 在 ResolveActorProcess 基础上叠加灰度迁移窗口内的
+    // 有界重试 —— 迁移「先迁后杀」saveAll 驱逐 actor 索引后、新进程 RegisterActor 之前 pid
+    // 短暂为空, 此处短暂等待 Actor 重现而非立即回落负载均衡。
+    ProcessInfo ResolveActorProcessForForward(EActorType t, ActorID id) const;
 };

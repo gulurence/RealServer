@@ -1,6 +1,4 @@
 -- init.lua — Player actor config (prod)
 require("common.include")
 require("actors.player.player")
-require("actors.player.on_event.include")
-require("actors.player.on_rpc.include")
 xEngine.Log.info("[Player:prod] ready")

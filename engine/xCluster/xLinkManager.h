@@ -37,7 +37,8 @@ public:
     // 检查对等进程是否可用于 Actor 分配
     bool IsPeerAvailable(int64 processId) const;
 
-    // 获取指定类型的最佳可用对等进程 (负载均衡: 选择负载最低的)
+    // 获取指定类型的最佳可用对等进程 (负载均衡: 选择负载最低的)。
+    // 每次调用被动从 Redis 拉取各候选进程最新负载/资源/状态, 不用本地缓存里每 10s 才刷新的陈旧值。
     ProcessInfo GetBestPeer(EProcessType targetType) const;
 
     // 获取指定类型的所有可用对等进程
@@ -73,4 +74,8 @@ private:
     bool m_discoveryLogged = false;
 
     mutable std::mutex m_mutex;
+
+    // 负载均衡平手轮询游标: 当多个候选进程 (loadScore/cpu/mem) 完全相同时, 轮询选取而非
+    // 恒选 processId 最小者 (Login 等单例进程 actor 数恒等, 旧逻辑会扎堆单点)。
+    mutable int64 m_rrCounter = 0;
 };

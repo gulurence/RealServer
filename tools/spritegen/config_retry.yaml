@@ -1,0 +1,60 @@
+# 补跑被 429 限流失败的 8 张
+provider: siliconflow
+provider_config:
+  model: "Kwai-Kolors/Kolors"
+
+output:
+  root: E:/RealServer/client/soulofgun/UIEditor/CocoStudio/assets_magic
+  sync_to: ""
+
+assets:
+  - name: uistore_bg
+    mode: background
+    prompt: 魔幻风格游戏商店界面背景，华丽金色边框，魔法商店，宝物架，暖金色光，无文字无水印
+    size: [800, 480]
+    gen_size: [1280, 720]
+    out_subdir: pic
+
+  - name: zhuanpan_bg
+    mode: background
+    prompt: 魔幻风格游戏转盘界面背景，魔法轮盘，符文，金色装饰，暗色背景，无文字无水印
+    size: [630, 410]
+    gen_size: [1280, 720]
+    out_subdir: pic
+
+  - name: fengmianzi5
+    mode: background
+    prompt: 魔幻风格游戏标题横幅，发光的神秘符文装饰，魔法纹饰，金色与紫色，横向横幅，无具体文字
+    size: [413, 141]
+    gen_size: [1024, 512]
+    out_subdir: pic
+
+  - name: boss01
+    mode: background
+    prompt: 魔幻风格游戏角色立绘，巨型恶魔领主，暗红色皮肤，火焰与暗影，双翼，狰狞，全身立绘，居中构图，无文字
+    size: [1024, 1024]
+    out_subdir: anim
+
+  - name: boy_max
+    mode: background
+    prompt: 魔幻风格游戏角色立绘，少年魔法师，蓝色法师袍，手持魔杖，发光法球，全身立绘，居中构图，无文字
+    size: [512, 512]
+    out_subdir: anim
+
+  - name: police_max
+    mode: background
+    prompt: 魔幻风格游戏角色立绘，圣殿骑士，银色盔甲，金色纹饰，手持长剑与盾牌，全身立绘，居中构图，无文字
+    size: [512, 512]
+    out_subdir: anim
+
+  - name: zombie_max
+    mode: background
+    prompt: 魔幻风格游戏角色立绘，亡灵战士，苍白皮肤，破旧盔甲，幽绿色鬼火，全身立绘，居中构图，无文字
+    size: [512, 512]
+    out_subdir: anim
+
+  - name: guns0
+    mode: background
+    prompt: 魔幻风格游戏武器立绘，奥术魔法手枪，金色与蓝色，发光符文，魔法能量核心，居中构图，无文字
+    size: [512, 512]
+    out_subdir: anim

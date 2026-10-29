@@ -91,6 +91,46 @@ ProcessInfo CActorLoadManager::ResolveActorProcess(EActorType t, ActorID id) con
     return PickProcessForActor(t);
 }
 
+// ResolveActorProcessForForward — 转发定位 (同步/异步转发共用)
+//
+// 迁移窗口内有界重试: 灰度「先迁后杀」在 saveAll 驱逐 cluster:actor:{type}:{id} 后、
+// 新进程 RegisterActor 之前, pid 短暂为空。此处在途消息按身份重查并短暂等待 Actor
+// 重现, 而非立即回落负载均衡 (可能打到不承载该 Actor 的进程而丢包) —— 客户端无感切换。
+// 正常路径一次 Redis HGET 即命中, 无额外延迟; 重试仅在 id!=0 且身份未命中时触发。
+// =============================================================================
+ProcessInfo CActorLoadManager::ResolveActorProcessForForward(EActorType t, ActorID id) const
+{
+    constexpr int32 kMigrateResolveRetry = 5;
+    constexpr int32 kMigrateResolveRetryMs = 200;
+
+    ProcessInfo peer;
+    if (id != 0)
+    {
+        for (int32 attempt = 0; attempt < kMigrateResolveRetry; ++attempt)
+        {
+            int64 pid = CServiceDiscovery::getMe().GetActorProcessId(t, id);
+            if (pid != 0 && CLinkManager::instance()->IsPeerAvailable(pid))
+            {
+                peer = CLinkManager::instance()->GetPeerInfo(pid);
+                if (peer.processId != 0)
+                {
+                    break;
+                }
+            }
+            peer = ProcessInfo{};
+            if (attempt + 1 < kMigrateResolveRetry)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(kMigrateResolveRetryMs));
+            }
+        }
+    }
+    if (peer.processId == 0)
+    {
+        peer = PickProcessForActor(t);
+    }
+    return peer;
+}
+
 // =============================================================================
 // CreateActorRemote — 挑进程 + 发 RPC 创建
 // =============================================================================
@@ -247,38 +287,7 @@ std::string CActorLoadManager::LoginRemote(int32 op, const std::string &payload)
 // =============================================================================
 std::string CActorLoadManager::ForwardToActor(EActorType t, ActorID id, const std::string &payload)
 {
-    // 迁移窗口内有界重试: 灰度「先迁后杀」在 saveAll 驱逐 cluster:actor:{type}:{id} 后、
-    // 新进程 RegisterActor 之前, pid 短暂为空。此处在途消息按身份重查并短暂等待 Actor
-    // 重现, 而非立即回落负载均衡 (可能打到不承载该 Actor 的进程而丢包) —— 客户端无感切换。
-    // 正常路径一次 Redis HGET 即命中, 无额外延迟; 重试仅在 id!=0 且身份未命中时触发。
-    constexpr int32 kMigrateResolveRetry = 5;
-    constexpr int32 kMigrateResolveRetryMs = 200;
-
-    ProcessInfo peer;
-    if (id != 0)
-    {
-        for (int32 attempt = 0; attempt < kMigrateResolveRetry; ++attempt)
-        {
-            int64 pid = CServiceDiscovery::getMe().GetActorProcessId(t, id);
-            if (pid != 0 && CLinkManager::instance()->IsPeerAvailable(pid))
-            {
-                peer = CLinkManager::instance()->GetPeerInfo(pid);
-                if (peer.processId != 0)
-                {
-                    break;
-                }
-            }
-            peer = ProcessInfo{};
-            if (attempt + 1 < kMigrateResolveRetry)
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(kMigrateResolveRetryMs));
-            }
-        }
-    }
-    if (peer.processId == 0)
-    {
-        peer = PickProcessForActor(t);
-    }
+    ProcessInfo peer = ResolveActorProcessForForward(t, id);
     if (peer.processId == 0)
     {
         XERR("[ForwardRpc] no available process for actor type=%d", (int32)t);
@@ -320,6 +329,42 @@ std::string CActorLoadManager::ForwardToActor(EActorType t, ActorID id, const st
     return result.rspBody;
 }
 
+// ForwardToActorAsync — 通用业务转发的异步版 (fire-and-forget, 无回包)
+//
+// 与 ForwardToActor 相同的进程定位 (含灰度迁移重试) 与 body 编码, 但用 SubmitRaw 异步
+// 发送, 不阻塞调用线程。供「通知类」转发使用: 目标 Actor 的回包为空串且调用方不消费
+// (如选角后置 Player online=1), 阻塞等待一个空回包是无谓的登录热路径延迟。失败仅日志。
+void CActorLoadManager::ForwardToActorAsync(EActorType t, ActorID id, const std::string &payload)
+{
+    ProcessInfo peer = ResolveActorProcessForForward(t, id);
+    if (peer.processId == 0)
+    {
+        XWRN("[ForwardRpcAsync] no available process for actor type=%d", (int32)t);
+        return;
+    }
+
+    // 12 字节头: [int32 type][int64 id] (小端, 与 si_net_body_cid 约定一致)
+    std::string reqBody;
+    reqBody.reserve(12 + payload.size());
+    for (int32 i = 0; i < 4; ++i)
+    {
+        reqBody.push_back((char)(((int32)t >> (8 * i)) & 0xFF));
+    }
+    for (int32 i = 0; i < 8; ++i)
+    {
+        reqBody.push_back((char)(((int64)id >> (8 * i)) & 0xFF));
+    }
+    reqBody.append(payload);
+
+    bool submitted
+        = CRpcTcpClient::instance()->SubmitRaw(peer.processId, RPC_METHOD_FORWARD_ACTOR, reqBody);
+    if (!submitted)
+    {
+        XWRN("[ForwardRpcAsync] submit failed (no connection to process=%lld): type=%d id=%lld",
+             (int64)peer.processId, (int32)t, (int64)id);
+    }
+}
+
 // =============================================================================
 // PushToGate — 挑 Gate 进程 + 发 RPC_METHOD_PUSH 主动推送 (异步, 无回包)
 //
@@ -345,7 +390,15 @@ void CActorLoadManager::PushToGate(int64 playerId, const std::string &payload)
     }
     reqBody.append(payload);
 
-    CRpcTcpClient::instance()->SubmitRaw(peer.processId, RPC_METHOD_PUSH, reqBody);
+    // SubmitRaw 返回 false 表示本进程与 Gate 之间无连接 (requestId==0), 推送被静默丢弃。
+    // 显式日志, 使「业务 Actor 推了但客户端没收到」的静默丢失可被排查 (P0: 推送链路可观测)。
+    bool submitted
+        = CRpcTcpClient::instance()->SubmitRaw(peer.processId, RPC_METHOD_PUSH, reqBody);
+    if (!submitted)
+    {
+        XWRN("[PushRpc] submit failed (no connection to Gate=%lld): drop push player=%lld",
+             (int64)peer.processId, (int64)playerId);
+    }
 }
 
 // =============================================================================
@@ -368,7 +421,12 @@ void CActorLoadManager::KickGateClient(int64 processId, int64 cid)
         reqBody.push_back((char)((cid >> (8 * i)) & 0xFF));
     }
 
-    CRpcTcpClient::instance()->SubmitRaw(processId, RPC_METHOD_KICK, reqBody);
+    bool submitted = CRpcTcpClient::instance()->SubmitRaw(processId, RPC_METHOD_KICK, reqBody);
+    if (!submitted)
+    {
+        XWRN("[KickGate] submit failed (no connection to Gate=%lld): cid=%lld",
+             (int64)processId, (int64)cid);
+    }
 }
 
 // =============================================================================

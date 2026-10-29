@@ -47,6 +47,7 @@ client/
 
 # MSVC 构建目录
 build_msvc/
+build_msvc18/
 
 # config 备份可能含明文凭证
 config/*.bak
@@ -59,6 +60,14 @@ env_root/RedisCluster/
 env_root/dumps/
 env_root/TestClient/
 env_root/*.txt
+
+# env_root 测试工具: 编译产物 + 压测结果 txt (Go 源码保留)
+env_root/TestClientGo/*.txt
+env_root/TestClientGo/*.exe
+env_root/preparesession/*.txt
+env_root/preparesession/*.exe
+env_root/cleanredis/*.exe
+env_root/logintest/*.exe
 
 # WebPlatform 运行时日志
 env_root/WebPlatform/*.log

@@ -125,10 +125,10 @@ local function recover_one(actorType, id)
 end
 
 -- 残留观战注册清理: Spectator (204) 是纯派生对象 (data_save/data_load 空、无恢复态),
--- 不应冷恢复 —— 崩溃/重启后由观战客户端重新 ensure_spectator 惰性重建。这里在冷恢复
--- 阶段顺带清理其持久索引 actor:index:204 中的孤儿条目, 否则下次重启反复枚举,
--- WebPlatform「Actor 实例」页残留已结束战斗的观战 Actor (历史 eager 创建 + delete
--- 路由 bug 遗留)。
+-- 不应冷恢复 —— 崩溃/重启后随下一次开战 (room.lua handle_start) 与 BattleActor 一一对应
+-- 地重建。这里在冷恢复阶段顺带清理其持久索引 actor:index:204 中的孤儿条目, 否则下次重启
+-- 反复枚举, WebPlatform「Actor 实例」页残留已结束战斗的观战 Actor (历史 eager 创建 +
+-- delete 路由 bug 遗留)。
 -- 判定「残留」: 战斗已结束 (无 battle:roster) 或 存活租约已蒸发 (cluster:actor:204
 -- 无 pid, 进程死后 30s TTL 过期)。两者同时不满足 (战斗仍存活且他进程仍在承载) 才保留。
 local function cleanup_spectator(idStr)

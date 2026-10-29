@@ -586,13 +586,29 @@ std::string CGmCommandMgr::ExecFramework(const std::vector<std::string> &argv)
 
     if (cmd == "shutdown")
     {
-        LogReply("shutdown requested — stopping now");
-        CProcessManager::getMe().SetState(EProcessState_Stopping);
-        CServiceDiscovery::getMe().Deregister();
-        // main.cpp 主循环是 while(true) 死循环, 优雅关闭不可达;
-        // 静态析构阶段会阻塞 (线程 join / 网络关闭), 因此用 _Exit 立即终止。
-        std::_Exit(0);
-        return "";
+        // 优雅关闭: 置关闭标志, OnRunning 主循环退出后走 OnStop 序列
+        // (落盘→停网关→注销→清理→停调度/RPC→释放), 替代旧 std::_Exit(0) 硬终止。
+        // 可选参数 <os_pid>: 与 migrate_save/drain 同款 os_pid 过滤, 供 gray_roll.ps1
+        // 广播到 type 频道时只让 OS 进程号匹配者执行, 避免误伤同类型仍在运行的其它进程。
+        if (argv.size() >= 2)
+        {
+            int64 wantPid = 0;
+            if (std::sscanf(argv[1].c_str(), "%lld", (long long *)&wantPid) == 1 && wantPid > 0)
+            {
+#ifdef _WIN32
+                int64 selfPid = (int64)GetCurrentProcessId();
+#else
+                int64 selfPid = (int64)getpid();
+#endif
+                if (selfPid != wantPid)
+                {
+                    return "shutdown SKIP — os_pid mismatch";
+                }
+            }
+        }
+
+        CProcessManager::getMe().RequestShutdown();
+        return "shutdown OK — graceful shutdown started";
     }
 
     if (cmd == "loglevel")

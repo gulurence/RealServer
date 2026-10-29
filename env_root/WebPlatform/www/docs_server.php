@@ -52,12 +52,10 @@ layout_header('服务端架构', 'docs_server');
             <thead><tr><th>模块</th><th>职责</th></tr></thead>
             <tbody>
                 <tr><td>xActor/</td><td>Actor 模型核心：CActorMgr 两级索引、ActorCreator 跨进程创建</td></tr>
-                <tr><td>xCluster/</td><td>进程集群：服务发现（Redis）、链接管理（gRPC）、心跳、负载</td></tr>
-                <tr><td>xScheduler/</td><td>协程（C++20 coroutine）+ 同步双线程池调度器</td></tr>
-                <tr><td>xEvent/</td><td>协议分发：xEventDispatcher 按 (msgType&lt;&lt;32)|msgID 注册回调</td></tr>
+                <tr><td>xCluster/</td><td>进程集群：服务发现（Redis）、链接管理（asio-TCP RPC）、心跳、负载</td></tr>
                 <tr><td>tService/</td><td>第三方服务管理（Redis/MySQL/Log/Xml/Platform），引用计数共享复用</td></tr>
                 <tr><td>xRecord/</td><td>持久化：读走 Redis 缓存 miss 回源 DB，写走 Redis 同步 + DB 异步</td></tr>
-                <tr><td>xDatabase/ xRedis/ xNats/</td><td>数据库 / Redis / Nats 基础设施</td></tr>
+                <tr><td>xDatabase/ xRedis/</td><td>数据库 / Redis 基础设施</td></tr>
                 <tr><td>xNet/</td><td>网络：CNetGateway 帧协议（与客户端一致）</td></tr>
                 <tr><td>xShareMem/ xConfig/ xLog/</td><td>共享内存 / 配置（XML）/ 日志（spdlog 封装）</td></tr>
                 <tr><td>luacore/</td><td>SWIG 接口（.i）生成 Lua 绑定，导出 si_* 前缀 C 接口</td></tr>

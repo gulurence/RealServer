@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xBase/xDefine.h"
+#include "xBase/xHmacSha256.h"
 #include "xLog/xLog.h"
 #include <string>
 #include <map>
@@ -265,25 +266,13 @@ inline uint16 GetBasePortForType(EProcessType type)
 // =============================================================================
 // 验证 Key 派生 — 由进程 ID + 固定密钥派生 (可离线校验)
 //
-// 用 FNV-1a 64 位哈希 (自包含、无外部依赖), 生产环境可升级为 HMAC-SHA256。
+// HMAC-SHA256(key=secret, msg=processId) → 64 字符小写 hex。密钥不可从
+// authKey 反推, 比旧 FNV-1a 具备密钥隔离性。密钥来源不变: server.xml
+// <auth secret="..."/> (默认 RealServerAuthSecret)。
 // =============================================================================
-inline uint64 Fnv1a64(const std::string &s)
-{
-    uint64 h = 14695981039346656037ULL; // FNV offset basis
-    for (uint8 c : s)
-    {
-        h ^= c;
-        h *= 1099511628211ULL; // FNV prime
-    }
-    return h;
-}
-
 inline std::string GenerateAuthKey(int64 processId, const std::string &secret)
 {
-    uint64 h = Fnv1a64(secret + ":" + std::to_string(processId));
-    char buf[32] = {0};
-    snprintf(buf, sizeof(buf), "%016llx", (uint64)h);
-    return buf;
+    return xHmacSha256::HmacSha256Hex(secret, std::to_string(processId));
 }
 
 // =============================================================================

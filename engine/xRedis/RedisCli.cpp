@@ -322,6 +322,53 @@ int32 CRedisCli::HGetAll(const std::string &hash, std::map<std::string, std::str
     }
 }
 
+int32 CRedisCli::HMSet(const std::string &hash, const std::map<std::string, std::string> &fields)
+{
+    if (!m_cluster)
+    {
+        return REDIS_ERROR;
+    }
+    try
+    {
+        // 单 key 多字段批量写 (HSET 变体), 落在同一 slot, 集群模式安全。
+        m_cluster->hmset(hash, fields.begin(), fields.end());
+        return REDIS_OK;
+    }
+    catch (const sw::redis::Error &e)
+    {
+        XERR("CRedisCli::HMSet error [host:%s,port:%d,key:%s,error:%s] !!!", m_redisHost,
+             m_redisPort, hash.c_str(), e.what());
+        return REDIS_ERROR;
+    }
+}
+
+int32 CRedisCli::HMSetEx(const std::string &hash, const std::map<std::string, std::string> &fields,
+                         int64 ttlSec)
+{
+    if (!m_cluster)
+    {
+        return REDIS_ERROR;
+    }
+    try
+    {
+        // pipeline: 同一 key (同一 slot) 的 HMSET + EXPIRE 打包一次往返, 省登录 session 同步的
+        // 一次网络往返。hash 作为 hash_tag 路由到所属节点, 两命令落在同一连接同一 slot。
+        // 注意 new_connection 必须为 false: true 会为每次 pipeline 新建 TCP 连接 (集群模式下
+        // 含建连 + 握手), 登录热路径每次 session 同步都新建连接会严重拖慢吞吐; 复用连接池即可。
+        auto pipe = m_cluster->pipeline(hash, false);
+        pipe.hmset(hash, fields.begin(), fields.end());
+        pipe.expire(hash, std::chrono::seconds((long)ttlSec));
+        pipe.exec();
+        return REDIS_OK;
+    }
+    catch (const sw::redis::Error &e)
+    {
+        XERR("CRedisCli::HMSetEx error [host:%s,port:%d,key:%s,error:%s] !!!", m_redisHost,
+             m_redisPort, hash.c_str(), e.what());
+        return REDIS_ERROR;
+    }
+}
+
 int32 CRedisCli::Del(const char *key)
 {
     if (!m_cluster)

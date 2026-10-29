@@ -121,7 +121,7 @@
 | `SRpcService::Start/RegistService` | `CRpcTcpServer::Start/Register` | gRPC `Service` → `methodId → lambda` |
 | `ActorMgrServiceImpl`（CreateActor/FindActor/UninstallActor） | `ActorRpcHandlers.cpp` 的 3 个 lambda handler | 语义一致（复用 `actor_mgr.proto` 消息） |
 | `RpcCallAwaiter/AsyncRpcCall`（gRPC stub） | asio+lambda 版 | 签名从 `(stub, fn, req, ioc)` 变为 `(peerId, methodId, req, ioc)` |
-| `RpcCallMgr` | 保留 | 遗留通用工作线程池，仅 `xNats/xService` 遗留宏引用，无 gRPC 依赖 |
+| `RpcCallMgr` | 移除 | 遗留通用工作线程池，随 `xNats/xService` 旧骨架一并移除 |
 
 `CallSyncRaw` 语义与 `methodId` 1/2/3/4 完全保留，`CActorLoadManager.cpp` 与 Lua 侧无需改动。
 
@@ -131,8 +131,8 @@
 
 | 文件 | 改动 |
 |---|---|
-| `engine/xRpc/xRpc.h` | 移除 gRPC（`grpcpp` 头、`RpcResult`、`SRpcService`、`CRpcService`、gRPC 版 `RpcCallAwaiter/AsyncRpcCall`）；保留 `RpcCallMgr`；新增 asio+lambda 版 `RpcCallAwaiter/AsyncRpcCall` |
-| `engine/xRpc/xRpc.cpp` | 移除 `SRpcService`/`CRpcService` 实现；保留 `RpcCallMgr` 实现 |
+| `engine/xRpc/xRpc.h` | 移除 gRPC（`grpcpp` 头、`RpcResult`、`SRpcService`、`CRpcService`、gRPC 版 `RpcCallAwaiter/AsyncRpcCall`）；移除 `RpcCallMgr`；新增 asio+lambda 版 `RpcCallAwaiter/AsyncRpcCall` |
+| `engine/xRpc/xRpc.cpp` | 移除 `SRpcService`/`CRpcService` 实现；移除 `RpcCallMgr` 实现（文件已删除） |
 | `engine/xActor/ActorMgrService.cpp/.h` | 删除（gRPC service，被 `ActorRpcHandlers` 取代） |
 | `engine/xCluster/xProcessManager.cpp` | 移除 `#include "xRpc/xRpc.h"`、`#include "xActor/ActorMgrService.h"`；更新 `InitEnvironment` 注释 |
 | `engine/xCluster/xProcessManager.h` | 更新 `InitEnvironment` 注释 |
@@ -156,6 +156,6 @@
 | **A3** | ✅ 已处理 | 低 | M0 | stale *.grpc.pb.cc/.h 生成物未删 | 已删 4 个 .grpc.pb.cc/.h，rpc 目录现只剩 *.pb.cc/.h。 |
 | **A4** | ✅ 已处理 | 低 | M0 | luacore_wrap.cxx 过时生成物 | 仓库旧文件已删，构建时由 SWIG 从 engine/luacore/luacore.i 重新生成。 |
 | **A5** | ✅ 已处理 | 低 | M1 | grpcPort 字段名未 rename rpcPort | 已统一 rename 为 rpcPort，波及 xServerConfig/xLocalInfo/xProcessDefine/xProcessManager/xLinkManager/xServiceDiscovery/ProcessEnv 等文件；源码已无 grpcPort 残留。 |
-| **A6** | 🔴 仍开放 | 低 | — | RpcCallMgr/xNatsCall.h 遗留宏混 std::cout | 为兼容 xService/xNats 旧骨架保留，其宏内混 std::cout 违反日志规范；待旧骨架清理时一并移除。 |
+| **A6** | ✅ 已处理 | 低 | — | RpcCallMgr/xNatsCall.h 遗留宏混 std::cout | 旧骨架 xService/xScheduler/xEvent/xNats 与 xRpc 的 RpcCallMgr 遗留线程已整体移除，xNatsCall.h 随 xNats 一并删除，其混 std::cout 的宏已不存在。 |
 | **A7** | 🔴 仍开放 | 中 | — | CallSync 阻塞调用方线程 | 同步 CallSync 在 Actor 协程内直接调用会阻塞调度线程最多 timeoutMs；协程场景应改 co_await AsyncRpcCall（原语已就绪），后续按需替换调用点。 |
 <!-- PROBLEMS:END -->

@@ -93,6 +93,15 @@ extern PBBattlePlayerInputDefaultTypeInternal _PBBattlePlayerInput_default_insta
 class PBBattleSnapshotNtf;
 struct PBBattleSnapshotNtfDefaultTypeInternal;
 extern PBBattleSnapshotNtfDefaultTypeInternal _PBBattleSnapshotNtf_default_instance_;
+class PBBattleSpectateFollowReq;
+struct PBBattleSpectateFollowReqDefaultTypeInternal;
+extern PBBattleSpectateFollowReqDefaultTypeInternal _PBBattleSpectateFollowReq_default_instance_;
+class PBBattleSpectatorEntry;
+struct PBBattleSpectatorEntryDefaultTypeInternal;
+extern PBBattleSpectatorEntryDefaultTypeInternal _PBBattleSpectatorEntry_default_instance_;
+class PBBattleSpectatorListNtf;
+struct PBBattleSpectatorListNtfDefaultTypeInternal;
+extern PBBattleSpectatorListNtfDefaultTypeInternal _PBBattleSpectatorListNtf_default_instance_;
 class PBBattleStartNtf;
 struct PBBattleStartNtfDefaultTypeInternal;
 extern PBBattleStartNtfDefaultTypeInternal _PBBattleStartNtf_default_instance_;
@@ -117,6 +126,8 @@ enum BattleMsgId : int {
   BATTLE_HASH_NTF = 10,
   BATTLE_LOGIN_REQ = 12,
   BATTLE_LOGIN_RSP = 13,
+  BATTLE_SPECTATE_FOLLOW_REQ = 14,
+  BATTLE_SPECTATOR_LIST_NTF = 15,
   BattleMsgId_INT_MIN_SENTINEL_DO_NOT_USE_ =
       std::numeric_limits<::int32_t>::min(),
   BattleMsgId_INT_MAX_SENTINEL_DO_NOT_USE_ =
@@ -126,8 +137,8 @@ enum BattleMsgId : int {
 bool BattleMsgId_IsValid(int value);
 extern const uint32_t BattleMsgId_internal_data_[];
 constexpr BattleMsgId BattleMsgId_MIN = static_cast<BattleMsgId>(0);
-constexpr BattleMsgId BattleMsgId_MAX = static_cast<BattleMsgId>(13);
-constexpr int BattleMsgId_ARRAYSIZE = 13 + 1;
+constexpr BattleMsgId BattleMsgId_MAX = static_cast<BattleMsgId>(15);
+constexpr int BattleMsgId_ARRAYSIZE = 15 + 1;
 const ::google::protobuf::EnumDescriptor*
 BattleMsgId_descriptor();
 template <typename T>
@@ -140,7 +151,7 @@ const std::string& BattleMsgId_Name(T value) {
 template <>
 inline const std::string& BattleMsgId_Name(BattleMsgId value) {
   return ::google::protobuf::internal::NameOfDenseEnum<BattleMsgId_descriptor,
-                                                 0, 13>(
+                                                 0, 15>(
       static_cast<int>(value));
 }
 inline bool BattleMsgId_Parse(absl::string_view name, BattleMsgId* value) {
@@ -371,6 +382,470 @@ class PBBattleStartNtf final : public ::google::protobuf::Message
     ::uint32_t small_type_;
     ::int64_t battle_id_;
     ::uint32_t seed_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_msg_2fbattle_2eproto;
+};
+// -------------------------------------------------------------------
+
+class PBBattleSpectatorEntry final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:PbBattle.PBBattleSpectatorEntry) */ {
+ public:
+  inline PBBattleSpectatorEntry() : PBBattleSpectatorEntry(nullptr) {}
+  ~PBBattleSpectatorEntry() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(PBBattleSpectatorEntry* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(PBBattleSpectatorEntry));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR PBBattleSpectatorEntry(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline PBBattleSpectatorEntry(const PBBattleSpectatorEntry& from) : PBBattleSpectatorEntry(nullptr, from) {}
+  inline PBBattleSpectatorEntry(PBBattleSpectatorEntry&& from) noexcept
+      : PBBattleSpectatorEntry(nullptr, std::move(from)) {}
+  inline PBBattleSpectatorEntry& operator=(const PBBattleSpectatorEntry& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PBBattleSpectatorEntry& operator=(PBBattleSpectatorEntry&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PBBattleSpectatorEntry& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PBBattleSpectatorEntry* internal_default_instance() {
+    return reinterpret_cast<const PBBattleSpectatorEntry*>(
+        &_PBBattleSpectatorEntry_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 14;
+  friend void swap(PBBattleSpectatorEntry& a, PBBattleSpectatorEntry& b) { a.Swap(&b); }
+  inline void Swap(PBBattleSpectatorEntry* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PBBattleSpectatorEntry* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PBBattleSpectatorEntry* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<PBBattleSpectatorEntry>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const PBBattleSpectatorEntry& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const PBBattleSpectatorEntry& from) { PBBattleSpectatorEntry::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(PBBattleSpectatorEntry* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "PbBattle.PBBattleSpectatorEntry"; }
+
+ protected:
+  explicit PBBattleSpectatorEntry(::google::protobuf::Arena* arena);
+  PBBattleSpectatorEntry(::google::protobuf::Arena* arena, const PBBattleSpectatorEntry& from);
+  PBBattleSpectatorEntry(::google::protobuf::Arena* arena, PBBattleSpectatorEntry&& from) noexcept
+      : PBBattleSpectatorEntry(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kSpectatorNameFieldNumber = 2,
+    kTargetNameFieldNumber = 4,
+    kSpectatorIdFieldNumber = 1,
+    kTargetIdFieldNumber = 3,
+  };
+  // string spectator_name = 2;
+  void clear_spectator_name() ;
+  const std::string& spectator_name() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_spectator_name(Arg_&& arg, Args_... args);
+  std::string* mutable_spectator_name();
+  PROTOBUF_NODISCARD std::string* release_spectator_name();
+  void set_allocated_spectator_name(std::string* value);
+
+  private:
+  const std::string& _internal_spectator_name() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_spectator_name(
+      const std::string& value);
+  std::string* _internal_mutable_spectator_name();
+
+  public:
+  // string target_name = 4;
+  void clear_target_name() ;
+  const std::string& target_name() const;
+  template <typename Arg_ = const std::string&, typename... Args_>
+  void set_target_name(Arg_&& arg, Args_... args);
+  std::string* mutable_target_name();
+  PROTOBUF_NODISCARD std::string* release_target_name();
+  void set_allocated_target_name(std::string* value);
+
+  private:
+  const std::string& _internal_target_name() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_target_name(
+      const std::string& value);
+  std::string* _internal_mutable_target_name();
+
+  public:
+  // int64 spectator_id = 1;
+  void clear_spectator_id() ;
+  ::int64_t spectator_id() const;
+  void set_spectator_id(::int64_t value);
+
+  private:
+  ::int64_t _internal_spectator_id() const;
+  void _internal_set_spectator_id(::int64_t value);
+
+  public:
+  // int64 target_id = 3;
+  void clear_target_id() ;
+  ::int64_t target_id() const;
+  void set_target_id(::int64_t value);
+
+  private:
+  ::int64_t _internal_target_id() const;
+  void _internal_set_target_id(::int64_t value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:PbBattle.PBBattleSpectatorEntry)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      2, 4, 0,
+      65, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const PBBattleSpectatorEntry& from_msg);
+    ::google::protobuf::internal::ArenaStringPtr spectator_name_;
+    ::google::protobuf::internal::ArenaStringPtr target_name_;
+    ::int64_t spectator_id_;
+    ::int64_t target_id_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_msg_2fbattle_2eproto;
+};
+// -------------------------------------------------------------------
+
+class PBBattleSpectateFollowReq final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:PbBattle.PBBattleSpectateFollowReq) */ {
+ public:
+  inline PBBattleSpectateFollowReq() : PBBattleSpectateFollowReq(nullptr) {}
+  ~PBBattleSpectateFollowReq() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(PBBattleSpectateFollowReq* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(PBBattleSpectateFollowReq));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR PBBattleSpectateFollowReq(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline PBBattleSpectateFollowReq(const PBBattleSpectateFollowReq& from) : PBBattleSpectateFollowReq(nullptr, from) {}
+  inline PBBattleSpectateFollowReq(PBBattleSpectateFollowReq&& from) noexcept
+      : PBBattleSpectateFollowReq(nullptr, std::move(from)) {}
+  inline PBBattleSpectateFollowReq& operator=(const PBBattleSpectateFollowReq& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PBBattleSpectateFollowReq& operator=(PBBattleSpectateFollowReq&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PBBattleSpectateFollowReq& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PBBattleSpectateFollowReq* internal_default_instance() {
+    return reinterpret_cast<const PBBattleSpectateFollowReq*>(
+        &_PBBattleSpectateFollowReq_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 15;
+  friend void swap(PBBattleSpectateFollowReq& a, PBBattleSpectateFollowReq& b) { a.Swap(&b); }
+  inline void Swap(PBBattleSpectateFollowReq* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PBBattleSpectateFollowReq* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PBBattleSpectateFollowReq* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<PBBattleSpectateFollowReq>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const PBBattleSpectateFollowReq& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const PBBattleSpectateFollowReq& from) { PBBattleSpectateFollowReq::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(PBBattleSpectateFollowReq* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "PbBattle.PBBattleSpectateFollowReq"; }
+
+ protected:
+  explicit PBBattleSpectateFollowReq(::google::protobuf::Arena* arena);
+  PBBattleSpectateFollowReq(::google::protobuf::Arena* arena, const PBBattleSpectateFollowReq& from);
+  PBBattleSpectateFollowReq(::google::protobuf::Arena* arena, PBBattleSpectateFollowReq&& from) noexcept
+      : PBBattleSpectateFollowReq(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kBigTypeFieldNumber = 1,
+    kSmallTypeFieldNumber = 2,
+    kBattleIdFieldNumber = 3,
+    kTargetIdFieldNumber = 4,
+  };
+  // uint32 big_type = 1;
+  void clear_big_type() ;
+  ::uint32_t big_type() const;
+  void set_big_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_big_type() const;
+  void _internal_set_big_type(::uint32_t value);
+
+  public:
+  // uint32 small_type = 2;
+  void clear_small_type() ;
+  ::uint32_t small_type() const;
+  void set_small_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_small_type() const;
+  void _internal_set_small_type(::uint32_t value);
+
+  public:
+  // int64 battle_id = 3;
+  void clear_battle_id() ;
+  ::int64_t battle_id() const;
+  void set_battle_id(::int64_t value);
+
+  private:
+  ::int64_t _internal_battle_id() const;
+  void _internal_set_battle_id(::int64_t value);
+
+  public:
+  // int64 target_id = 4;
+  void clear_target_id() ;
+  ::int64_t target_id() const;
+  void set_target_id(::int64_t value);
+
+  private:
+  ::int64_t _internal_target_id() const;
+  void _internal_set_target_id(::int64_t value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:PbBattle.PBBattleSpectateFollowReq)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      2, 4, 0,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const PBBattleSpectateFollowReq& from_msg);
+    ::uint32_t big_type_;
+    ::uint32_t small_type_;
+    ::int64_t battle_id_;
+    ::int64_t target_id_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -2835,6 +3310,239 @@ class PBBattleEndNtf final : public ::google::protobuf::Message
     ::uint32_t small_type_;
     ::int64_t battle_id_;
     ::int32_t win_side_;
+    ::google::protobuf::internal::CachedSize _cached_size_;
+    PROTOBUF_TSAN_DECLARE_MEMBER
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_msg_2fbattle_2eproto;
+};
+// -------------------------------------------------------------------
+
+class PBBattleSpectatorListNtf final : public ::google::protobuf::Message
+/* @@protoc_insertion_point(class_definition:PbBattle.PBBattleSpectatorListNtf) */ {
+ public:
+  inline PBBattleSpectatorListNtf() : PBBattleSpectatorListNtf(nullptr) {}
+  ~PBBattleSpectatorListNtf() PROTOBUF_FINAL;
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+  void operator delete(PBBattleSpectatorListNtf* msg, std::destroying_delete_t) {
+    SharedDtor(*msg);
+    ::google::protobuf::internal::SizedDelete(msg, sizeof(PBBattleSpectatorListNtf));
+  }
+#endif
+
+  template <typename = void>
+  explicit PROTOBUF_CONSTEXPR PBBattleSpectatorListNtf(
+      ::google::protobuf::internal::ConstantInitialized);
+
+  inline PBBattleSpectatorListNtf(const PBBattleSpectatorListNtf& from) : PBBattleSpectatorListNtf(nullptr, from) {}
+  inline PBBattleSpectatorListNtf(PBBattleSpectatorListNtf&& from) noexcept
+      : PBBattleSpectatorListNtf(nullptr, std::move(from)) {}
+  inline PBBattleSpectatorListNtf& operator=(const PBBattleSpectatorListNtf& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PBBattleSpectatorListNtf& operator=(PBBattleSpectatorListNtf&& from) noexcept {
+    if (this == &from) return *this;
+    if (::google::protobuf::internal::CanMoveWithInternalSwap(GetArena(), from.GetArena())) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance);
+  }
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields()
+      ABSL_ATTRIBUTE_LIFETIME_BOUND {
+    return _internal_metadata_.mutable_unknown_fields<::google::protobuf::UnknownFieldSet>();
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::google::protobuf::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::google::protobuf::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PBBattleSpectatorListNtf& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PBBattleSpectatorListNtf* internal_default_instance() {
+    return reinterpret_cast<const PBBattleSpectatorListNtf*>(
+        &_PBBattleSpectatorListNtf_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages = 16;
+  friend void swap(PBBattleSpectatorListNtf& a, PBBattleSpectatorListNtf& b) { a.Swap(&b); }
+  inline void Swap(PBBattleSpectatorListNtf* other) {
+    if (other == this) return;
+    if (::google::protobuf::internal::CanUseInternalSwap(GetArena(), other->GetArena())) {
+      InternalSwap(other);
+    } else {
+      ::google::protobuf::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PBBattleSpectatorListNtf* other) {
+    if (other == this) return;
+    ABSL_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PBBattleSpectatorListNtf* New(::google::protobuf::Arena* arena = nullptr) const {
+    return ::google::protobuf::Message::DefaultConstruct<PBBattleSpectatorListNtf>(arena);
+  }
+  using ::google::protobuf::Message::CopyFrom;
+  void CopyFrom(const PBBattleSpectatorListNtf& from);
+  using ::google::protobuf::Message::MergeFrom;
+  void MergeFrom(const PBBattleSpectatorListNtf& from) { PBBattleSpectatorListNtf::MergeImpl(*this, from); }
+
+  private:
+  static void MergeImpl(
+      ::google::protobuf::MessageLite& to_msg,
+      const ::google::protobuf::MessageLite& from_msg);
+
+  public:
+  bool IsInitialized() const {
+    return true;
+  }
+  ABSL_ATTRIBUTE_REINITIALIZES void Clear() PROTOBUF_FINAL;
+  #if defined(PROTOBUF_CUSTOM_VTABLE)
+  private:
+  static ::size_t ByteSizeLong(const ::google::protobuf::MessageLite& msg);
+  static ::uint8_t* _InternalSerialize(
+      const MessageLite& msg, ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream);
+
+  public:
+  ::size_t ByteSizeLong() const { return ByteSizeLong(*this); }
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+    return _InternalSerialize(*this, target, stream);
+  }
+  #else   // PROTOBUF_CUSTOM_VTABLE
+  ::size_t ByteSizeLong() const final;
+  ::uint8_t* _InternalSerialize(
+      ::uint8_t* target,
+      ::google::protobuf::io::EpsCopyOutputStream* stream) const final;
+  #endif  // PROTOBUF_CUSTOM_VTABLE
+  int GetCachedSize() const { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::google::protobuf::Arena* arena);
+  static void SharedDtor(MessageLite& self);
+  void InternalSwap(PBBattleSpectatorListNtf* other);
+ private:
+  template <typename T>
+  friend ::absl::string_view(
+      ::google::protobuf::internal::GetAnyMessageName)();
+  static ::absl::string_view FullMessageName() { return "PbBattle.PBBattleSpectatorListNtf"; }
+
+ protected:
+  explicit PBBattleSpectatorListNtf(::google::protobuf::Arena* arena);
+  PBBattleSpectatorListNtf(::google::protobuf::Arena* arena, const PBBattleSpectatorListNtf& from);
+  PBBattleSpectatorListNtf(::google::protobuf::Arena* arena, PBBattleSpectatorListNtf&& from) noexcept
+      : PBBattleSpectatorListNtf(arena) {
+    *this = ::std::move(from);
+  }
+  const ::google::protobuf::internal::ClassData* GetClassData() const PROTOBUF_FINAL;
+  static void* PlacementNew_(const void*, void* mem,
+                             ::google::protobuf::Arena* arena);
+  static constexpr auto InternalNewImpl_();
+  static const ::google::protobuf::internal::ClassDataFull _class_data_;
+
+ public:
+  ::google::protobuf::Metadata GetMetadata() const;
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+  enum : int {
+    kSpectatorsFieldNumber = 4,
+    kBigTypeFieldNumber = 1,
+    kSmallTypeFieldNumber = 2,
+    kBattleIdFieldNumber = 3,
+  };
+  // repeated .PbBattle.PBBattleSpectatorEntry spectators = 4;
+  int spectators_size() const;
+  private:
+  int _internal_spectators_size() const;
+
+  public:
+  void clear_spectators() ;
+  ::PbBattle::PBBattleSpectatorEntry* mutable_spectators(int index);
+  ::google::protobuf::RepeatedPtrField<::PbBattle::PBBattleSpectatorEntry>* mutable_spectators();
+
+  private:
+  const ::google::protobuf::RepeatedPtrField<::PbBattle::PBBattleSpectatorEntry>& _internal_spectators() const;
+  ::google::protobuf::RepeatedPtrField<::PbBattle::PBBattleSpectatorEntry>* _internal_mutable_spectators();
+  public:
+  const ::PbBattle::PBBattleSpectatorEntry& spectators(int index) const;
+  ::PbBattle::PBBattleSpectatorEntry* add_spectators();
+  const ::google::protobuf::RepeatedPtrField<::PbBattle::PBBattleSpectatorEntry>& spectators() const;
+  // uint32 big_type = 1;
+  void clear_big_type() ;
+  ::uint32_t big_type() const;
+  void set_big_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_big_type() const;
+  void _internal_set_big_type(::uint32_t value);
+
+  public:
+  // uint32 small_type = 2;
+  void clear_small_type() ;
+  ::uint32_t small_type() const;
+  void set_small_type(::uint32_t value);
+
+  private:
+  ::uint32_t _internal_small_type() const;
+  void _internal_set_small_type(::uint32_t value);
+
+  public:
+  // int64 battle_id = 3;
+  void clear_battle_id() ;
+  ::int64_t battle_id() const;
+  void set_battle_id(::int64_t value);
+
+  private:
+  ::int64_t _internal_battle_id() const;
+  void _internal_set_battle_id(::int64_t value);
+
+  public:
+  // @@protoc_insertion_point(class_scope:PbBattle.PBBattleSpectatorListNtf)
+ private:
+  class _Internal;
+  friend class ::google::protobuf::internal::TcParser;
+  static const ::google::protobuf::internal::TcParseTable<
+      2, 4, 1,
+      0, 2>
+      _table_;
+
+  friend class ::google::protobuf::MessageLite;
+  friend class ::google::protobuf::Arena;
+  template <typename T>
+  friend class ::google::protobuf::Arena::InternalHelper;
+  using InternalArenaConstructable_ = void;
+  using DestructorSkippable_ = void;
+  struct Impl_ {
+    inline explicit constexpr Impl_(
+        ::google::protobuf::internal::ConstantInitialized) noexcept;
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena);
+    inline explicit Impl_(::google::protobuf::internal::InternalVisibility visibility,
+                          ::google::protobuf::Arena* arena, const Impl_& from,
+                          const PBBattleSpectatorListNtf& from_msg);
+    ::google::protobuf::RepeatedPtrField< ::PbBattle::PBBattleSpectatorEntry > spectators_;
+    ::uint32_t big_type_;
+    ::uint32_t small_type_;
+    ::int64_t battle_id_;
     ::google::protobuf::internal::CachedSize _cached_size_;
     PROTOBUF_TSAN_DECLARE_MEMBER
   };
@@ -5634,6 +6342,361 @@ inline ::int64_t PBBattleLoginRsp::_internal_battle_id() const {
 inline void PBBattleLoginRsp::_internal_set_battle_id(::int64_t value) {
   ::google::protobuf::internal::TSanWrite(&_impl_);
   _impl_.battle_id_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PBBattleSpectatorEntry
+
+// int64 spectator_id = 1;
+inline void PBBattleSpectatorEntry::clear_spectator_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.spectator_id_ = ::int64_t{0};
+}
+inline ::int64_t PBBattleSpectatorEntry::spectator_id() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectatorEntry.spectator_id)
+  return _internal_spectator_id();
+}
+inline void PBBattleSpectatorEntry::set_spectator_id(::int64_t value) {
+  _internal_set_spectator_id(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectatorEntry.spectator_id)
+}
+inline ::int64_t PBBattleSpectatorEntry::_internal_spectator_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.spectator_id_;
+}
+inline void PBBattleSpectatorEntry::_internal_set_spectator_id(::int64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.spectator_id_ = value;
+}
+
+// string spectator_name = 2;
+inline void PBBattleSpectatorEntry::clear_spectator_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.spectator_name_.ClearToEmpty();
+}
+inline const std::string& PBBattleSpectatorEntry::spectator_name() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectatorEntry.spectator_name)
+  return _internal_spectator_name();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PBBattleSpectatorEntry::set_spectator_name(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.spectator_name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectatorEntry.spectator_name)
+}
+inline std::string* PBBattleSpectatorEntry::mutable_spectator_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_spectator_name();
+  // @@protoc_insertion_point(field_mutable:PbBattle.PBBattleSpectatorEntry.spectator_name)
+  return _s;
+}
+inline const std::string& PBBattleSpectatorEntry::_internal_spectator_name() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.spectator_name_.Get();
+}
+inline void PBBattleSpectatorEntry::_internal_set_spectator_name(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.spectator_name_.Set(value, GetArena());
+}
+inline std::string* PBBattleSpectatorEntry::_internal_mutable_spectator_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.spectator_name_.Mutable( GetArena());
+}
+inline std::string* PBBattleSpectatorEntry::release_spectator_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:PbBattle.PBBattleSpectatorEntry.spectator_name)
+  return _impl_.spectator_name_.Release();
+}
+inline void PBBattleSpectatorEntry::set_allocated_spectator_name(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.spectator_name_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.spectator_name_.IsDefault()) {
+    _impl_.spectator_name_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:PbBattle.PBBattleSpectatorEntry.spectator_name)
+}
+
+// int64 target_id = 3;
+inline void PBBattleSpectatorEntry::clear_target_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.target_id_ = ::int64_t{0};
+}
+inline ::int64_t PBBattleSpectatorEntry::target_id() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectatorEntry.target_id)
+  return _internal_target_id();
+}
+inline void PBBattleSpectatorEntry::set_target_id(::int64_t value) {
+  _internal_set_target_id(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectatorEntry.target_id)
+}
+inline ::int64_t PBBattleSpectatorEntry::_internal_target_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.target_id_;
+}
+inline void PBBattleSpectatorEntry::_internal_set_target_id(::int64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.target_id_ = value;
+}
+
+// string target_name = 4;
+inline void PBBattleSpectatorEntry::clear_target_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.target_name_.ClearToEmpty();
+}
+inline const std::string& PBBattleSpectatorEntry::target_name() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectatorEntry.target_name)
+  return _internal_target_name();
+}
+template <typename Arg_, typename... Args_>
+inline PROTOBUF_ALWAYS_INLINE void PBBattleSpectatorEntry::set_target_name(Arg_&& arg,
+                                                     Args_... args) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.target_name_.Set(static_cast<Arg_&&>(arg), args..., GetArena());
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectatorEntry.target_name)
+}
+inline std::string* PBBattleSpectatorEntry::mutable_target_name() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  std::string* _s = _internal_mutable_target_name();
+  // @@protoc_insertion_point(field_mutable:PbBattle.PBBattleSpectatorEntry.target_name)
+  return _s;
+}
+inline const std::string& PBBattleSpectatorEntry::_internal_target_name() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.target_name_.Get();
+}
+inline void PBBattleSpectatorEntry::_internal_set_target_name(const std::string& value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.target_name_.Set(value, GetArena());
+}
+inline std::string* PBBattleSpectatorEntry::_internal_mutable_target_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _impl_.target_name_.Mutable( GetArena());
+}
+inline std::string* PBBattleSpectatorEntry::release_target_name() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  // @@protoc_insertion_point(field_release:PbBattle.PBBattleSpectatorEntry.target_name)
+  return _impl_.target_name_.Release();
+}
+inline void PBBattleSpectatorEntry::set_allocated_target_name(std::string* value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.target_name_.SetAllocated(value, GetArena());
+  if (::google::protobuf::internal::DebugHardenForceCopyDefaultString() && _impl_.target_name_.IsDefault()) {
+    _impl_.target_name_.Set("", GetArena());
+  }
+  // @@protoc_insertion_point(field_set_allocated:PbBattle.PBBattleSpectatorEntry.target_name)
+}
+
+// -------------------------------------------------------------------
+
+// PBBattleSpectateFollowReq
+
+// uint32 big_type = 1;
+inline void PBBattleSpectateFollowReq::clear_big_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = 0u;
+}
+inline ::uint32_t PBBattleSpectateFollowReq::big_type() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectateFollowReq.big_type)
+  return _internal_big_type();
+}
+inline void PBBattleSpectateFollowReq::set_big_type(::uint32_t value) {
+  _internal_set_big_type(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectateFollowReq.big_type)
+}
+inline ::uint32_t PBBattleSpectateFollowReq::_internal_big_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.big_type_;
+}
+inline void PBBattleSpectateFollowReq::_internal_set_big_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = value;
+}
+
+// uint32 small_type = 2;
+inline void PBBattleSpectateFollowReq::clear_small_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = 0u;
+}
+inline ::uint32_t PBBattleSpectateFollowReq::small_type() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectateFollowReq.small_type)
+  return _internal_small_type();
+}
+inline void PBBattleSpectateFollowReq::set_small_type(::uint32_t value) {
+  _internal_set_small_type(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectateFollowReq.small_type)
+}
+inline ::uint32_t PBBattleSpectateFollowReq::_internal_small_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.small_type_;
+}
+inline void PBBattleSpectateFollowReq::_internal_set_small_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = value;
+}
+
+// int64 battle_id = 3;
+inline void PBBattleSpectateFollowReq::clear_battle_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_id_ = ::int64_t{0};
+}
+inline ::int64_t PBBattleSpectateFollowReq::battle_id() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectateFollowReq.battle_id)
+  return _internal_battle_id();
+}
+inline void PBBattleSpectateFollowReq::set_battle_id(::int64_t value) {
+  _internal_set_battle_id(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectateFollowReq.battle_id)
+}
+inline ::int64_t PBBattleSpectateFollowReq::_internal_battle_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.battle_id_;
+}
+inline void PBBattleSpectateFollowReq::_internal_set_battle_id(::int64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_id_ = value;
+}
+
+// int64 target_id = 4;
+inline void PBBattleSpectateFollowReq::clear_target_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.target_id_ = ::int64_t{0};
+}
+inline ::int64_t PBBattleSpectateFollowReq::target_id() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectateFollowReq.target_id)
+  return _internal_target_id();
+}
+inline void PBBattleSpectateFollowReq::set_target_id(::int64_t value) {
+  _internal_set_target_id(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectateFollowReq.target_id)
+}
+inline ::int64_t PBBattleSpectateFollowReq::_internal_target_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.target_id_;
+}
+inline void PBBattleSpectateFollowReq::_internal_set_target_id(::int64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.target_id_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PBBattleSpectatorListNtf
+
+// uint32 big_type = 1;
+inline void PBBattleSpectatorListNtf::clear_big_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = 0u;
+}
+inline ::uint32_t PBBattleSpectatorListNtf::big_type() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectatorListNtf.big_type)
+  return _internal_big_type();
+}
+inline void PBBattleSpectatorListNtf::set_big_type(::uint32_t value) {
+  _internal_set_big_type(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectatorListNtf.big_type)
+}
+inline ::uint32_t PBBattleSpectatorListNtf::_internal_big_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.big_type_;
+}
+inline void PBBattleSpectatorListNtf::_internal_set_big_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.big_type_ = value;
+}
+
+// uint32 small_type = 2;
+inline void PBBattleSpectatorListNtf::clear_small_type() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = 0u;
+}
+inline ::uint32_t PBBattleSpectatorListNtf::small_type() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectatorListNtf.small_type)
+  return _internal_small_type();
+}
+inline void PBBattleSpectatorListNtf::set_small_type(::uint32_t value) {
+  _internal_set_small_type(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectatorListNtf.small_type)
+}
+inline ::uint32_t PBBattleSpectatorListNtf::_internal_small_type() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.small_type_;
+}
+inline void PBBattleSpectatorListNtf::_internal_set_small_type(::uint32_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.small_type_ = value;
+}
+
+// int64 battle_id = 3;
+inline void PBBattleSpectatorListNtf::clear_battle_id() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_id_ = ::int64_t{0};
+}
+inline ::int64_t PBBattleSpectatorListNtf::battle_id() const {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectatorListNtf.battle_id)
+  return _internal_battle_id();
+}
+inline void PBBattleSpectatorListNtf::set_battle_id(::int64_t value) {
+  _internal_set_battle_id(value);
+  // @@protoc_insertion_point(field_set:PbBattle.PBBattleSpectatorListNtf.battle_id)
+}
+inline ::int64_t PBBattleSpectatorListNtf::_internal_battle_id() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.battle_id_;
+}
+inline void PBBattleSpectatorListNtf::_internal_set_battle_id(::int64_t value) {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.battle_id_ = value;
+}
+
+// repeated .PbBattle.PBBattleSpectatorEntry spectators = 4;
+inline int PBBattleSpectatorListNtf::_internal_spectators_size() const {
+  return _internal_spectators().size();
+}
+inline int PBBattleSpectatorListNtf::spectators_size() const {
+  return _internal_spectators_size();
+}
+inline void PBBattleSpectatorListNtf::clear_spectators() {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  _impl_.spectators_.Clear();
+}
+inline ::PbBattle::PBBattleSpectatorEntry* PBBattleSpectatorListNtf::mutable_spectators(int index)
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_mutable:PbBattle.PBBattleSpectatorListNtf.spectators)
+  return _internal_mutable_spectators()->Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField<::PbBattle::PBBattleSpectatorEntry>* PBBattleSpectatorListNtf::mutable_spectators()
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_mutable_list:PbBattle.PBBattleSpectatorListNtf.spectators)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  return _internal_mutable_spectators();
+}
+inline const ::PbBattle::PBBattleSpectatorEntry& PBBattleSpectatorListNtf::spectators(int index) const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_get:PbBattle.PBBattleSpectatorListNtf.spectators)
+  return _internal_spectators().Get(index);
+}
+inline ::PbBattle::PBBattleSpectatorEntry* PBBattleSpectatorListNtf::add_spectators() ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::PbBattle::PBBattleSpectatorEntry* _add = _internal_mutable_spectators()->Add();
+  // @@protoc_insertion_point(field_add:PbBattle.PBBattleSpectatorListNtf.spectators)
+  return _add;
+}
+inline const ::google::protobuf::RepeatedPtrField<::PbBattle::PBBattleSpectatorEntry>& PBBattleSpectatorListNtf::spectators() const
+    ABSL_ATTRIBUTE_LIFETIME_BOUND {
+  // @@protoc_insertion_point(field_list:PbBattle.PBBattleSpectatorListNtf.spectators)
+  return _internal_spectators();
+}
+inline const ::google::protobuf::RepeatedPtrField<::PbBattle::PBBattleSpectatorEntry>&
+PBBattleSpectatorListNtf::_internal_spectators() const {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return _impl_.spectators_;
+}
+inline ::google::protobuf::RepeatedPtrField<::PbBattle::PBBattleSpectatorEntry>*
+PBBattleSpectatorListNtf::_internal_mutable_spectators() {
+  ::google::protobuf::internal::TSanRead(&_impl_);
+  return &_impl_.spectators_;
 }
 
 #ifdef __GNUC__

@@ -1,0 +1,153 @@
+# 魔幻风格重生成配置：把 soulofgun 的 assets 关键视觉资源重生成一份魔幻版
+# 输出到独立的 assets_magic 目录，不覆盖原 assets。
+provider: siliconflow
+
+provider_config:
+  model: "Kwai-Kolors/Kolors"
+
+output:
+  root: E:/RealServer/client/soulofgun/UIEditor/CocoStudio/assets_magic
+  sync_to: ""                     # 不自动同步回原 assets
+
+assets:
+  # ---- 关卡/世界背景（map）----
+  - name: bg02
+    mode: background
+    prompt: 魔幻风格游戏场景背景，夜色中发光的魔法森林，蓝紫色萤火粒子，巨大古树，雾气，无文字无水印
+    size: [512, 512]
+    out_subdir: map
+
+  - name: bg03
+    mode: background
+    prompt: 魔幻风格游戏场景背景，暗黑魔幻城堡，紫色雾气，尖塔，血月，哥特风格，无文字无水印
+    size: [1024, 512]
+    out_subdir: map
+
+  - name: bg04
+    mode: background
+    prompt: 魔幻风格游戏场景背景，古老魔法遗迹，断裂石柱，发光符文，藤蔓，幽蓝色光，无文字无水印
+    size: [512, 512]
+    out_subdir: map
+
+  - name: bg05
+    mode: background
+    prompt: 魔幻风格游戏场景背景，地下水晶洞窟，蓝紫色水晶簇，幽光，钟乳石，无文字无水印
+    size: [512, 512]
+    out_subdir: map
+
+  - name: bg06
+    mode: background
+    prompt: 魔幻风格游戏场景背景，熔岩地狱，岩浆河流，恶魔符文，红色火光，黑暗岩石，无文字无水印
+    size: [512, 512]
+    out_subdir: map
+
+  - name: frontdoor
+    mode: background
+    prompt: 魔幻风格游戏场景背景，巨大魔幻城门，石质拱门，魔法结界光幕，火把，无文字无水印
+    size: [512, 512]
+    out_subdir: map
+
+  - name: mapPic1
+    mode: background
+    prompt: 魔幻风格世界地图，俯视视角，发光的大陆与海洋，符文标记，魔法传送门，山脉与森林，游戏地图，无文字
+    size: [1024, 2048]
+    out_subdir: map
+
+  # ---- 主界面 / 加载 / 全屏 / 商店（pic）----
+  - name: fengmianbeijMainmenu
+    mode: background
+    prompt: 魔幻风格游戏主菜单背景，史诗魔法城堡，金色光芒，魔法阵，星空，冷色调，无文字无水印
+    size: [800, 480]
+    gen_size: [1280, 720]
+    out_subdir: pic
+
+  - name: fullScreen01
+    mode: background
+    prompt: 魔幻风格游戏战斗背景，广阔战场，魔法阵，剑与魔法，硝烟，冷色调，无文字无水印
+    size: [800, 480]
+    gen_size: [1280, 720]
+    out_subdir: pic
+
+  - name: fullScreen02
+    mode: background
+    prompt: 魔幻风格游戏战斗背景，暗黑森林战场，月光，魔法光效，冷色调，无文字无水印
+    size: [800, 480]
+    gen_size: [1280, 720]
+    out_subdir: pic
+
+  - name: uistore_bg
+    mode: background
+    prompt: 魔幻风格游戏商店界面背景，华丽金色边框，魔法商店，宝物架，暖金色光，无文字无水印
+    size: [800, 480]
+    gen_size: [1280, 720]
+    out_subdir: pic
+
+  - name: zhuanpan_bg
+    mode: background
+    prompt: 魔幻风格游戏转盘界面背景，魔法轮盘，符文，金色装饰，暗色背景，无文字无水印
+    size: [630, 410]
+    gen_size: [1280, 720]
+    out_subdir: pic
+
+  - name: bc_jifei
+    mode: background
+    prompt: 魔幻风格游戏界面背景，魔法宝箱，金币与宝石，金色光芒，暗色背景，无文字无水印
+    size: [656, 390]
+    gen_size: [1280, 720]
+    out_subdir: pic
+
+  - name: fengmianzi5
+    mode: background
+    prompt: 魔幻风格游戏标题横幅，发光的神秘符文装饰，魔法纹饰，金色与紫色，横向横幅，无具体文字
+    size: [413, 141]
+    gen_size: [1024, 512]
+    out_subdir: pic
+
+  # ---- 角色 / 武器立绘（anim）----
+  - name: boss01
+    mode: background
+    prompt: 魔幻风格游戏角色立绘，巨型恶魔领主，暗红色皮肤，火焰与暗影，双翼，狰狞，全身立绘，居中构图，无文字
+    size: [1024, 1024]
+    out_subdir: anim
+
+  - name: boss2
+    mode: background
+    prompt: 魔幻风格游戏角色立绘，暗黑大法师，黑色长袍，紫色魔法能量，法杖，兜帽，全身立绘，居中构图，无文字
+    size: [768, 1024]
+    out_subdir: anim
+
+  - name: boy_max
+    mode: background
+    prompt: 魔幻风格游戏角色立绘，少年魔法师，蓝色法师袍，手持魔杖，发光法球，全身立绘，居中构图，无文字
+    size: [512, 512]
+    out_subdir: anim
+
+  - name: police_max
+    mode: background
+    prompt: 魔幻风格游戏角色立绘，圣殿骑士，银色盔甲，金色纹饰，手持长剑与盾牌，全身立绘，居中构图，无文字
+    size: [512, 512]
+    out_subdir: anim
+
+  - name: worker_max
+    mode: background
+    prompt: 魔幻风格游戏角色立绘，矮人铁匠，肌肉结实，大胡子，手持巨锤，皮甲，全身立绘，居中构图，无文字
+    size: [512, 512]
+    out_subdir: anim
+
+  - name: zombie_max
+    mode: background
+    prompt: 魔幻风格游戏角色立绘，亡灵战士，苍白皮肤，破旧盔甲，幽绿色鬼火，全身立绘，居中构图，无文字
+    size: [512, 512]
+    out_subdir: anim
+
+  - name: guns0
+    mode: background
+    prompt: 魔幻风格游戏武器立绘，奥术魔法手枪，金色与蓝色，发光符文，魔法能量核心，居中构图，无文字
+    size: [512, 512]
+    out_subdir: anim
+
+  - name: guns_1
+    mode: background
+    prompt: 魔幻风格游戏武器立绘，魔法重型枪械，紫晶能量，蒸汽朋克与魔幻结合，发光，居中构图，无文字
+    size: [512, 512]
+    out_subdir: anim

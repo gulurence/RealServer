@@ -1,0 +1,117 @@
+2026-10-21 11:11:57,361 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\box.plist：总 22 帧，待处理 2 帧
+2026-10-21 11:11:57,361 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\boy.plist：总 80 帧，待处理 2 帧
+2026-10-21 11:11:57,361 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\boss03.plist：总 60 帧，待处理 2 帧
+2026-10-21 11:11:57,363 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\boy_max.plist：总 108 帧，待处理 2 帧
+2026-10-21 11:11:57,364 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\chef.plist：总 73 帧，待处理 2 帧
+2026-10-21 11:11:57,365 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\dama.plist：总 88 帧，待处理 2 帧
+2026-10-21 11:11:57,365 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\boss2.plist：总 60 帧，待处理 2 帧
+2026-10-21 11:11:57,369 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\boss01.plist：总 189 帧，待处理 2 帧
+2026-10-21 11:11:58,369 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:11:58,375 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:11:58,407 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:11:58,452 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:12:03,637 INFO [1/2] boss03_0.png (102x51) 6.3s
+2026-10-21 11:12:05,040 INFO [1/2] dama_0.png (12x17) 7.7s
+2026-10-21 11:12:05,347 INFO [1/2] boy_max_0.png (64x97) 8.0s
+2026-10-21 11:12:05,797 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:12:06,038 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:12:07,095 INFO [1/2] boss01_0.png (152x79) 9.7s
+2026-10-21 11:12:07,880 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:12:10,023 INFO [2/2] boss03_1.png (29x33) 6.4s
+2026-10-21 11:12:10,027 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\dead.plist：总 66 帧，待处理 2 帧
+2026-10-21 11:12:10,831 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:12:24,357 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:12:24,427 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:12:24,562 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:12:24,643 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:12:31,442 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:12:31,657 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:12:33,733 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:12:43,764 INFO [1/2] dead_0.png (85x82) 33.7s
+2026-10-21 11:12:44,413 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:12:50,103 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:12:50,331 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:12:50,421 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:12:50,435 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:12:57,002 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:12:57,211 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:12:59,281 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:13:16,059 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\dog.plist：总 48 帧，待处理 2 帧
+2026-10-21 11:13:16,877 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\girl.plist：总 89 帧，待处理 2 帧
+2026-10-21 11:13:16,951 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\guns0.plist：总 199 帧，待处理 2 帧
+2026-10-21 11:13:16,974 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:13:16,978 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\guns_1.plist：总 189 帧，待处理 2 帧
+2026-10-21 11:13:17,277 INFO [2/2] dead_1.png (79x83) 33.5s
+2026-10-21 11:13:17,282 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\hero0.plist：总 77 帧，待处理 2 帧
+2026-10-21 11:13:17,576 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:13:17,792 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:13:17,873 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:13:18,064 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:13:22,726 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\hero_1.plist：总 56 帧，待处理 2 帧
+2026-10-21 11:13:22,868 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\lianye.plist：总 25 帧，待处理 2 帧
+2026-10-21 11:13:23,415 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:13:23,843 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:13:24,927 INFO 图集 E:\RealServer\client\soulofgun\Debug.win32\anim\police.plist：总 115 帧，待处理 2 帧
+2026-10-21 11:13:25,752 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:13:43,130 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:13:43,508 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:13:43,555 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:13:43,700 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:13:48,033 INFO [1/2] dog_0.png (38x21) 32.0s
+2026-10-21 11:13:48,815 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:13:48,971 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:13:49,406 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:13:51,447 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:14:08,917 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:14:08,989 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:14:09,077 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:14:14,299 INFO [1/2] girl_0.png (38x21R) 57.4s
+2026-10-21 11:14:14,328 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:14:14,330 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:14:14,838 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:14:14,885 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:14:16,893 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:14:39,812 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:14:40,469 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:14:40,620 INFO [1/2] guns_1_0.png (37x16) 83.6s
+2026-10-21 11:14:41,041 WARNING 429 限流，25s 后重试（1/3）
+2026-10-21 11:15:06,047 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:15:06,649 WARNING 429 限流，25s 后重试（2/3）
+2026-10-21 11:15:11,293 INFO [2/2] dog_1.png (50x52) 83.3s
+2026-10-21 11:15:32,164 WARNING 429 限流，25s 后重试（3/3）
+2026-10-21 11:16:06,582 INFO [2/2] guns_1_1.png (14x21) 86.0s
+Traceback (most recent call last):
+  File "E:\RealServer\tools\spritegen\restyle_atlas.py", line 309, in <module>
+    main()
+  File "E:\RealServer\tools\spritegen\restyle_atlas.py", line 302, in main
+    list(ex.map(run_one, atlases))
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RealServer\tools\spritegen\restyle_atlas.py", line 293, in run_one
+    process_atlas(provider, zip_path, plist_name, png_name, out_png,
+  File "E:\RealServer\tools\spritegen\restyle_atlas.py", line 197, in process_atlas
+    new = restyle_frame(provider, region, rotated, prompt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RealServer\tools\spritegen\restyle_atlas.py", line 136, in restyle_frame
+    r = provider.img2img(rgb, prompt, size=(pw, ph))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RealServer\tools\spritegen\providers\siliconflow.py", line 72, in img2img
+    return self._request(payload, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\RealServer\tools\spritegen\providers\siliconflow.py", line 87, in _request
+    r.raise_for_status()
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python312\Lib\site-packages\requests\models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 429 Client Error: Too Many Requests for url: https://api.siliconflow.cn/v1/images/generations

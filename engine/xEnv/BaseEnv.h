@@ -14,12 +14,10 @@
 enum EKernelModule : uint32
 {
     Kernel_None = 0,
-    Kernel_Scheduler = 1u << 0, // 协程 + 同步双线程池调度器
     Kernel_Grpc = 1u << 1,      // gRPC 服务器 + 客户端连接池 (跨进程 RPC)
     Kernel_Redis = 1u << 2,     // Redis 服务 (缓存 + 服务发现)
     Kernel_MySql = 1u << 3,     // MySQL 持久化 (record 模块落库)
     Kernel_Net = 1u << 4,       // 网络接入层 (TCP, Gate 专用)
-    Kernel_Nats = 1u << 5,      // NATS 消息 (预留)
     Kernel_Log = 1u << 6,       // 日志服务
     Kernel_Xml = 1u << 7,       // XML 配置服务
     Kernel_Platform = 1u << 8,  // 平台服务
@@ -32,20 +30,20 @@ inline uint32 GetKernelModulesForType(EProcessType type)
     {
     case EProcessType_PGate:
         // 网关: 网络接入 + 无持久化 (不需要 MySQL)
-        return Kernel_Scheduler | Kernel_Grpc | Kernel_Redis | Kernel_Net | Kernel_Log | Kernel_Xml
+        return Kernel_Grpc | Kernel_Redis | Kernel_Net | Kernel_Log | Kernel_Xml
                | Kernel_Platform;
     case EProcessType_PLogin:
     case EProcessType_PGlobal:
     case EProcessType_PGame:
         // 有状态进程: 需要 MySQL 持久化, 无网络接入
-        return Kernel_Scheduler | Kernel_Grpc | Kernel_Redis | Kernel_MySql | Kernel_Log
+        return Kernel_Grpc | Kernel_Redis | Kernel_MySql | Kernel_Log
                | Kernel_Xml | Kernel_Platform;
     case EProcessType_PBattle:
         // 战斗进程: 客户端直连 (Kernel_Net), 战斗花名册/鉴权走 Redis, 无 MySQL 持久化
-        return Kernel_Scheduler | Kernel_Grpc | Kernel_Redis | Kernel_Net | Kernel_Log
+        return Kernel_Grpc | Kernel_Redis | Kernel_Net | Kernel_Log
                | Kernel_Xml | Kernel_Platform;
     default:
-        return Kernel_Scheduler | Kernel_Grpc | Kernel_Log | Kernel_Xml;
+        return Kernel_Grpc | Kernel_Log | Kernel_Xml;
     }
 }
 

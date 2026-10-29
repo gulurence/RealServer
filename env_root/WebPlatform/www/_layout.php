@@ -254,13 +254,39 @@ function live_region_end(): void
  * 页面在 autorefresh() 之后用 live_region_start()/live_region_end() 包裹数据区,
  * 控件与倒计时留在数据区外, 不会被替换。刷新时 fetch 当前 URL + ?partial=1 拿纯数据 HTML。
  * 传入 $manualLabel 可额外渲染一个「立即刷新」按钮 (同样只做局部刷新)。
+ * 传入 $pauseButton=true 可额外渲染一个「暂停/继续」按钮 (切换自动刷新开关)。
+ * 传入 $autoRefresh=false 关闭自动刷新 (不渲染开关/倒计时/定时器), 仅保留手动刷新按钮。
  */
-function autorefresh(int $seconds = 1, string $manualLabel = ''): void
+function autorefresh(int $seconds = 1, string $manualLabel = '', bool $pauseButton = false, bool $autoRefresh = true): void
 {
     if (is_partial()) return;   // 局部刷新响应里不含控件/脚本
     $secs = max(1, $seconds);
     $manualBtn = $manualLabel !== ''
         ? '<button class="btn btn-sm" id="manual-refresh">' . esc($manualLabel) . '</button>'
+        : '';
+
+    // 局部刷新共用的 refresh() 定义 (手动/自动共用)。
+    $refreshFn = 'function refresh(){var region=document.getElementById("live-region");'
+       . 'if(!region)return;'
+       . 'var u=new URL(location.href);u.searchParams.set("partial","1");'
+       . 'fetch(u).then(function(r){return r.text();}).then(function(html){'
+       . 'if(html.indexOf("<html")!==-1||html.indexOf("<!DOCTYPE")!==-1){location.reload();return;}'
+       . 'region.innerHTML=html;}).catch(function(){});}';
+
+    if (!$autoRefresh) {
+        // 只保留手动刷新, 不启用定时自动刷新。
+        if ($manualBtn !== '') {
+            echo '<div class="d-flex align-items-center gap-3 mb-3">' . $manualBtn . '</div>';
+        }
+        echo '<script>(function(){' . $refreshFn
+           . 'var mb=document.getElementById("manual-refresh");'
+           . 'if(mb)mb.addEventListener("click",function(){refresh();});'
+           . '})();</script>';
+        return;
+    }
+
+    $pauseBtn = $pauseButton
+        ? '<button class="btn btn-sm" id="pause-refresh">暂停</button>'
         : '';
     echo '<div class="d-flex align-items-center gap-3 mb-3">'
        . '<label class="form-check form-switch mb-0">'
@@ -268,6 +294,7 @@ function autorefresh(int $seconds = 1, string $manualLabel = ''): void
        . '<span class="form-check-label">自动刷新（每 ' . $secs . ' 秒）</span>'
        . '</label>'
        . '<span class="dim"><i class="ti ti-refresh"></i> <span id="refresh-countdown">' . $secs . 's</span></span>'
+       . $pauseBtn
        . $manualBtn
        . '</div>'
        . '<script>(function(){var secs=' . $secs . ';var timer=null;'
@@ -277,13 +304,18 @@ function autorefresh(int $seconds = 1, string $manualLabel = ''): void
        . 'if(box&&!box.checked){if(cd)cd.textContent="已暂停";schedule();return;}'
        . 'if(secs<=0){refresh();secs=' . $secs . ';}'
        . 'if(cd)cd.textContent=secs+"s";secs--;schedule();}'
-       . 'function refresh(){var region=document.getElementById("live-region");'
-       . 'if(!region)return;'
-       . 'var u=new URL(location.href);u.searchParams.set("partial","1");'
-       . 'fetch(u).then(function(r){return r.text();}).then(function(html){'
-       . 'if(html.indexOf("<html")!==-1||html.indexOf("<!DOCTYPE")!==-1){location.reload();return;}'
-       . 'region.innerHTML=html;}).catch(function(){});}'
+       . $refreshFn
        . 'var mb=document.getElementById("manual-refresh");'
        . 'if(mb)mb.addEventListener("click",function(){refresh();secs=' . $secs . ';});'
+       . 'var pb=document.getElementById("pause-refresh");'
+       . 'if(pb){pb.addEventListener("click",function(){var box=document.getElementById("autoRefresh");'
+       . 'var cd=document.getElementById("refresh-countdown");'
+       . 'var running=box?box.checked:true;'
+       . 'if(box)box.checked=!running;'
+       . 'if(running){pb.textContent="继续";if(cd)cd.textContent="已暂停";}'
+       . 'else{pb.textContent="暂停";secs=' . $secs . ';if(cd)cd.textContent=secs+"s";}'
+       . '});'
+       . 'var boxEl=document.getElementById("autoRefresh");'
+       . 'if(boxEl)boxEl.addEventListener("change",function(){pb.textContent=boxEl.checked?"暂停":"继续";});}'
        . 'schedule();})();</script>';
 }

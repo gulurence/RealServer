@@ -118,8 +118,8 @@ $dbRoles = $totals['roles'];
 $q = trim((string)($_GET['q'] ?? ''));
 
 // ---- 分页: 可选每页行数 (SQL LIMIT/OFFSET) ----
-$per = (int)($_GET['per'] ?? 20);
-if (!in_array($per, [10, 20, 50, 100], true)) $per = 20;
+$per = (int)($_GET['per'] ?? 8);
+if (!in_array($per, [8, 10, 20, 50, 100], true)) $per = 8;
 $filteredTotal = count_accounts($pdo, $q);                  // SQL COUNT
 $totalPages = max(1, (int)ceil($filteredTotal / $per));
 $page = (int)($_GET['page'] ?? 1);
@@ -155,7 +155,7 @@ $totalRoles = array_sum(array_map(fn($a) => count($a['roles']), $pageAccounts));
                     <label>
                         <span>每页行数</span>
                         <select name="per" class="form-select">
-                            <?php foreach ([10, 20, 50, 100] as $opt): ?>
+                            <?php foreach ([8, 10, 20, 50, 100] as $opt): ?>
                                 <option value="<?= $opt ?>" <?= $per === $opt ? 'selected' : '' ?>><?= $opt ?> 行/页</option>
                             <?php endforeach; ?>
                         </select>

@@ -43,6 +43,18 @@ public:
     // ---- 状态管理 ----
     bool SetState(EProcessState state);
 
+    // ---- 优雅关闭 ----
+    // 置关闭标志: OnRunning 主循环检测到后退出, 走 OnStop 优雅关闭序列。
+    void RequestShutdown();
+    bool IsShutdownRequested() const
+    {
+        return m_shutdownRequested.load();
+    }
+
+    // 安装 Ctrl+C / SIGTERM 处理器 → RequestShutdown (进程内优雅关闭, 替代硬杀)。
+    // 注意: Stop-Process -Force / TerminateProcess 是硬杀、不走此回调, 灰度重启须走 GM shutdown。
+    void InstallSignalHandlers();
+
     // ---- 访问器 ----
     const ProcessInfo &GetSelfInfo() const
     {
@@ -70,4 +82,5 @@ private:
     std::thread m_heartbeatThread;
     std::atomic<bool> m_bHeartbeatRunning{false};
     std::atomic<bool> m_bStopHeartbeat{false};
+    std::atomic<bool> m_shutdownRequested{false};
 };

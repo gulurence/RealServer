@@ -121,6 +121,25 @@ std::string si_pb_battle_leave_rsp(int32 errorCode) {
     rsp.set_error_code((PbID::ErrorCode)errorCode);
     std::string out; rsp.SerializeToString(&out); return out;
 }
+// spectatorsStr: "spectator_id,spectator_name,target_id,target_name;..."
+// (昵称建号时已校验排除 ,;|:%c, 逗号拼接安全)
+std::string si_pb_battle_spectator_list_ntf(int64 battleId, const std::string& spectatorsStr) {
+    PbBattle::PBBattleSpectatorListNtf ntf;
+    ntf.set_big_type(PbID::AT_BATTLE);
+    ntf.set_small_type(PbBattle::BATTLE_SPECTATOR_LIST_NTF);
+    ntf.set_battle_id(battleId);
+    for (auto& rec : pb_split(spectatorsStr, ';')) {
+        if (rec.empty()) continue;
+        auto f = pb_split(rec, ',');
+        if (f.size() < 4) continue;
+        auto* e = ntf.add_spectators();
+        e->set_spectator_id(atoll(f[0].c_str()));
+        e->set_spectator_name(f[1]);
+        e->set_target_id(atoll(f[2].c_str()));
+        e->set_target_name(f[3]);
+    }
+    std::string out; ntf.SerializeToString(&out); return out;
+}
 %}
 
 // ================================================================

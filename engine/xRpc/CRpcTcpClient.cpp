@@ -20,6 +20,15 @@ void CRpcTcpClient::Init()
     XLOG("[RpcTcpClient] io_context thread started");
 }
 
+void CRpcTcpClient::Stop()
+{
+    if (m_ioc)
+    {
+        m_ioc->stop();
+        XLOG("[RpcTcpClient] stop requested — io_context stopped");
+    }
+}
+
 bool CRpcTcpClient::Connect(int64 peerId, const std::string &host, uint16 port)
 {
     std::promise<bool> prom;

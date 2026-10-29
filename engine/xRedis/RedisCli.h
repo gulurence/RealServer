@@ -60,6 +60,11 @@ public:
                std::string &out); // 字符串值 (NodeManager 读配置)
     int32 HGetAll(const std::string &hash,
                   std::map<std::string, std::string> &out); // 全量读 (Actor 状态恢复)
+    int32 HMSet(const std::string &hash,
+                const std::map<std::string, std::string> &fields); // 批量写 (账户 session 同步)
+    // HMSET + EXPIRE 合并为单次往返 (pipeline, 同一 key 同一 slot), 账户 session 同步热路径
+    int32 HMSetEx(const std::string &hash, const std::map<std::string, std::string> &fields,
+                  int64 ttlSec);
 
     int32 Del(const char *key);
 

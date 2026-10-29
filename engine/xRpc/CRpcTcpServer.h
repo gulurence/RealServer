@@ -8,6 +8,7 @@
 #include <asio.hpp>
 #include <atomic>
 #include <map>
+#include <memory>
 #include <mutex>
 
 // =============================================================================
@@ -29,6 +30,9 @@ public:
     bool Start(uint16 u16Port);
     void Register(uint32 u32MethodId, RpcHandler handler);
 
+    // 优雅关闭: 停 io_context 使 thread_proc 退出 (detach 线程随进程退出回收)。
+    void Stop();
+
     virtual void thread_proc() override;
 
 private:
@@ -38,6 +42,7 @@ private:
 private:
     uint16 m_u16Port = 0;
     std::atomic<bool> m_bRunning = true;
+    std::shared_ptr<asio::io_context> m_ioc;
     std::map<uint32, RpcHandler> m_mapHandlers;
     std::mutex m_mutex;
 };

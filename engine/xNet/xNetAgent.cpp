@@ -128,6 +128,6 @@ void xNetAgent::thread_proc()
     }
     catch (std::exception &e)
     {
-        XERR("xService::thread_proc Exception: %s", e.what());
+        XERR("NetAgent listener Exception: %s", e.what());
     }
 }

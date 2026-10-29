@@ -52,6 +52,8 @@ private:
     bool LaunchProcess(EProcessType type, const std::string &name);
     bool StartChild(ChildInfo &c); // 实际 CreateProcess/fork (填充 handle/osPid/lastStart)
     void ReapExitedChildren();     // 检测退出 → 退避重启 / 清理
+    void RequestChildStop(ChildInfo &c); // PUBLISH shutdown <os_pid> + 登记硬杀兜底截止时间
+    void HardKillChild(ChildInfo &c);    // TerminateProcess / kill(SIGTERM) 兜底
     std::string NextName(EProcessType type) const; // 生成 {TypeName}-{seq} 名称
 
     // 自动扩缩容控制器 (P6: Leader 选举 + 按类型资源评估改 desired)
@@ -87,6 +89,7 @@ private:
         int64 lastStart = 0;    // 最近一次启动 unix 秒
         int64 restartAt = 0;    // 退避重启时间点 (unix 秒, 0=无待重启)
         bool graceful = false;  // true=期望停止, 不再拉起
+        int64 gracefulDeadline = 0; // 优雅停止硬杀兜底截止时间 (unix 秒, 0=未请求)
     };
 
     uint32 m_machineId = 0;

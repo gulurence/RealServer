@@ -1,0 +1,61 @@
+# spritegen 配置文件
+# provider 选择：mock | siliconflow | comfyui | gemini
+provider: siliconflow
+
+# 各 provider 的配置，按当前 provider 填对应字段（其他字段会被忽略）。
+# 注意：API Key 不放这里（本文件入 git），统一走环境变量，见 README。
+provider_config:
+  model: "Kwai-Kolors/Kolors"      # 可用：Kwai-Kolors/Kolors、Qwen/Qwen-Image、Tongyi-MAI/Z-Image(-Turbo)
+#   # ComfyUI（本地/远端）
+#   base_url: "http://127.0.0.1:8188"
+#   workflow_template: workflows/bg.json
+#   # Gemini（需代理 + key）
+#   model: "gemini-2.0-flash-exp"
+
+output:
+  root: ./out                     # 输出根目录，相对本配置文件
+  # 本机客户端资产「源」目录（编辑器松散发源，与 res 存档同构）。生成后自动同步。
+  # 换机请改路径。
+  sync_to: E:/RealServer/client/soulofgun/UIEditor/CocoStudio/assets
+
+assets:
+  - name: bg_warm_village
+    mode: background              # background | ui | sprite
+    prompt: 手绘风游戏场景背景，暖色调乡村街道，柔和侧光，无文字无水印
+    size: [1280, 720]
+    out_subdir: map
+    fit: cover
+
+  - name: bg_cool_forest
+    mode: background
+    prompt: 手绘风游戏场景背景，冷色调密林，雾气，纵深层次，无文字无水印
+    size: [1280, 720]
+    out_subdir: map
+    fit: cover
+
+  - name: btn_confirm
+    mode: ui                      # ui 模式默认做去背景，输出透明 PNG
+    prompt: 扁平手绘风确认按钮，圆角矩形，绿色渐变，高光，纯白背景
+    gen_size: [1024, 576]         # AI 生成尺寸（Kolors 支持），后处理再缩放到 size
+    size: [256, 96]
+    out_subdir: pic
+    fit: cover
+
+  - name: icon_coin
+    mode: ui
+    prompt: 手绘风金币图标，暖金色，卡通描边，纯白背景
+    gen_size: [512, 512]
+    size: [128, 128]
+    out_subdir: pic
+    fit: cover
+
+  # 像素风 sprite 示例：AI 高分辨率生成 → 最近邻下采样 → 打包成 plist+png 图集
+  - name: hero_walk
+    mode: sprite
+    prompt: 像素风角色行走动画，侧视图，纯白背景
+    gen_size: [512, 512]          # AI 生成尺寸（高分辨率），后处理再下采样
+    size: [16, 24]                # 单帧像素尺寸
+    frames: 4                     # 帧数（>1 自动打包图集）
+    pack: true
+    palette: 16                   # 锁色板（最多 16 色）
+    out_subdir: anim

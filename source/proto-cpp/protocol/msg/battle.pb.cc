@@ -54,6 +54,66 @@ struct PBBattleStartNtfDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PBBattleStartNtfDefaultTypeInternal _PBBattleStartNtf_default_instance_;
 
+inline constexpr PBBattleSpectatorEntry::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : spectator_name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        target_name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        spectator_id_{::int64_t{0}},
+        target_id_{::int64_t{0}},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR PBBattleSpectatorEntry::PBBattleSpectatorEntry(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct PBBattleSpectatorEntryDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR PBBattleSpectatorEntryDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~PBBattleSpectatorEntryDefaultTypeInternal() {}
+  union {
+    PBBattleSpectatorEntry _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PBBattleSpectatorEntryDefaultTypeInternal _PBBattleSpectatorEntry_default_instance_;
+
+inline constexpr PBBattleSpectateFollowReq::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : big_type_{0u},
+        small_type_{0u},
+        battle_id_{::int64_t{0}},
+        target_id_{::int64_t{0}},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR PBBattleSpectateFollowReq::PBBattleSpectateFollowReq(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct PBBattleSpectateFollowReqDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR PBBattleSpectateFollowReqDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~PBBattleSpectateFollowReqDefaultTypeInternal() {}
+  union {
+    PBBattleSpectateFollowReq _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PBBattleSpectateFollowReqDefaultTypeInternal _PBBattleSpectateFollowReq_default_instance_;
+
 inline constexpr PBBattleSnapshotNtf::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : state_(
@@ -360,6 +420,34 @@ struct PBBattleEndNtfDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
     PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PBBattleEndNtfDefaultTypeInternal _PBBattleEndNtf_default_instance_;
 
+inline constexpr PBBattleSpectatorListNtf::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : spectators_{},
+        big_type_{0u},
+        small_type_{0u},
+        battle_id_{::int64_t{0}},
+        _cached_size_{0} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR PBBattleSpectatorListNtf::PBBattleSpectatorListNtf(::_pbi::ConstantInitialized)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(_class_data_.base()),
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(),
+#endif  // PROTOBUF_CUSTOM_VTABLE
+      _impl_(::_pbi::ConstantInitialized()) {
+}
+struct PBBattleSpectatorListNtfDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR PBBattleSpectatorListNtfDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~PBBattleSpectatorListNtfDefaultTypeInternal() {}
+  union {
+    PBBattleSpectatorListNtf _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PBBattleSpectatorListNtfDefaultTypeInternal _PBBattleSpectatorListNtf_default_instance_;
+
 inline constexpr PBBattleInputReq::Impl_::Impl_(
     ::_pbi::ConstantInitialized) noexcept
       : _cached_size_{0},
@@ -649,6 +737,42 @@ const ::uint32_t
         PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginRsp, _impl_.small_type_),
         PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginRsp, _impl_.error_code_),
         PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleLoginRsp, _impl_.battle_id_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectatorEntry, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectatorEntry, _impl_.spectator_id_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectatorEntry, _impl_.spectator_name_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectatorEntry, _impl_.target_id_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectatorEntry, _impl_.target_name_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectateFollowReq, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectateFollowReq, _impl_.big_type_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectateFollowReq, _impl_.small_type_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectateFollowReq, _impl_.battle_id_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectateFollowReq, _impl_.target_id_),
+        ~0u,  // no _has_bits_
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectatorListNtf, _internal_metadata_),
+        ~0u,  // no _extensions_
+        ~0u,  // no _oneof_case_
+        ~0u,  // no _weak_field_map_
+        ~0u,  // no _inlined_string_donated_
+        ~0u,  // no _split_
+        ~0u,  // no sizeof(Split)
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectatorListNtf, _impl_.big_type_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectatorListNtf, _impl_.small_type_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectatorListNtf, _impl_.battle_id_),
+        PROTOBUF_FIELD_OFFSET(::PbBattle::PBBattleSpectatorListNtf, _impl_.spectators_),
 };
 
 static const ::_pbi::MigrationSchema
@@ -667,6 +791,9 @@ static const ::_pbi::MigrationSchema
         {154, -1, -1, sizeof(::PbBattle::PBBattleHashNtf)},
         {167, -1, -1, sizeof(::PbBattle::PBBattleLoginReq)},
         {181, -1, -1, sizeof(::PbBattle::PBBattleLoginRsp)},
+        {193, -1, -1, sizeof(::PbBattle::PBBattleSpectatorEntry)},
+        {205, -1, -1, sizeof(::PbBattle::PBBattleSpectateFollowReq)},
+        {217, -1, -1, sizeof(::PbBattle::PBBattleSpectatorListNtf)},
 };
 static const ::_pb::Message* const file_default_instances[] = {
     &::PbBattle::_PBBattlePlayerInput_default_instance_._instance,
@@ -683,6 +810,9 @@ static const ::_pb::Message* const file_default_instances[] = {
     &::PbBattle::_PBBattleHashNtf_default_instance_._instance,
     &::PbBattle::_PBBattleLoginReq_default_instance_._instance,
     &::PbBattle::_PBBattleLoginRsp_default_instance_._instance,
+    &::PbBattle::_PBBattleSpectatorEntry_default_instance_._instance,
+    &::PbBattle::_PBBattleSpectateFollowReq_default_instance_._instance,
+    &::PbBattle::_PBBattleSpectatorListNtf_default_instance_._instance,
 };
 const char descriptor_table_protodef_msg_2fbattle_2eproto[] ABSL_ATTRIBUTE_SECTION_VARIABLE(
     protodesc_cold) = {
@@ -732,14 +862,25 @@ const char descriptor_table_protodef_msg_2fbattle_2eproto[] ABSL_ATTRIBUTE_SECTI
     "ectate\030\006 \001(\010\"p\n\020PBBattleLoginRsp\022\020\n\010big_"
     "type\030\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022#\n\nerror_"
     "code\030\003 \001(\0162\017.PbID.ErrorCode\022\021\n\tbattle_id"
-    "\030\004 \001(\003*\252\002\n\013BattleMsgId\022\023\n\017BATTLE_MSG_NON"
-    "E\020\000\022\024\n\020BATTLE_ENTER_REQ\020\001\022\024\n\020BATTLE_ENTE"
-    "R_RSP\020\002\022\024\n\020BATTLE_START_NTF\020\003\022\024\n\020BATTLE_"
-    "INPUT_REQ\020\004\022\024\n\020BATTLE_FRAME_NTF\020\005\022\027\n\023BAT"
-    "TLE_SNAPSHOT_NTF\020\006\022\022\n\016BATTLE_END_NTF\020\007\022\024"
-    "\n\020BATTLE_LEAVE_REQ\020\010\022\024\n\020BATTLE_LEAVE_RSP"
-    "\020\t\022\023\n\017BATTLE_HASH_NTF\020\n\022\024\n\020BATTLE_LOGIN_"
-    "REQ\020\014\022\024\n\020BATTLE_LOGIN_RSP\020\rb\006proto3"
+    "\030\004 \001(\003\"n\n\026PBBattleSpectatorEntry\022\024\n\014spec"
+    "tator_id\030\001 \001(\003\022\026\n\016spectator_name\030\002 \001(\t\022\021"
+    "\n\ttarget_id\030\003 \001(\003\022\023\n\013target_name\030\004 \001(\t\"g"
+    "\n\031PBBattleSpectateFollowReq\022\020\n\010big_type\030"
+    "\001 \001(\r\022\022\n\nsmall_type\030\002 \001(\r\022\021\n\tbattle_id\030\003"
+    " \001(\003\022\021\n\ttarget_id\030\004 \001(\003\"\211\001\n\030PBBattleSpec"
+    "tatorListNtf\022\020\n\010big_type\030\001 \001(\r\022\022\n\nsmall_"
+    "type\030\002 \001(\r\022\021\n\tbattle_id\030\003 \001(\003\0224\n\nspectat"
+    "ors\030\004 \003(\0132 .PbBattle.PBBattleSpectatorEn"
+    "try*\351\002\n\013BattleMsgId\022\023\n\017BATTLE_MSG_NONE\020\000"
+    "\022\024\n\020BATTLE_ENTER_REQ\020\001\022\024\n\020BATTLE_ENTER_R"
+    "SP\020\002\022\024\n\020BATTLE_START_NTF\020\003\022\024\n\020BATTLE_INP"
+    "UT_REQ\020\004\022\024\n\020BATTLE_FRAME_NTF\020\005\022\027\n\023BATTLE"
+    "_SNAPSHOT_NTF\020\006\022\022\n\016BATTLE_END_NTF\020\007\022\024\n\020B"
+    "ATTLE_LEAVE_REQ\020\010\022\024\n\020BATTLE_LEAVE_RSP\020\t\022"
+    "\023\n\017BATTLE_HASH_NTF\020\n\022\024\n\020BATTLE_LOGIN_REQ"
+    "\020\014\022\024\n\020BATTLE_LOGIN_RSP\020\r\022\036\n\032BATTLE_SPECT"
+    "ATE_FOLLOW_REQ\020\016\022\035\n\031BATTLE_SPECTATOR_LIS"
+    "T_NTF\020\017b\006proto3"
 };
 static const ::_pbi::DescriptorTable* const descriptor_table_msg_2fbattle_2eproto_deps[1] =
     {
@@ -749,13 +890,13 @@ static ::absl::once_flag descriptor_table_msg_2fbattle_2eproto_once;
 PROTOBUF_CONSTINIT const ::_pbi::DescriptorTable descriptor_table_msg_2fbattle_2eproto = {
     false,
     false,
-    2155,
+    2575,
     descriptor_table_protodef_msg_2fbattle_2eproto,
     "msg/battle.proto",
     &descriptor_table_msg_2fbattle_2eproto_once,
     descriptor_table_msg_2fbattle_2eproto_deps,
     1,
-    14,
+    17,
     schemas,
     file_default_instances,
     TableStruct_msg_2fbattle_2eproto::offsets,
@@ -768,9 +909,9 @@ const ::google::protobuf::EnumDescriptor* BattleMsgId_descriptor() {
   return file_level_enum_descriptors_msg_2fbattle_2eproto[0];
 }
 PROTOBUF_CONSTINIT const uint32_t BattleMsgId_internal_data_[] = {
-    720896u, 32u, 6u, };
+    720896u, 32u, 30u, };
 bool BattleMsgId_IsValid(int value) {
-  return 0 <= value && value <= 13 && ((14335u >> value) & 1) != 0;
+  return 0 <= value && value <= 15 && ((63487u >> value) & 1) != 0;
 }
 // ===================================================================
 
@@ -5495,6 +5636,942 @@ void PBBattleLoginRsp::InternalSwap(PBBattleLoginRsp* PROTOBUF_RESTRICT other) {
 }
 
 ::google::protobuf::Metadata PBBattleLoginRsp::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class PBBattleSpectatorEntry::_Internal {
+ public:
+};
+
+PBBattleSpectatorEntry::PBBattleSpectatorEntry(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:PbBattle.PBBattleSpectatorEntry)
+}
+inline PROTOBUF_NDEBUG_INLINE PBBattleSpectatorEntry::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::PbBattle::PBBattleSpectatorEntry& from_msg)
+      : spectator_name_(arena, from.spectator_name_),
+        target_name_(arena, from.target_name_),
+        _cached_size_{0} {}
+
+PBBattleSpectatorEntry::PBBattleSpectatorEntry(
+    ::google::protobuf::Arena* arena,
+    const PBBattleSpectatorEntry& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  PBBattleSpectatorEntry* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, spectator_id_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, spectator_id_),
+           offsetof(Impl_, target_id_) -
+               offsetof(Impl_, spectator_id_) +
+               sizeof(Impl_::target_id_));
+
+  // @@protoc_insertion_point(copy_constructor:PbBattle.PBBattleSpectatorEntry)
+}
+inline PROTOBUF_NDEBUG_INLINE PBBattleSpectatorEntry::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : spectator_name_(arena),
+        target_name_(arena),
+        _cached_size_{0} {}
+
+inline void PBBattleSpectatorEntry::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, spectator_id_),
+           0,
+           offsetof(Impl_, target_id_) -
+               offsetof(Impl_, spectator_id_) +
+               sizeof(Impl_::target_id_));
+}
+PBBattleSpectatorEntry::~PBBattleSpectatorEntry() {
+  // @@protoc_insertion_point(destructor:PbBattle.PBBattleSpectatorEntry)
+  SharedDtor(*this);
+}
+inline void PBBattleSpectatorEntry::SharedDtor(MessageLite& self) {
+  PBBattleSpectatorEntry& this_ = static_cast<PBBattleSpectatorEntry&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.spectator_name_.Destroy();
+  this_._impl_.target_name_.Destroy();
+  this_._impl_.~Impl_();
+}
+
+inline void* PBBattleSpectatorEntry::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) PBBattleSpectatorEntry(arena);
+}
+constexpr auto PBBattleSpectatorEntry::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::CopyInit(sizeof(PBBattleSpectatorEntry),
+                                            alignof(PBBattleSpectatorEntry));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull PBBattleSpectatorEntry::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_PBBattleSpectatorEntry_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &PBBattleSpectatorEntry::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<PBBattleSpectatorEntry>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &PBBattleSpectatorEntry::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<PBBattleSpectatorEntry>(), &PBBattleSpectatorEntry::ByteSizeLong,
+            &PBBattleSpectatorEntry::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_._cached_size_),
+        false,
+    },
+    &PBBattleSpectatorEntry::kDescriptorMethods,
+    &descriptor_table_msg_2fbattle_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* PBBattleSpectatorEntry::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 4, 0, 65, 2> PBBattleSpectatorEntry::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    4, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967280,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    4,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::PbBattle::PBBattleSpectatorEntry>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // string target_name = 4;
+    {::_pbi::TcParser::FastUS1,
+     {34, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_.target_name_)}},
+    // int64 spectator_id = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PBBattleSpectatorEntry, _impl_.spectator_id_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_.spectator_id_)}},
+    // string spectator_name = 2;
+    {::_pbi::TcParser::FastUS1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_.spectator_name_)}},
+    // int64 target_id = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PBBattleSpectatorEntry, _impl_.target_id_), 63>(),
+     {24, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_.target_id_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // int64 spectator_id = 1;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_.spectator_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // string spectator_name = 2;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_.spectator_name_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+    // int64 target_id = 3;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_.target_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // string target_name = 4;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_.target_name_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUtf8String | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\37\0\16\0\13\0\0\0"
+    "PbBattle.PBBattleSpectatorEntry"
+    "spectator_name"
+    "target_name"
+  }},
+};
+
+PROTOBUF_NOINLINE void PBBattleSpectatorEntry::Clear() {
+// @@protoc_insertion_point(message_clear_start:PbBattle.PBBattleSpectatorEntry)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.spectator_name_.ClearToEmpty();
+  _impl_.target_name_.ClearToEmpty();
+  ::memset(&_impl_.spectator_id_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.target_id_) -
+      reinterpret_cast<char*>(&_impl_.spectator_id_)) + sizeof(_impl_.target_id_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* PBBattleSpectatorEntry::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const PBBattleSpectatorEntry& this_ = static_cast<const PBBattleSpectatorEntry&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* PBBattleSpectatorEntry::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const PBBattleSpectatorEntry& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:PbBattle.PBBattleSpectatorEntry)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // int64 spectator_id = 1;
+          if (this_._internal_spectator_id() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<1>(
+                    stream, this_._internal_spectator_id(), target);
+          }
+
+          // string spectator_name = 2;
+          if (!this_._internal_spectator_name().empty()) {
+            const std::string& _s = this_._internal_spectator_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "PbBattle.PBBattleSpectatorEntry.spectator_name");
+            target = stream->WriteStringMaybeAliased(2, _s, target);
+          }
+
+          // int64 target_id = 3;
+          if (this_._internal_target_id() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<3>(
+                    stream, this_._internal_target_id(), target);
+          }
+
+          // string target_name = 4;
+          if (!this_._internal_target_name().empty()) {
+            const std::string& _s = this_._internal_target_name();
+            ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+                _s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormatLite::SERIALIZE, "PbBattle.PBBattleSpectatorEntry.target_name");
+            target = stream->WriteStringMaybeAliased(4, _s, target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:PbBattle.PBBattleSpectatorEntry)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t PBBattleSpectatorEntry::ByteSizeLong(const MessageLite& base) {
+          const PBBattleSpectatorEntry& this_ = static_cast<const PBBattleSpectatorEntry&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t PBBattleSpectatorEntry::ByteSizeLong() const {
+          const PBBattleSpectatorEntry& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:PbBattle.PBBattleSpectatorEntry)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // string spectator_name = 2;
+            if (!this_._internal_spectator_name().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_spectator_name());
+            }
+            // string target_name = 4;
+            if (!this_._internal_target_name().empty()) {
+              total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                              this_._internal_target_name());
+            }
+            // int64 spectator_id = 1;
+            if (this_._internal_spectator_id() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_spectator_id());
+            }
+            // int64 target_id = 3;
+            if (this_._internal_target_id() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_target_id());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void PBBattleSpectatorEntry::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<PBBattleSpectatorEntry*>(&to_msg);
+  auto& from = static_cast<const PBBattleSpectatorEntry&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:PbBattle.PBBattleSpectatorEntry)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_spectator_name().empty()) {
+    _this->_internal_set_spectator_name(from._internal_spectator_name());
+  }
+  if (!from._internal_target_name().empty()) {
+    _this->_internal_set_target_name(from._internal_target_name());
+  }
+  if (from._internal_spectator_id() != 0) {
+    _this->_impl_.spectator_id_ = from._impl_.spectator_id_;
+  }
+  if (from._internal_target_id() != 0) {
+    _this->_impl_.target_id_ = from._impl_.target_id_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void PBBattleSpectatorEntry::CopyFrom(const PBBattleSpectatorEntry& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:PbBattle.PBBattleSpectatorEntry)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void PBBattleSpectatorEntry::InternalSwap(PBBattleSpectatorEntry* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.spectator_name_, &other->_impl_.spectator_name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.target_name_, &other->_impl_.target_name_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_.target_id_)
+      + sizeof(PBBattleSpectatorEntry::_impl_.target_id_)
+      - PROTOBUF_FIELD_OFFSET(PBBattleSpectatorEntry, _impl_.spectator_id_)>(
+          reinterpret_cast<char*>(&_impl_.spectator_id_),
+          reinterpret_cast<char*>(&other->_impl_.spectator_id_));
+}
+
+::google::protobuf::Metadata PBBattleSpectatorEntry::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class PBBattleSpectateFollowReq::_Internal {
+ public:
+};
+
+PBBattleSpectateFollowReq::PBBattleSpectateFollowReq(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:PbBattle.PBBattleSpectateFollowReq)
+}
+PBBattleSpectateFollowReq::PBBattleSpectateFollowReq(
+    ::google::protobuf::Arena* arena, const PBBattleSpectateFollowReq& from)
+    : PBBattleSpectateFollowReq(arena) {
+  MergeFrom(from);
+}
+inline PROTOBUF_NDEBUG_INLINE PBBattleSpectateFollowReq::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
+
+inline void PBBattleSpectateFollowReq::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, big_type_),
+           0,
+           offsetof(Impl_, target_id_) -
+               offsetof(Impl_, big_type_) +
+               sizeof(Impl_::target_id_));
+}
+PBBattleSpectateFollowReq::~PBBattleSpectateFollowReq() {
+  // @@protoc_insertion_point(destructor:PbBattle.PBBattleSpectateFollowReq)
+  SharedDtor(*this);
+}
+inline void PBBattleSpectateFollowReq::SharedDtor(MessageLite& self) {
+  PBBattleSpectateFollowReq& this_ = static_cast<PBBattleSpectateFollowReq&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* PBBattleSpectateFollowReq::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) PBBattleSpectateFollowReq(arena);
+}
+constexpr auto PBBattleSpectateFollowReq::InternalNewImpl_() {
+  return ::google::protobuf::internal::MessageCreator::ZeroInit(sizeof(PBBattleSpectateFollowReq),
+                                            alignof(PBBattleSpectateFollowReq));
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull PBBattleSpectateFollowReq::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_PBBattleSpectateFollowReq_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &PBBattleSpectateFollowReq::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<PBBattleSpectateFollowReq>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &PBBattleSpectateFollowReq::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<PBBattleSpectateFollowReq>(), &PBBattleSpectateFollowReq::ByteSizeLong,
+            &PBBattleSpectateFollowReq::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_._cached_size_),
+        false,
+    },
+    &PBBattleSpectateFollowReq::kDescriptorMethods,
+    &descriptor_table_msg_2fbattle_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* PBBattleSpectateFollowReq::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 4, 0, 0, 2> PBBattleSpectateFollowReq::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    4, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967280,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    4,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::PbBattle::PBBattleSpectateFollowReq>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // int64 target_id = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PBBattleSpectateFollowReq, _impl_.target_id_), 63>(),
+     {32, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_.target_id_)}},
+    // uint32 big_type = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBBattleSpectateFollowReq, _impl_.big_type_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_.big_type_)}},
+    // uint32 small_type = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBBattleSpectateFollowReq, _impl_.small_type_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_.small_type_)}},
+    // int64 battle_id = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PBBattleSpectateFollowReq, _impl_.battle_id_), 63>(),
+     {24, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_.battle_id_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint32 big_type = 1;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_.big_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // uint32 small_type = 2;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_.small_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // int64 battle_id = 3;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_.battle_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // int64 target_id = 4;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_.target_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+PROTOBUF_NOINLINE void PBBattleSpectateFollowReq::Clear() {
+// @@protoc_insertion_point(message_clear_start:PbBattle.PBBattleSpectateFollowReq)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&_impl_.big_type_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.target_id_) -
+      reinterpret_cast<char*>(&_impl_.big_type_)) + sizeof(_impl_.target_id_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* PBBattleSpectateFollowReq::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const PBBattleSpectateFollowReq& this_ = static_cast<const PBBattleSpectateFollowReq&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* PBBattleSpectateFollowReq::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const PBBattleSpectateFollowReq& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:PbBattle.PBBattleSpectateFollowReq)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint32 big_type = 1;
+          if (this_._internal_big_type() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                1, this_._internal_big_type(), target);
+          }
+
+          // uint32 small_type = 2;
+          if (this_._internal_small_type() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                2, this_._internal_small_type(), target);
+          }
+
+          // int64 battle_id = 3;
+          if (this_._internal_battle_id() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<3>(
+                    stream, this_._internal_battle_id(), target);
+          }
+
+          // int64 target_id = 4;
+          if (this_._internal_target_id() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<4>(
+                    stream, this_._internal_target_id(), target);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:PbBattle.PBBattleSpectateFollowReq)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t PBBattleSpectateFollowReq::ByteSizeLong(const MessageLite& base) {
+          const PBBattleSpectateFollowReq& this_ = static_cast<const PBBattleSpectateFollowReq&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t PBBattleSpectateFollowReq::ByteSizeLong() const {
+          const PBBattleSpectateFollowReq& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:PbBattle.PBBattleSpectateFollowReq)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // uint32 big_type = 1;
+            if (this_._internal_big_type() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_big_type());
+            }
+            // uint32 small_type = 2;
+            if (this_._internal_small_type() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_small_type());
+            }
+            // int64 battle_id = 3;
+            if (this_._internal_battle_id() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_battle_id());
+            }
+            // int64 target_id = 4;
+            if (this_._internal_target_id() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_target_id());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void PBBattleSpectateFollowReq::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<PBBattleSpectateFollowReq*>(&to_msg);
+  auto& from = static_cast<const PBBattleSpectateFollowReq&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:PbBattle.PBBattleSpectateFollowReq)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_big_type() != 0) {
+    _this->_impl_.big_type_ = from._impl_.big_type_;
+  }
+  if (from._internal_small_type() != 0) {
+    _this->_impl_.small_type_ = from._impl_.small_type_;
+  }
+  if (from._internal_battle_id() != 0) {
+    _this->_impl_.battle_id_ = from._impl_.battle_id_;
+  }
+  if (from._internal_target_id() != 0) {
+    _this->_impl_.target_id_ = from._impl_.target_id_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void PBBattleSpectateFollowReq::CopyFrom(const PBBattleSpectateFollowReq& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:PbBattle.PBBattleSpectateFollowReq)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void PBBattleSpectateFollowReq::InternalSwap(PBBattleSpectateFollowReq* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_.target_id_)
+      + sizeof(PBBattleSpectateFollowReq::_impl_.target_id_)
+      - PROTOBUF_FIELD_OFFSET(PBBattleSpectateFollowReq, _impl_.big_type_)>(
+          reinterpret_cast<char*>(&_impl_.big_type_),
+          reinterpret_cast<char*>(&other->_impl_.big_type_));
+}
+
+::google::protobuf::Metadata PBBattleSpectateFollowReq::GetMetadata() const {
+  return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
+}
+// ===================================================================
+
+class PBBattleSpectatorListNtf::_Internal {
+ public:
+};
+
+PBBattleSpectatorListNtf::PBBattleSpectatorListNtf(::google::protobuf::Arena* arena)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  SharedCtor(arena);
+  // @@protoc_insertion_point(arena_constructor:PbBattle.PBBattleSpectatorListNtf)
+}
+inline PROTOBUF_NDEBUG_INLINE PBBattleSpectatorListNtf::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from, const ::PbBattle::PBBattleSpectatorListNtf& from_msg)
+      : spectators_{visibility, arena, from.spectators_},
+        _cached_size_{0} {}
+
+PBBattleSpectatorListNtf::PBBattleSpectatorListNtf(
+    ::google::protobuf::Arena* arena,
+    const PBBattleSpectatorListNtf& from)
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+    : ::google::protobuf::Message(arena, _class_data_.base()) {
+#else   // PROTOBUF_CUSTOM_VTABLE
+    : ::google::protobuf::Message(arena) {
+#endif  // PROTOBUF_CUSTOM_VTABLE
+  PBBattleSpectatorListNtf* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_, from);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, big_type_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, big_type_),
+           offsetof(Impl_, battle_id_) -
+               offsetof(Impl_, big_type_) +
+               sizeof(Impl_::battle_id_));
+
+  // @@protoc_insertion_point(copy_constructor:PbBattle.PBBattleSpectatorListNtf)
+}
+inline PROTOBUF_NDEBUG_INLINE PBBattleSpectatorListNtf::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : spectators_{visibility, arena},
+        _cached_size_{0} {}
+
+inline void PBBattleSpectatorListNtf::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, big_type_),
+           0,
+           offsetof(Impl_, battle_id_) -
+               offsetof(Impl_, big_type_) +
+               sizeof(Impl_::battle_id_));
+}
+PBBattleSpectatorListNtf::~PBBattleSpectatorListNtf() {
+  // @@protoc_insertion_point(destructor:PbBattle.PBBattleSpectatorListNtf)
+  SharedDtor(*this);
+}
+inline void PBBattleSpectatorListNtf::SharedDtor(MessageLite& self) {
+  PBBattleSpectatorListNtf& this_ = static_cast<PBBattleSpectatorListNtf&>(self);
+  this_._internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
+  ABSL_DCHECK(this_.GetArena() == nullptr);
+  this_._impl_.~Impl_();
+}
+
+inline void* PBBattleSpectatorListNtf::PlacementNew_(const void*, void* mem,
+                                        ::google::protobuf::Arena* arena) {
+  return ::new (mem) PBBattleSpectatorListNtf(arena);
+}
+constexpr auto PBBattleSpectatorListNtf::InternalNewImpl_() {
+  constexpr auto arena_bits = ::google::protobuf::internal::EncodePlacementArenaOffsets({
+      PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.spectators_) +
+          decltype(PBBattleSpectatorListNtf::_impl_.spectators_)::
+              InternalGetArenaOffset(
+                  ::google::protobuf::Message::internal_visibility()),
+  });
+  if (arena_bits.has_value()) {
+    return ::google::protobuf::internal::MessageCreator::ZeroInit(
+        sizeof(PBBattleSpectatorListNtf), alignof(PBBattleSpectatorListNtf), *arena_bits);
+  } else {
+    return ::google::protobuf::internal::MessageCreator(&PBBattleSpectatorListNtf::PlacementNew_,
+                                 sizeof(PBBattleSpectatorListNtf),
+                                 alignof(PBBattleSpectatorListNtf));
+  }
+}
+PROTOBUF_CONSTINIT
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::google::protobuf::internal::ClassDataFull PBBattleSpectatorListNtf::_class_data_ = {
+    ::google::protobuf::internal::ClassData{
+        &_PBBattleSpectatorListNtf_default_instance_._instance,
+        &_table_.header,
+        nullptr,  // OnDemandRegisterArenaDtor
+        nullptr,  // IsInitialized
+        &PBBattleSpectatorListNtf::MergeImpl,
+        ::google::protobuf::Message::GetNewImpl<PBBattleSpectatorListNtf>(),
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        &PBBattleSpectatorListNtf::SharedDtor,
+        ::google::protobuf::Message::GetClearImpl<PBBattleSpectatorListNtf>(), &PBBattleSpectatorListNtf::ByteSizeLong,
+            &PBBattleSpectatorListNtf::_InternalSerialize,
+#endif  // PROTOBUF_CUSTOM_VTABLE
+        PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_._cached_size_),
+        false,
+    },
+    &PBBattleSpectatorListNtf::kDescriptorMethods,
+    &descriptor_table_msg_2fbattle_2eproto,
+    nullptr,  // tracker
+};
+const ::google::protobuf::internal::ClassData* PBBattleSpectatorListNtf::GetClassData() const {
+  ::google::protobuf::internal::PrefetchToLocalCache(&_class_data_);
+  ::google::protobuf::internal::PrefetchToLocalCache(_class_data_.tc_table);
+  return _class_data_.base();
+}
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 4, 1, 0, 2> PBBattleSpectatorListNtf::_table_ = {
+  {
+    0,  // no _has_bits_
+    0, // no _extensions_
+    4, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967280,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    4,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    _class_data_.base(),
+    nullptr,  // post_loop_handler
+    ::_pbi::TcParser::GenericFallback,  // fallback
+    #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
+    ::_pbi::TcParser::GetTable<::PbBattle::PBBattleSpectatorListNtf>(),  // to_prefetch
+    #endif  // PROTOBUF_PREFETCH_PARSE_TABLE
+  }, {{
+    // repeated .PbBattle.PBBattleSpectatorEntry spectators = 4;
+    {::_pbi::TcParser::FastMtR1,
+     {34, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.spectators_)}},
+    // uint32 big_type = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBBattleSpectatorListNtf, _impl_.big_type_), 63>(),
+     {8, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.big_type_)}},
+    // uint32 small_type = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(PBBattleSpectatorListNtf, _impl_.small_type_), 63>(),
+     {16, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.small_type_)}},
+    // int64 battle_id = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint64_t, offsetof(PBBattleSpectatorListNtf, _impl_.battle_id_), 63>(),
+     {24, 63, 0, PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.battle_id_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // uint32 big_type = 1;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.big_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // uint32 small_type = 2;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.small_type_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kUInt32)},
+    // int64 battle_id = 3;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.battle_id_), 0, 0,
+    (0 | ::_fl::kFcSingular | ::_fl::kInt64)},
+    // repeated .PbBattle.PBBattleSpectatorEntry spectators = 4;
+    {PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.spectators_), 0, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::PbBattle::PBBattleSpectatorEntry>()},
+  }}, {{
+  }},
+};
+
+PROTOBUF_NOINLINE void PBBattleSpectatorListNtf::Clear() {
+// @@protoc_insertion_point(message_clear_start:PbBattle.PBBattleSpectatorListNtf)
+  ::google::protobuf::internal::TSanWrite(&_impl_);
+  ::uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.spectators_.Clear();
+  ::memset(&_impl_.big_type_, 0, static_cast<::size_t>(
+      reinterpret_cast<char*>(&_impl_.battle_id_) -
+      reinterpret_cast<char*>(&_impl_.big_type_)) + sizeof(_impl_.battle_id_));
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
+}
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::uint8_t* PBBattleSpectatorListNtf::_InternalSerialize(
+            const MessageLite& base, ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) {
+          const PBBattleSpectatorListNtf& this_ = static_cast<const PBBattleSpectatorListNtf&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::uint8_t* PBBattleSpectatorListNtf::_InternalSerialize(
+            ::uint8_t* target,
+            ::google::protobuf::io::EpsCopyOutputStream* stream) const {
+          const PBBattleSpectatorListNtf& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(serialize_to_array_start:PbBattle.PBBattleSpectatorListNtf)
+          ::uint32_t cached_has_bits = 0;
+          (void)cached_has_bits;
+
+          // uint32 big_type = 1;
+          if (this_._internal_big_type() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                1, this_._internal_big_type(), target);
+          }
+
+          // uint32 small_type = 2;
+          if (this_._internal_small_type() != 0) {
+            target = stream->EnsureSpace(target);
+            target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+                2, this_._internal_small_type(), target);
+          }
+
+          // int64 battle_id = 3;
+          if (this_._internal_battle_id() != 0) {
+            target = ::google::protobuf::internal::WireFormatLite::
+                WriteInt64ToArrayWithField<3>(
+                    stream, this_._internal_battle_id(), target);
+          }
+
+          // repeated .PbBattle.PBBattleSpectatorEntry spectators = 4;
+          for (unsigned i = 0, n = static_cast<unsigned>(
+                                   this_._internal_spectators_size());
+               i < n; i++) {
+            const auto& repfield = this_._internal_spectators().Get(i);
+            target =
+                ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+                    4, repfield, repfield.GetCachedSize(),
+                    target, stream);
+          }
+
+          if (PROTOBUF_PREDICT_FALSE(this_._internal_metadata_.have_unknown_fields())) {
+            target =
+                ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+                    this_._internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
+          }
+          // @@protoc_insertion_point(serialize_to_array_end:PbBattle.PBBattleSpectatorListNtf)
+          return target;
+        }
+
+#if defined(PROTOBUF_CUSTOM_VTABLE)
+        ::size_t PBBattleSpectatorListNtf::ByteSizeLong(const MessageLite& base) {
+          const PBBattleSpectatorListNtf& this_ = static_cast<const PBBattleSpectatorListNtf&>(base);
+#else   // PROTOBUF_CUSTOM_VTABLE
+        ::size_t PBBattleSpectatorListNtf::ByteSizeLong() const {
+          const PBBattleSpectatorListNtf& this_ = *this;
+#endif  // PROTOBUF_CUSTOM_VTABLE
+          // @@protoc_insertion_point(message_byte_size_start:PbBattle.PBBattleSpectatorListNtf)
+          ::size_t total_size = 0;
+
+          ::uint32_t cached_has_bits = 0;
+          // Prevent compiler warnings about cached_has_bits being unused
+          (void)cached_has_bits;
+
+          ::_pbi::Prefetch5LinesFrom7Lines(&this_);
+           {
+            // repeated .PbBattle.PBBattleSpectatorEntry spectators = 4;
+            {
+              total_size += 1UL * this_._internal_spectators_size();
+              for (const auto& msg : this_._internal_spectators()) {
+                total_size += ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
+              }
+            }
+          }
+           {
+            // uint32 big_type = 1;
+            if (this_._internal_big_type() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_big_type());
+            }
+            // uint32 small_type = 2;
+            if (this_._internal_small_type() != 0) {
+              total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+                  this_._internal_small_type());
+            }
+            // int64 battle_id = 3;
+            if (this_._internal_battle_id() != 0) {
+              total_size += ::_pbi::WireFormatLite::Int64SizePlusOne(
+                  this_._internal_battle_id());
+            }
+          }
+          return this_.MaybeComputeUnknownFieldsSize(total_size,
+                                                     &this_._impl_._cached_size_);
+        }
+
+void PBBattleSpectatorListNtf::MergeImpl(::google::protobuf::MessageLite& to_msg, const ::google::protobuf::MessageLite& from_msg) {
+  auto* const _this = static_cast<PBBattleSpectatorListNtf*>(&to_msg);
+  auto& from = static_cast<const PBBattleSpectatorListNtf&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:PbBattle.PBBattleSpectatorListNtf)
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_internal_mutable_spectators()->MergeFrom(
+      from._internal_spectators());
+  if (from._internal_big_type() != 0) {
+    _this->_impl_.big_type_ = from._impl_.big_type_;
+  }
+  if (from._internal_small_type() != 0) {
+    _this->_impl_.small_type_ = from._impl_.small_type_;
+  }
+  if (from._internal_battle_id() != 0) {
+    _this->_impl_.battle_id_ = from._impl_.battle_id_;
+  }
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void PBBattleSpectatorListNtf::CopyFrom(const PBBattleSpectatorListNtf& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:PbBattle.PBBattleSpectatorListNtf)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+
+void PBBattleSpectatorListNtf::InternalSwap(PBBattleSpectatorListNtf* PROTOBUF_RESTRICT other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.spectators_.InternalSwap(&other->_impl_.spectators_);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.battle_id_)
+      + sizeof(PBBattleSpectatorListNtf::_impl_.battle_id_)
+      - PROTOBUF_FIELD_OFFSET(PBBattleSpectatorListNtf, _impl_.big_type_)>(
+          reinterpret_cast<char*>(&_impl_.big_type_),
+          reinterpret_cast<char*>(&other->_impl_.big_type_));
+}
+
+::google::protobuf::Metadata PBBattleSpectatorListNtf::GetMetadata() const {
   return ::google::protobuf::Message::GetMetadataImpl(GetClassData()->full());
 }
 // @@protoc_insertion_point(namespace_scope)

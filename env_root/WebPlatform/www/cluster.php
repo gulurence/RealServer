@@ -5,7 +5,7 @@
 // 期望数: 读/写 cluster:desired:{type}.count → NodeManager 每 2s 收敛。
 // 存活数: 读 cluster:process:by_type:{type} + cluster:process:{type}:{id},
 //         按心跳新鲜(≤15s)判定真正存活；心跳过期的成员视为「僵尸」并单独显示。
-// 页面每 5s 自动刷新 (可暂停), 实时反映 Redis 中的集群状态。
+// 页面仅手动刷新 (点「立即刷新」局部刷新数据区), 实时反映 Redis 中的集群状态。
 // =============================================================================
 require_once __DIR__ . '/_layout.php';
 
@@ -118,7 +118,7 @@ if ($r !== null) {
 $alerts = fetch_alerts($r, 40);
 
 layout_header('集群控制', 'cluster');
-autorefresh(1, '立即刷新');
+autorefresh(1, '立即刷新', false, false);
 live_region_start();
 ?>
 <?php if ($notice !== ''): ?>

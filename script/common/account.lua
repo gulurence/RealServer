@@ -256,9 +256,10 @@ function xEngine.Role.encode(roles)
 end
 
 --- 追加角色: 写列表 + player:{roleId} 数据 + 重名索引
+-- @param existing 可选: 已拉取的角色列表 (避免调用方重复 listRoles 的往返)
 -- @return bool
-function xEngine.Role.addRole(accountId, roleId, name, level, job, data)
-    local roles = xEngine.Role.listRoles(accountId)
+function xEngine.Role.addRole(accountId, roleId, name, level, job, data, existing)
+    local roles = existing or xEngine.Role.listRoles(accountId)
     roles[#roles + 1] = { roleId = roleId, name = name, level = level or 1, job = job or 0 }
     local ok = xEngine.Redis.Set(xEngine.Role.listKey(accountId), xEngine.Role.encode(roles))
     xEngine.Redis.Set(xEngine.Role.nameKey(name), xEngine.Number.intKey(roleId))
@@ -317,13 +318,14 @@ function xEngine.AccountSession.getState(accountId)
         or xEngine.SessionState.OFFLINE
 end
 
---- 写 session 字段 (fields: field→value, 内部 tostring; 每次写刷新 TTL)
+--- 一次读全量 session 字段 (登录热路径: 替代逐个 getField 的多次往返)
+function xEngine.AccountSession.getAll(accountId)
+    return xEngine.Redis.HGetAll(xEngine.AccountSession.key(accountId))
+end
+
+--- 写 session 字段 (fields: field→value; HMSET+EXPIRE 单次往返 + 刷新 TTL)
 function xEngine.AccountSession.set(accountId, fields)
-    local key = xEngine.AccountSession.key(accountId)
-    for k, v in pairs(fields) do
-        xEngine.Redis.HSet(key, k, tostring(v))
-    end
-    xEngine.Redis.Expire(key, 30)
+    return xEngine.Redis.HMSetEx(xEngine.AccountSession.key(accountId), fields, 30)
 end
 
 --- 每账号登录短锁 (SET NX EX), 串行化并发登录; 成功返回 true

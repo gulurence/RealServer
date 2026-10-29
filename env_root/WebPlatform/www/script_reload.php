@@ -20,8 +20,10 @@ const HF_FILES_KEY = 'cluster:hotfix:files';
 const HF_BASELINE_KEY = 'cluster:hotfix:baseline';
 const HF_HISTORY_KEY = 'cluster:hotfix:history';
 const HF_SEQ_KEY = 'cluster:hotfix:seq';
+const HF_NOTE_KEY = 'cluster:hotfix:note';   // 版本 → 热更说明 (供进程热更状态列表按 hotfix_last_ver 反查)
 const HF_CHANNEL = 'cluster:gm:all';
 const HF_HISTORY_MAX = 200;
+const HF_PAGE_SIZE = 8;   // 热更历史 / 进程热更状态 每页条数
 
 // 框架核心文件: 定义热更机制本身 / 持有 file-local 注册表, 热更会导致断链, 标灰需整机重启。
 function is_framework_file(string $rel): bool
@@ -108,7 +110,28 @@ function fetch_hotfix_process_status(?RedisCluster $r): array
             $result[] = $h;
         }
     }
+    // 稳定排序 (type 升序 → id 自然序), 保证分页连续
+    usort($result, function ($a, $b) {
+        $ta = (int)($a['type'] ?? 0); $tb = (int)($b['type'] ?? 0);
+        if ($ta !== $tb) return $ta <=> $tb;
+        return strnatcmp((string)($a['id'] ?? ''), (string)($b['id'] ?? ''));
+    });
     return $result;
+}
+
+/** 脚本热更页分页链接: 保留 hist_page / proc_page, 覆盖指定参数 */
+function hf_page_href(array $overrides): string
+{
+    $params = [];
+    foreach ($_GET as $k => $v) {
+        if ($k === 'hist_page' || $k === 'proc_page') {
+            $params[$k] = (string)$v;
+        }
+    }
+    foreach ($overrides as $k => $v) {
+        $params[$k] = (string)$v;
+    }
+    return 'script_reload.php?' . http_build_query($params);
 }
 
 $r = redis();
@@ -181,6 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // 热更: 打包所有「MD5 相对基线发生变化」的选中文件 → SET pkg:<v> → PUBLISH "hotfix <v>"
         $files = $_POST['files'] ?? [];
+        $note  = post_str('note', '');   // 热更说明 (可选, 存入历史 + 按版本号写入 cluster:hotfix:note)
         if (!is_array($files) || empty($files)) {
             $notice = '未选择任何文件';
             $noticeOk = false;
@@ -220,8 +244,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $entry = [
                     'seq' => $ver, 'ts' => time(), 'operator' => $operator,
-                    'action' => 'hotfix', 'files' => $entryFiles,
+                    'action' => 'hotfix', 'files' => $entryFiles, 'note' => $note,
                 ];
+                $r->hset(HF_NOTE_KEY, (string)$ver, $note);   // 版本 → 说明, 供进程状态列表反查
                 $r->rpush(HF_HISTORY_KEY, json_encode($entry, JSON_UNESCAPED_UNICODE));
                 $r->ltrim(HF_HISTORY_KEY, -HF_HISTORY_MAX, -1);
                 $cmd = 'hotfix ' . $ver;
@@ -247,6 +272,19 @@ if ($r !== null) {
         }
     }
 }
+
+// 分页: 热更历史 / 进程热更状态 (每页 HF_PAGE_SIZE 条)
+$histTotal = count($history);
+$histPages = max(1, (int)ceil($histTotal / HF_PAGE_SIZE));
+$histPage  = max(1, min((int)($_GET['hist_page'] ?? 1), $histPages));
+$historyPage = array_slice($history, ($histPage - 1) * HF_PAGE_SIZE, HF_PAGE_SIZE);
+
+$procs = fetch_hotfix_process_status($r);
+$notes = redis_hash_get($r, HF_NOTE_KEY);   // 版本 → 说明 (进程状态列表按 hotfix_last_ver 反查)
+$procTotal = count($procs);
+$procPages = max(1, (int)ceil($procTotal / HF_PAGE_SIZE));
+$procPage  = max(1, min((int)($_GET['proc_page'] ?? 1), $procPages));
+$procsPage = array_slice($procs, ($procPage - 1) * HF_PAGE_SIZE, HF_PAGE_SIZE);
 
 // 文件列表 + 变动判定 (md5 对所有文件计算, 供界面展示 + 「有变动」判定)
 $rows = [];
@@ -373,6 +411,11 @@ layout_header('脚本热更', 'script_reload');
         <div class="card-footer">
             <button class="btn btn-primary" type="submit"><i class="ti ti-package"></i> 热更</button>
             <span class="dim ms-2">将所选文件内容写入 Redis 并向全部进程发布 hotfix 命令</span>
+            <div class="mt-2">
+                <label class="form-label mb-1" for="hotfix-note">热更说明</label>
+                <input type="text" id="hotfix-note" name="note" class="form-control" maxlength="200"
+                       placeholder="本次热更的说明（可选，将显示在热更历史与进程热更状态列表末尾）">
+            </div>
         </div>
     </div>
 </form>
@@ -380,13 +423,13 @@ layout_header('脚本热更', 'script_reload');
 <div class="card mt-3">
     <div class="card-header">热更历史 <span class="dim">最新在前，回滚 = 重新发布该次热更前的文件内容</span></div>
     <div class="card-body">
-        <?php if (empty($history)): ?>
+        <?php if ($histTotal === 0): ?>
             <div class="empty">暂无热更记录。</div>
         <?php else: ?>
         <table class="table table-sm">
-            <thead><tr><th>时间</th><th>版本</th><th>操作</th><th>文件</th><th style="width:80px">回滚</th></tr></thead>
+            <thead><tr><th>时间</th><th>版本</th><th>操作</th><th>文件</th><th style="width:80px">回滚</th><th>说明</th></tr></thead>
             <tbody>
-            <?php foreach ($history as $e): ?>
+            <?php foreach ($historyPage as $e): ?>
                 <tr>
                     <td class="text-nowrap"><?= esc(date('Y-m-d H:i:s', (int)($e['ts'] ?? 0))) ?></td>
                     <td>v<?= esc((string)($e['seq'] ?? '?')) ?></td>
@@ -403,10 +446,24 @@ layout_header('脚本热更', 'script_reload');
                         </form>
                         <?php endif; ?>
                     </td>
+                    <td class="small"><?= esc((string)($e['note'] ?? '')) ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
+        <?php if ($histPages > 1): ?>
+        <div class="actions" style="justify-content:space-between; align-items:center; flex-wrap:wrap;">
+            <div class="dim">第 <?= $histPage ?> / <?= $histPages ?> 页 · 共 <?= $histTotal ?> 条</div>
+            <div class="actions">
+                <?php if ($histPage > 1): ?>
+                    <a class="btn btn-sm btn-outline-secondary" href="<?= esc(hf_page_href(['hist_page' => $histPage - 1])) ?>">上一页</a>
+                <?php endif; ?>
+                <?php if ($histPage < $histPages): ?>
+                    <a class="btn btn-sm btn-outline-secondary" href="<?= esc(hf_page_href(['hist_page' => $histPage + 1])) ?>">下一页</a>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>
@@ -414,14 +471,13 @@ layout_header('脚本热更', 'script_reload');
 <div class="card mt-3">
     <div class="card-header">进程热更状态 <span class="dim">各进程当前 lua 版本 / 上次热更结果与报错</span></div>
     <div class="card-body">
-        <?php $procs = fetch_hotfix_process_status($r); ?>
-        <?php if (empty($procs)): ?>
+        <?php if ($procTotal === 0): ?>
             <div class="empty">暂无在线进程。</div>
         <?php else: ?>
         <table class="table table-sm">
-            <thead><tr><th>进程</th><th>类型</th><th>Lua版本</th><th>热更状态</th><th>已热更版本</th><th>报错信息</th></tr></thead>
+            <thead><tr><th>进程</th><th>类型</th><th>Lua版本</th><th>热更状态</th><th>已热更版本</th><th>报错信息</th><th>说明</th></tr></thead>
             <tbody>
-            <?php foreach ($procs as $p): ?>
+            <?php foreach ($procsPage as $p): ?>
                 <tr>
                     <td class="mono"><?= esc($p['name'] ?? $p['id'] ?? '') ?></td>
                     <td><?= esc(process_type_name($p['type'] ?? '')) ?></td>
@@ -439,10 +495,24 @@ layout_header('脚本热更', 'script_reload');
                     </td>
                     <td class="mono small"><?= esc($p['hotfix_versions'] ?? '—') ?></td>
                     <td class="small text-danger" style="white-space:pre-line"><?= esc($p['hotfix_error'] ?? '') ?></td>
+                    <td class="small"><?= esc((string)($notes[$p['hotfix_last_ver'] ?? ''] ?? '')) ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
+        <?php if ($procPages > 1): ?>
+        <div class="actions" style="justify-content:space-between; align-items:center; flex-wrap:wrap;">
+            <div class="dim">第 <?= $procPage ?> / <?= $procPages ?> 页 · 共 <?= $procTotal ?> 个进程</div>
+            <div class="actions">
+                <?php if ($procPage > 1): ?>
+                    <a class="btn btn-sm btn-outline-secondary" href="<?= esc(hf_page_href(['proc_page' => $procPage - 1])) ?>">上一页</a>
+                <?php endif; ?>
+                <?php if ($procPage < $procPages): ?>
+                    <a class="btn btn-sm btn-outline-secondary" href="<?= esc(hf_page_href(['proc_page' => $procPage + 1])) ?>">下一页</a>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
         <?php endif; ?>
     </div>
 </div>
