@@ -140,7 +140,9 @@ void CTraceManager::ReportProtocolLatency(TraceDirection direction, int64 latenc
     Sample s;
     s.latencyMs = latencyMs;
     s.msgId = msgId;
-    s.ts = (int64)time(nullptr);
+    s.ts = (int64)std::chrono::duration_cast<std::chrono::milliseconds>(
+                   std::chrono::system_clock::now().time_since_epoch())
+                   .count();
     s.direction = (int32)direction;
 
     // 本地缓冲: 每 link 维护 top-N 最大延迟列表 (最小堆, 超限淘汰最小者)

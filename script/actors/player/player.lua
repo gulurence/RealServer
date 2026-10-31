@@ -70,19 +70,23 @@ function PlayerClass:on_rpc_forward(wrapped)
     return ""
 end
 
--- 断线收尾 (Gate 转发): 玩家离线状态落 frame 状态字段 online=0 (心跳落盘, 可恢复)。
--- Player Actor 不卸载 (断线重连/重复选角复用同一实例), 仅置状态。
+-- 断线收尾 (Gate 转发): 销毁 Player Actor。持久数据 (player:equip / role / account) 已在
+-- Redis, 下一登录经 balanceCreate 重建 (Install → data_load 读回装备), 无需驻留复用。
+-- 修复残留根因: 旧实现仅置 online=0、不卸载 → actor:index:201 无界累积, 重启时
+-- migration.run 全量重建幻影 Player。销毁走 si_actor_delete_local (自卸载 + RequestStop +
+-- 延迟 delete, 与 BattleActor 的 BATTLE_FINALIZE 自毁同路径, 避免消息循环内 delete this);
+-- UnInstall 会 DeregisterActor (清 actor:index/cluster:actor) 并 DecrPlayerCount (修正
+-- cluster:load:player_count 虚高)。战斗结算已兼容 Player 不存在 (battle.deliver_settle 走
+-- Role.updateAttrs Redis 兜底), 故战斗中断线同样可安全销毁。
 function PlayerClass:handle_disconnect(senderId)
-    local me = luacore.si_actor_mgr_find(AT.PLAYER, self._actor_id)
-    if me then
-        luacore.si_set_state_field(me, "online", "0")
-    end
-    xEngine.Log.info("[Player] disconnect: player=%d -> offline", self._actor_id)
+    luacore.si_actor_delete_local(AT.PLAYER, self._actor_id)
+    xEngine.Log.info("[Player] disconnect: player=%d -> destroyed", self._actor_id)
     return ""
 end
 
--- 上线收尾 (Login 转发): 玩家在线状态落 frame 状态字段 online=1 (心跳落盘, 可恢复)。
--- 与 handle_disconnect 配对, 补全 online 字段的 1/0 双向语义。
+-- 上线收尾 (Login 转发): 玩家在线状态落 frame 状态字段 online=1 (心跳落盘, 供恢复/展示)。
+-- 断线已改为销毁 Actor, 不再与 handle_disconnect 构成 1/0 配对; online 仅作在线存续标记
+-- (当前无消费者, 保留供将来 WebPlatform/监控展示)。
 function PlayerClass:handle_online(senderId)
     local me = luacore.si_actor_mgr_find(AT.PLAYER, self._actor_id)
     if me then

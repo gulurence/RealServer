@@ -581,7 +581,8 @@ function GateClass:do_disconnect_cleanup(cid)
         spectator_unregister(spectateId, playerId)
     end
 
-    -- 4) Player Actor 状态置离线: 合成 DISCONNECT 通知, Player 落 frame 状态字段 online=0。
+    -- 4) Player Actor 销毁: 合成 DISCONNECT 通知, Player.handle_disconnect 自卸载
+    --    (持久数据已在 Redis, 下一登录 balanceCreate 重建; 见 player.lua)。
     luacore.si_forward_rpc(AT.PLAYER, playerId,
         luacore.si_net_body_wrap(playerId, encode_small_type(DISCONNECT_SMALL.PLAYER_OFFLINE)))
 end

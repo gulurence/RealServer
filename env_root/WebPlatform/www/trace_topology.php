@@ -441,6 +441,45 @@ if ($isAjax) {
         }
         .msg-list .empty { color: var(--dim); font-size: 13px; padding: 24px 0; }
 
+        /* ===== 消息流瀑布图 (时间轴, 条长=延迟) ===== */
+        .wf-scale { display: flex; align-items: center; gap: 8px; margin: 2px 0 10px; }
+        .wf-scale .wf-time { flex: 0 0 54px; }
+        .wf-scale .wf-val { flex: 0 0 60px; }   /* 与数据行 val 同宽, 保证刻度与条形对齐 */
+        .wf-axis {
+            flex: 1; display: flex; justify-content: space-between;
+            color: var(--dim); font-size: 10px; font-variant-numeric: tabular-nums;
+        }
+        .wf-row { padding: 5px 0; border-bottom: 1px solid #1a2a3a; }
+        .wf-row:last-child { border-bottom: 0; }
+        .wf-line { display: flex; align-items: center; gap: 8px; }
+        .wf-time {
+            flex: 0 0 54px; color: var(--dim); font-size: 11px;
+            font-variant-numeric: tabular-nums;
+        }
+        .wf-track {
+            position: relative; flex: 1; height: 18px;
+            background:
+                linear-gradient(to right, rgba(255,255,255,.05) 1px, transparent 1px);
+            background-size: 25% 100%;
+            border-radius: 3px;
+        }
+        .wf-bar {
+            position: absolute; left: 0; top: 2px; height: 14px;
+            border-radius: 3px; min-width: 2px;
+        }
+        .wf-val {
+            flex: 0 0 60px; text-align: right; color: var(--text); font-size: 12px;
+            font-variant-numeric: tabular-nums;
+        }
+        .wf-caption {
+            margin: 2px 0 0 62px;   /* 对齐条形区 (54px 时间列 + 8px gap) */
+            display: flex; align-items: center; gap: 8px;
+        }
+        .wf-name {
+            max-width: 210px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            color: var(--dim); font-size: 12px;
+        }
+
         /* 连线: 一根固定粗细, 选中高亮发光, 其余变暗 */
         .link-line {
             cursor: pointer; stroke-width: 5;
@@ -526,9 +565,9 @@ if ($isAjax) {
                 </svg>
                 <div class="topo-panel">
                     <h3>链路消息 <span class="dim" id="sel-link-label"></span></h3>
-                    <div class="sub">按延迟降序，最多显示 Top-<?= $topN ?> 条</div>
+                    <div class="sub">消息流瀑布图 · 按延迟降序 · 条长 = 延迟 · 最多显示 Top-<?= $topN ?> 条</div>
                     <div class="legend">
-                        连线颜色 = 峰值延迟：
+                        条色 = 延迟：
                         <span class="dot" style="background:#22c55e;"></span>低
                         <span class="dot" style="background:#eab308;margin-left:12px;"></span>中
                         <span class="dot" style="background:#ef4444;margin-left:12px;"></span>高
@@ -658,7 +697,7 @@ if ($isAjax) {
             });
         }
 
-        // 右侧消息列表控件渲染 (按当前选中链路)
+        // 右侧消息流瀑布图渲染 (时间轴: 每条消息一根横向条, 条长=延迟)
         function renderSamplePanel(key) {
             var label = document.getElementById('sel-link-label');
             var box = document.getElementById('sample-list');
@@ -672,6 +711,7 @@ if ($isAjax) {
             var toName = (nodePos[lk.to] || {}).name || lk.to;
             label.textContent = ' (' + fromName + ' → ' + toName + ', 峰值 ' + (lk.latency || '?') + 'ms, 共 ' + lk.total + ' 条)';
 
+            // 按延迟降序 (慢消息在前), 保持条长=延迟的可读性
             var samples = (lk.samples || []).slice().sort(function (a, b) {
                 return (b.latency_ms || 0) - (a.latency_ms || 0);
             });
@@ -679,21 +719,38 @@ if ($isAjax) {
                 box.innerHTML = '<div class="empty">该链路暂无慢消息。</div>';
                 return;
             }
-            var html = '<table class="table table-vcenter"><thead><tr>' +
-                '<th>延迟(ms)</th><th>名称</th><th>方向</th><th>消息ID</th><th>时间</th>' +
-                '</tr></thead><tbody>';
+
+            // 统一刻度: 条长按当前样本最大延迟归一, 保证所有条可横向比较
+            var maxLat = 0;
+            samples.forEach(function (s) { maxLat = Math.max(maxLat, s.latency_ms || 0); });
+            if (maxLat <= 0) maxLat = 1;
+            var midLat = Math.round(maxLat / 2);
+
+            var html = '<div class="wf-scale">' +
+                '<span class="wf-time"></span>' +
+                '<div class="wf-axis"><span>0 ms</span><span>' + midLat + ' ms</span><span>' + maxLat + ' ms</span></div>' +
+                '<span class="wf-val"></span>' +
+                '</div>';
+
             samples.forEach(function (s) {
+                var lat = s.latency_ms || 0;
+                var pct = Math.max(2, Math.round(lat / maxLat * 1000) / 10);   // 至少 2px 可见
                 var isSend = (s.direction === 'send');
-                html += '<tr>' +
-                    '<td class="mono" style="color:' + (s.color || '#67E2DB') + ';">' + (s.latency_ms ?? '-') + '</td>' +
-                    '<td>' + escHtml(s.name || ('#' + s.msg_id)) + '</td>' +
-                    '<td><span class="badge-dir ' + (isSend ? 'send' : 'recv') + '">' +
-                        (isSend ? '发出' : '接收') + '</span></td>' +
-                    '<td class="mono">' + (s.msg_id ?? '-') + '</td>' +
-                    '<td class="mono">' + fmtTs(s.ts) + '</td>' +
-                    '</tr>';
+                var nm = escHtml(s.name || ('#' + s.msg_id));
+                var tip = nm + ' · ' + lat + ' ms · ' + (isSend ? '发出' : '接收') +
+                    ' · msg_id=' + (s.msg_id ?? '-') + ' · ' + fmtTs(s.ts);
+                html += '<div class="wf-row">' +
+                    '<div class="wf-line">' +
+                        '<span class="wf-time">' + fmtTs(s.ts) + '</span>' +
+                        '<div class="wf-track"><div class="wf-bar" title="' + tip + '" style="width:' + pct + '%;background:' + (s.color || '#67E2DB') + ';"></div></div>' +
+                        '<span class="wf-val">' + lat + ' ms</span>' +
+                    '</div>' +
+                    '<div class="wf-caption">' +
+                        '<span class="wf-name" title="' + nm + '">' + nm + '</span>' +
+                        '<span class="badge-dir ' + (isSend ? 'send' : 'recv') + '">' + (isSend ? '发出' : '接收') + '</span>' +
+                    '</div>' +
+                    '</div>';
             });
-            html += '</tbody></table>';
             box.innerHTML = html;
         }
 
@@ -705,9 +762,11 @@ if ($isAjax) {
 
         function fmtTs(ts) {
             if (!ts) return '-';
-            var d = new Date(ts * 1000);
-            function p(n) { return (n < 10 ? '0' : '') + n; }
-            return p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+            // 兼容旧秒级数据: 毫秒时间戳 >= 1e12, 秒级 (< 1e10) 需要 *1000
+            var ms = (ts >= 1e12) ? ts : (ts * 1000);
+            var d = new Date(ms);
+            function p(n, w) { n = String(n); while (n.length < (w || 2)) n = '0' + n; return n; }
+            return p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()) + '.' + p(d.getMilliseconds(), 3);
         }
 
         // 选中一条链路: 高亮 + 渲染消息列表 + 同步 URL (刷新后仍恢复选中)
