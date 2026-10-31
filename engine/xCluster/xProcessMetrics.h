@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xProcessMetrics.h
+      Purpose:   进程监控字段定义表：Redis Hash 字段名与序列化/反序列化绑定。
+
+      namespace xProcessMetrics 定义 ProcessMetricDef 结构与 kProcessMetrics 字段表（type/id/name/host/ip/port/load 等 19 字段）
+      每字段配 get/set 函数，WriteProcessInfo/ReadProcessInfo 只遍历此表批量 HMSet/HGetAll，避免逐字段硬编码
+      新增监控字段只需在此表加一行，实现定义与逻辑分离
+  *****************************************************************/
+
 #pragma once
 
 #include "xProcessDefine.h"

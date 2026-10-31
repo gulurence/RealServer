@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CRpcTcpClient.cpp
+      Purpose:   自建 asio-TCP RPC 客户端实现
+
+      Connect 建立到 peer 的 TCP 连接并 co_spawn Session 协程读响应帧
+      Submit 按 requestId 登记 pending 回调并写请求帧, CallSyncRaw 同步阻塞等待含超时
+      Session 反查 pending 回调并上报 RPC 往返延迟
+  *****************************************************************/
+
 #include "CRpcTcpClient.h"
 #include "xLog/xLog.h"
 #include "xTrace/CTraceManager.h"

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: RedisMgr.cpp
+      Purpose:   Redis 连接管理器实现
+
+      实现 CRedisPoolMgr::ConnectToRedis 按 title 构造共享 CRedisCli 并校验重复连接
+      GetRedisCli 按 title 返回持久化句柄，未找到时记录错误并返回 nullptr
+  *****************************************************************/
+
 #include "RedisMgr.h"
 #include "xBase/xXMLParser.h"
 

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xRedisRecord.h
+      Purpose:   Redis 记录缓存声明
+
+      CRedisRecord 封装 Load/Update/Remove 三步同步缓存操作, 连接池名默认 actor_cache
+      内部 MakeActorKey 拼接 {type}.{id} 作为 Redis key
+  *****************************************************************/
+
 #pragma once
 
 #include "xRecordDefine.h"

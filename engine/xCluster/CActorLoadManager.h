@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CActorLoadManager.h
+      Purpose:   Actor 负载管理器接口声明：Actor 类型到承载进程的定位与跨进程创建/转发入口。
+
+      声明 CActorLoadManager 单例（继承 xSingleton），负责启动注册可承载类型、按负载挑进程、远程创建/查询/卸载 Actor
+      含按身份定位 ResolveActorProcess 与灰度迁移窗口有界重试的 ResolveActorProcessForForward
+      转发/推送/踢下线均为向目标进程发 asio-TCP RPC，单例状态委托 CActorMgr，不另造真值源
+  *****************************************************************/
+
 #pragma once
 
 #include "xProcessDefine.h"

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xXMLParser.cpp
+      Purpose:   libxml2 封装 XML 解析实现
+
+      实现 parseDoc/getRoot/getChild/getNodeByPath/getPropStr 等方法
+      含 GBK/UTF-8 iconv 编码转换与 getPropValue 的字符串流解析
+  *****************************************************************/
+
 #include "xXMLParser.h"
 #include "xTools.h"
 #include <iconv.h>

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xDefine.h
+      Purpose:   基础整数类型别名与平台适配宏
+
+      定义 int8/int16/int32/int64 等整数别名、ServiceID 与 UInt8_MAX 等极值宏
+      导出 SAFE_DELETE、UE_MIN/UE_MAX 及 Windows/Linux 平台差异宏(bzero/usleep 等)，并集中 include 常用标准库头
+  *****************************************************************/
+
 #pragma once
 
 #ifdef _MSC_VER

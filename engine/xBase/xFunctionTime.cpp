@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xFunctionTime.cpp
+      Purpose:   函数级耗时统计实现
+
+      实现 xFunctionTime 的 inc 累加与 reset 定期清空统计
+      FunctionTimeWrap 用 clock_gettime 记录作用域起止时间差并计入对应返回地址
+  *****************************************************************/
+
 #include <time.h>
 #include "xFunctionTime.h"
 #include "xLog/xLog.h"

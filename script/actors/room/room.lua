@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: room.lua
+      Purpose:   房间/组队 Actor 实现（单例，Game 进程）
+
+      RoomClass 管理房间创建/加入/离开/准备/踢人/转让/开局，房间态与计数器持久化到 Redis 供灰度滚动回读。
+      handle_start 异步开局（ROOM_START_ASYNC）经 balanceCreate 跨进程创建 BattleActor/SpectatorActor 并写花名册、auth_key、装备与观战映射；handle_battle_end 使房间回到等待态。
+]]
+
 -- room.lua — Room actor implementation (单例, Game 进程, id=0)
 --
 -- 客户端业务消息经 Gate 注入发送方 player_id 后, 经 RPC_METHOD_FORWARD_ACTOR

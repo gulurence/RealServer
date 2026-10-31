@@ -1,3 +1,13 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: CMakeLists.txt
+# Purpose:   引擎构建与部署定义
+#
+# 汇总 engine 各模块源文件、SWIG 生成的 luacore 模块包装与 proto-cpp 消息源码，编译 RealServer 可执行文件
+# 同时构建 NodeManager 守护进程二进制；派生 git 短哈希为版本头，并在 MSVC 下 POST_BUILD 拷贝产物到 bin/windows
+#
+
 cmake_minimum_required(VERSION 3.10)
 
 # 设置 C++ 标准

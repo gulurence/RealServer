@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xProcessManager.cpp
+      Purpose:   进程生命周期管理实现：创建进程身份、注册发现、心跳与优雅关闭。
+
+      实现 CProcessManager 单例：CreateProcess 走 Redis INCR 生成进程 ID、分配端口、探测本机 IP、派生验证 Key 并写 local.info/Redis
+      StartHeartbeat 启动 1s tick 心跳线程，每 5s 上报状态/负载/CPU/内存/版本并刷新 Actor 状态与 player 索引 TTL
+      InstallSignalHandlers/RequestShutdown 处理 Ctrl+C/SIGTERM 的进程内优雅关闭
+  *****************************************************************/
+
 #include "xProcessManager.h"
 #include "xServiceDiscovery.h"
 #include "xLocalInfo.h"

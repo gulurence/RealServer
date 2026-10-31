@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: RpcFrame.h
+      Purpose:   自建 asio-TCP RPC 帧定义
+
+      定义请求/响应帧格式(主机字节序)与 RpcFrameHeadST, 第三个 uint32 字段请求侧为 methodId 响应侧为 errCode
+      定义 ERpcMethodId 方法枚举、RpcHandler/RpcHandlerResult/RpcCallResult/RawRpcResult 及 MAX_RPC_BODY_SIZE
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

@@ -1,3 +1,14 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: battle.lua
+      Purpose:   战斗 Actor 实现（多实例，Battle 进程）
+
+      BattleClass 继承 xEngine.ActorBase，每个战斗房一个实例（id=battle_id），经 Room 异步开局用 ActorCreator.balanceCreate 跨进程创建。
+      通过 si_battlecore_* 绑定确定性纯 C++ 帧同步核心，实现锁步输入收集、flush_frame 帧推进、周期快照、断线重连追帧、观战推流与战斗结算。
+      结束条件由 Lua 权威判定，并负责战斗回放校验（save_replay）、战报索引与 BATTLE_FINALIZE 延迟回收。
+]]
+
 -- battle.lua — Battle actor implementation (多实例, Battle 进程, id=battle_id)
 --
 -- 每个战斗房对应一个 BattleActor 实例 (id == battle_id)。跨进程创建由 Room 在

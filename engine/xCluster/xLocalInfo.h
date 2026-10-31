@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xLocalInfo.h
+      Purpose:   本机节点注册表 local.info 接口：端口分配与本机节点登记。
+
+      声明 CLocalInfo 单例：Init 加载 local.info，AllocatePort 分配类型可用 RPC 端口
+      Register/Remove 登记或移除节点，GetNodes 返回全部节点，GetLocalIp 静态方法取本机 IPv4
+      文件位于运行根目录，用于进程初始化端口分配与 IP/AuthKey 记录
+  *****************************************************************/
+
 #pragma once
 
 #include "xProcessDefine.h"

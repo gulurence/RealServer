@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xCircularBuffer.cpp
+      Purpose:   网络接收环形缓冲区实现：asio 读写缓冲与客户端帧拆包。
+
+      实现 xCircularBuffer 类：GetWriteBuffer/Write/Read/Put 维护 head_/tail_/size_ 原子量环形读写
+      缓冲区满时 Resize 翻倍扩容并重整数据，支持回绕拷贝
+      HaveFullPackage 按 [uint32 u32Len][body] 客户端帧判断是否已有完整包，返回整包长度
+  *****************************************************************/
+
 
 #include "xCircularBuffer.h"
 

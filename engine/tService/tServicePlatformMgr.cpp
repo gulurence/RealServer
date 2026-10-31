@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tServicePlatformMgr.cpp
+      Purpose:   平台管理服务实现
+
+      tServicePlatformMgr::Init 从 ThridPlatformMgrConfig 读取 platform、traceEndpoint、enableTrace 并登记追踪开关
+      TraceEvent 与 ReportMetric 通过 xLog 输出链路追踪事件与运行时指标
+  *****************************************************************/
+
 #include "tServicePlatformMgr.h"
 #include "xLog/xLog.h"
 

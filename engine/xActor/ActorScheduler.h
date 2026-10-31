@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ActorScheduler.h
+      Purpose:   Actor 协程调度器声明
+
+      声明 CActorScheduler 单例: Init/Stop/Spawn/ScheduleAfter 及 GetContext
+      DispatchSync 模板把非调度线程(RPC 服务线程)的调用 post 到调度线程串行执行, 保护进程唯一 lua_State
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xSingleton.h"

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: BattleCore.cpp
+      Purpose:   确定性帧同步引擎实现(引擎层)
+
+      CBattleCore 引擎职责实现: Init 复位引擎标量、SubmitInput 累积输入、Tick 委托 BattleGame.Step
+      快照/哈希负责 magic/seed/rng/frame/nextId 引擎标量并与游戏状态流拼接, HurtSp01ById 为 P2 伤害入口
+  *****************************************************************/
+
 // =============================================================================
 // BattleCore.cpp — 确定性帧同步引擎实现 (纯引擎: PRNG / id 分配 / 输入队列 / 快照引擎标量)
 //

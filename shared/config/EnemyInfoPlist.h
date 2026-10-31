@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: EnemyInfoPlist.h
+      Purpose:   enemyInfo.plist 离线解析为 sp01/turret 表
+
+      EnemyInfoToSp01Table/PtInfoToTurretTable 把 plist 键映射为 sp01/turret 表
+      name→classId 复用 ParseMonsterId, 存原始 plist 值, 换算与难度增量留到解码层完成
+  *****************************************************************/
+
 // =============================================================================
 // EnemyInfoPlist.h — plist/enemyInfo.plist (小怪属性) → sp01 表 的离线解析与映射 (纯 C++)
 //

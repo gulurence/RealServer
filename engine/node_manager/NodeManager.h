@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: NodeManager.h
+      Purpose:   物理机守护进程 CNodeManager 类声明
+
+      声明 CNodeManager 守护进程类与 ChildInfo 子进程状态结构
+      定义机器注册心跳、期望数收敛、自动扩缩容、灰度更新等接口与各 Redis 键常量
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

@@ -1,4 +1,16 @@
 #!/usr/bin/env python
+
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: deploy_restyle.py
+# Purpose:   把 restyled 重绘图集部署进客户端资源目录
+#
+# backup 先备份原松散图与 res 存档，deploy_loose 覆盖 anim、extension 松散 png
+# 按 ZIP_MAP 重写 res zip 中指定 pic、map png，写临时 zip 校验后再原子替换
+# 默认目标为 client/soulofgun/Debug.win32/Resources
+#
+
 # -*- coding: utf-8 -*-
 """把 restyled/ 的重绘图集部署进客户端资源目录。
 - anim/*.png、extension/mf_p.png 是松散文件，直接覆盖。

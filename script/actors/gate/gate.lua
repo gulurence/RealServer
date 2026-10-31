@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: gate.lua
+      Purpose:   Gate 网关 Actor 实现（客户端接入与登录链路编排）
+
+      GateClass 处理客户端 asio TCP 长连接消息，按 BigType/SmallType 分发登录、选角、创角与业务转发（forward_business）。
+      维护 connPlayer/playerConn/connAccount 映射并注入发送方身份，实现登录 RPC 透传、on_rpc_push 服务器主动推送、观战席位 Redis 登记（spectator_register/spectator_unregister）与统一断线收尾（do_disconnect_cleanup）。
+]]
+
 -- gate.lua — Gate actor implementation (客户端接入 + 登录链路编排)
 --
 -- 客户端 → Gate: asio TCP 长连接, 帧 = [uint32 len][protobuf body]。

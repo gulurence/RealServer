@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: class.lua
+      Purpose:   Lua 面向对象类系统
+
+      xEngine.Class.define 提供类定义、继承、ctor 构造、super 调用与全局注册表。
+      热更时原地更新类表，既有实例经 metatable.__index 自动获得新方法。
+]]
+
 -- class.lua — Lua OOP class management system
 -- Provides class definition with inheritance, constructor, super calls,
 -- and global registry for hot-reload support.

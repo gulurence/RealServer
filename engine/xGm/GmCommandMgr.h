@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: GmCommandMgr.h
+      Purpose:   GM 命令模块 CGmCommandMgr 声明
+
+      声明 CGmCommandMgr 单例
+      订阅 cluster:gm:all/type/pid 频道，提供 RegisterActor/LogReply 与 hotfix hash 门控成员
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xSingleton.h"

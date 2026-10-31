@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: _audit.py
+# Purpose:   图集重绘保真度审计脚本
+#
+# per_frame 按 plist 帧矩形裁剪原图与重绘图，逐帧调用 frame_corr 计算灰度结构相关
+# 汇总每张图集的中位 r、均值 r 与低分帧占比，并输出整体中位与均值及阈值分布
+# 用于量化 restyle_atlas 重绘后与原图的构图一致性
+#
+
 import re, zipfile, io, glob, os
 from PIL import Image
 from plistlib import loads as plist_loads

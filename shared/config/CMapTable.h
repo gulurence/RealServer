@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CMapTable.h
+      Purpose:   地图碰撞配置强类型解码
+
+      CMapTable 跨 map/map_rect/map_entry 三表按 levelId 重组 battlecore::MapCollision
+      矩形(people/bullet)与出生点像素 int 经 FxFromInt 转定点, 对齐旧客户端底左原点语义
+  *****************************************************************/
+
 // =============================================================================
 // CMapTable.h — 碰撞配置 bin 的强类型解码 (跨 map / map_rect / map_entry 三张表)
 //

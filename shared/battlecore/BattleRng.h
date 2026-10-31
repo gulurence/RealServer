@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: BattleRng.h
+      Purpose:   确定性 PRNG(splitmix64)
+
+      CBattleRng splitmix64 确定性伪随机数发生器, 同种子同序列, 0 种子视为 1
+      提供 NextU32/NextFloat/NextRange 与全局确定性源 SeedBattleRng/DetRandom/DetRandomRange/DetRandom01
+  *****************************************************************/
+
 // =============================================================================
 // BattleRng.h — 确定性 PRNG (splitmix64)
 //

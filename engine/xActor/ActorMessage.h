@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ActorMessage.h
+      Purpose:   Actor 消息结构与协程队列
+
+      定义 ActorMessage(消息ID/负载/入队时刻)与 ActorTask 协程返回类型
+      实现 ActorMessageQueue 线程安全 MPSC 队列, 唤醒经 asio::post 调度到绑定 io_context 线程
+      规避丢失唤醒竞态, 保证 Actor 业务始终在单一调度线程串行执行
+  *****************************************************************/
+
 #pragma once
 
 #include "ActorDefine.h"

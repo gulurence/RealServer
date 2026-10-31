@@ -1,3 +1,12 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: actor_type.lua
+      Purpose:   Actor 类型枚举定义
+
+      定义 xEngine.ActorType，与 C++ EActorType 对齐：Gate=100、Login=101、Friend=102、Room=103、Chat=104、Config=105、Player=201、Battle=203、Spectator=204。
+]]
+
 -- actor_type.lua — Actor type enum definitions
 -- Shared between C++ (EActorType enum) and Lua layer
 -- Must match the values in engine/xBase/xTypeDefine.h EActorType

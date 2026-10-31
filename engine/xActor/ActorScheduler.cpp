@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ActorScheduler.cpp
+      Purpose:   Actor 协程调度器实现
+
+      单 io_context + work_guard + 工作线程, Spawn 将 Actor 的 MessageLoop 协程挂上调度器
+      ScheduleAfter 用 asio::steady_timer 延迟投递, 到点经 CActorMgr 重新 Find 定位实例避免裸指针悬挂
+  *****************************************************************/
+
 #include "ActorScheduler.h"
 #include "Actor.h"
 #include "ActorMgr.h"

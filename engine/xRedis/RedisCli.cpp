@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: RedisCli.cpp
+      Purpose:   Redis Cluster 客户端实现
+
+      实现 CRedisCli 基于 sw::redis::RedisCluster 的 String/Hash/Set/ZSet/List/PubSub 命令封装
+      ConnectDB 构造集群句柄并发现全集群，订阅通道以独立后台线程加独立连接消费
+      HMSetEx 用 pipeline 合并 HMSET+EXPIRE 为单次往返以优化登录 session 同步热路径
+  *****************************************************************/
+
 #include "RedisCli.h"
 
 #include <chrono>

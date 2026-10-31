@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CPlayerActorIndex.h
+      Purpose:   player:{playerId} 到 actorId 路由索引接口：按业务 PlayerID 定位其 Player Actor 所在进程。
+
+      声明 CPlayerActorIndex 单例：Register/Deregister/Resolve/Invalidate/RefreshTtl 管理 player:{id} 索引
+      Incr/DecrPlayerCount 维护玩家总数计数器供登录排队限流
+      本地缓存 map<playerId,actorId> 由 m_mutex 保护，Redis 不可用时退化为仅本地缓存
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xSingleton.h"

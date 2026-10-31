@@ -1,3 +1,12 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ActorRpcHandlers.h
+      Purpose:   Actor RPC 处理器注册声明
+
+      声明 RegisterActorRpcHandlers(), 在 CRpcTcpServer::Start 之前完成跨进程 Actor 管理方法注册
+  *****************************************************************/
+
 #pragma once
 
 // =============================================================================

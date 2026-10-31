@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: postprocess.py
+# Purpose:   AI 直出图后处理为游戏可用资产
+#
+# process 按 mode 分 background、ui、sprite 三类，分别做 cover 裁切、去背景、像素风下采样
+# remove_background 支持 rembg 与色键去除 chroma 两种策略，缺 rembg 时自动退回 chroma
+# pixelate 用最近邻缩放并可 median-cut 量化锁色板，保留 alpha 通道
+#
+
 """后处理：AI 直出图 → 游戏可用资产。
 
 - background：等比裁切（cover）/缩放到目标尺寸，输出不透明 PNG（全出血背景）。

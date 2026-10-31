@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xStringTool.h
+      Purpose:   字符串工具类 StringTool
+
+      提供 format/format_index、split/join、trim/tolower/toupper 等字符串工具
+      含模板 tostring/append 与自然排序 compare_nature、通配 match_wildcard
+  *****************************************************************/
+
 #pragma once
 
 #include "xTools.h"

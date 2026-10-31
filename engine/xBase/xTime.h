@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xTime.h
+      Purpose:   xTime 时间类与定时器
+
+      定义 xTime 静态时间工具、xTimer/xMilliTimer/xDayTimer 定时器
+      含 getCurSec/getDayStart/elapse 接口与 getAscTime 辅助函数
+  *****************************************************************/
+
 #pragma once
 
 #include "xDefine.h"

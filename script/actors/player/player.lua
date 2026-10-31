@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: player.lua
+      Purpose:   Player 玩家 Actor 实现
+
+      PlayerClass 承载单个玩家的角色热数据，处理装备上传（handle_save_loadout）与战斗结算回传（on_player_settle_msg）。
+      断线时 handle_disconnect 调用 si_actor_delete_local 自销毁，避免 actor:index:201 无界累积；装备权威持久化到 player:equip:{roleId}。
+]]
+
 -- player.lua — Player actor implementation
 local AT = xEngine.ActorType
 

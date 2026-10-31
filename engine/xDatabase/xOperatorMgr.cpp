@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xOperatorMgr.cpp
+      Purpose:   数据库操作管理器实现
+
+      实现 COperatorMgr 的对象池 Pop/PushOperatorNode 与 ConnectToDB/PushOperator
+      ConnectToDB 按 title 创建 DBOperator 并注册到 m_mapDBOperator，PushOperator 按节点 title 投递
+  *****************************************************************/
+
 #include "xOperatorMgr.h"
 
 DatabaseOpNode *COperatorMgr::PopOperatorNode()

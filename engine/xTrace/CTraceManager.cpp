@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CTraceManager.cpp
+      Purpose:   链路追踪采样与异步上报实现
+
+      实现 CTraceManager::ReportProtocolLatency 本地 top-N 堆缓冲
+      FlushLoop 每 60s 异步 ZADD 到 trace:link 前缀 ZSET 并打 slow report
+  *****************************************************************/
+
 #include "CTraceManager.h"
 
 #include "xRedis/RedisMgr.h"

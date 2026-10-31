@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: chat.proto
+      Purpose:   聊天模块协议定义
+
+      定义 ChatMsgId / ChatChannelType 枚举与 PBChatSendReq/Rsp、PBChatNtf、PBChatHistoryReq/Rsp 及子数据 PBChatMsg
+      包名 PbChat，一级 Actor 类型 AT_CHAT=104
+  *****************************************************************/
+
 // =============================================================================
 // chat.proto — 聊天模块协议 (一级 Actor 类型 = AT_CHAT = 104)
 //

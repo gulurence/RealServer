@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xRedisRecord.cpp
+      Purpose:   Redis 记录缓存实现
+
+      CRedisRecord 的 Load/Update/Remove 经 CRedisPoolMgr 取连接池客户端执行 Get/Set/Del
+      Redis key 格式为 {type}.{id}, 连接池名默认 actor_cache
+  *****************************************************************/
+
 #include "xRedisRecord.h"
 #include "xRedis/RedisMgr.h"
 #include "xLog/xLog.h"

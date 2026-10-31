@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xServiceDiscovery.cpp
+      Purpose:   基于 Redis 的服务发现与注册实现：注册、心跳、发现与身份解析。
+
+      实现 CServiceDiscovery 单例：Register/Heartbeat 写 cluster:process:{type}:{id} Hash 与类型索引 Set 并续 30s TTL
+      DiscoverPeers/GetProcessInfo 读 Hash 并做 15s 心跳过滤，GetActorProcessId 读 cluster:actor:{type}:{id} 的 pid 定位 Actor 进程
+      GetLinkRules 读 cluster:link:rules，WriteProcessInfo/ReadProcessInfo 用 HMSet/HGetAll 批量读写，GenerateProcessId 走 Redis INCR
+  *****************************************************************/
+
 #include "xServiceDiscovery.h"
 #include "xProcessMetrics.h"
 #include "xRedis/RedisMgr.h"

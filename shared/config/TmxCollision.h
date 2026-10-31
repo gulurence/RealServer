@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: TmxCollision.h
+      Purpose:   TMX 碰撞对象层离线解析
+
+      ParseTmxCollision 解析 collide_people/collide_bullet/entry 对象层为 battlecore::MapCollision
+      MapCollisionToTables/ParseTmxTurretPoints/TurretPointsToTables 转 map 表与炮台出生点, y 翻转底左原点
+  *****************************************************************/
+
 // =============================================================================
 // TmxCollision.h — TMX 对象层 (collide_people/collide_bullet/entry) → 内核碰撞
 // MapCollision 的离线解析与映射 (纯 C++, S2)

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: RedisMgr.h
+      Purpose:   Redis 连接管理器（单例）
+
+      定义 CRedisPoolMgr 单例，按 title 维护 CRedisCli 共享句柄映射
+      ConnectToRedis 建立连接，GetRedisCli 返回线程安全的同一 RedisCluster 句柄供各模块复用
+  *****************************************************************/
+
 #pragma once
 
 #include "RedisCli.h"

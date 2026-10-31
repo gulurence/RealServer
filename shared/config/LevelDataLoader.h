@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: LevelDataLoader.h
+      Purpose:   关卡配置加载注入核心
+
+      LevelDataLoader 解码 wave/map_collision/sp01 三份 bin 并原子注入 CBattleCore
+      InjectFromDir 本地直读, InjectFromBlobs 客户端网络拉取, 共用 InjectFromReaders 纯解码无 I/O
+  *****************************************************************/
+
 // =============================================================================
 // LevelDataLoader.h — C6 S5 收口: 从关卡 bin 目录加载并注入核心
 //

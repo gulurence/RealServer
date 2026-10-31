@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xOperatorNode.cpp
+      Purpose:   数据库操作节点实现
+
+      实现 DatabaseOpNode::OnCallLogic 按 m_enOpType 分发 onInsert/onSelect/onUpdate/onDelete 并触发异步回调
+      DBOperator 以 xThread 线程循环消费节点队列，PushOperator 入队并通知条件变量
+  *****************************************************************/
+
 #include "xOperatorNode.h"
 #include "xOperatorMgr.h"
 #include "xLog/xLog.h"

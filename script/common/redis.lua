@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: redis.lua
+      Purpose:   Redis 访问工具模块
+
+      xEngine.Redis 封装 SWIG si_redis_* 接口，提供字符串、哈希、列表、集合及计数器操作。
+      含 Get/Set/Del、HGet/HSet/HGetAll/HMSet/HMSetEx、RPush/LPop/LPos、SetNxEx/Expire、SAdd/SRem/SMembers 等。
+]]
+
 -- redis.lua — xEngine.Redis global tool module
 -- Wraps C++ Redis operations exported via SWIG si_redis_* functions.
 --

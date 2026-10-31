@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CNetGateway.cpp
+      Purpose:   Gate 网络接入层实现：客户端 TCP 帧解析并路由到 Gate Actor。
+
+      实现 CNetGateway 单例：OnPackage 解析 [uint32 len][protobuf body] 前导 big_type/small_type 组装 msgId 路由到 Gate Actor
+      body 前置 8 字节小端 CID 供回包，OnDisconnect 投递 SYS_DISCONNECT 到 Gate Actor 统一收尾
+      SendToCID 投递到 socket executor 异步写，GetRateLimitPerSec 每 5s 读 gate_rate_limit_per_sec 用令牌桶限流
+  *****************************************************************/
+
 #include "CNetGateway.h"
 #include "xNetAgent.h"
 #include "xActor/ActorMgr.h"

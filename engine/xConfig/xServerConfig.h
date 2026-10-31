@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xServerConfig.h
+      Purpose:   服务器配置结构与加载单例
+
+      定义 ServerXmlConfig/ProcessXmlConfig/HostedActorsConfig 等配置结构
+      CServerConfig 单例提供 Load 与 FindRedisCfg/FindDBCfg/GetHostedActorTypes 查询
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xSingleton.h"

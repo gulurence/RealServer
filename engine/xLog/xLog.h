@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xLog.h
+      Purpose:   spdlog 日志封装与日志宏
+
+      定义 xLog 单例与 Level 枚举
+      提供 XTRC/XDBG/XLOG/XINF/XWRN/XERR 日志宏
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

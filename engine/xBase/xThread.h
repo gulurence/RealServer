@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xThread.h
+      Purpose:   xThread 线程基类
+
+      定义 xThread 抽象类与 ThreadState 状态枚举
+      提供 thread_init/thread_proc 虚接口与 thread_run 静态回调
+  *****************************************************************/
+
 #pragma once
 
 #include "xDefine.h"

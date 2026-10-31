@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CRpcTcpServer.cpp
+      Purpose:   自建 asio-TCP RPC 服务端实现
+
+      Listener 接受连接并为每连接 co_spawn Session 协程
+      Session 读帧后按 methodId 查 handler 注册表分发, 组装响应帧(第三字段回传 errCode), 上报服务端处理延迟
+  *****************************************************************/
+
 #include "CRpcTcpServer.h"
 #include "xLog/xLog.h"
 #include "xTrace/CTraceManager.h"

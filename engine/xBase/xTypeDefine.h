@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xTypeDefine.h
+      Purpose:   全局类型系统枚举定义
+
+      定义 EProcessType（进程类型）、EActorType（Actor 类型）与 EProcessState（进程状态）枚举
+      消除裸整数别名，供 xActor/tService/xConfig 等基础层引用
+  *****************************************************************/
+
 #pragma once
 
 // =============================================================================

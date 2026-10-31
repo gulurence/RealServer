@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: GmCommandMgr.cpp
+      Purpose:   GM 命令模块实现（Redis pub/sub 控制面）
+
+      实现 CGmCommandMgr 订阅线程、框架命令(help/info/spawn/shutdown/hotfix 等)与 Actor 命令转发
+      含脚本热更 HFX1 包解包、FNV-1a hash 门控与 Actor 注册/注销
+  *****************************************************************/
+
 #include "GmCommandMgr.h"
 
 #include "xActor/Actor.h"

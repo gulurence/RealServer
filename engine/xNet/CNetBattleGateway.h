@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CNetBattleGateway.h
+      Purpose:   战斗进程网络接入层接口：客户端直连 Battle 进程的 TCP 握手与消息路由。
+
+      声明 CNetBattleGateway 单例：复用 xNetAgent，路由目标为多实例 BattleActor
+      首帧 LOGIN_REQ 在 C++ 层握手校验 auth/roster 后绑定 CID→(battleId,playerId) 会话并回 LOGIN_RSP
+      后续帧按 msgId 投递给 BattleActor 的 on_msg，body 前置 8 字节 playerId，SendToPlayer 由会话反查 CID 下发
+  *****************************************************************/
+
 #pragma once
 
 #include "xNetDefine.h"

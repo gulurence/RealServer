@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: actor_mgr.proto
+      Purpose:   跨进程 Actor 管理 RPC 消息定义
+
+      定义 PBRPCCreateActorRequest/Reply、PBRPCFindActorRequest/Reply、PBRPCUninstallActorRequest/Reply
+      仅保留消息结构，传输走 asio-TCP，gRPC service 已退役，包名 actormgr
+  *****************************************************************/
+
 // actor_mgr.proto — Cross-process actor management RPC message schema
 //
 // Enables ActorMgr to create, find, and uninstall actors on remote processes.

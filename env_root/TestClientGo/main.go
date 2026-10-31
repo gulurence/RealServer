@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: main.go
+      Purpose:   Go 版 RealServer 压测客户端入口
+
+      解析 gate-host、count、concurrency、mode 等参数后用 goroutine 并发孵化虚拟客户端
+      聚合 result 统计成功率、吞吐、延迟分位数及 battle 模式帧同步收发量
+      支持 login 测在线上限与 battle 测战斗上限两种模式，替换旧 C++ 每客户端一进程的低效方案
+  *****************************************************************/
+
 package main
 
 // TestClient (Go) — RealServer 压测客户端。

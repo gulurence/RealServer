@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tServiceXml.cpp
+      Purpose:   XML 配置服务封装实现
+
+      tServiceXml::Init 在 CServerConfig 未加载时按 ThridXmlConfig 路径 Load 配置
+      已加载时跳过重复加载以避免覆盖命令行参数（--type/--name/--port/--platform）
+  *****************************************************************/
+
 #include "tServiceXml.h"
 #include "xConfig/xServerConfig.h"
 #include "xLog/xLog.h"

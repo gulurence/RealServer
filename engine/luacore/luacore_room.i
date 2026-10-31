@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: luacore_room.i
+      Purpose:   房间模块 Lua 绑定
+
+      生成 %module luacore_room，导出 PbRoom 编解码 si_pb_room_create/list/join/leave/ready/kick/start 等响应与 info/member 通知
+      房间与成员列表以逗号分号串拼装 repeated 字段，开战响应含 battle_id/auth_key/host_ip/port
+  *****************************************************************/
+
 // luacore_room.i — 房间模块编解码绑定 (package PbRoom)
 // Lua: luacore_room.si_pb_room_*
 %module luacore_room

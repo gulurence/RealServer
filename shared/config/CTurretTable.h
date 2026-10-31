@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CTurretTable.h
+      Purpose:   炮台属性与出生点配置强类型解码
+
+      CTurretTable 跨 turret/turret_point 两表解码 TurretConfig 与 TurretSpawn
+      bulletSpeed 按 moveSpeed×3 折算 20Hz 帧, hurtHeroDis 取 attackdis, 炮台无难度加成
+  *****************************************************************/
+
 // =============================================================================
 // CTurretTable.h — 炮台属性 + 出生点配置 bin 的强类型解码 (跨 turret / turret_point 两表)
 //

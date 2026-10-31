@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: hotfix.lua
+      Purpose:   Lua 热更新插件
+
+      源自 tools/LuaHotFix-master/HotFix.lua，xEngine.HotFix 在隔离 fakeEnv 中 loadfile 目标模块，用 upvaluejoin 对全局函数原位打补丁、对 table 只更新函数/保留数据。
+      工程适配禁用了 require 拦截，并追加 UpdateFiles/UpdateFilesData/PrecheckFilesData 批量热更入口。
+]]
+
 -----------------------------------------------------------
 -- 文件名　：hotfix.lua
 -- 来源　　：tools/LuaHotFix-master/HotFix.lua (yuerer, Lua 5.3/5.4 服务端热更新)

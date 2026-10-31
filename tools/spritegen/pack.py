@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: pack.py
+# Purpose:   多帧 PNG 打包为 cocos2d-x TexturePacker 格式图集
+#
+# pack 用 _shelf_pack 高度降序 shelf 算法把多帧拼进一张 RGBA 大图
+# 输出 format=2 的 plist 与 png，rotated 恒为 false，可被 CCSpriteFrameCache 直接加载
+# 帧元数据含 frame、offset、sourceColorRect、sourceSize 与 metadata
+#
+
 """pack.py: 把多帧 PNG 打包成 cocos2d-x（TexturePacker）格式的 plist + png 图集。
 
 与客户端 anim/ 下现有图集（如 boy.plist）同格式（format=2），可直接被

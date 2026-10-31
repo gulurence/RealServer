@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: luacore_config.i
+      Purpose:   配置热更模块 Lua 绑定
+
+      生成 %module luacore_config，提供 si_config_load 读取 wave/map_collision/sp01 三份 bin 到进程内全局 blob 缓存
+      并导出 si_config_get_rsp / si_config_changed_ntf，contentHash 全程留在 C++ 侧编码进 proto，规避 64 位哈希经 Lua double 丢精度
+  *****************************************************************/
+
 // luacore_config.i — 配置热更模块编解码 + 配置加载 (package PbConfig)
 //   si_config_load           — 读 3 份 bin → 全局 blob 缓存 + 聚合 contentHash
 //   si_config_get_rsp        — 完整 bundle 响应 (version + contentHash + files)

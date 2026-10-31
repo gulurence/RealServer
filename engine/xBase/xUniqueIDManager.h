@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xUniqueIDManager.h
+      Purpose:   唯一 ID 分配器模板
+
+      定义 UniqueIDManager<T> 模板，在 min 到 max 区间环形分配不重复 ID
+      提供 UniqueUInt32IDManager/UniqueUInt16IDManager 别名
+  *****************************************************************/
+
 #pragma once
 
 #include "xDefine.h"

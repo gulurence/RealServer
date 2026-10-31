@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: chat.lua
+      Purpose:   聊天 Actor 实现（单例，Global 进程）
+
+      ChatClass 经 on_rpc_forward 处理 SEND_REQ/HISTORY_REQ，按频道类型与频道 id 把历史消息缓存在 xEngine.chat_state（跨热更保留）。
+      handle_send 写入历史并实时广播 CHAT_NTF，handle_history 返回频道历史；历史以逗号/分号拼串编码，含定界符的 content 会被截断。
+]]
+
 -- chat.lua — Chat actor implementation (单例, Global 进程, id=0)
 --
 -- 客户端业务消息经 Gate 注入发送方 player_id 后, 经 RPC_METHOD_FORWARD_ACTOR

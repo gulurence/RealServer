@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xProcessDefine.h
+      Purpose:   集群进程类型/状态定义与 Actor 承载映射、进程身份结构体。
+
+      定义 XCLOG/XCWRN/XCERR 绿色集群日志宏，GetHostedActorTypes/ActorTypeToProcessType 声明进程与 Actor 承载关系
+      定义 ProcessInfo/PeerConnection/LinkRule/RpcError 等结构体及 GenerateAuthKey(HMAC-SHA256) 派生验证 Key
+      声明 GetBasePortForType 各类型基础 RPC 端口、负载阈值常量 kCpuFullPercentDefault 等与 kProcessVersion
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

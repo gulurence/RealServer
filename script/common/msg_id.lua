@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: msg_id.lua
+      Purpose:   消息 ID 约定定义
+
+      xEngine.MsgId 定义 32 位消息 ID 分段（高 16 位类别、低 16 位子编号）及 USER_BEGIN 业务消息。
+      NAMES 表登记 msg_id 到 handler 名后缀（on_<name>_msg）的映射，供 ActorBase:on_msg 分发。
+]]
+
 -- msg_id.lua — 消息 ID 约定 (Lua 侧)
 -- 镜像 C++ engine/xActor/ActorMsgId.h 的 32 位 ID 分段约定:
 --   高 16 位 = 类别 (0 = 框架系统消息/C++ 处理; 非0 = 业务消息/Lua 处理)

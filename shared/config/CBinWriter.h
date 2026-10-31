@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CBinWriter.h
+      Purpose:   配置 bin 序列化(确定性)
+
+      BuildBin 把多张 TableData 序列化成 RSCF bin, 同输入逐字节同输出
+      字符串表 intern 去重 + schema/data/index 分段组装 + content_hash/schema_hash 回写, 行编码含 id 与数组长度前缀
+  *****************************************************************/
+
 // =============================================================================
 // CBinWriter.h — 配置 bin 序列化 (确定性: 同输入 → 逐字节同输出)
 //

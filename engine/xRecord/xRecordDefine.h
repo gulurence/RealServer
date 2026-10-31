@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xRecordDefine.h
+      Purpose:   记录模块类型定义入口
+
+      引入 xBase/xRecordDataDefine.h 提供 RecordDataST 等记录结构
+      文件内保留注释掉的订单表字段/列定义示例, 无实际生效代码
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xTools.h
+      Purpose:   通用工具函数集
+
+      定义 Tools 结构、randBetween/selectByPercent 随机函数与 Clamp/square 模板
+      含 getLocalTime/parseTime/addslashes/SAFE_CLOSE_SOCKET 等内联工具
+  *****************************************************************/
+
 #pragma once
 
 #include "xLog/xLog.h"

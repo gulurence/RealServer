@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CSp01Table.h
+      Purpose:   小怪属性配置强类型解码
+
+      CSp01Table 解码 sp01 表并按难度增量(kSp01DiffHp/Hurt/Speed)换算 Sp01Config
+      maxHp/walkSpeed/hurtToHero 口径对齐旧客户端, 键为 Sp01ConfigKey(classId,sp01Id)
+  *****************************************************************/
+
 // =============================================================================
 // CSp01Table.h — 小怪属性配置 bin 的强类型解码 (单张 sp01 表)
 //

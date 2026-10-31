@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: number.lua
+      Purpose:   整型 ID 归一化工具
+
+      xEngine.Number 提供 toInt/intKey，把 SWIG 暴露的浮点整数值归一化为 Lua 整数，避免 Redis 键出现 3.0 之类格式。
+      用于拼接 Redis 键与日志。
+]]
+
 -- number.lua — 数值工具: 归一化跨 SWIG 的整型 ID
 --
 -- 背景: SWIG 生成的 si_* 接口把所有 C++ 整型 (int32/int64) 都以

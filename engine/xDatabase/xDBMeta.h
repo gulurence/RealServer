@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xDBMeta.h
+      Purpose:   数据库列元数据定义
+
+      定义 DBDATA_TYPE_* 枚举（CHAR/INT/UInt8..UInt64/BIN/BIN2）与 DBDataBin2 变长二进制结构
+      定义 dbCol 结构（name/type/size）描述表字段布局
+  *****************************************************************/
+
 #pragma once
 
 #include "../xBase/xDefine.h"

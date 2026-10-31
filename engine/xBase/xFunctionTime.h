@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xFunctionTime.h
+      Purpose:   函数级耗时统计类与宏
+
+      定义 xFunctionTime 累加器与 FunctionTimeWrap 作用域计时器
+      提供 FunctionTime_Scope/FunctionTime_Reset 宏，以 __builtin_return_address 为键统计函数调用耗时
+  *****************************************************************/
+
 #pragma once
 
 #include "xTime.h"

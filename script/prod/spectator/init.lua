@@ -1,3 +1,12 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: init.lua
+      Purpose:   prod 环境 Spectator 进程启动脚本
+
+      require common.include 与 actors.spectator.spectator，由 spectator.lua 尾部 registerPrototype/install 完成 SpectatorClass 原型初始化，随后记录 ready 日志。
+]]
+
 -- init.lua — Spectator actor config (prod)
 require("common.include")
 require("actors.spectator.spectator")

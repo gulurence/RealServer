@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: BattleEntity.h
+      Purpose:   战斗实体纯数据模型
+
+      定义 HeroState/Sp01State/BulletState/TurretState/PropState/MapCollision/WaveState/GameState 等纯 struct
+      坐标/速度/角度用 Q16.16 定点 fx_t, 实体 id 按确定性顺序分配, 作为锁步对齐与序列化/哈希主键
+  *****************************************************************/
+
 // =============================================================================
 // BattleEntity.h — 战斗实体纯数据模型 (客户端 / 服务器共享, 零引擎依赖)
 //

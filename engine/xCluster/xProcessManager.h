@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xProcessManager.h
+      Purpose:   进程生命周期管理接口：进程创建、环境初始化、服务注册与心跳。
+
+      声明 CProcessManager 单例：CreateProcess/CreateProcessFromFallback 创建进程身份，InitEnvironment/RegisterInDiscovery 初始化并注册
+      StartHeartbeat/StopHeartbeat 管理心跳线程，SetState/RequestShutdown/IsShutdownRequested 状态与优雅关闭
+      GetSelfInfo/GetState/GetProcessId 访问器返回 ProcessInfo 自描述
+  *****************************************************************/
+
 #pragma once
 
 #include "xProcessDefine.h"

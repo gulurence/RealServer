@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: config.proto
+      Purpose:   配置热更模块协议定义
+
+      定义 ConfigMsgId 枚举与 PBConfigGetReq/Rsp、PBConfigChangedNtf 及子数据 PBConfigFile
+      包名 PbConfig，承载 version + contentHash + 三份 bin 字节的拉取与变更通知，一级 Actor 类型 AT_CONFIG=105
+  *****************************************************************/
+
 // =============================================================================
 // config.proto — 配置热更模块协议 (一级 Actor 类型 = AT_CONFIG = 105)
 //

@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: include.lua
+      Purpose:   common 模块顶层加载入口
+
+      按依赖顺序 require 所有 common 子模块（actor_type/msg_id/class/redis/db/rpc/account/util/actor/migration/hotfix）。
+      幂等 require 尊重 package.loaded，框架模块首次加载后常驻，避免热更重建 ClassRegistry 等注册表。
+]]
+
 -- include.lua — Top-level common module entry point
 -- Requires all common sub-modules in dependency order.
 -- Re-executing this file performs a hot-reload of all common modules.

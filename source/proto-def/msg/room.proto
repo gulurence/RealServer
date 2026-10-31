@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: room.proto
+      Purpose:   房间模块协议定义
+
+      定义 RoomMsgId / RoomMode / RoomVisibility 枚举与 PBRoomCreateReq/Rsp、PBRoomListReq/Rsp、PBRoomJoinReq/Rsp、PBRoomLeaveReq/Rsp、PBRoomReadyReq/Rsp、PBRoomKickReq/Rsp、PBRoomTransferReq、PBRoomStartReq/Rsp、PBRoomInfoNtf、PBRoomMemberNtf 及子数据 PBRoomMember/PBRoomInfo
+      包名 PbRoom，一级 Actor 类型 AT_ROOM=103
+  *****************************************************************/
+
 // =============================================================================
 // room.proto — 房间模块协议 (一级 Actor 类型 = AT_ROOM = 103)
 //

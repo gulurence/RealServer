@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: BattleInput.h
+      Purpose:   输入指令结构与方向量化
+
+      PlayerInput 单帧输入(移动 8 方向/射击向量/技能/枪械)与 SkillId, 镜像 battle.proto PBBattlePlayerInput
+      DirFromVector/DirToUnitVectorFx/DirToRadiansFx/AngleToEightDirFx 提供连续方向与 8 方向/定点向量互转
+  *****************************************************************/
+
 // =============================================================================
 // BattleInput.h — 真实输入指令结构 (七件套「输入指令」)
 //

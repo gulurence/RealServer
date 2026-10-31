@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: migration.lua
+      Purpose:   灰度迁移「先迁后杀」模块
+
+      xEngine.ActorMigration 提供 saveAll（旧进程落 Redis + 驱逐注册）与 run（新进程扫描 actor:index 重建孤儿 Actor）。
+      Player/Battle 经 C++ CActorMgr 路径定位 delegate 实例恢复，Spectator 无恢复态只清残留索引，恢复完成后写 cluster:migrate:restored 进度键。
+]]
+
 -- migration.lua — 灰度迁移「先迁后杀」: 保存当前负载 Actor 到 Redis, 新进程恢复重建。
 -- Registered as xEngine.ActorMigration.
 --

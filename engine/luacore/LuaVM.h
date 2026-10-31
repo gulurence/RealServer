@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: LuaVM.h
+      Purpose:   LuaVM 单例声明：管理进程唯一 lua_State
+
+      xSingleton<LuaVM> 持有 m_pL/m_strScriptRoot/m_strPlatform/m_vecHostedTypes，供全进程与 SWIG 桥接共用唯一 lua_State
+      声明 Init/Release/DoFile/DoString/LoadAllActors/HotReload/HotReloadFiles/HotReloadPrecheck/InitLuacoreModule/GetState/GetScriptRoot 等接口
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CActorReportMgr.h
+      Purpose:   Actor 监控上报模块声明
+
+      与 WebPlatform Actor 信息显示界面配合: 收到订阅请求持续上报, 超时 20s 停止
+      声明 Init/OnReportRequest/Sweep, subscriber 线程与心跳线程经 m_lock 串行化
+  *****************************************************************/
+
 #pragma once
 
 #include "xActor/ActorDefine.h"

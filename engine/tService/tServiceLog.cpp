@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tServiceLog.cpp
+      Purpose:   日志服务封装实现
+
+      实现 tServiceLog::Init 完成 xLog 服务注册并记录日志路径与级别
+      Release 仅复位初始化标记，实际日志由 xLog(spdlog) 统一管理
+  *****************************************************************/
+
 #include "tServiceLog.h"
 #include "xLog/xLog.h"
 

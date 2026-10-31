@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xLocalInfo.cpp
+      Purpose:   本机节点注册表 local.info 的解析与维护实现。
+
+      实现 CLocalInfo 单例：Load/Save 解析与全量落盘 local.info（type processId name ip rpcPort listenPort authKey state 空格分隔）
+      AllocatePort 按类型基础端口加首个空闲偏移分配 RPC 端口，每类型预留 50 端口
+      Register/Remove 增改删节点，GetLocalIp 用 gethostname/gethostbyname 取本机 IPv4
+  *****************************************************************/
+
 #include "xLocalInfo.h"
 #include "xLog/xLog.h"
 

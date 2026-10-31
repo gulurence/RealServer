@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tServiceMgr.h
+      Purpose:   统一第三方服务管理器（单例）
+
+      以 xSingleton 管理所有 ThridService 的创建、复用、销毁及 ActorDependency 依赖声明
+      AcquireServices/ReleaseServices 基于 EActorType 引用计数共享复用，归零销毁
+      内部维护服务映射、配置映射与依赖映射并加 mutex 保护
+  *****************************************************************/
+
 #pragma once
 
 #include "tThridService.h"

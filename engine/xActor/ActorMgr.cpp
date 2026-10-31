@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ActorMgr.cpp
+      Purpose:   进程级 Actor 实例管理器实现
+
+      按 type 到 (id 到 actor) 两级索引维护实例注册表, 提供 AddInstance/RemoveInstance/Find/FindByActorID/GetByType
+      Install/UnInstall 多步骤生命周期: tServiceMgr 服务引用计数、Player 路由索引、Redis 注册、状态快照恢复、消息循环挂载
+      实例增删即时 FlushLoad 回写 Redis 负载, 避免并发建 Actor 扎堆选同一低负载节点
+  *****************************************************************/
+
 #include "ActorMgr.h"
 #include "ActorCreator.h"
 #include "ActorScheduler.h"

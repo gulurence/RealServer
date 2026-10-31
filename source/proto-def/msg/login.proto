@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: login.proto
+      Purpose:   登录模块协议定义
+
+      定义 LoginMsgId 枚举与 PBMsgLoginReq/Rsp、PBMsgSelectRoleReq/Rsp、PBMsgCreateRoleReq/Rsp、PBMsgLogoutReq/Rsp
+      包名 PbLogin，含登录排队字段与断线重连 battle 信息，一级 Actor 类型 AT_LOGIN=101
+  *****************************************************************/
+
 // =============================================================================
 // login.proto — 登录模块协议 (一级 Actor 类型 = AT_LOGIN = 101)
 //

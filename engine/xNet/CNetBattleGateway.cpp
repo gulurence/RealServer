@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CNetBattleGateway.cpp
+      Purpose:   战斗进程网络接入层实现：客户端直连 Battle 进程的握手与帧路由。
+
+      实现 CNetBattleGateway 单例：Start 绑定 xNetAgent 回调，OnPackage 按 msgId=(BigType<<16)|SmallType 路由到 BattleActor
+      HandleLogin 首帧校验 battle:auth/battle:roster 或观战名单后绑定 CID 会话，OnDisconnect 合成 DISCONNECT 通知投递 BattleActor
+      SendToPlayer/SendToCID 由会话反查 CID 下发帧，GetRateLimitPerSec 每 5s 读 battle_rate_limit_per_sec 用令牌桶限流
+  *****************************************************************/
+
 #include "CNetBattleGateway.h"
 #include "xNetAgent.h"
 #include "xProtoParse.h"

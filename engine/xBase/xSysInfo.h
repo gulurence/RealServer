@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xSysInfo.h
+      Purpose:   跨平台系统与进程资源采样类
+
+      声明 xSysInfo 静态工具类
+      提供进程 CPU/内存与整机核数/内存采样，CPU 百分比带基线、内存单位 MB
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

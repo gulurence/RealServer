@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tServiceRedis.cpp
+      Purpose:   Redis 缓存服务封装实现
+
+      tServiceRedis::Init 从 ThridRedisConfig 取配置并调用 CRedisPoolMgr::ConnectToRedis 建立共享连接
+      Release 不主动断开，连接池由 CRedisPoolMgr 析构清理
+  *****************************************************************/
+
 #include "tServiceRedis.h"
 #include "xRedis/RedisMgr.h"
 #include "xLog/xLog.h"

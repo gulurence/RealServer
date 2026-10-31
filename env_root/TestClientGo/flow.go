@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: flow.go
+      Purpose:   单个虚拟客户端完整链路流程实现
+
+      runClient 实现连 Gate、登录、创角、选角后按模式在线驻留或进入战斗
+      runBattle 实现建房、准备、开局、直连 Battle 网关并逐帧上报输入
+      提供 sendFrame、recvFrame、recvMatching 帧 IO 与 result 结构记录耗时及收发帧数
+  *****************************************************************/
+
 package main
 
 // 单个虚拟客户端的完整链路: 连 Gate → 登录 → 创角 → 选角 → (在线驻留 | 建房开战帧同步)。

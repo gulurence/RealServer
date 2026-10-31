@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: friend.proto
+      Purpose:   好友模块协议定义
+
+      定义 FriendMsgId 枚举与 PBFriendAddReq/Rsp、PBFriendApplyNtf、PBFriendAcceptReq/Rsp、PBFriendListReq/Rsp、PBFriendDelReq/Rsp、PBFriendOnlineNtf、PBFriendInviteReq/Ntf 及子数据 PBFriendInfo
+      包名 PbFriend，一级 Actor 类型 AT_FRIEND=102
+  *****************************************************************/
+
 // =============================================================================
 // friend.proto — 好友模块协议 (一级 Actor 类型 = AT_FRIEND = 102)
 //

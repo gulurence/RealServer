@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: restyle_atlas.py
+# Purpose:   图集逐帧或整张 img2img 改风格并重打包
+#
+# restyle_frame 处理 rotated 帧的转置裁剪、旋转转正与贴回，restyle_sheet 把整张图集当大图 img2img
+# frame_corr 计算灰度结构相关作保真度打分，低分帧用 fix-r 补绘，TokenBucket 做全局限流
+# 支持多 worker 并发与 restyle_state.json 断点续跑，默认 provider 为 volcark
+#
+
 """restyle_atlas.py — 图集「逐帧 img2img」改风格（重打包）。
 
 从客户端资源里读 TexturePacker 图集（plist + png），逐帧 img2img 改风格后贴回原位置。

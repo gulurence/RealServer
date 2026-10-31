@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: LuaVM.cpp
+      Purpose:   LuaVM 单例实现：进程唯一 Lua 虚拟机
+
+      Init 创建唯一 lua_State、开标准库、设 package.path、注册 SWIG 子 core 模块(luaopen_luacore 及 friend/room/chat/battle/spectate/config)并加载 common/include.lua
+      LoadAllActors 按 hostedTypes 加载 script/<platform>/<actorDir>/init.lua；HotReload 清 package.loaded 里 actors.* 缓存后重跑 init.lua 热更业务脚本
+      HotReloadFiles/HotReloadPrecheck 数据驱动调 xEngine.HotFix.UpdateFilesData/PrecheckFilesData；Release 经 lua_close 释放状态
+  *****************************************************************/
+
 #include "LuaVM.h"
 #include "xLog/xLog.h"
 #include "xCluster/xProcessDefine.h"

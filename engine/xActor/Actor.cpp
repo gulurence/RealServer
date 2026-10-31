@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: Actor.cpp
+      Purpose:   CActor 基类实现
+
+      实现 BuildReportJson 手拼上报 JSON 及 JsonEscape 转义
+      实现帧级脏读写 Redis 状态框架: FlushState/LoadState/RefreshStateTtl/DeleteState/LogRecovery
+      实现 PostMessage/RequestStop/MessageLoop 协程消息循环, 空 body 为停止信号
+  *****************************************************************/
+
 #include "Actor.h"
 #include "xBase/xXMLParser.h"
 #include "xLog/xLog.h"

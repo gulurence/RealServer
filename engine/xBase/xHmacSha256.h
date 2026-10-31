@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xHmacSha256.h
+      Purpose:   自包含 SHA-256 与 HMAC-SHA256 摘要实现
+
+      纯头文件实现 FIPS 180-4 SHA-256 与 RFC 2104 HMAC-SHA256
+      入口 HmacSha256Hex(key,msg) 输出 64 位小写十六进制摘要，无 OpenSSL 依赖
+  *****************************************************************/
+
 #pragma once
 
 #include "xDefine.h"

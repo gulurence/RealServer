@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ActorCreator.h
+      Purpose:   Actor 原型注册与工厂创建
+
+      ActorCreator 单例: RegistActor 注册原型, SetCreateEnable 控制类型创建开关
+      Create 从原型克隆实例, DeleteActor 卸载并删除实例
+      提供 GetLocalInstanceCount/GetLocalTypeCount 负载统计接口
+  *****************************************************************/
+
 #pragma once
 
 #include "Actor.h"

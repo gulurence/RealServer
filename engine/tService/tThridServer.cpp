@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tThridServer.cpp
+      Purpose:   第三方服务基类实现
+
+      实现 ThridService 构造函数与析构，记录服务类型、ID、名称及创建时间
+      构造与析构通过 xLog 输出生命周期日志
+  *****************************************************************/
+
 #include "tThridService.h"
 #include "xBase/xTime.h"
 #include "xLog/xLog.h"

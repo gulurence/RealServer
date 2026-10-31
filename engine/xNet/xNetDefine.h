@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xNetDefine.h
+      Purpose:   网络层基础类型与帧结构定义：包头、客户端帧、回调与配置结构。
+
+      定义 NetPackageHeadST/ClientFrameHeadST/NetPackageST 等帧结构，ClientFrameHeadSize 为 4 字节长度前缀
+      引入 asio 协程类型别名（awaitable/tcp_socket/tcp_acceptor/default_token）与 NetCID/NetPackageSharedPtr
+      定义 NetPackageAcceptPtr/NetPackageCallPtr/NetDisconnectPtr/NetSocketReadyPtr 回调与 NetAgentConfigST 配置结构
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

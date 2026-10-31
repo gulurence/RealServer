@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tmx_exporter.cpp
+      Purpose:   碰撞对象层 tmx 转配置 bin 的命令行导出工具
+
+      ParseTmxCollision 解析 map/level{bb}{ss}.tmx，MapCollisionToTables 生成 map、map_rect、map_entry 表
+      ParseTmxTurretPoints 解析 paota_point 层生成 turret_point 表，缺层时跳过不报错
+      levelId 从文件名末尾数字推导，多关卡合成一张大表后 BuildBin 打包
+  *****************************************************************/
+
 // =============================================================================
 // tmx_exporter.cpp — map/level{bb}{ss}.tmx (碰撞对象层) → 配置 bin (命令行工具, S2)
 //

@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CTokenBucketLimiter.h
+      Purpose:   单连接消息接收限流器：每 CID 一个令牌桶的匀速补充限流。
+
+      定义 CTokenBucketLimiter 类：SetRate 设置速率并清空旧桶，Consume 每秒补充 rate 枚令牌、放行扣 1 枚
+      桶容量等于 rate，允许一次突发，rate<=0 不限流，Reset 断线时清理该 CID 桶
+      std::map<NetCID,Bucket> 加 m_mutex 保证 PackageCheck 并发调用线程安全
+  *****************************************************************/
+
 #pragma once
 
 #include "xNetDefine.h"

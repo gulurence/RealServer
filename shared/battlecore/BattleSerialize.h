@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: BattleSerialize.h
+      Purpose:   二进制序列化与状态哈希原语
+
+      BinWriter/BinReader 小端字节流读写与 Hasher FNV-1a 64 位累加器
+      供 CBattleCore 与 BattleGame 复用, serialize/deserialize/hash 三处字段顺序严格对齐
+  *****************************************************************/
+
 // =============================================================================
 // BattleSerialize.h — 二进制序列化 / 状态哈希原语 (客户端 / 服务器共享, 零引擎依赖)
 //

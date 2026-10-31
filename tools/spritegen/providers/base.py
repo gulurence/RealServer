@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: base.py
+# Purpose:   AI 生成后端抽象基类与公共工具
+#
+# 定义 Provider 抽象基类，要求子类实现 generate 返回 GenerateResult，可选实现 img2img 图生图
+# 提供 image_from_b64 与 image_from_url 把 base64 或 URL 转成 RGBA PIL.Image
+# 新增 provider 只需继承 Provider 并在 providers/__init__.py 注册
+#
+
 """Provider 抽象基类与公共工具。
 
 所有 AI 生成后端都实现 Provider.generate()，返回 GenerateResult。

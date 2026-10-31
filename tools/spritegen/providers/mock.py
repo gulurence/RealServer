@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: mock.py
+# Purpose:   无需 API key 的占位生成后端
+#
+# 用 sha256(prompt) 或 seed 作随机种子生成确定性程序图，同名 prompt 输出一致
+# background 模式画垂直渐变加半透明光斑，ui 模式画纯品红底圆角矩形便于色键去背景
+# 仅用于跑通配置、生成、后处理、落盘全流程，不代表真实美术效果
+#
+
 """mock provider：无需 API key 的占位生成器。
 
 用途：在接真实 AI 后端前，用确定性程序图跑通「配置 → 生成 → 后处理 → 落盘」全流程。

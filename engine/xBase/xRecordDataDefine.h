@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xRecordDataDefine.h
+      Purpose:   Record 模块 Actor 数据传输缓冲区
+
+      定义 RecordDataST 结构（继承 xObjPoolBase）
+      封装 type/id/变长数据缓冲，支持拷贝/移动/Resize/cleanUp，用于 Record 传递 Actor 数据
+  *****************************************************************/
+
 #pragma once
 
 #include "xDefine.h"

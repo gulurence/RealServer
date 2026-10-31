@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xLog.cpp
+      Purpose:   spdlog 日志封装实现
+
+      实现 xLog::Init（rotating file + stdout 双 sink、秒级异步 flush）与 Print
+      按 Level 分发到 spdlog，输出带文件名与行号前缀
+  *****************************************************************/
+
 #include "xLog.h"
 
 #include <spdlog/spdlog.h>

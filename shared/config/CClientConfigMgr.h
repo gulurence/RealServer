@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CClientConfigMgr.h
+      Purpose:   客户端配置热更编排
+
+      CClientConfigMgr 拉模型热更: LoadLocal 本地加载, OnNotify 按版本判断是否拉取
+      ApplyPull/ReceiveBundle 经 IConfigTransport 拉字节→校验 contentHash→CConfigMgr 原子替换, 失败保持旧配置回滚
+  *****************************************************************/
+
 // =============================================================================
 // CClientConfigMgr.h — 客户端配置热更编排 (纯 C++, 传输层解耦; C4 核心)
 //

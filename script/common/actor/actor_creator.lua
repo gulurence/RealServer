@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: actor_creator.lua
+      Purpose:   全局 Actor 创建与跨进程路由
+
+      xEngine.ActorCreator 提供 create/find/delete/query 与 balanceCreate/getProcessLoad。
+      本进程托管类型走 ActorMgr 本地创建，远程类型走 si_actor_creator_rpc_* 由 C++ CActorLoadManager 均衡到最低负载进程。
+]]
+
 -- actor_creator.lua — Global actor creator with RPC routing
 -- Registered as xEngine.ActorCreator.
 --

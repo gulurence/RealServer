@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: luacore.i
+      Purpose:   框架层 Lua 绑定主模块
+
+      生成 %module luacore，导出 si_ 前缀 C++ 接口：日志、时间/计时器、字符串/随机工具、UID 管理器
+      Actor 通用数据与注册创建、ActorMgr 实例管理、Redis/DB/Record、登录 protobuf 编解码、通用 pb 字段读取、跨进程 RPC 转发、客户端网络帧解包与 GM 命令应答
+  *****************************************************************/
+
 // luacore.i — Main SWIG interface for RealServer Lua bindings
 //
 // Naming convention: all C++→Lua exported functions use the si_ prefix.

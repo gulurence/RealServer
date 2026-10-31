@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: repack_atlas.py
+# Purpose:   把 AI 生成的魔幻 UI 图贴回客户端图集对应帧
+#
+# 按 JOBS 表从 res zip 读取 plist 帧矩形，用 assets_magic 源图替换图集 PNG 目标帧像素
+# 不改 plist 帧位置与尺寸，仅套回原帧 alpha 掩码保留透明边角
+# 要求所有目标帧 rotated 为 false，回写整个 res zip 存档
+#
+
 """repack_atlas.py: 把 AI 生成的魔幻 UI 图贴回客户端 TexturePacker 图集的对应帧。
 
 不改 plist（帧位置/尺寸不变），只替换图集 PNG 里目标帧的像素，并套用原帧的

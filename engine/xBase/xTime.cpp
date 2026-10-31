@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xTime.cpp
+      Purpose:   xTime 时间工具实现
+
+      实现 getCurUSec/getDayStart/elapse 等时间方法
+      含自然日/周/月起点、同天/周/月判断与 Windows 下 gettimeofday 兼容实现
+  *****************************************************************/
+
 #ifndef _WINDOWS
 #include <sys/time.h>
 #endif

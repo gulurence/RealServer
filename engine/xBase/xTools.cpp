@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xTools.cpp
+      Purpose:   Tools 通用工具实现
+
+      实现 Tools::initGlobal（解析 config.xml 到 global 表）与 stringTok/split/printBinary
+      Windows 下提供 strcasecmp/strncasecmp 兼容实现
+  *****************************************************************/
+
 #include "xTools.h"
 #include "xXMLParser.h"
 

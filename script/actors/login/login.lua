@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: login.lua
+      Purpose:   Login 登录 Actor 实现
+
+      LoginClass 经 on_rpc_login 处理 Gate 转发的登录链路 RPC（LOGIN/SELECT_ROLE/CREATE_ROLE）。
+      rpc_login 校验 Session 并做排队判定、顶号踢旧与陈旧登录判定，rpc_create_role 校验角色名并分配 roleId，rpc_select_role 经 ActorCreator.balanceCreate 创建 Player 并支持战斗断线重连。
+]]
+
 -- login.lua — Login actor implementation
 local AT = xEngine.ActorType
 

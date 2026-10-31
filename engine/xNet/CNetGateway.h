@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CNetGateway.h
+      Purpose:   Gate 网络接入层接口：网络层到 Actor 协程消息循环的桥接点。
+
+      声明 CNetGateway 单例：把 xNetAgent 收到的网络包经 OnPackage 路由到 Gate Actor 的 PostMessage
+      SendToCID 向指定连接发送 [uint32 len][body] 帧，KickConnection 供同账号并发登录踢旧使用
+      数据流为 TCP→xNetAgent::Accept→PackageCheck 拆包→OnPackage→CActor::PostMessage 消息循环
+  *****************************************************************/
+
 #pragma once
 
 #include "xNetDefine.h"

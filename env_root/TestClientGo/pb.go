@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: pb.go
+      Purpose:   极简 protobuf wire 格式编解码与消息构造
+
+      手写 varint 编解码与 parseWire，parseRoute 只读 field1、field2 做 big_type、small_type 快速路由
+      提供 buildLoginReq、buildCreateRoleReq、buildSelectRoleReq、buildRoom 系列与 buildBattle 系列消息构造
+      不引入 google.golang.org/protobuf，保持零外部依赖，消息常量与 msg_id.proto 对齐
+  *****************************************************************/
+
 package main
 
 // 极简 protobuf wire-format 编解码 (仅够本压测客户端的消息)。

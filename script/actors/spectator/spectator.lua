@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: spectator.lua
+      Purpose:   观战 Actor 实现（多实例，Battle 进程）
+
+      SpectatorClass 与 BattleActor 一一对应（id=battle_id），处理观战 ENTER_REQ/LEAVE_REQ。
+      handle_enter 校验战斗房并从 Redis 重建花名册/装备/关卡，登记观战席位到 battle:spectator:{battleId}；席位清空后经 SPECTATOR_FINALIZE 延迟回收自删。
+]]
+
 -- spectator.lua — Spectator actor implementation (多实例, Battle 进程, id=battle_id)
 --
 -- 观战玩家只读帧流、不参与模拟: 进入时快照对齐, 之后追帧播放。

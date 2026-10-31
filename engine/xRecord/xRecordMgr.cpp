@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xRecordMgr.cpp
+      Purpose:   统一持久化管理器实现
+
+      LoadActor 先查 Redis 缓存 miss 回源 DB 并回填缓存, 新 Actor 视为正常
+      UpdateActor 走 Redis 同步写 + DB 异步落库, RemoveActor 走 Redis 删除 + DB 异步删除(尽力清理)
+  *****************************************************************/
+
 #include "xRecordMgr.h"
 #include "xRedisRecord.h"
 #include "xDatabaseRecord.h"

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: luacore_chat.i
+      Purpose:   聊天模块 Lua 绑定
+
+      生成 %module luacore_chat，导出 PbChat 编解码 si_pb_chat_send_rsp / si_pb_chat_ntf / si_pb_chat_history_rsp
+      历史消息以逗号分号串拼装 repeated messages，避免 std::vector 跨越 SWIG 边界
+  *****************************************************************/
+
 // luacore_chat.i — 聊天模块编解码绑定 (package PbChat)
 // Lua: luacore_chat.si_pb_chat_*
 %module luacore_chat

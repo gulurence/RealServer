@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CActorLoadManager.cpp
+      Purpose:   Actor 负载管理器实现：按负载均衡挑选承载进程并完成跨进程 Actor 创建/转发/推送。
+
+      实现 CActorLoadManager 单例：Init 按进程类型注册可承载 Actor 类型
+      提供 PickProcessForActor/ResolveActorProcess(ForForward) 定位承载进程，以及 CreateActorRemote/FindActorRemote/UninstallActorRemote 远程 RPC
+      另实现 LoginRemote/ForwardToActor(Async)/PushToGate/KickGateClient 等登录与业务转发通道，GetLocalLoad 上报本进程 Actor 实例数
+  *****************************************************************/
+
 #include "CActorLoadManager.h"
 
 #include "CPlayerActorIndex.h"

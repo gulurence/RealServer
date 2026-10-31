@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xOperatorNode.h
+      Purpose:   数据库操作节点与异步执行线程声明
+
+      定义 DBDataNode 变长数据缓冲区与 DatabaseOpNode（操作类型/表名/where/列/数据/回调）
+      定义 DBOperator 继承 xThread，持 DBConnPool 与条件变量队列异步执行节点
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

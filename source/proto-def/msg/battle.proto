@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: battle.proto
+      Purpose:   战斗模块协议定义
+
+      定义 BattleMsgId 枚举与 PBBattleEnterReq/Rsp、PBBattleStartNtf、PBBattleInputReq、PBBattleFrameNtf、PBBattleSnapshotNtf、PBBattleEndNtf、PBBattleLeaveReq/Rsp、PBBattleHashNtf、PBBattleLoginReq/Rsp、观战列表等消息
+      前两字段固定 BigType/SmallType 路由，包名 PbBattle，一级 Actor 类型 AT_BATTLE=203
+  *****************************************************************/
+
 // =============================================================================
 // battle.proto — 战斗模块协议 (一级 Actor 类型 = AT_BATTLE = 203)
 //

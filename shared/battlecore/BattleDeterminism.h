@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: BattleDeterminism.h
+      Purpose:   确定性随机与逻辑时钟收口宏
+
+      把 rand/random_range/frandom/CCRANDOM_0_1 与墙钟统一收口到 battlecore 确定性源
+      联网模式走 DetRandom 系列与逻辑帧时钟, 单机回退 rand()/系统时钟, 提供 NetRandom/NetCurTimeMs 等内联函数
+  *****************************************************************/
+
 // =============================================================================
 // BattleDeterminism.h — 确定性入口宏 (六件套「确定性随机」统一收口)
 //

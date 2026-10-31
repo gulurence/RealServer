@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xSysInfo.cpp
+      Purpose:   跨平台系统与进程资源采样实现
+
+      实现 GetProcessCpuPercent/GetProcessMemRssMb/GetMachineCpuCores/GetMachineTotalMemMb
+      Windows 走 GetProcessTimes/GlobalMemoryStatusEx，Linux 走 /proc 与 sysconf
+  *****************************************************************/
+
 #include "xSysInfo.h"
 
 #ifdef _WINDOWS

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xRecordMgr.h
+      Purpose:   统一持久化管理器声明
+
+      CRecordMgr 单例组合 CRedisRecord(actor_cache 同步缓存)与 CDatabaseRecord(actor_db 异步落库)
+      对外提供 LoadActor/UpdateActor/RemoveActor 及 PushBackRecordData 对象池回收
+  *****************************************************************/
+
 #pragma once
 
 #include "xRecordDefine.h"

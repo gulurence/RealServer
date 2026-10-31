@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: main.go
+      Purpose:   登录顶号与登录超时三种场景验证工具
+
+      场景1 IN_GAME 顶号、场景2 登录中未超时被拒、场景3 登录中超时替换
+      复用 TestClientGo 的 wire 编解码与帧格式，loginOnly 发登录请求并读回错误码
+      按 PASS、FAIL 输出并返回非零退出码，依赖 preparesession 预写 session 键
+  *****************************************************************/
+
 package main
 
 // logintest — 验证登录「顶号 / 登录中超时判定」三种场景 (自包含, 复用 TestClientGo 的 wire 格式):

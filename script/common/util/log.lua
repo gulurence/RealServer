@@ -1,3 +1,12 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: log.lua
+      Purpose:   日志桥接模块
+
+      xEngine.Log 桥接 C++ xLog 系统，提供 trace/debug/info/warn/error 五个日志级别，经 si_log_* 输出。
+]]
+
 -- log.lua — Bridge to C++ xLog system via xEngine.Log
 -- Uses the si_log_* helpers registered into the luacore table by SWIG.
 --

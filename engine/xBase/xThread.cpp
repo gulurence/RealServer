@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xThread.cpp
+      Purpose:   xThread 线程基类实现
+
+      实现 thread_start（detach std::thread 执行 thread_run）与 thread_stop 状态轮询
+      子类需实现 thread_proc 纯虚函数
+  *****************************************************************/
+
 #include "xThread.h"
 #include "xTools.h"
 

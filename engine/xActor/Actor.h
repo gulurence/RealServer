@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: Actor.h
+      Purpose:   CActor 基类声明
+
+      定义 Actor 通用属性(类型/ID/名称/负载分值/状态/归属/全局ID)与 ActorReport 上报结构
+      声明帧级脏读写 Redis 状态框架(SetStateField/GetStateField/FlushState/LoadState)
+      声明消息队列与协程 MessageLoop, OnMessage/HandleSystemMessage 虚钩子
+  *****************************************************************/
+
 #pragma once
 
 #include "ActorDefine.h"

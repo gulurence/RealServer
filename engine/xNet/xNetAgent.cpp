@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xNetAgent.cpp
+      Purpose:   asio-TCP 网络代理实现：监听、接受连接与解包线程。
+
+      实现 xNetAgent 类（继承 xThread）：Listener 协程 accept 后 co_spawn Accept
+      Accept 用 shared_ptr 持有 socket、注册发送通道、起 PackageCheck 解包线程并协程读入 xCircularBuffer
+      thread_proc 创建 io_context 运行协程，断线时回调 pDisconnect 并注销 socket，读满自动扩容环形缓冲
+  *****************************************************************/
+
 
 #include "xNetAgent.h"
 

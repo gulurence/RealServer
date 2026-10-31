@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tServiceMgr.cpp
+      Purpose:   第三方服务管理器实现
+
+      实现 Actor 依赖注册与 Acquire/Release 引用计数生命周期
+      AcquireServices 按依赖复用或经 CreateService 工厂创建并 Init，ReleaseServices 归零时 DestroyService
+      CreateService 按 EThridServiceType 生成 tServiceMySql/tServiceRedis/tServiceLog/tServiceXml/tServicePlatformMgr
+  *****************************************************************/
+
 #include "tServiceMgr.h"
 #include "tServiceMySql.h"
 #include "tServiceRedis.h"

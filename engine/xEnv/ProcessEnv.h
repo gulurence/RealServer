@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ProcessEnv.h
+      Purpose:   默认进程运行环境 CProcessEnv
+
+      声明 CProcessEnv（继承 CBaseEnv）
+      用 CProcessManager/CActorMgr/LuaVM/CNetGateway 等管理器实现六阶段生命周期
+  *****************************************************************/
+
 #pragma once
 
 #include "xEnv/BaseEnv.h"

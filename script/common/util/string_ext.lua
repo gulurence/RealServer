@@ -1,3 +1,12 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: string_ext.lua
+      Purpose:   字符串扩展工具
+
+      xEngine.StringExt 封装 C++ StringTool，提供 trim/trim_begin/trim_end/contains/starts_with/ends_with/to_lower/to_upper/replace。
+]]
+
 -- string_ext.lua — Wraps C++ StringTool via SWIG luacore, registered as xEngine.StringExt
 --
 -- Usage:

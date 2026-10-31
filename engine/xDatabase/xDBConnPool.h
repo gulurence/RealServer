@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xDBConnPool.h
+      Purpose:   MySQL 连接池声明
+
+      声明 DBConn 单连接封装与 DBConnPool 连接池
+      DBConnPool 提供 getDBConn/putDBConn 及按 DBConnID 转发的增删改查接口，持有 UniqueIDManager 连接编号与连接映射
+  *****************************************************************/
+
 #pragma once
 
 #include "../xBase/xDefine.h"

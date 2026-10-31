@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tThridService.h
+      Purpose:   第三方服务基类
+
+      定义所有第三方服务的公共基类 ThridService，含类型/ID/名称/创建时间字段与 Init/Release 生命周期接口
+      提供 AddRef/DecRef/GetRefCount 原子引用计数，子类为 tServiceMySql/tServiceRedis/tServiceLog/tServiceXml/tServicePlatformMgr
+  *****************************************************************/
+
 #pragma once
 
 #include "tThridServiceConfig.h"

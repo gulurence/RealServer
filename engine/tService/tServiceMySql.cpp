@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tServiceMySql.cpp
+      Purpose:   MySQL 服务封装实现
+
+      tServiceMySql::Init 从 ThridMysqlConfig 取库配置并调用 COperatorMgr::ConnectToDB 建立连接池
+      Release 暂不主动断开，实际连接由 DBOperator 析构回收
+  *****************************************************************/
+
 #include "tServiceMySql.h"
 #include "xDatabase/xOperatorMgr.h"
 #include "xLog/xLog.h"

@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: main.go
+      Purpose:   预建压测账号会话池
+
+      直连 Redis Cluster 各主节点，先 CLUSTER SLOTS 拿槽位区间再按 CRC16 路由 SET
+      写 session:pool{accountId}=accountId 键，绕过 WebPlatform HTTP 登录瓶颈
+      client 类型手写 Redis RESP 协议，按主节点地址维护持久连接复用
+  *****************************************************************/
+
 // preparesession — 预建压测账号会话池 (session:pool{accountId} = accountId)。
 // 直连 Redis Cluster 各主节点, 按 CRC16 槽位路由 SET, 绕过 WebPlatform HTTP 登录瓶颈。
 package main

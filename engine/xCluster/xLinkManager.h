@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xLinkManager.h
+      Purpose:   进程间 asio-TCP RPC 链接管理器接口：对等节点连接与负载均衡选择。
+
+      声明 CLinkManager 单例：维护 m_linkRules 与 m_mapPeers(processId→PeerConnection)
+      提供 Init/DiscoverAndConnect/ConnectToPeer/DisconnectFromPeer/IsPeerAvailable/GetBestPeer/GetAvailablePeers/RefreshLoop
+      GetBestPeer 每次实时读 Redis 并平手轮询，m_rrCounter 防止单例进程负载恒等时扎堆单点
+  *****************************************************************/
+
 #pragma once
 
 #include "xProcessDefine.h"

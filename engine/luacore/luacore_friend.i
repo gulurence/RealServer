@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: luacore_friend.i
+      Purpose:   好友模块 Lua 绑定
+
+      生成 %module luacore_friend，导出 PbFriend 编解码 si_pb_friend_add_rsp / apply_ntf / accept_rsp / list_rsp / del_rsp / online_ntf / invite_ntf
+      好友列表以逗号分号串拼装 repeated friends 字段
+  *****************************************************************/
+
 // luacore_friend.i — 好友模块编解码绑定 (package PbFriend)
 // Lua: luacore_friend.si_pb_friend_*
 %module luacore_friend

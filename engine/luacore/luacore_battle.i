@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: luacore_battle.i
+      Purpose:   战斗模块 Lua 绑定
+
+      生成 %module luacore_battle，导出 PbBattle 消息编解码 si_pb_battle_*（enter/start/frame/snapshot/end/leave/spectator_list）
+      以及共享战斗核心 si_battlecore_*（new/init/submit_input/setup_level/tick/serialize/deserialize/hash 等），经进程内注册表句柄避免 64 位指针精度丢失
+  *****************************************************************/
+
 // luacore_battle.i — 战斗模块编解码 + 战斗核心绑定
 //   si_pb_battle_*    — 战斗协议编解码 (package PbBattle)
 //   si_battlecore_*   — 共享战斗核心 (battlecore/CBattleCore)

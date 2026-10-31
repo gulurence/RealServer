@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: account.proto
+      Purpose:   账号共享数据结构定义
+
+      定义 GameInfo/RoleInfo/AccountInfo/PlayerInfo/ItemInfo 等子数据消息（package PbAccount）
+      供 login.proto / player.proto / player_item.proto import 复用，无独立协议消息
+  *****************************************************************/
+
 // =============================================================================
 // account.proto — 账号/角色/游戏/玩家/物品 共享数据结构 (子数据定义)
 // 供 login.proto / player.proto / player_item.proto import 复用

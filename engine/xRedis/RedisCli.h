@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: RedisCli.h
+      Purpose:   Redis Cluster 客户端声明
+
+      声明 CRedisCli，封装 redis-plus-plus RedisCluster 的命令接口（Set/Get/HSet/HGet/HMSetEx/SAdd/ZAdd/RPush/Publish 等）
+      底层连接池线程安全且自带 slot 路由与 MOVED/ASK 重定向，Subscribe 每 channel 独立线程与连接
+  *****************************************************************/
+
 #pragma once
 
 #include "RedisDefine.h"

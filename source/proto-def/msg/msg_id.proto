@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: msg_id.proto
+      Purpose:   全局消息 ID 与系统枚举定义
+
+      定义 ActorType（Gate=100/Login=101/Friend=102/Room=103/Chat=104/Config=105/Player=201/Battle=203/Spectator=204）、AccountState 状态机与通用 ErrorCode
+      包名 PbID，供各业务 proto import，对应 C++ 侧 EActorType 语义
+  *****************************************************************/
+
 // =============================================================================
 // msg_id.proto — 全局消息 ID 枚举
 // 一级 Actor 类型 (BigType 路由字段取值) + 系统级枚举

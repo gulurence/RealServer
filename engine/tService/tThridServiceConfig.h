@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tThridServiceConfig.h
+      Purpose:   第三方服务类型与配置定义
+
+      定义 EThridServiceType 枚举（MySql/Redis/Log/Xml/PlatformMgr）及各类型专用配置结构体
+      ThridServiceConfig 统一容器聚合 ThridMysqlConfig/ThridRedisConfig/ThridLogConfig/ThridXmlConfig/ThridPlatformMgrConfig
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

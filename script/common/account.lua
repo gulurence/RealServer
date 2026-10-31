@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: account.lua
+      Purpose:   账号/会话/角色状态与登录排队模块
+
+      注册 xEngine.Account/Session/Role/AccountSession/LoginQueue 等模块，基于 Redis 热数据 + MySQL 兜底。
+      提供账户状态机、Session 校验、角色列表与重名索引、会话同步短锁、玩家属性 parseAttrs/encodeAttrs/updateAttrs 及登录排队 FIFO。
+]]
+
 -- account.lua — 账号 / 会话 / 角色状态 (Redis 热数据 + MySQL 兜底)
 -- 注册为 xEngine.Account / xEngine.Session / xEngine.AccountState。
 --

@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: spritegen.py
+# Purpose:   AI 资产生成流水线入口
+#
+# load_config 读 config.yaml，generate_asset 单图生成，_generate_frames 多帧生成后调用 pack 打包图集
+# sync_outputs 同步产物，指定 res-zip 或 loose-dir 时经 respack.deploy 部署进客户端
+# 支持 --provider、--asset、--dry-run 与 --delay 限流参数，逐资产生成并容错继续
+#
+
 """spritegen：AI 资产生成流水线入口。
 
 用法：

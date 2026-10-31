@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: player.proto
+      Purpose:   玩家模块协议定义
+
+      定义 PlayerMsgId 枚举与 PBMsgPlayerEnterReq/Rsp、PBMsgPlayerSaveLoadoutReq
+      包名 PbPlayer，承载进入游戏与枪械载具持久化，一级 Actor 类型 AT_PLAYER=201
+  *****************************************************************/
+
 // =============================================================================
 // player.proto — 玩家模块协议 (一级 Actor 类型 = AT_PLAYER = 201)
 // Player 是 Actor 类型, 由 Game 进程承载 (与进程类型解耦)。

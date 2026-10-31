@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: volcark.py
+# Purpose:   火山方舟 Seedream 图像生成与图生图后端 provider
+#
+# 对接 ark.cn-beijing.volces.com 的 /images/generations OpenAI 兼容接口，需 ARK_API_KEY
+# model 必须填 ep-xxxxx 推理接入点 ID 而非模型名，img2img 用 image Data URI 加 ref_type_list 控制参考强度
+# 429 限流自动退避重试，ref_type 为 ip 时构图保真度最高
+#
+
 """Volcengine Ark（火山方舟）provider：字节豆包 Seedream 图像生成 / 图生图。
 
 接口：POST {base_url}/images/generations（OpenAI 兼容）

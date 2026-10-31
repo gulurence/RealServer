@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ConfigExporter.h
+      Purpose:   Excel TSV 导出为 bin 与结构体头
+
+      ParseTsv 解析 TSV(字段名/类型/注释/数据)为 TableData, fx 字段复用 FxFromFloat 保持导出与运行时一致
+      ExportTables 打包 bin, GenerateHeader 生成强类型结构体头(生成物勿手改)
+  *****************************************************************/
+
 // =============================================================================
 // ConfigExporter.h — Excel(TSV 导出) → bin + 生成 C++ 结构体头
 //

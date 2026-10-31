@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xXMLParser.h
+      Purpose:   libxml2 封装 XML 解析类
+
+      声明 xXMLParser 类
+      提供节点遍历、路径查询、属性读取与 InnerXml 接口，模板 getPropValue 支持类型转换
+  *****************************************************************/
+
 #pragma once
 
 #include "xDefine.h"

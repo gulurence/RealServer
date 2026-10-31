@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ProcessEnv.cpp
+      Purpose:   默认进程运行环境六阶段实现
+
+      实现 CProcessEnv 的 OnInit/OnKernelEnable/OnRegister/OnActorInit/OnRunning/OnStop
+      负责进程身份创建、内核模块启用、Lua/Actor 安装、网络网关启动与优雅关闭收尾
+  *****************************************************************/
+
 #include "ProcessEnv.h"
 
 #include "xLog/xLog.h"

@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: actor_mgr.lua
+      Purpose:   进程内本地 Actor 实例管理器
+
+      xEngine.ActorMgr 管理原型注册（registerPrototype）、本地实例生命周期（createLocal/findLocal/deleteLocal）与 install/uninstall（引用计数）。
+      维护 protoRegistry/localInstances/protoInstalled，支持热更原地刷新原型；canHostType 由 C++ 托管类型注册决定。
+]]
+
 -- actor_mgr.lua — Local actor instance manager
 -- Registered as xEngine.ActorMgr.
 --

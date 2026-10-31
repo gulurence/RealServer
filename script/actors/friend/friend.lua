@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: friend.lua
+      Purpose:   好友 Actor 实现（单例，Global 进程）
+
+      FriendClass 维护好友关系与待处理申请（存于 xEngine.friend_state），处理 ADD/ACCEPT/LIST/DEL/INVITE 等消息。
+      serialize_friend/save_friend 把全量好友与申请序列化到 friend:index，新进程 isFresh 时经 parse_friends 回读重建。
+]]
+
 -- friend.lua — Friend actor implementation (单例, Global 进程, id=0)
 --
 -- 客户端业务消息经 Gate 注入发送方 player_id 后, 经 RPC_METHOD_FORWARD_ACTOR

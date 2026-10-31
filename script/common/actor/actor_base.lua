@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: actor_base.lua
+      Purpose:   Lua 侧 Actor 基类
+
+      定义 ActorBase（xEngine.ActorBase），实现 ctor、onInstall/onUnInstall、data_load/data_save、on_event、on_msg、on_rpc_call、on_gm_cmd 等生命周期与消息分发。
+      所有业务 Actor 类继承它；data_save 写 Redis 后经 si_record_notify 异步落库，on_msg 经 xEngine.MsgId.NAMES 分发到 on_<name>_msg 处理器。
+]]
+
 -- actor_base.lua — Base class for all Lua-side actor implementations
 -- Registered as xEngine.ActorBase via the class system.
 --

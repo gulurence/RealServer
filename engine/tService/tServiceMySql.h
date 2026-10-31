@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tServiceMySql.h
+      Purpose:   MySQL 数据库服务声明
+
+      声明继承 ThridService 的 tServiceMySql，类型为 EST_MySql
+      Init 通过 COperatorMgr 连接池初始化，Release 关闭 DB 连接
+  *****************************************************************/
+
 #pragma once
 
 #include "tThridService.h"

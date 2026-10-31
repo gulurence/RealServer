@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xLinkManager.cpp
+      Purpose:   进程间 asio-TCP RPC 链接管理器实现：按链接规则发现并维持对端连接。
+
+      实现 CLinkManager 单例：Init 加载链接规则，DiscoverAndConnect 按有向规则发现并只连接 Running 节点
+      GetBestPeer 被动读 Redis 最新负载做硬过滤（心跳/排空/CPU/内存/Actor 上限）后加权挑最优、平手轮询
+      ConnectToPeer/DisconnectFromPeer(NoLock) 维护 m_mapPeers 并关闭底层 TCP，RefreshLoop 周期刷新节点状态与移除失活对端
+  *****************************************************************/
+
 #include "xLinkManager.h"
 #include "xServiceDiscovery.h"
 #include "xProcessManager.h"

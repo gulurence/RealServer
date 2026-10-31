@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: gemini.py
+# Purpose:   Google Gemini 文生图后端 provider
+#
+# 对接 Google generativelanguage generateContent REST 接口，需 GEMINI_API_KEY
+# 请求 generationConfig 指定 responseModalities 为 IMAGE，解析 candidates 中 inlineData 的 base64 图片
+# 国内环境需代理，默认模型 gemini-2.0-flash-exp
+#
+
 """Gemini provider：Google 文生图 REST 接口（需 GEMINI_API_KEY，国内需代理）。"""
 import base64
 import io

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CBinReader.h
+      Purpose:   配置 bin 读取校验与随机访问
+
+      CBinReader 加载 RSCF bin, 校验 magic/版本/content_hash/schema_hash 与各 section 越界
+      提供 FindRow 按 id 二分取行、ForEachId 升序遍历、字符串表解析与 RowCursor 顺序解码游标
+  *****************************************************************/
+
 // =============================================================================
 // CBinReader.h — 配置 bin 读取/校验/随机访问 (纯 C++, 无引擎/无网络/无第三方依赖)
 //

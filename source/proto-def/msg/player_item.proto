@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: player_item.proto
+      Purpose:   玩家物品子模块协议定义
+
+      定义 PlayerItemMsgId 枚举与 PBMsgItemListReq/Rsp
+      包名 PbPlayerItem，为一级 Actor 类型 AT_PLAYER=201 下的物品二级子模块
+  *****************************************************************/
+
 // =============================================================================
 // player_item.proto — 玩家物品子模块
 // 演示「一级 actor 类型 + 子模块二级类型」唯一确定一个 proto 文件:

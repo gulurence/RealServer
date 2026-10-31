@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xServiceDiscovery.h
+      Purpose:   基于 Redis 的服务发现接口：进程注册/心跳/发现与链接规则、ID 生成。
+
+      声明 CServiceDiscovery 单例：Register/Heartbeat/Deregister/ConfirmNodeDetail 管理进程注册与心跳
+      DiscoverPeers/GetAllRunningPeers/GetProcessInfo/IsProcessRunning/IsHeartbeatStale 服务发现，GetActorProcessId 按身份解析 Actor 进程
+      GetLinkRules/SetLinkRule 管理链接规则，GenerateProcessId 生成唯一进程 ID，持有专用 Redis 连接并加 m_redisMutex 串行化
+  *****************************************************************/
+
 #pragma once
 
 #include "xProcessDefine.h"

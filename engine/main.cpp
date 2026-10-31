@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: main.cpp
+      Purpose:   RealServer 进程入口，11 阶段启动流程
+
+      main 先初始化 xLog、加载 config/server.xml，再解析 --type/--name/--port/--platform/--machine/--version 覆盖 process 配置
+      构造 CProcessEnv(type) 并 env.Run() 进入 11 阶段启动(身份创建→内核启用→服务注册→Actor/Lua 初始化→运行态)
+      Run 主循环为死循环，正常不返回，退出码依 Run 结果取 0 或 1
+  *****************************************************************/
+
 #include "xLog/xLog.h"
 #include "xConfig/xServerConfig.h"
 #include "xEnv/ProcessEnv.h"

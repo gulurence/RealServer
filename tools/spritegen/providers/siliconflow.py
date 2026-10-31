@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: siliconflow.py
+# Purpose:   SiliconFlow 文生图与图生图后端 provider
+#
+# 对接 api.siliconflow.cn 的 /v1/images/generations，需 SILICONFLOW_API_KEY
+# img2img 按模型区分参考图字段：image-edit 系走 Data URI 的 image 字段，Kolors 等 SD 系走裸 base64 的 image_base64
+# 对 429 限流自动退避重试，retries 与 retry_backoff 可调
+#
+
 """SiliconFlow provider：国内可直连的文生图 / 图生图 API（需 SILICONFLOW_API_KEY）。
 
 接口：POST /v1/images/generations

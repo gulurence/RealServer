@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: WavePlist.h
+      Purpose:   波次 plist 离线解析为 WaveDef
+
+      ParsePlist 解析最小 plist XML 值树, ParseMonsterId 按子串顺序映射怪物串为 classId
+      PlistToWavePlan/WavePlanToTables 把 out 波次时间线转为 wave/wave_spawn 表, 秒→帧、60fps delay→20Hz interval
+  *****************************************************************/
+
 // =============================================================================
 // WavePlist.h — Cocos plist(XML) → 波次编排 (WaveDef) 的离线解析与映射 (纯 C++)
 //

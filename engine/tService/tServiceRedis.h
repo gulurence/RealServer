@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tServiceRedis.h
+      Purpose:   Redis 缓存服务声明
+
+      声明继承 ThridService 的 tServiceRedis（EST_Redis）
+      Init 通过 CRedisPoolMgr 连接池初始化，Release 关闭 Redis 连接
+  *****************************************************************/
+
 #pragma once
 
 #include "tThridService.h"

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xStringTool.cpp
+      Purpose:   StringTool 字符串工具实现
+
+      实现 StringTool 的 format/vformat/split/replace/integer 等静态方法
+      含 compare_nature 自然排序与 match_wildcard 通配匹配实现
+  *****************************************************************/
+
 #include "xStringTool.h"
 
 //

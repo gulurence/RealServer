@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ActorMsgId.h
+      Purpose:   Actor 消息 ID 约定
+
+      消息 ID 高 16 位为类别(0=系统消息 C++ 处理, 非0=业务消息 Lua 分发), 低 16 位为子编号
+      定义 SYS_PING/SYS_PONG/SYS_DISCONNECT/SYS_RPC_PUSH/SYS_GM_CMD 等系统消息常量及 IsSystemMsg/IsUserMsg 判断
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

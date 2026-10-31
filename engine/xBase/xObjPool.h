@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xObjPool.h
+      Purpose:   线程安全对象池模板
+
+      定义 xObjPoolBase 基类与 xObjPool<T> 模板
+      预分配 T* 数组，NewObj/DeleteObj 池化复用，支持 Resize 扩容并带 mutex 锁
+  *****************************************************************/
+
 #pragma once
 
 #include "xDefine.h"

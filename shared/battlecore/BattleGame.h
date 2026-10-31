@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: BattleGame.h
+      Purpose:   战斗数据模块接口
+
+      BattleGame 类: 实体容器(hero/sp01/bullet/turret/prop)+地图碰撞+波次/小怪/炮台配置注入+全部玩法规则
+      只依赖 BattleEntity/BattleInput/BattleRng/BattleSerialize, 序列化仅覆盖本局可变状态, 不 #include BattleCore.h
+  *****************************************************************/
+
 // =============================================================================
 // BattleGame.h — 战斗数据模块 (实体数据 + 配置 + 全部玩法规则)
 //

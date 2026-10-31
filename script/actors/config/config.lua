@@ -1,3 +1,13 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: config.lua
+      Purpose:   配置热更 Actor 实现（单例，Global 进程）
+
+      ConfigClass 经 si_config_load 加载 wave/map_collision/sp01 三份 RSCF bin 并聚合 contentHash，处理 GET_REQ 返回完整 bundle。
+      GM reload 触发重载并广播 CONFIG_CHANGED_NTF，版本单调性由客户端共享 CConfigMgr 校验；任一 bin 缺失则 loaded=false 不部分提交。
+]]
+
 -- config.lua — Config actor implementation (单例, Global 进程, id=0)
 --
 -- 配置热更服务端: 加载 3 份 RSCF bin (wave/map_collision/sp01) → 聚合 contentHash

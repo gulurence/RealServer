@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CTraceManager.h
+      Purpose:   链路追踪管理模块 CTraceManager 声明
+
+      声明 CTraceManager 单例与 TraceDirection/TraceEndpoint 结构
+      按 trace:config 阈值采样协议延迟，本地缓冲后异步上报 Redis
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xSingleton.h"

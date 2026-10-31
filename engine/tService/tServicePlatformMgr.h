@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: tServicePlatformMgr.h
+      Purpose:   平台管理与链路追踪服务声明
+
+      声明继承 ThridService 的 tServicePlatformMgr（EST_PlatformMgr），提供 GetPlatform、TraceEvent、ReportMetric 接口
+      持有平台标识、追踪端点与追踪开关等运行时配置
+  *****************************************************************/
+
 #pragma once
 
 #include "tThridService.h"

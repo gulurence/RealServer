@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: NodeManager.cpp
+      Purpose:   物理机守护进程核心实现
+
+      实现 CNodeManager 的全部方法
+      包括子进程拉起 StartChild、崩溃退避重启 ReapExitedChildren、期望数收敛 ReconcileProcesses、Leader 锁自动扩缩容 AutoScale 与进程级灰度滚动重启 ProcessUpdateGray
+  *****************************************************************/
+
 #include "NodeManager.h"
 
 #include "xConfig/xServerConfig.h"

@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xCircularBuffer.h
+      Purpose:   网络接收环形缓冲区接口：原子环形缓冲与客户端帧完整性检测。
+
+      声明 xCircularBuffer 类：GetWriteBuffer/Write 供 asio 协程写入，Read/Put 供解包线程消费
+      head_/tail_/size_ 为 std::atomic 保证跨线程安全，Resize 私有方法按需扩容
+      HaveFullPackage 维护 m_bNeedBody/m_u32BodyLen 状态机检测完整客户端帧
+  *****************************************************************/
+
 #pragma once
 
 #include "xNetDefine.h"

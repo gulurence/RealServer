@@ -1,3 +1,14 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: comfyui.py
+# Purpose:   ComfyUI 后端 provider
+#
+# 对接本地或远端 ComfyUI HTTP 接口，POST /prompt 提交工作流后轮询 /history/{id} 再 GET /view 取 PNG
+# _patch 自动改写工作流模板中的 CLIPTextEncode 正负提示词与 EmptyLatentImage 宽高
+# 需项目自备 workflow 模板 JSON，模板其余节点保持不动
+#
+
 """ComfyUI provider：本地/远端 ComfyUI 的 HTTP 接口。
 
 流程：POST /prompt 提交工作流 → 轮询 /history/{id} → 取第一张图 → GET /view 拿 PNG。

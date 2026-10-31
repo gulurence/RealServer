@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xProtoParse.h
+      Purpose:   客户端帧 protobuf 前导字段最小解析工具。
+
+      namespace netproto 定义 ReadVarint 与 ParseRouteFields，解析 body 前两个 varint 字段 big_type(field 1)/small_type(field 2)
+      只做前导字段读取并跳过 length-delimited/fixed32/fixed64 字段，不引入完整 protobuf 反序列化
+      供 CNetGateway 与 CNetBattleGateway 共用，协议主体由 Lua 侧业务编解码处理
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

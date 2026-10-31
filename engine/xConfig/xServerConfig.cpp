@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xServerConfig.cpp
+      Purpose:   server.xml 配置解析实现
+
+      实现 CServerConfig::Load 及各 Parse*Section 段解析
+      含 Redis/DB 池、process/hosted-actors/cluster 回退解析与 GetHostedActorTypes 查询
+  *****************************************************************/
+
 #include "xServerConfig.h"
 #include "xBase/xXMLParser.h"
 #include "xLog/xLog.h"

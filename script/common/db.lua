@@ -1,3 +1,12 @@
+--[[
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: db.lua
+      Purpose:   数据库访问工具模块
+
+      xEngine.DB 封装 SWIG si_db_* 接口，提供 Select/Insert/Update/Delete 四个数据库操作。
+]]
+
 -- db.lua — xEngine.DB global tool module
 -- Wraps C++ Database operations exported via SWIG si_db_* functions.
 --

@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: sp01_exporter.cpp
+      Purpose:   小怪属性 plist 转配置 bin 的命令行导出工具
+
+      EnemyInfoToSp01Table 解析 enemyInfo.plist 生成 sp01 表，PtInfoToTurretTable 生成 turret 表
+      存原始 plist 值，难度增量与换算留在解码层 CSp01Table::GetSp01Config 完成
+      BuildBin 将两张表打包进同一 bin，键 name_N 中 N 取最后一个下划线后的数字作 sp01Id
+  *****************************************************************/
+
 // =============================================================================
 // sp01_exporter.cpp — plist/enemyInfo.plist (小怪属性) → 配置 bin (命令行工具, S3)
 //

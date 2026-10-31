@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: BaseEnv.h
+      Purpose:   进程运行环境抽象基类
+
+      定义 EKernelModule 位掩码与 CBaseEnv 抽象类
+      Run 模板方法按 OnInit/OnKernelEnable/OnRegister/OnActorInit/OnRunning/OnStop 六阶段驱动进程生命周期
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

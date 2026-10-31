@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xDefine.i
+      Purpose:   Lua 绑定基础类型与 typemap 定义
+
+      声明 int8/uint64 等整数别名与 ActorID/ServiceID/NetCID/GateID 域别名，定义 ACCEPT_LUA_NUMBER 输入 typemap
+      以 lua_pushinteger 改写 int64/uint64 输出 typemap 保持 64 位精度，并提供 toint32/toint64 转换助手
+  *****************************************************************/
+
 // xDefine.i -- Type aliases and constants for Lua
 // We do NOT %include "xDefine.h" directly because it contains
 // MSVC-specific windows.h includes that SWIG cannot parse.

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CWaveTable.h
+      Purpose:   波次配置强类型解码
+
+      CWaveTable 跨 wave/wave_spawn 两表按 levelId 重组 battlecore::WaveDef 计划
+      行 id 按 levelId→waveNum→seq 升序, ForEachId 升序遍历即正确刷怪顺序
+  *****************************************************************/
+
 // =============================================================================
 // CWaveTable.h — 波次配置 bin 的强类型解码 (跨 wave / wave_spawn 两张表)
 //

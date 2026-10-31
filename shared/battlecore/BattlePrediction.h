@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: BattlePrediction.h
+      Purpose:   客户端预测回滚与哈希校验快照纠偏
+
+      CPredictiveSim 实现 F1 本地预测、F2 回滚和解、F3 哈希校验与快照纠偏
+      按帧存 checkpoint 快照与权威输入, RollbackAndReplay/VerifyFrame/ResyncFromSnapshot 检测并纠正确定性漂移
+  *****************************************************************/
+
 // =============================================================================
 // BattlePrediction.h — 客户端预测 + 回滚和解 + 哈希校验/快照纠偏 (F1/F2/F3)
 //

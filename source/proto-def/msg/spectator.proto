@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: spectator.proto
+      Purpose:   观战模块协议定义
+
+      定义 SpectatorMsgId 枚举与 PBSpectateEnterReq/Rsp、PBSpectateLeaveReq/Rsp、PBSpectateSnapshotNtf、PBSpectateFrameNtf、PBSpectateEndNtf
+      包名 PbSpectator，进入响应字段号对齐 PBBattleEnterRsp 以复用花名册解析，一级 Actor 类型 AT_SPECTATOR=204
+  *****************************************************************/
+
 // =============================================================================
 // spectator.proto — 观战模块协议 (一级 Actor 类型 = AT_SPECTATOR = 204)
 //

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CRpcTcpServer.h
+      Purpose:   自建 asio-TCP RPC 服务端声明
+
+      替代 gRPC SRpcService, 单线程 io_context + acceptor + 每连接协程
+      声明 Start/Register/Stop 及 Listener/Session 协程
+  *****************************************************************/
+
 #pragma once
 
 #include "RpcFrame.h"

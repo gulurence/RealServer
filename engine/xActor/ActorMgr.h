@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ActorMgr.h
+      Purpose:   进程级 Actor 实例管理器声明
+
+      声明 CActorMgr 单例: 托管类型管理(AddHostedType/CanHostType)、实例增删、Install/UnInstall 生命周期
+      第三方服务生命周期委托 tServiceMgr 按引用计数共享复用
+  *****************************************************************/
+
 #pragma once
 
 #include "Actor.h"

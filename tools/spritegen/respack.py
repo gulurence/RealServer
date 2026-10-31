@@ -1,3 +1,13 @@
+#
+# Copyright (c) 2026 GuMingYao,  All rights reserved
+#
+# File name: respack.py
+# Purpose:   把生成产物部署进客户端运行时
+#
+# deploy 按 out_subdir 区分 zip 类与松散类，zip 类经 _inject_zip 注入 res 存档并自动备份 res.bak
+# 松散类直接拷贝到 Debug.win32 对应目录，未指定 res-zip 或 loose-dir 时跳过并告警
+#
+
 """respack.py: 把生成产物部署进客户端运行时。
 
 客户端有两类资源路径：

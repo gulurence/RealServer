@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: ActorRpcHandlers.cpp
+      Purpose:   Actor 管理 RPC 方法注册
+
+      RegisterActorRpcHandlers 注册 CreateActor/FindActor/UninstallActor/Login/ForwardActor/Push/Kick 七个方法
+      创建/卸载/转发会触碰 lua_State, 经 CActorScheduler::DispatchSync 或 SYS_RPC_PUSH 投递调度线程串行执行
+      复用 actor_mgr.proto 的 actormgr::* 消息结构, 不再走 gRPC stub
+  *****************************************************************/
+
 #include "ActorRpcHandlers.h"
 #include "RpcFrame.h"
 #include "CRpcTcpServer.h"

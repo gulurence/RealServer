@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: luacore_spectate.i
+      Purpose:   观战模块 Lua 绑定
+
+      生成 %module luacore_spectate，导出 PbSpectator 编解码 si_pb_spectate_enter/leave/snapshot/frame/end
+      enter_rsp 与 PBBattleEnterRsp 逐字段同构以复用客户端花名册解析，并携带战斗直连 host_ip/port
+  *****************************************************************/
+
 // luacore_spectate.i — 观战模块编解码绑定 (package PbSpectator)
 // Lua: luacore_spectate.si_pb_spectate_*
 %module luacore_spectate

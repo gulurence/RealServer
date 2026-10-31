@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CActorReportMgr.cpp
+      Purpose:   Actor 监控上报模块实现
+
+      订阅 cluster:actor:report:req 频道, 解析订阅请求刷新 m_monitors 上报标记
+      Sweep 对存活 Actor 调 BuildReportJson 写 cluster:actor:report:{type}:{id}(TTL 15s), 清理超时/已卸载标记
+  *****************************************************************/
+
 #include "CActorReportMgr.h"
 
 #include "xActor/ActorMgr.h"

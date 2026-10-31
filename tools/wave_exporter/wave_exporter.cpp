@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: wave_exporter.cpp
+      Purpose:   关卡波次时间线 plist 转配置 bin 的命令行导出工具
+
+      PlistToWavePlan 解析 out{bb}{ss}.plist 为 WaveDef 波次计划，WavePlanToTables 生成 wave 与 wave_spawn 表
+      levelId 从文件名末尾数字推导，多关卡合成一张大表后 BuildBin 打包
+      行结构体 WaveInfo、WaveSpawnInfo 与 shared/config/CWaveTable.h 严格对齐
+  *****************************************************************/
+
 // =============================================================================
 // wave_exporter.cpp — out/*.plist (关卡波次时间线) → 配置 bin (命令行工具, S1)
 //

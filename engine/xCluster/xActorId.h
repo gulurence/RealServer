@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xActorId.h
+      Purpose:   64 位全局 ActorID 与 ProcessID 的位布局编解码工具。
+
+      namespace xActorId 定义 ActorID=MachineID(24)+PID(16)+ActorIndex(24)、ProcessID 高 24 位保留+MachineID(24)+PID(16)
+      提供 MakeActorId/MakeProcessId 打包与 GetMachineId/GetPid/GetActorIndex/ActorIdToProcessId/IsValidActorId 拆解
+      GetOsPid 返回本进程 OS PID，ActorID 自描述可直接解析出承载进程而无需额外索引
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

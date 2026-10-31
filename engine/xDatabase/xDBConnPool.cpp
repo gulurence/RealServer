@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xDBConnPool.cpp
+      Purpose:   MySQL 连接池实现
+
+      实现 DBConn 基于 mysql C API 的 init/reconnect 及 exeInsert/exeUpdate/exeSelect/exeDelete/exeSql 等 SQL 拼装执行
+      DBConnPool 管理固定大小连接集合并通过 UniqueIDManager 分配/回收 DBConnID
+      按 dbCol 类型（CHAR/INT/UInt32/UInt64/BIN/BIN2）序列化数据并转义二进制
+  *****************************************************************/
+
 #include "xDBConnPool.h"
 
 #include "../xBase/xTools.h"

@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: RedisDefine.h
+      Purpose:   Redis 列表数据结构定义
+
+      定义 ListData/ListDataMap 别名与 REDIS_LIST_OP_TYPE 枚举（POP/PUSH）
+      注释说明旧 RedisConfigST/RedisConfigMap 已废弃，统一改用 ThridRedisConfig
+  *****************************************************************/
+
 #pragma once
 
 #include "xBase/xDefine.h"

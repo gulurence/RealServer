@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CLuaActor.cpp
+      Purpose:   CLuaActor 的 Lua 委托、生命周期与消息分发实现
+
+      实现 CLuaActor：MintGlobalActorId 用 machineId/osPid/自增 ActorIndex 铸全局唯一 ActorID
+      将 Init/Install/UnInstall 转发到 Lua 的 onInit/onInstall/onUnInstall，Create 经 class:new 克隆实例并绑定独立 delegate 表
+      DispatchRpc/DispatchRpcReply/DispatchGmCommand/OnMessage 分发到 on_rpc_call/on_gm_cmd/on_msg，HandleSystemMessage 处理 SYS_PING/SYS_PONG/SYS_DISCONNECT/SYS_RPC_PUSH/SYS_GM_CMD，CallDataSave/CallDataLoad 支撑灰度迁移
+  *****************************************************************/
+
 #include "CLuaActor.h"
 #include "LuaVM.h"
 #include "xActor/ActorMsgId.h"

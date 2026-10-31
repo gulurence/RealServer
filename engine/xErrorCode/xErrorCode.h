@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xErrorCode.h
+      Purpose:   框架统一错误码定义
+
+      定义 xErrorCode 枚举（按 Actor/Cluster/RPC/Redis/DB/Config 分段）
+      提供 GetErrorString 返回中文错误描述字符串
+  *****************************************************************/
+
 #pragma once
 
 #include <string>

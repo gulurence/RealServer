@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CLuaActor.h
+      Purpose:   CLuaActor 类声明：委托业务逻辑到 Lua 脚本的 CActor 子类
+
+      声明 CLuaActor(CActor 子类)，用 lua_State 与 registry 引用 m_iLuaDelegateRef 绑定 Lua delegate 表
+      暴露 SetLuaDelegate/GetLuaDelegateRef/GetLuaState 及 DispatchRpc/DispatchRpcReply/DispatchGmCommand/CallDataSave/CallDataLoad 等接口
+      重写 Init/Install/UnInstall/Create/OnMessage，框架系统消息经 HandleSystemMessage 在 C++ 侧处理不进 Lua
+  *****************************************************************/
+
 #pragma once
 
 #include "xActor/Actor.h"

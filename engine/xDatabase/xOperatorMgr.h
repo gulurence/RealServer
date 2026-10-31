@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xOperatorMgr.h
+      Purpose:   数据库操作管理器（单例）
+
+      定义 COperatorMgr 单例，管理 DatabaseOpNode 对象池与 DBOperatorMap（按 title 索引）
+      提供 ConnectToDB 建立连接池及 Pop/PushOperatorNode 节点复用接口
+  *****************************************************************/
+
 #pragma once
 
 #include "xDBConnPool.h"

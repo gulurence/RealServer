@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xSingleton.h
+      Purpose:   单例模板 xSingleton<T>
+
+      定义 xSingleton<T> 模板，提供 getMe/instance/get_mutable_instance 访问器
+      内嵌 CGarbo 类在静态析构期自动释放单例实例
+  *****************************************************************/
+
 #pragma once
 
 #include "xDefine.h"

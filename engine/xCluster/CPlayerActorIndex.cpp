@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: CPlayerActorIndex.cpp
+      Purpose:   player:{playerId} 到 actorId 路由索引实现：本地缓存加 Redis 双写。
+
+      实现 CPlayerActorIndex 单例：Register/Deregister 维护本地 map 与 Redis player:{id} 键并设 30s TTL
+      Resolve 本地缓存优先、miss 回查 Redis 并回填，Invalidate 仅清本地缓存
+      另含 IncrPlayerCount/DecrPlayerCount 维护 cluster:load:player_count 供登录排队限流，Redis 操作由 m_mutex 串行化
+  *****************************************************************/
+
 #include "CPlayerActorIndex.h"
 #include "xRedis/RedisMgr.h"
 #include "xRedis/RedisCli.h"

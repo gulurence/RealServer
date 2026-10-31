@@ -1,3 +1,14 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: main.go
+      Purpose:   逐节点清理 Redis Cluster 测试态键
+
+      直连本机 7000 至 7005 六个节点，按 room:*、battle:*、cluster:actor:*、session:* 等模式 KEYS 后 DEL
+      client 类型手写 Redis RESP 协议编解码，每个节点一条持久连接
+      清理后打印 cluster:load:player_count 现值，供压测后重置测试环境
+  *****************************************************************/
+
 // cleanredis — 逐节点清理 Redis Cluster 测试态键 (KEYS + DEL, 持久连接)。
 // 仅清测试态: room:* battle:* cluster:actor:* cluster:load:* session:pool*。
 package main

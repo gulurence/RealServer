@@ -1,3 +1,13 @@
+/*****************************************************************
+      Copyright (c) 2026 GuMingYao,  All rights reserved
+
+      File name: xDatabaseRecord.cpp
+      Purpose:   MySQL 数据库记录实现
+
+      CDatabaseRecord 的 Load/Update/Remove 通过 COperatorMgr 提交 SELECT/INSERT/DELETE 到 actor_{type} 表
+      列描述为 id(UInt64)+data(BIN), 连接池名默认 actor_db
+  *****************************************************************/
+
 #include "xDatabaseRecord.h"
 #include "xDatabase/xOperatorMgr.h"
 #include "xLog/xLog.h"
